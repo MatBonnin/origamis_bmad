@@ -41,12 +41,16 @@ so that recevoir les alertes que je souhaite.
 
 ### Donnees (minimum)
 
-- `notification_preferences`: `user_id`, `email_enabled`, `push_enabled`, `in_app_enabled`.
+- `notification_preferences`: 
+  - `user_id`
+  - `channel` (`email`, `push`, `in_app`)
+  - `category` (`messages`, `rdv`, `system`)
+  - `enabled`
 - Conventions `snake_case`.
 
 ### Validation & UX
 
-- Toggles accesibles (label + role switch).
+- Toggles accesibles par canal + categorie (groupes `messages`, `rdv`, `system`).
 - Feedback success/erreur, `aria-live`.
 
 ### Application
@@ -68,12 +72,6 @@ so that recevoir les alertes que je souhaite.
 
 - Do: charger les preferences par defaut a l'inscription.
 - Don't: envoyer des notifications ignorees par user.
-
-### Project Structure Notes
-
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
 
 ### References
 

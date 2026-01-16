@@ -37,10 +37,11 @@ so that préciser mon profil et mes besoins.
 
 ### Parcours UX (resume)
 
-- Choix profil (etudiant/mentor) si non determine.
+- L'onboarding fait partie de la creation de compte (story 1.1).
+- Choix profil (etudiant/mentor).
 - Parcours academique: domaine, niveau, annee.
 - Objectifs: selection multiple.
-- Creation/confirmation compte puis redirection dashboard.
+- Fin onboarding -> redirection dashboard.
 
 ### API Contracts (onboarding)
 
@@ -74,12 +75,6 @@ so that préciser mon profil et mes besoins.
 
 - Do: conserver l'etat partiel pour reprise.
 - Don't: perdre les reponses si refresh.
-
-### Project Structure Notes
-
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
 
 ### References
 

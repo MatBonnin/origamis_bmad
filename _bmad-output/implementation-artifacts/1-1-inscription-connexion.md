@@ -7,7 +7,7 @@ Status: ready-for-dev
 ## Story
 
 As a étudiant/mentor,
-I want créer un compte et me connecter,
+I want créer un compte et me connecter (onboarding inclus lors de la creation),
 so that accéder à la plateforme et mes fonctionnalités.
 
 ## Acceptance Criteria
@@ -50,7 +50,8 @@ so that accéder à la plateforme et mes fonctionnalités.
 - Email valide, mot de passe avec politique minimale (longueur + complexite).
 - Erreurs inline + resume en haut, focus sur premier champ invalide.
 - `aria-live` pour feedback; labels explicites; cibles 44px+.
-- Redirection apres succes: dashboard (zone app).
+- L'inscription inclut l'onboarding (parcours multi-etapes).
+- Redirection apres succes: fin onboarding -> dashboard (zone app).
 
 ### Schéma de données (minimum)
 

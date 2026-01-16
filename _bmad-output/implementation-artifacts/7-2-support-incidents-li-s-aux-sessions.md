@@ -14,30 +14,74 @@ so that aider à la résolution.
 
 1. Given un incident déclaré When le support consulte le dossier Then les détails de session sont visibles
 
-## Tasks / Subtasks
-
-- [ ] Implémenter l’API/logiciel correspondant (AC: #1)
-- [ ] Implémenter l’UI/flux associé (AC: #1)
-- [ ] Ajouter tests unitaires/integ (AC: #1)
+- [ ] Endpoint `GET /sessions/:id/incidents`, `POST /incidents` + `PATCH /incidents/:id/status` (AC: #1)
+- [ ] UI support avec timeline incident (sessions, messages, notifications) (AC: #1)
+- [ ] Intégrer logs + attachments (logs, visio replays, messages) (AC: #1)
+- [ ] Notifications automatiques (support, mentor, student) (AC: #1)
+- [ ] Tests API + UI + alert workflow (AC: #1)
 
 ## Dev Notes
 
-- Stack: Next.js (front) + NestJS (API), TypeScript
-- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma)
-- Auth: NextAuth 4.24.13 + JWT + RBAC
-- API: REST + Swagger + WebSocket
-- Conventions: snake_case DB, camelCase JSON, enveloppe {data, error}
-- UX: responsive + WCAG 2.1 AA + pages publiques SEO
-- Cible: admin/support/analytics
-- RGPD suppression données
+### Contexte et contraintes non negotiables
 
-### Project Structure Notes
+- Stack: Next.js (App Router) + NestJS, TypeScript.
+- DB: PostgreSQL 17 + Prisma 7.2.0.
+- Auth: NextAuth 4.24.13 + JWT + RBAC (support/admin).
+- API: REST + Swagger + WebSocket, enveloppe `{ data, error }`.
+- Conventions: `snake_case` DB, `camelCase` JSON.
+- UX: responsive + WCAG 2.1 AA.
+- Cible: admin/support/analytics.
+- Historisation + RGPD.
 
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
+### API Contracts (incidents)
+
+- `POST /incidents` -> `{ data: { incident }, error: null }`
+- `GET /sessions/:id/incidents` -> `{ data: { incidents }, error: null }`
+- `PATCH /incidents/:id/status` -> `{ data: { incident }, error: null }`
+- `GET /incidents?status=` -> list for support queue.
+- Erreurs: `{ error: { code, message, details? } }`.
+
+### Donnees (minimum)
+
+- `incidents`: `id`, `session_id`, `type`, `reported_by`, `details`, `status`, `created_at`.
+- `incident_logs`: `incident_id`, `action`, `performed_by`, `notes`.
+- `incident_attachments`: `incident_id`, `type`, `url`.
+- Conventions `snake_case`.
+
+### UX & accessibilité
+
+- Timeline view (session events, incidents, notes).
+- Accessible controls for support, modals with `aria-live`.
+- Filters (status, severity) + search.
+
+### Workflow & notifications
+
+- Notify mentor/student/support when incident escalates.
+- Link to booking/session/responses for context.
+- Provide option to record resolution summary.
+
+### Testing Requirements
+
+- API: incident queue, status transitions, RBAC.
+- UI: timeline, attachments, filters.
+- Integration: notification triggers.
+
+### Do / Don’t
+
+- Do: log each action (audit).
+- Do: capture context (session id, user).
+- Don’t: hide incidents without resolution.
+
+- Web: `apps/web/src/features/support/incidents`.
+- API: `apps/api/src/modules/support`.
+- Shared DTOs: `packages/shared/src/schemas`.
 
 ### References
+
+- _bmad-output/planning-artifacts/epics.md
+- _bmad-output/planning-artifacts/prd.md
+- _bmad-output/planning-artifacts/architecture.md
+- _bmad-output/planning-artifacts/ux-design-specification.md
 
 - _bmad-output/planning-artifacts/epics.md
 - _bmad-output/planning-artifacts/prd.md

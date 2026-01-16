@@ -16,28 +16,71 @@ so that adapter mon accompagnement.
 
 ## Tasks / Subtasks
 
-- [ ] Implémenter l’API/logiciel correspondant (AC: #1)
-- [ ] Implémenter l’UI/flux associé (AC: #1)
-- [ ] Ajouter tests unitaires/integ (AC: #1)
+- [ ] Endpoint `GET /students/:id/progression` (AC: #1)
+- [ ] Ajouter section “Insights” (avancement, risques, notes) (AC: #1)
+- [ ] UI mentor: timeline, filtres par jalon, alertes (AC: #1)
+- [ ] Ajouter workflow notifications mentor (reminder, escalation) (AC: #1)
+- [ ] Tests API + UI + notifications (AC: #1)
 
 ## Dev Notes
 
-- Stack: Next.js (front) + NestJS (API), TypeScript
-- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma)
-- Auth: NextAuth 4.24.13 + JWT + RBAC
-- API: REST + Swagger + WebSocket
-- Conventions: snake_case DB, camelCase JSON, enveloppe {data, error}
-- UX: responsive + WCAG 2.1 AA + pages publiques SEO
-- Cible: milestones/jalons
-- Progression visible
+### Contexte et contraintes non negotiables
+
+- Stack: Next.js (App Router) + NestJS, TypeScript.
+- DB: PostgreSQL 17 + Prisma 7.2.0.
+- Auth: NextAuth 4.24.13 + JWT + RBAC (mentor view).
+- API: REST + Swagger + WebSocket, enveloppe `{ data, error }`.
+- Conventions: `snake_case` DB, `camelCase` JSON.
+- UX: responsive + WCAG 2.1 AA.
+- Cible: modules milestones/jalons.
+- Progression visible.
+
+- `GET /students/:id/progression` -> `{ data: { milestones, metadata }, error: null }`
+- `GET /students/:id/milestone-insights` -> `{ data: { insights }, error: null }`
+- Erreurs: `{ error: { code, message, details? } }`.
+
+### Donnees (minimum)
+
+- `mentor_insights`: `student_id`, `risk_level`, `last_checkin`, `notes`.
+- `milestone_notes`: `milestone_id`, `mentor_id`, `note`, `created_at`.
+- Conventions `snake_case`.
+
+### UX & accessibilité
+
+- Mentor dashboard with cards (progress, risk).
+- Timeline, filters (type, status).
+- Accessibilité: focus states, `aria-live` for alerts.
+- Alerts for overdue milestones + CTA.
+
+### Integration & delivery
+
+- Notification escalations if stalled (story 3-3).
+- Provide quick links to mentor conversation + booking.
+- Sync with progression (story 4-1) and milestone completion (story 4-2).
+
+### Testing Requirements
+
+- API: progression retrieval, insights accuracy, RBAC.
+- UI: timeline interactions, alert modals, keyboard nav.
+- Integration: escalation → notification action.
+
+### Do / Don’t
+
+- Do: record mentor notes per milestone.
+- Don’t: expose other students data (RBAC).
 
 ### Project Structure Notes
 
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
+- Web: `apps/web/src/features/mentors/progression`.
+- API: `apps/api/src/modules/milestones`.
+- Shared DTOs: `packages/shared/src/schemas`.
 
 ### References
+
+- _bmad-output/planning-artifacts/epics.md
+- _bmad-output/planning-artifacts/prd.md
+- _bmad-output/planning-artifacts/architecture.md
+- _bmad-output/planning-artifacts/ux-design-specification.md
 
 - _bmad-output/planning-artifacts/epics.md
 - _bmad-output/planning-artifacts/prd.md

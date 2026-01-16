@@ -64,12 +64,6 @@ so that contrôler les accès selon les profils.
 - Do: journaliser action sensible (assignation role).
 - Don't: permettre auto-promotion a admin sans garde-fou.
 
-### Project Structure Notes
-
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
-
 ### References
 
 - _bmad-output/planning-artifacts/epics.md

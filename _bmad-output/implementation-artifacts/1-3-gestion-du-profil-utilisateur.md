@@ -71,12 +71,6 @@ so that garder mes informations à jour.
 - Do: retourner enveloppe `{ data, error }`.
 - Don't: exposer d'autres profils sans authorization explicite.
 
-### Project Structure Notes
-
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
-
 ### References
 
 - _bmad-output/planning-artifacts/epics.md

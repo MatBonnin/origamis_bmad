@@ -14,28 +14,70 @@ so that exercer mon droit RGPD.
 
 1. Given un utilisateur authentifié When il demande la suppression de ses données Then la demande est enregistrée And un processus de suppression est déclenché
 
-## Tasks / Subtasks
-
-- [ ] Implémenter l’API/logiciel correspondant (AC: #1)
-- [ ] Implémenter l’UI/flux associé (AC: #1)
-- [ ] Ajouter tests unitaires/integ (AC: #1)
+- [ ] Endpoint `POST /users/:id/request-deletion` -> queues suppressions (AC: #1)
+- [ ] Workflow `DELETE /users/:id/data` triggered after review + export log (AC: #1)
+- [ ] UI: gestionnaire RGPD avec formulaire, statut de demande, FAQ (AC: #1)
+- [ ] Notification client & admin + logging (AC: #1)
+- [ ] Tests API + UI + audit (AC: #1)
 
 ## Dev Notes
 
-- Stack: Next.js (front) + NestJS (API), TypeScript
-- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma)
-- Auth: NextAuth 4.24.13 + JWT + RBAC
-- API: REST + Swagger + WebSocket
-- Conventions: snake_case DB, camelCase JSON, enveloppe {data, error}
-- UX: responsive + WCAG 2.1 AA + pages publiques SEO
-- Cible: admin/support/analytics
-- RGPD suppression données
+### Contexte et contraintes non negotiables
+
+- Stack: Next.js (App Router) + NestJS, TypeScript.
+- DB: PostgreSQL 17 + Prisma 7.2.0.
+- Auth: NextAuth 4.24.13 + JWT + RBAC.
+- API: REST + Swagger + WebSocket, enveloppe `{ data, error }`.
+- Conventions: `snake_case` DB, `camelCase` JSON.
+- UX: responsive + WCAG 2.1 AA.
+- Cible: admin/support/analytics.
+- Processus RGPD traçé + audit.
+
+### API Contracts (suppression)
+
+- `POST /users/:id/request-deletion` -> `{ data: { request }, error: null }`
+- `PATCH /users/:id/deletion-status` -> `{ data: { status }, error: null }`
+- `DELETE /users/:id/data` -> `{ data: { success }, error: null }` (after approval).
+- Erreurs: `{ error: { code, message, details? } }`.
+
+### Donnees (minimum)
+
+- `deletion_requests`: `id`, `user_id`, `requested_at`, `status`, `reviewed_by`.
+- `deletion_actions`: `request_id`, `admin_id`, `action`, `details`, `timestamp`.
+- `deleted_artifacts`: list of tables cleaned (users, messages, bookings).
+- Conventions `snake_case`.
+
+### UX & accessibilité
+
+- Formulaire suppression avec champs (raison, export) + instructions WCAG.
+- Timeline de statut (requested, reviewed, deleted).
+- `aria-live` for confirmations, accessible confirmations modals.
+- Provide FAQ + help links.
+
+### Workflow & compliance
+
+- Notify user/admin at each status change.
+- Allow export of personal data before deletion (per RGPD).
+- Keep retention log (who approved, what was deleted).
+- Provide undo window until final delete.
+
+### Testing Requirements
+
+- API: request, status updates, delete actions, RBAC.
+- UI: flow, exports, reminder notifications.
+- Compliance: log entries, retention checks.
+
+### Do / Don’t
+
+- Do: verify identity before deletion request.
+- Do: log every delete action for audit.
+- Don’t: delete before admin approval.
 
 ### Project Structure Notes
 
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
+- Web: `apps/web/src/features/rgpd/deletion`.
+- API: `apps/api/src/modules/rgpd`.
+- Shared DTOs: `packages/shared/src/schemas`.
 
 ### References
 

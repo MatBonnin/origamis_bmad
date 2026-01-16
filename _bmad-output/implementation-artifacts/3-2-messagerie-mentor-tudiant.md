@@ -16,26 +16,68 @@ so that coordonner les échanges.
 
 ## Tasks / Subtasks
 
-- [ ] Implémenter l’API/logiciel correspondant (AC: #1)
-- [ ] Implémenter l’UI/flux associé (AC: #1)
-- [ ] Ajouter tests unitaires/integ (AC: #1)
+- [ ] Réutiliser le module messaging (messages, conversations, read_status) pour mentors (AC: #1)
+- [ ] Soumettre endpoint `POST /messages` avec RBAC mentor/étudiant + validation (AC: #1)
+- [ ] Ajouter WebSocket `message.sent`, `message.typing`, `message.read` (AC: #1)
+- [ ] Créer UI mentor: liste étudiants, composer, pièces jointes, statuts (AC: #1)
+- [ ] Tests API + WebSocket + UI (RBAC, offline, erreurs) (AC: #1)
 
 ## Dev Notes
 
-- Stack: Next.js (front) + NestJS (API), TypeScript
-- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma)
-- Auth: NextAuth 4.24.13 + JWT + RBAC
-- API: REST + Swagger + WebSocket
-- Conventions: snake_case DB, camelCase JSON, enveloppe {data, error}
-- UX: responsive + WCAG 2.1 AA + pages publiques SEO
-- Cible: messaging + scheduling
-- WebSocket pour messages/notifications
+### Contexte et contraintes non negotiables
+
+- Stack: Next.js (App Router) + NestJS, TypeScript.
+- DB: PostgreSQL 17 + Prisma 7.2.0.
+- Auth: NextAuth 4.24.13 + JWT + RBAC (mentor role required).
+- API: REST + Swagger + WebSocket, enveloppe `{ data, error }`.
+- Conventions: `snake_case` DB, `camelCase` JSON, endpoints pluriel.
+- UX: responsive + WCAG 2.1 AA, pages publiques SEO.
+- Cible: modules messaging + scheduling.
+- WebSocket pour push temps réel.
+
+### API Contracts (messagerie mentor)
+
+- `POST /messages` -> `{ data: { message }, error: null }` (mentor) with conversation_id.
+- `GET /conversations/:id/messages` -> `{ data: { messages, metadata }, error: null }`.
+- WebSocket events: `message.sent`, `message.typing`, `message.read`.
+- Erreurs: `{ error: { code, message, details? } }`.
+
+### Donnees (minimum)
+
+- `messages`, `conversations`, `read_status` (voir story 3.1).
+- Spécifier `sender_role` dans `read_status` pour analytics.
+- Conventions `snake_case`.
+
+### UX & accessibilité
+
+- Mentor UI: student list (badge unread), composer accessible (textarea + attach).
+- Bubbles alignées, focus visible, `aria-live`.
+- Statut mentor (online/away) affiché.
+- Loader + skeleton accessible (`aria-busy`).
+
+### Real-time collaboration
+
+- WebSocket pour envoyer, recevoir, typing, ack.
+- Notifications push (si préférence active) + toasts (aria-live).
+- Support offline (queue, retry).
+
+### Testing Requirements
+
+- API: RBAC, validation length, conversation permission.
+- WebSocket: typing + ack + reconnect.
+- UI: composer, attachments, error states.
+
+### Do / Don’t
+
+- Do: respecter RBAC (mentor only).
+- Do: mentionner si étudiant offline ou indisponible.
+- Don’t: afficher conversations hors scope.
 
 ### Project Structure Notes
 
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
+- Web: `apps/web/src/features/messaging/mentor`.
+- API: `apps/api/src/modules/messaging`.
+- Shared DTOs: `packages/shared/src/schemas`.
 
 ### References
 

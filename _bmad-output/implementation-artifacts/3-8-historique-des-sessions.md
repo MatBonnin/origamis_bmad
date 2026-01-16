@@ -2,7 +2,7 @@
 
 Status: ready-for-dev
 
-<!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
+<!-- Note: Validation is optional. Run validate-create-story pour quality check before dev-story. -->
 
 ## Story
 
@@ -16,26 +16,70 @@ so that suivre mes échanges passés.
 
 ## Tasks / Subtasks
 
-- [ ] Implémenter l’API/logiciel correspondant (AC: #1)
-- [ ] Implémenter l’UI/flux associé (AC: #1)
-- [ ] Ajouter tests unitaires/integ (AC: #1)
+- [ ] Endpoint `GET /sessions/history?user_id=` (pagination + filters) (AC: #1)
+- [ ] Ajouter export (PDF/CSV) + lien de replay (si dispo) (AC: #1)
+- [ ] UI historique: timeline, filtre par type (message, RDV, visio) (AC: #1)
+- [ ] Relier aux logs (message, booking) + respect RGPD (AC: #1)
+- [ ] Tests API + UI + access (AC: #1)
 
 ## Dev Notes
 
-- Stack: Next.js (front) + NestJS (API), TypeScript
-- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma)
-- Auth: NextAuth 4.24.13 + JWT + RBAC
-- API: REST + Swagger + WebSocket
-- Conventions: snake_case DB, camelCase JSON, enveloppe {data, error}
-- UX: responsive + WCAG 2.1 AA + pages publiques SEO
-- Cible: messaging + scheduling
-- WebSocket pour messages/notifications
+### Contexte et contraintes non negociables
+
+- Stack: Next.js (App Router) + NestJS, TypeScript.
+- DB: PostgreSQL 17 + Prisma 7.2.0.
+- Auth: NextAuth 4.24.13 + JWT + RBAC.
+- API: REST + Swagger, enveloppe `{ data, error }`.
+- Conventions: `snake_case` DB, `camelCase` JSON.
+- UX: responsive + WCAG 2.1 AA.
+- Cible: modules messaging + scheduling.
+- WebSocket pour notifications.
+
+### API Contracts (historique)
+
+- `GET /sessions/history?user_id=&category=&cursor=` -> `{ data: { sessions, metadata }, error: null }`
+- `GET /sessions/:id/replay-link` -> `{ data: { url }, error: null }`
+- `POST /sessions/history/export` -> `{ data: { export_url }, error: null }`
+- Erreurs: `{ error: { code, message, details? } }`.
+
+### Donnees (minimum)
+
+- `sessions`: `id`, `booking_id`, `user_id`, `mentor_id`, `type`, `started_at`, `ended_at`, `notes`.
+- `session_history_events`: `session_id`, `event_type`, `payload`, `created_at`.
+- `replays`: `session_id`, `url`, `stored_at`.
+- Respect RGPD: anonymiser après suppression request.
+- Conventions `snake_case`.
+
+### UX & accessibilité
+
+- Timeline view, filtres par type (message/RDV/visio).
+- `aria-live` for updates, accessible keyboard nav.
+- Export: CTA accessible, instructions.
+- Indicateur de statut (completed, cancelled).
+
+### Integration & monitoring
+
+- Liens vers messages/notifications (3-1/3-3).
+- Replay link (if recorded) accessible until expiration.
+- Audit logs for session access (RGPD).
+
+### Testing Requirements
+
+- API: pagination, filters, export, access control.
+- UI: timeline, filters, export buttons.
+- Security: ensure access only to owner.
+
+### Do / Don’t
+
+- Do: cacher l’historique si user demande anonymisation (RGPD).
+- Do: loguer access pour audits.
+- Don’t: afficher liens replay après expiration.
 
 ### Project Structure Notes
 
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
+- Web: `apps/web/src/features/sessions/history`.
+- API: `apps/api/src/modules/sessions`.
+- Shared DTOs: `packages/shared/src/schemas`.
 
 ### References
 

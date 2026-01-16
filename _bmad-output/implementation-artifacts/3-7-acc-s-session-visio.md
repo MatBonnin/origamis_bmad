@@ -16,26 +16,70 @@ so that réaliser la session prévue.
 
 ## Tasks / Subtasks
 
-- [ ] Implémenter l’API/logiciel correspondant (AC: #1)
-- [ ] Implémenter l’UI/flux associé (AC: #1)
-- [ ] Ajouter tests unitaires/integ (AC: #1)
+- [ ] Générer lien sécurisé (token + expiration) via service visio interne ou provider (AC: #1)
+- [ ] Endpoint `GET /bookings/:id/session-link` + WebSocket `booking.session.ready` (AC: #1)
+- [ ] UI RDV: boutons “Rejoindre visio”, instructions + fallback lien externe (AC: #1)
+- [ ] Gérer décalages horaires (UTC -> utilisateur, mentor) (AC: #1)
+- [ ] Tests : génération lien, permissions, fallback, UX (AC: #1)
 
 ## Dev Notes
 
-- Stack: Next.js (front) + NestJS (API), TypeScript
-- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma)
-- Auth: NextAuth 4.24.13 + JWT + RBAC
-- API: REST + Swagger + WebSocket
-- Conventions: snake_case DB, camelCase JSON, enveloppe {data, error}
-- UX: responsive + WCAG 2.1 AA + pages publiques SEO
-- Cible: messaging + scheduling
-- WebSocket pour messages/notifications
+### Contexte et contraintes non negotiables
+
+- Stack: Next.js (App Router) + NestJS, TypeScript.
+- DB: PostgreSQL 17 + Prisma 7.2.0.
+- Auth: NextAuth 4.24.13 + JWT + RBAC.
+- API: REST + Swagger + WebSocket, enveloppe `{ data, error }`.
+- Conventions: `snake_case` DB, `camelCase` JSON.
+- UX: responsive + WCAG 2.1 AA.
+- Cible: modules scheduling + messaging.
+- WebSocket pour notifications RDV.
+
+### API Contracts (session visio)
+
+- `GET /bookings/:id/session-link` -> `{ data: { url, expires_at }, error: null }`
+- `POST /bookings/:id/session-link/regenerate` (admin/mentor) -> new URL.
+- WebSocket `booking.session.ready` pour notifier.
+- Erreurs: `{ error: { code, message, details? } }`.
+
+### Donnees (minimum)
+
+- `sessions`: `booking_id`, `url`, `token`, `expires_at`.
+- `session_access_logs`: `user_id`, `booking_id`, `accessed_at`, `result`.
+- `availability`: indicates timezone for display.
+- Conventions `snake_case`.
+
+### UX & accessibilité
+
+- Bouton “Rejoindre visio” (primary, accessible).
+- Afficher timezone convertie + countdown.
+- Fallback texte + bouton “Obtenir lien manuel”.
+- `aria-live` for connection status.
+
+### Security & delivery
+
+- Tokens short-lived (ex: 10 min), tied to booking.
+- Validate user is participant before returning URL.
+- Support fallback to external provider link + instructions.
+- Log access for audit.
+
+### Testing Requirements
+
+- API: access control, token expiry, regenerate.
+- WebSocket: notifications for link ready.
+- UI: join button, fallback, error states.
+
+### Do / Don’t
+
+- Do: stocker l’URL chiffrée (si provider).
+- Do: invalider lien après expiration.
+- Don’t: exposer lien si booking non confirmé.
 
 ### Project Structure Notes
 
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
+- Web: `apps/web/src/features/bookings/session`.
+- API: `apps/api/src/modules/bookings/session`.
+- Shared DTOs: `packages/shared/src/schemas`.
 
 ### References
 

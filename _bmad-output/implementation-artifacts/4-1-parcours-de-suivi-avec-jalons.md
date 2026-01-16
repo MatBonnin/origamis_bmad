@@ -16,28 +16,73 @@ so that organiser ma progression.
 
 ## Tasks / Subtasks
 
-- [ ] Implémenter l’API/logiciel correspondant (AC: #1)
-- [ ] Implémenter l’UI/flux associé (AC: #1)
-- [ ] Ajouter tests unitaires/integ (AC: #1)
+- [ ] Créer service milestones (tables, statuses, progressions) (AC: #1)
+- [ ] Exposer endpoint `GET /progression` + filtrage par student/mentor (AC: #1)
+- [ ] UI parcours : timeline jalons, filtres, bandeau progression (AC: #1)
+- [ ] Sync avec bookings/events pour lier RDV/visio (AC: #1)
+- [ ] Tests API + UI + accessibilité (AC: #1)
 
 ## Dev Notes
 
-- Stack: Next.js (front) + NestJS (API), TypeScript
-- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma)
-- Auth: NextAuth 4.24.13 + JWT + RBAC
-- API: REST + Swagger + WebSocket
-- Conventions: snake_case DB, camelCase JSON, enveloppe {data, error}
-- UX: responsive + WCAG 2.1 AA + pages publiques SEO
-- Cible: milestones/jalons
-- Progression visible
+### Contexte et contraintes non negotiables
+
+- Stack: Next.js (App Router) + NestJS, TypeScript.
+- DB: PostgreSQL 17 + Prisma 7.2.0.
+- Auth: NextAuth 4.24.13 + JWT + RBAC (student/mentor).
+- API: REST + Swagger + WebSocket, enveloppe `{ data, error }`.
+- Conventions: `snake_case` DB, `camelCase` JSON.
+- UX: responsive + WCAG 2.1 AA.
+- Cible: modules milestones/jalons.
+- Progression visible central.
+
+- `GET /progression?user_id=&type=` -> `{ data: { milestones, metadata }, error: null }`
+- `POST /milestones/:id/progress` -> `{ data: { milestone }, error: null }`
+- `GET /milestones/:id` -> `{ data: { milestone }, error: null }`
+- Erreurs: `{ error: { code, message, details? } }`.
+
+### Donnees (minimum)
+
+- `milestones`: `id`, `user_id`, `type`, `status`, `due_at`, `completed_at`.
+- `milestone_progress`: `milestone_id`, `step`, `completed_at`.
+- `progression_metadata`: `total_completed`, `total_pending`.
+- Conventions `snake_case`.
+
+### UX & accessibilité
+
+- Timeline card with status chips (planned/in-progress/done).
+- Filters (by type, mentor, due date) with accessible buttons.
+- `aria-live` for progress updates + tooltips for statuses.
+- Progress bar (aria-valuenow) summarizing completion.
+
+### Integration & delivery
+
+- Sync with booking/session events (stories 3-5,3-7) for milestone updates.
+- Notify mentors when student hits key milestones.
+- Support message/notification triggers via `notifications` module.
+
+### Testing Requirements
+
+- API: filters, pagination, mentoring access.
+- UI: timeline interactions, filters, progress updates.
+- Integration: milestone update → notifications/webhooks.
+
+### Do / Don’t
+
+- Do: lock progression when milestone in review.
+- Don’t: mark milestone done silently (requires confirmation).
 
 ### Project Structure Notes
 
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
+- Web: `apps/web/src/features/milestones`.
+- API: `apps/api/src/modules/milestones`.
+- Shared DTOs: `packages/shared/src/schemas`.
 
 ### References
+
+- _bmad-output/planning-artifacts/epics.md
+- _bmad-output/planning-artifacts/prd.md
+- _bmad-output/planning-artifacts/architecture.md
+- _bmad-output/planning-artifacts/ux-design-specification.md
 
 - _bmad-output/planning-artifacts/epics.md
 - _bmad-output/planning-artifacts/prd.md

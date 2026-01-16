@@ -71,12 +71,6 @@ so that gagner du temps dans la configuration.
 - Do: garder une trace de la suggestion proposee.
 - Don't: bloquer l'utilisateur s'il choisit de modifier.
 
-### Project Structure Notes
-
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
-
 ### References
 
 - _bmad-output/planning-artifacts/epics.md

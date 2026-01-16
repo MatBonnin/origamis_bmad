@@ -48,8 +48,9 @@ so that contrôler l’usage de mes données.
 
 ### Impact retrait
 
-- Informer l'utilisateur des impacts (ex: services limites).
-- Bloquer actions sensibles si consentement retire.
+- Informer l'utilisateur des impacts (message explicite).
+- En mode retrait, bloquer: matching, messagerie, RDV, notifications.
+- Autoriser: consultation compte, telechargement donnees, demande suppression.
 
 ### Validation & UX
 
@@ -71,12 +72,6 @@ so that contrôler l’usage de mes données.
 
 - Do: stocker la version du texte de consentement.
 - Don't: supprimer les preuves de consentement.
-
-### Project Structure Notes
-
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
 
 ### References
 

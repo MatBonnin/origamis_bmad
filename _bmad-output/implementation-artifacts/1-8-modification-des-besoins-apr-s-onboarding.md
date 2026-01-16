@@ -69,12 +69,6 @@ so that adapter mon accompagnement.
 - Do: conserver historique minimal (timestamp).
 - Don't: recalculer recommandations sans signaler le changement.
 
-### Project Structure Notes
-
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
-
 ### References
 
 - _bmad-output/planning-artifacts/epics.md
