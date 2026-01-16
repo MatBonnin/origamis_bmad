@@ -1,0 +1,29 @@
+Fonctionnalités
+Etudiants (version freemium)
+Onboarding Personnalisé : Permet à l'étudiant de créer son profil en renseignant son niveau d'études, diplôme préparé ou domaine, besoins d'accompagnement, etc..
+Matching Intelligent : Un système algorithmique oriente l'étudiant vers les mentors ou les ressources les plus pertinentes selon sa demande et son profil.
+Recherche et Consultation de Profils Mentors : Une page dédiée affiche les experts recommandés avec leur photo, description, prix, avis, certifications et mots-clés.
+Fiches de révision réalisés par les mentors avec un CTA à la fin (un peu comme un blog)
+Communauté Étudiante : Un espace (style Discord ou mini-forum) permet aux étudiants de poser des questions ou d'échanger gratuitement entre pairs ou avec des mentors.
+Rappels Automatiques personnalisable : Notifications mobiles
+Etudiants (version premium)
+Onboarding Personnalisé : Permet à l'étudiant de créer son profil en renseignant son niveau d'études, diplôme préparé ou domaine, besoins d'accompagnement, etc..
+Matching Intelligent : Un système algorithmique oriente l'étudiant vers les mentors ou les ressources les plus pertinentes selon sa demande et son profil.
+Système de Messagerie : Permet une communication directe et en temps réel entre l'étudiant et le mentor.
+Accompagnement coaching visio ou par chat : hard skills et soft skills (gestion du stress par exemple)
+Recherche et Consultation de Profils Mentors : Une page dédiée affiche les experts recommandés avec leur photo, description, prix, avis, certifications et mots-clés.
+Prise de Contact Facilitée : Un bouton permet de contacter un mentor via un message pré-rempli.
+Prise de Rendez-vous : L'étudiant et le mentor se mettent d’accord pour des sessions, en visioconférence intégrée, le mentor définissant ses disponibilités via un agenda synchronisé.
+Parcours de Suivi Structuré : Pour les besoins récurrents (comme la rédaction d'un mémoire), l'application propose un parcours décomposé en jalons, pouvant être rempli et personnalisé par l'étudiant via l’IA. “Module de gestion de projet”
+Des templates de parcours (ex: pour un mémoire) sont disponibles.
+Gestion des Documents : Stockage cloud sécurisé (RGPD compliant) des documents partagés.
+(écran d’accueil)  Fiches de révision réalisés par les mentors avec un CTA à la fin (un peu comme un blog)
+Communauté Étudiante : Un espace (style Discord ou mini-forum) permet aux étudiants de poser des questions ou d'échanger gratuitement entre pairs ou avec des mentors.
+Rappels Automatiques personnalisable : Notifications mobiles
+Fonctionnalités principales pour les Mentors :
+Onboarding Personnalisé : Permet au mentor de créer son profil en renseignant son niveau d'études, diplôme ou domaine, etc.. Téléverser ses diplômes dans l’appli
+Accueil et Gestion des Rendez-vous : Accès pour gérer les sessions  de visio. Liste de rdv. Poster / Modifier son annonce
+Système de Messagerie : Pour échanger avec les étudiants, possibilité de choisir les profils d'étudiants et de refuser les projets qui ne correspondent pas à leur expertise ou standards
+Agenda : Définition des créneaux via un agenda synchronisé.
+Mon compte : Informations ajoutées grâce à l’onboarding. Les mentors peuvent fixer eux-mêmes leur tarif et choisir entre accompagnement ponctuel ou suivi régulier.
+Cours: possibilité de créer des fiches de cours avec un CTA (convaincre un étudiant freemium de payer leurs services)

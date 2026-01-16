@@ -1,0 +1,8 @@
+{
+  "name": "origami",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

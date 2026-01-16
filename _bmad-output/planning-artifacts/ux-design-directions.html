@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orig'ami UX Design Directions</title>
+  <style>
+    :root {
+      --blue-900: #00064F;
+      --blue-700: #36529B;
+      --blue-600: #3A68AD;
+      --orange-600: #F29F08;
+      --orange-300: #F9CF83;
+      --orange-800: #8C3900;
+      --gray-800: #525252;
+      --gray-400: #B4B4B4;
+      --gray-100: #F5F5F5;
+      --blue-050: #EBF0F7;
+      --white: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+      color: var(--gray-800);
+      background: var(--white);
+    }
+    header {
+      padding: 24px 32px;
+      background: var(--white);
+      border-bottom: 1px solid var(--blue-050);
+    }
+    header h1 { margin: 0 0 6px 0; font-size: 22px; color: var(--blue-900); }
+    header p { margin: 0; color: var(--gray-800); }
+
+    .directions { padding: 24px 24px 48px; display: grid; gap: 32px; }
+    .direction {
+      border: 1px solid var(--blue-050);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--white);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+    }
+    .direction header {
+      border: none;
+      border-bottom: 1px solid var(--blue-050);
+      background: var(--blue-050);
+    }
+    .direction header h2 { margin: 0; font-size: 18px; color: var(--blue-900); }
+    .direction header p { margin: 6px 0 0; font-size: 13px; color: var(--gray-800); }
+
+    .mock {
+      display: grid;
+      grid-template-columns: 76px 1fr 260px;
+      min-height: 360px;
+      background: var(--white);
+    }
+
+    .sidebar {
+      background: var(--blue-700);
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 18px 12px;
+      font-size: 11px;
+    }
+    .nav-item { opacity: 0.9; }
+    .nav-item.active { font-weight: 700; }
+
+    .main { padding: 18px 20px; background: var(--white); }
+    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .badge { background: var(--orange-600); color: var(--white); border-radius: 999px; padding: 6px 10px; font-size: 12px; }
+
+    .grid { display: grid; gap: 12px; }
+    .grid.cols-2 { grid-template-columns: 1fr 1fr; }
+    .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+    .card {
+      background: var(--blue-050);
+      border-radius: 12px;
+      padding: 12px;
+      min-height: 80px;
+    }
+
+    .card h4 { margin: 0 0 6px; font-size: 13px; color: var(--blue-900); }
+    .card p { margin: 0; font-size: 12px; color: var(--gray-800); }
+
+    .cta {
+      background: var(--orange-600);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      display: inline-block;
+    }
+
+    .panel {
+      background: var(--blue-050);
+      padding: 12px;
+      border-left: 4px solid var(--blue-600);
+    }
+
+    .list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .list-item {
+      background: var(--white);
+      border: 1px solid var(--blue-050);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .right {
+      background: var(--blue-050);
+      padding: 14px;
+      border-left: 1px solid var(--blue-050);
+    }
+
+    .filter {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 10px;
+      border: 1px solid var(--blue-050);
+      margin-bottom: 10px;
+    }
+
+    .tag { display: inline-block; background: var(--blue-600); color: var(--white); padding: 4px 6px; border-radius: 6px; font-size: 11px; margin: 2px; }
+
+    @media (max-width: 980px) {
+      .mock { grid-template-columns: 64px 1fr; }
+      .right { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Orig'ami — Directions Visuelles</h1>
+    <p>6 variations basées sur la maquette existante (palette stricte, layout sidebar, cartes).</p>
+  </header>
+
+  <section class="directions">
+    <article class="direction">
+      <header>
+        <h2>Direction A — Tableau de bord clair</h2>
+        <p>Approche proche maquette : cartes grandes + progression visible.</p>
+      </header>
+      <div class="mock">
+        <div class="sidebar">
+          <div class="nav-item active">Tableau de bord</div>
+          <div class="nav-item">Mentors</div>
+          <div class="nav-item">Messages</div>
+          <div class="nav-item">Calendrier</div>
+        </div>
+        <div class="main">
+          <div class="topbar">
+            <strong>AMI</strong>
+            <span class="badge">Profil Etudiant</span>
+          </div>
+          <div class="grid cols-2">
+            <div class="card">
+              <h4>Appels a venir</h4>
+              <p>Seance 3 · 15h</p>
+              <span class="cta">Commencer</span>
+            </div>
+            <div class="card">
+              <h4>Notifications</h4>
+              <p>2 nouveaux messages</p>
+            </div>
+          </div>
+          <div class="grid cols-2" style="margin-top: 12px;">
+            <div class="card">
+              <h4>Devoirs</h4>
+              <p>Parcours Memoire · Etape 2</p>
+            </div>
+            <div class="card">
+              <h4>Suivi de projet</h4>
+              <p>20% · Jalons en cours</p>
+            </div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="filter">
+            <h4>Recherche rapide</h4>
+            <p>Mentor marketing</p>
+          </div>
+          <div class="filter">
+            <h4>Progression</h4>
+            <p>Jalon 1 valide</p>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="direction">
+      <header>
+        <h2>Direction B — Mentors focus marketplace</h2>
+        <p>Priorite a la recherche et aux cartes mentors.</p>
+      </header>
+      <div class="mock">
+        <div class="sidebar">
+          <div class="nav-item">Tableau de bord</div>
+          <div class="nav-item active">Mentors</div>
+          <div class="nav-item">Messages</div>
+          <div class="nav-item">Calendrier</div>
+        </div>
+        <div class="main">
+          <div class="topbar">
+            <strong>Mentors</strong>
+            <span class="badge">8 resultats</span>
+          </div>
+          <div class="list">
+            <div class="list-item">
+              <div>
+                <strong>Alice Dupont</strong><br>
+                Marketing · 4.6
+              </div>
+              <span class="cta">Demande</span>
+            </div>
+            <div class="list-item">
+              <div>
+                <strong>Maximus Primus</strong><br>
+                E-commerce · 5.0
+              </div>
+              <span class="cta">Message</span>
+            </div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="filter">
+            <h4>Filtres</h4>
+            <span class="tag">Marketing</span>
+            <span class="tag">Relecture</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="direction">
+      <header>
+        <h2>Direction C — Parcours/Jalons prioritaire</h2>
+        <p>Progression et to-do au centre, mentors en secondaire.</p>
+      </header>
+      <div class="mock">
+        <div class="sidebar">
+          <div class="nav-item active">Tableau de bord</div>
+          <div class="nav-item">Mentors</div>
+          <div class="nav-item">Messages</div>
+          <div class="nav-item">Calendrier</div>
+        </div>
+        <div class="main">
+          <div class="topbar">
+            <strong>Suivi de projet</strong>
+            <span class="badge">20%</span>
+          </div>
+          <div class="panel">
+            <h4>Jalons</h4>
+            <p>Etape 1 terminee · Etape 2 en cours</p>
+          </div>
+          <div class="grid cols-2" style="margin-top: 12px;">
+            <div class="card">
+              <h4>Prochain RDV</h4>
+              <p>Mentor Alice · 15h</p>
+            </div>
+            <div class="card">
+              <h4>Mentor recommande</h4>
+              <p>Voir profil</p>
+            </div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="filter">
+            <h4>Notifications</h4>
+            <p>1 nouveau message</p>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="direction">
+      <header>
+        <h2>Direction D — Onboarding immersif</h2>
+        <p>Experience d'inscription guidee, etapes claires.</p>
+      </header>
+      <div class="mock">
+        <div class="sidebar">
+          <div class="nav-item active">Onboarding</div>
+          <div class="nav-item">Mentors</div>
+          <div class="nav-item">Dashboard</div>
+        </div>
+        <div class="main">
+          <div class="topbar">
+            <strong>Etape 3/5</strong>
+            <span class="badge">Profil</span>
+          </div>
+          <div class="card">
+            <h4>Votre parcours academique</h4>
+            <p>Domaine, niveau, annee de diplome</p>
+          </div>
+          <div style="margin-top: 12px;">
+            <span class="cta">Continuer</span>
+          </div>
+        </div>
+        <div class="right">
+          <div class="filter">
+            <h4>Progression</h4>
+            <p>Etape 3 validee</p>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="direction">
+      <header>
+        <h2>Direction E — Dense efficace</h2>
+        <p>Plus de contenu par ecran, pour utilisateurs avances.</p>
+      </header>
+      <div class="mock">
+        <div class="sidebar">
+          <div class="nav-item active">Dashboard</div>
+          <div class="nav-item">Mentors</div>
+          <div class="nav-item">Messages</div>
+          <div class="nav-item">Calendrier</div>
+        </div>
+        <div class="main">
+          <div class="topbar">
+            <strong>Dashboard</strong>
+            <span class="badge">Actif</span>
+          </div>
+          <div class="grid cols-3">
+            <div class="card"><h4>Appels</h4><p>2</p></div>
+            <div class="card"><h4>Jalons</h4><p>3/10</p></div>
+            <div class="card"><h4>Messages</h4><p>4</p></div>
+          </div>
+          <div class="list" style="margin-top: 12px;">
+            <div class="list-item"><div>Jalon 2 · Recherche</div><span class="cta">Voir</span></div>
+            <div class="list-item"><div>Mentor · Alice</div><span class="cta">RDV</span></div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="filter">
+            <h4>Filtres</h4>
+            <span class="tag">Memoire</span>
+            <span class="tag">Stress</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="direction">
+      <header>
+        <h2>Direction F — Minimal et rassurant</h2>
+        <p>Moins d'elements, plus de calme et d'espaces.</p>
+      </header>
+      <div class="mock">
+        <div class="sidebar">
+          <div class="nav-item active">Tableau de bord</div>
+          <div class="nav-item">Mentors</div>
+          <div class="nav-item">Messages</div>
+          <div class="nav-item">Calendrier</div>
+        </div>
+        <div class="main">
+          <div class="topbar">
+            <strong>Bienvenue</strong>
+            <span class="badge">AMI</span>
+          </div>
+          <div class="card">
+            <h4>Votre prochain RDV</h4>
+            <p>Mentor Alice · 15h</p>
+          </div>
+          <div class="card" style="margin-top: 12px;">
+            <h4>Jalon en cours</h4>
+            <p>Etape 2 · Proposition de recherches</p>
+          </div>
+        </div>
+        <div class="right">
+          <div class="filter">
+            <h4>Rappels</h4>
+            <p>1 notification</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+</body>
+</html>

@@ -1,0 +1,22 @@
+0 verbose cli /home/mathieu/.nvm/versions/node/v20.17.0/bin/node /home/mathieu/.nvm/versions/node/v20.17.0/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@10.8.2
+2 info using node@v20.17.0
+3 silly config load:file:/home/mathieu/.nvm/versions/node/v20.17.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/mnt/c/Users/matma/Documents/MyDigitalSchool/M1/OrigAMI/site/.npmrc
+5 silly config load:file:/home/mathieu/.npmrc
+6 silly config load:file:/home/mathieu/.nvm/versions/node/v20.17.0/etc/npmrc
+7 verbose title npm exec create-next-app@latest --help
+8 verbose argv "exec" "--" "create-next-app@latest" "--help"
+9 verbose logfile logs-max:10 dir:/mnt/c/Users/matma/Documents/MyDigitalSchool/M1/OrigAMI/site/.npm-cache/_logs/2026-01-16T12_59_03_727Z-
+10 verbose logfile /mnt/c/Users/matma/Documents/MyDigitalSchool/M1/OrigAMI/site/.npm-cache/_logs/2026-01-16T12_59_03_727Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:2106327040 maxSize:526581760 maxEntrySize:263290880
+13 http fetch GET 200 https://registry.npmjs.org/create-next-app 318ms (cache revalidated)
+14 silly packumentCache heap:2106327040 maxSize:526581760 maxEntrySize:263290880
+15 silly packumentCache heap:2106327040 maxSize:526581760 maxEntrySize:263290880
+16 verbose cwd /mnt/c/Users/matma/Documents/MyDigitalSchool/M1/OrigAMI/site/apps
+17 verbose os Linux 5.15.167.4-microsoft-standard-WSL2
+18 verbose node v20.17.0
+19 verbose npm  v10.8.2
+20 verbose exit 0
+21 info ok

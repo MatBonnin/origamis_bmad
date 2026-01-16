@@ -1,0 +1,3990 @@
+ZEDEK Lylia, ROSSET CHAMBRUN Seïla, BONNIN Mathieu, BETHUNE Capucine, DOSJOUB Marion2 0 2 5 MY DIGITAL SCHOOL
+Rapport 
+start-up challenge
+O r i g ’ a m i s
+
+du rapportS o m m a i r e
+1 Business plan et etude marketing 
+2 Cibler pour mieux convertir
+3 Étude qualitatif et quantitatif
+4 Stratégie marketing
+5 Plan de Financements
+6 Business model page 3
+page 33
+page 44
+page 57
+page 61
+page 73
+7 Analyses et études UX - U page 75
+8 Bibliographie et annexes page 92
+
+3
+BUSINESS
+PLAN ET
+ÉTUDE
+MARKETING
+
+
+Résumé exécutif
+Orig’amis a développé l’application AMI (Apprendre Mieux, Inspirer) pour aider chaque talent de
+demain à progresser dans le monde académique. Elle s’adresse aux étudiants du domaine
+supérieur. Dans un contexte où l’isolement académique, la précarité étudiante et le manque de
+soutien méthodologique freinent la réussite, AMI propose une approche structurante, humaine et
+personnalisée, pour aider chacun(e) à s’organiser, avancer, apprendre et réussir.
+Ce qui rend AMI unique c’est : 
+son approche structurée de l’accompagnement académique qui repose sur un suivi régulier et
+individualisé, intégrant à la fois les compétences disciplinaires (hard skills) et les
+compétences transversales (soft skills), essentielles à la réussite dans l’enseignement
+supérieur.
+sa plateforme construite avec et pour les étudiant(e)s, en collaboration avec des mentors, des
+expert·es en pédagogie, des professionnel(le)s de l’enseignement supérieur,
+sa technologie évolutive au service de la réussite (replay de visio, IA de synthèse…).1.PRÉSENTATION DE L’ENTREPRISE1
+2. NOTRE ÉQUIPE 
+Notre équipe est composée de cinq membres complémentaires aux compétences stratégiques,
+techniques et créatives :
+ ÉQUIPE MARKETING
+Ce duo coordonne la stratégie d’entreprise 
+et la communication de diffusion du projet.
+Marion pilote le positionnement stratégique 
+et la stratégie de communication. 
+Elle est la créatrice de la start-up.
+Seila aide à la création des supports 
+de communication.DÉVELOPPEUR FULL-STACK
+Mathieu est responsable de l’architecture
+technique et de l’intégration 
+des fonctionnalités, Mathieu assure 
+la stabilité, la sécurité et l’évolutivité 
+de l’application.
+DIRECTRICE ARTISTIQUE
+En charge de l’identité visuelle de la
+marque, Lylia construit une image de
+projet à la fois engageante, accessible
+et inclusive. Elle apporte aussi ces
+connaissances à la stratégie marketing. UX/UI DESIGNER
+Spécialiste de l’expérience utilisateur,
+Capucine est chargée de la conception
+fonctionnelle et visuelle de l’application.
+4
+
+
+3.STRUCTURE JURIDIQUE  
+4.DOMAINE D’ACTIVITÉ
+L’entreprise Orig’amis a pour domaine d’activité
+l’éducation, le mentorat et l’accompagnement académique
+personnalisé via une plateforme numérique. Nous
+envisageons donc le code APE suivant :  
+L’accent principal étant mis sur l’accompagnement
+pédagogique, incluant le soutien académique, le coaching
+méthodologique, l’aide à la relecture ou la préparation aux
+examens, alors le code APE 85.59B : Autres
+enseignements est le plus approprié. Ce code couvre les
+activités de formation non diplômante, de cours
+particuliers, ou encore de soutien scolaire hors cadre
+institutionnel, y compris en ligne. Il correspond à une
+plateforme qui se positionne comme un levier éducatif à
+part entière.Certains membres de l’équipe ont déjà collaboré sur des projets associatifs, numériques ou
+sociaux à fort impact. Ces expériences communes nous ont permis de développer une
+méthodologie de travail efficace, orientée impact et centrée utilisateur, que nous remettons en
+œuvre avec ambition sur AMI.
+Pour notre projet, le statut juridique est Société par Actions Simplifiée (SAS). Ce choix s’impose
+naturellement au regard de la structure de notre équipe, composée de profils complémentaires. La
+SAS permet une organisation souple, ce qui correspond parfaitement à notre fonctionnement en
+collectif, tout en offrant la possibilité d'adapter librement la répartition des responsabilités et des
+pouvoirs de décision.
+La protection sociale est également un critère déterminant. En optant pour une SAS, la personne à
+la tête de la structure bénéficie du régime général de la sécurité sociale, une couverture plus
+complète et sécurisante que celle proposée par d'autres formes juridiques, notamment pour un
+statut de dirigeant.
+Le choix de la SAS s’inscrit aussi dans une vision à moyen et long terme. Si nous envisageons un
+jour de faire entrer un investisseur, un partenaire stratégique ou même d’élargir l’équipe, ce statut
+facilite largement l’ouverture du capital. Il est également mieux perçu dans l’écosystème
+entrepreneurial, notamment dans les domaines de la tech et de l’innovation, ce qui renforce notre
+crédibilité face à de potentiels soutiens financiers ou institutionnels.
+En comparaison, la SARL serait trop rigide, notamment dans la gestion des parts sociales et la
+prise de décision collective, tandis que l’auto-entreprise est inadaptée pour un projet collaboratif
+comme le nôtre.
+Le statut de SAS nous apporte donc la flexibilité, la sécurité et l’ouverture dont nous avons besoin
+pour développer Orig’amis de manière cohérente et ambitieuse.
+5
+
+
+5.LES DIFFÉRENTS PÔLES DE L’ENTREPRISE
+Renforcer l’accompagnement pédagogique dans l’enseignement supérieur
+L’objectif central est de pallier les lacunes actuelles du système universitaire français 
+en proposant un accompagnement individualisé, flexible et humain, centré sur les besoins
+spécifiques des étudiants (coaching méthodologique, relecture, prise de parole, orientation, etc.).
+Orig’amis ambitionne de devenir un appui complémentaire à l’encadrement académique
+institutionnel.
+Offrir une réponse concrète à la précarité
+et à l’isolement des étudiants
+En facilitant la mise en relation entre pairs ou
+avec des profils expérimentés (freelances,
+retraités, professionnels), Orig’amis veut
+briser la solitude et proposer un appui sur
+mesure aux étudiants, 
+y compris ceux qui sont en alternance,
+internationaux ou en situation de fragilité
+(sociale, psychologique, géographique…).
+Valoriser les compétences 
+de mentors variés
+Orig’amis souhaite structurer un vivier de
+mentors aux profils multiples en leur offrant
+un espace de visibilité, de reconnaissance
+(avis, certifications, portfolio), et une source
+de revenus ponctuels ou réguliers.
+L’ambition est de professionnaliser 
+ces activités souvent informelles 
+et sous-valorisées.Développer un modèle hybride mentor-
+humain / intelligence artificielle
+L'un des axes d’innovation d’Orig’amis est de
+combiner l’expertise humaine des mentors
+avec l’efficacité d’une IA de soutien (par
+exemple pour la relecture rapide, la
+planification de révisions, ou les questions
+de méthodologie). L’objectif est de proposer
+un accompagnement à la fois chaleureux et
+optimisé.S’ancrer dans un écosystème
+ éducatif et institutionnel
+Orig’amis ambitionne d’établir des partenariats avec
+les établissements d’enseignement supérieur, 
+les collectivités locales, ou les structures
+d’orientation, afin de devenir un acteur reconnu 
+de la réussite étudiante. À terme, des collaborations
+pourraient permettre l’intégration de la plateforme
+dans les parcours d’accompagnement officiels
+(BDE, Crous, universités…).
+6. MISSION
+Notre mission est de démocratiser l’accès à
+l’accompagnement éducatif, en mettant en
+relation les talents de demain avec celles et
+ceux qui souhaitent transmettre, guider et
+inspirer.
+6
+
+
+8. VISION
+Faire de l’accompagnement une ressource accessible à tous, au moment où chacun en a besoin.
+9.VALEUR
+Accessibilité
+Nous croyons que chaque étudiant, quel que soit son
+milieu, son origine ou son parcours, doit pouvoir accéder
+à un accompagnement de qualité, adapté à ses besoins
+et à ses contraintes.
+Transmission
+La pédagogie est au cœur de notre projet. 
+Nous valorisons les savoirs humains, l’expérience v
+écue et la capacité à rendre 
+es connaissances compréhensibles et actionnables.
+Éthique
+Nos mentors sont sélectionnés pour leur écoute, leur
+engagement et leur sens du respect. Nous construisons
+un environnement sécurisé, transparent et respectueux
+de chaque utilisateur.
+Innovation responsable
+L’IA que nous développons ne remplace pas l’humain :
+elle le complète. Notre technologie est au service
+ de la pédagogie, non l’inverse.
+Valorisation
+Nous reconnaissons la valeur du travail des mentors,
+souvent invisible ou sous-rémunéré. Orig’amis s’engage
+à professionnaliser ces interventions en leur donnant 
+un cadre, une reconnaissance et une rémunération juste.
+7
+
+
+1.ANALYSE DE MARCHÉDIAGNOSTIC EXTERNE 2
+Les étudiants et leur environnement 
+Le paysage de l’enseignement supérieur en
+France est aujourd’hui à un tournant majeur.
+En 2024, plus de 3,1 millions d’étudiants sont
+inscrits dans des formations post-bac, contre
+2,3 millions en 2010. Cette croissance
+soutenue est portée par une démocratisation
+de l’accès au baccalauréat et une
+prolongation des parcours académiques,
+avec une hausse notable des inscriptions en
+Master, CPGE, écoles de commerce ou
+d’ingénieurs. Cependant, cette dynamique ne
+bénéficie pas uniformément à toutes les
+filières : les formations universitaires
+classiques, en particulier en lettres, sciences
+humaines et sociales, enregistrent un recul
+préoccupant.
+Ce paradoxe révèle les limites structurelles du système
+universitaire français, aujourd’hui en grande difficulté. En
+2024, 60 des 75 universités françaises affichaient un déficit
+budgétaire, certains culminant à 25 millions d’euros. Ce
+déséquilibre financier est accentué par une baisse drastique
+du budget alloué à l’enseignement supérieur (-3,588 milliards
+d’euros) et une crise de recrutement des enseignants : le
+nombre de candidats aux concours du secondaire a chuté
+de 73 % en 25 ans. Cette pénurie oblige les établissements à
+recourir massivement à des vacataires (167 000 en 2021-
+2022), sous-payés et surchargés, ce qui dégrade la qualité de
+l’encadrement, notamment dans les premières années de
+licence.
+Ce contexte fragilise les étudiants, confrontés à une précarité
+financière persistante, avec un revenu moyen de 919 € par
+mois (INSEE, 2020), et à un accompagnement pédagogique
+souvent insuffisant. Près de 75 % d’entre eux dépendent de
+leurs parents, et 4 % vivent même dans une situation de
+précarité. Ceux qui exercent un emploi pour subvenir à leurs
+besoins (en moyenne 1 059 € de revenus mensuels) voient
+leur charge mentale augmenter et leur engagement
+académique mis à mal.
+8
+
+
+Les étudiants en alternance, plus de 600 000 en 2024, représentent quant à eux une
+population cible stratégique. Dotés de revenus plus réguliers et d’objectifs professionnels
+clairs, ils manifestent une demande croissante pour des services les aidant à exceller tant
+sur le plan académique qu’en entreprise. Leur profil en fait des utilisateurs potentiels
+récurrents et solvables.
+Par ailleurs, la transition du lycée à l’université constitue une rupture marquante. Alors que le
+lycée permet un encadrement de proximité avec des classes de 30 élèves, les étudiants
+découvrent à la faculté des amphithéâtres de 300 à 600 personnes, souvent sans contact
+direct avec les enseignants. Cette brutalité du changement engendre une perte de repères,
+une désorientation, et un sentiment d’anonymat. Les étudiants internationaux et ceux qui
+changent de ville sont particulièrement vulnérables, confrontés à l’isolement, au choc
+culturel et à des difficultés d’intégration sociale. Une étude relayée par Le Monde indique
+que 62 % des jeunes de 18 à 24 ans en France se sentent régulièrement seuls, un phénomène
+aggravé par la pandémie de Covid-19.
+Face à ces enjeux, les familles cherchent de plus en plus à pallier les carences de
+l’institution. Selon une étude de Xerfi, les parents dépensent en moyenne 1 500 € par an pour
+du soutien scolaire (soit environ 36,50 € de l’heure), avant déduction fiscale. Grâce à la loi
+Borloo de 2005, ces dépenses ouvrent droit à une réduction d’impôt de 50 %. Cela montre la
+disposition des familles à investir dans des dispositifs personnalisés, y compris pour les
+jeunes adultes, pour garantir leur réussite académique et leur insertion professionnelle.
+Dans ce contexte, le marché du soutien scolaire et universitaire constitue une réelle
+opportunité. Il est estimé à 2 milliards d’euros en France, avec une dynamique de croissance
+annuelle de 20 à 25 % pour certains acteurs. Longtemps dominé par des géants comme
+Acadomia, ce secteur évolue vers des modèles plus flexibles et numériques, en réponse à
+une demande en forte augmentation pour des services personnalisés et adaptés aux réalités
+du supérieur. Aujourd’hui, près d’un million d’élèves bénéficient déjà de cours à domicile,
+tandis que 70 à 80 % du marché reste informel, souvent basé sur le bouche-à-oreille.
+9
+
+
+C’est précisément sur ces faiblesses que
+Orig’amis peut proposer une alternative
+crédible. En facilitant la mise en relation
+directe entre étudiants et mentors
+qualifiés via une plateforme numérique, le
+projet vise à dépasser le modèle bénévole
+et institutionnel du mentorat pour le
+rendre plus personnalisé, plus souple et
+plus durable. Orig’amis permettra ainsi
+aux mentors de fixer leurs tarifs, de
+choisir leurs missions, et aux étudiants de
+s’appuyer sur des profils pédagogiques
+adaptés à leurs besoins.Les mentors 
+Le mentorat en France connaît une dynamique nouvelle. Longtemps limité à des initiatives
+isolées, il s’est structuré avec l’impulsion du plan gouvernemental « 1 jeune, 1 mentor », lancé en
+2021 et étendu à grande échelle. Ce programme a permis d’accompagner 160 000 jeunes en
+2023, contre seulement 30 000 en 2020, selon les données de l’Institut National de la Jeunesse et
+de l’Éducation Populaire (INJEP). Cette montée en puissance révèle un besoin croissant
+d’accompagnement individualisé dans les parcours scolaires et professionnels. Pourtant, les
+limites structurelles de ce dispositif commencent à émerger : une étude relayée par Le Monde en
+avril 2024 montre que les effets du mentorat sont jugés « modérés » sur les résultats scolaires,
+l’orientation, la confiance en soi ou encore l’insertion professionnelle. Surtout, l’impact est jugé
+quasi nul lorsque la relation de mentorat dure moins de six mois, ce qui est fréquent dans les
+dispositifs publics peu pérennes. Le même rapport souligne également la précarité des
+encadrants : seuls 21 % des mentors mobilisés ont un contrat stable, ce qui fragilise la continuité
+et la qualité de l’accompagnement. 
+Le vivier de mentors en France est vaste, diversifié et encore largement sous-exploité, offrant une
+opportunité significative pour des plateformes comme Orig’amis. En 2024, on dénombre environ
+3 millions de freelances selon l’INSEE, dont une part croissante intervient dans les secteurs de
+l’éducation, de la traduction ou de l’accompagnement académique. 
+Par ailleurs, près de 200 000 retraités actifs poursuivent une activité professionnelle ou bénévole,
+motivés par la transmission de leur expertise et le souhait de compléter leurs revenus. Ces profils
+tendent à se professionnaliser, en particulier ceux issus de la sphère freelance et des
+professionnels en reconversion, fréquemment auto entrepreneurs (plus de 2,7 millions en France
+en 2023 selon l’INSEE), habitués au travail flexible et sensibles à la reconnaissance (avis clients,
+certifications, visibilité en ligne). Pour eux, la valorisation sociale et professionnelle de leur rôle
+est aussi importante que la rémunération. Or, les plateformes traditionnelles telles que Superprof
+prélèvent jusqu’à 50 % de commission, ce qui constitue un frein important pour les mentors
+qualifiés. Orig’amis peut répondre à ces attentes en proposant des outils de gestion, de visibilité
+et de reconnaissance adaptés, favorisant la professionnalisation et la fidélisation de ce vivier
+hétérogène.
+10
+
+
+Par ailleurs, le taux de chômage des jeunes en France reste élevé, atteignant 19 % pour les 15-24
+ans fin 2024, soit près de trois fois le taux national moyen. De plus, une part importante des
+jeunes se retrouve en situation de NEET, ce qui accentue leur précarité économique et sociale.
+Dans ce contexte, l’application Orig’amis peut offrir une opportunité précieuse à ces jeunes en
+recherche d’emploi, en leur permettant de valoriser leurs compétences à travers des missions de
+mentorat ponctuelles telles que la relecture, le coaching méthodologique ou l’orientation. Cette
+flexibilité répond à leurs besoins tout en leur offrant une expérience professionnelle valorisable
+sur leur CV. Ainsi, Orig’amis s’inscrit dans une logique d’insertion professionnelle et
+d’accompagnement personnalisé, en connectant étudiants en quête de soutien et jeunes mentors
+en quête d’opportunités.
+2.PESTEL
+Politique : 
+En 2025, la France bénéficie d’une stabilité politique qui soutient l’investissement dans le secteur
+éducatif. Le gouvernement déploie le plan France 2030, doté de 2,5 milliards d’euros
+spécifiquement dédiés à l’innovation pédagogique et à la transformation numérique de
+l’éducation. Ce plan vise à moderniser les méthodes d’enseignement et à renforcer la EdTech.
+La loi services à la personne (SAP), instaurée par la loi n°2005-841 du 26 juillet 2005, permet aux
+particuliers de bénéficier d’un crédit d’impôt de 50 % sur les dépenses engagées pour des cours
+particuliers (article 199 sexdecies du CGI). En 2023, ce dispositif a permis à environ 4 millions de
+foyers d’accéder à ces services, stimulant un marché estimé à 4 milliards d’euros.
+Cependant, la réforme en discussion du statut des auto-entrepreneurs, visant à renforcer leur
+protection sociale (dans la continuité de la loi El Khomri n°2016-1088), pourrait augmenter les
+charges sociales pour les prestataires indépendants, réduisant la flexibilité du secteur.
+Au niveau européen, la directive Digital Services Act (DSA), en vigueur depuis 2022, impose aux
+plateformes numériques une stricte réglementation concernant la transparence des algorithmes,
+la modération des contenus et la protection des utilisateurs. Ces obligations, applicables dès
+2025, engendrent des coûts supplémentaires et des contraintes légales pour les plateformes
+EdTech.
+11
+
+Économique 
+Le marché français du tutorat est en croissance stable, avec une estimation de 2 milliards d’euros
+en 2024 pour le soutien scolaire, porté par une demande croissante de personnalisation des
+apprentissages. Cependant, le pouvoir d’achat des ménages est fragilisé par une inflation
+cumulée de 11 % entre 2021 et 2024, ce qui limite leur capacité à dépenser pour des services non
+essentiels. 
+Le secteur bénéficie d’un vivier important avec 2,97 millions d’étudiants en France pour l’année
+2024-2025, dont 53 % déclarent avoir besoin d’un accompagnement pédagogique
+complémentaire, ce qui alimente la demande selon le rapport du Ministère de l’Enseignement
+supérieur datant de 2024.
+À l’échelle mondiale, le e-tutoring connaît une croissance rapide, avec une projection annuelle
+moyenne de +14,8 % jusqu’en 2029, indiquant une tendance favorable à la digitalisation des
+services éducatifs.
+Social 
+L’évolution des modes de vie influence fortement le marché. Le numérique fait désormais partie
+intégrante des usages éducatifs des jeunes. Parallèlement, l’hétérogénéité des profils
+d’apprenants (CSP, origine sociale, structure familiale) renforce la demande pour des parcours
+ultra-personnalisés. Le vieillissement de la population enseignante, combiné à une pénurie de
+professeurs dans certaines disciplines (maths, physique, langues vivantes), renforce l’appel à des
+solutions alternatives comme le tutorat en ligne.
+À cela s’ajoute une montée des attentes en termes de qualité et d’expérience utilisateur,
+notamment chez les jeunes générations nées dans un environnement digitalisé, habituées à des
+contenus interactifs et multimédias. Cette génération Z, et même alpha, privilégie les formats
+courts, ludiques et adaptatifs, ce qui pousse les acteurs du secteur à innover en termes de
+pédagogie.
+Par ailleurs, les évolutions sociétales vers une plus grande sensibilisation à la santé mentale et au
+bien-être des élèves font émerger une demande pour des accompagnements plus holistiques,
+intégrant soutien psychologique et méthodes de gestion du stress.
+Enfin, le rôle croissant des parents dans l’accompagnement scolaire, renforcé par l’accès aux
+outils numériques, modifie les relations classiques enseignant-élève et génère de nouvelles
+attentes sur la transparence des progrès et l’implication familiale.
+Technologique 
+L'intégration de l'intelligence artificielle (IA) dans les services éducatifs révolutionne les modes
+d'apprentissage. Les technologies récentes permettent de proposer des expériences
+pédagogiques hyper-personnalisées, basées sur le profil cognitif, le rythme de progression et les
+préférences d’apprentissage des élèves. Les plateformes EdTech exploitent désormais des
+moteurs de recommandation avancés, des chatbots éducatifs dopés à l’IA générative (comme
+ChatGPT), et des systèmes de Learning Analytics prédictifs capables d’anticiper les décrochages
+scolaires.
+12
+
+
+Les innovations les plus marquantes depuis 2023 incluent :
+Tuteurs IA conversationnels capables de simuler des dialogues personnalisés en temps réel.
+Réalité virtuelle (VR) et réalité augmentée (AR) intégrées dans les parcours éducatifs
+immersifs.
+Plates-formes d'apprentissage adaptatif utilisant l’IA pour réorganiser dynamiquement les
+modules selon les performances de l’élève.
+IA émotionnelle pour détecter l’engagement ou la frustration à travers la caméra ou l’analyse
+vocale.
+Déploiement de blockchain éducative pour sécuriser les données de parcours et certificats.
+En parallèle, l’automatisation continue des tâches administratives (gestion des plannings,
+reporting, évaluation continue) optimise les opérations internes des structures de tutorat. Ces
+avancées permettent aux acteurs du secteur de répondre à une demande croissante de flexibilité,
+de personnalisation et de réactivité.
+Mais cette transformation technologique soulève également des défis : la vitesse d’obsolescence,
+les coûts d’implémentation élevés, et les risques de cybersécurité sont des freins majeurs. La
+protection des données, notamment celles des mineurs, est encadrée par des réglementations
+strictes (RGPD, DSA, loi Informatique et Libertés). Enfin, la fracture numérique reste un obstacle
+pour certains publics, peu à l’aise avec ces outils.
+Environnement 
+Le tutorat en ligne contribue à la réduction de l’empreinte carbone en limitant les déplacements,
+ce qui constitue un atout dans un contexte de transition écologique. Cette dématérialisation
+directe s’inscrit dans les objectifs de neutralité carbone poursuivis par la France à horizon 2050.
+Toutefois, l’empreinte environnementale du numérique reste significative : consommation
+énergétique des serveurs, recours massif au cloud computing, streaming de vidéos pédagogiques
+en HD, ou encore usage intensif de terminaux connectés.
+Les entreprises du secteur EdTech sont de plus en plus incitées, voire contraintes, à intégrer des
+démarches de responsabilité environnementale. Cela inclut la réalisation d’un bilan carbone, la
+sobriété énergétique, l’éco-conception des plateformes (design, poids des contenus, hébergeurs
+verts), ou encore l’utilisation de data centers labellisés (ex. : ISO 50001, HDS, Green Data). Ces
+exigences sont renforcées par la loi Climat et Résilience (2021) et les nouvelles normes
+européennes telles que la CSRD (Corporate Sustainability Reporting Directive), applicables aux
+entreprises à partir de 2025 selon leur taille.
+Les acheteurs publics incluent désormais des critères RSE stricts dans leurs appels d’offres,
+donnant un avantage concurrentiel aux structures alignées avec les objectifs de développement
+durable (ODD). Une communication environnementale crédible, vérifiable et sans exagération est
+indispensable : les pratiques de greenwashing sont de plus en plus sanctionnées par les
+consommateurs et les autorités, notamment via la loi anti-greenwashing entrée en vigueur en
+2023.
+13
+
+
+Légal 
+Les activités de tutorat, en particulier en ligne, sont soumises à un cadre réglementaire de plus en
+plus rigoureux. Le RGPD (Règlement Général sur la Protection des Données) impose une gestion
+stricte et transparente des données personnelles, en particulier celles des mineurs, avec des
+obligations de consentement explicite, de minimisation des données (art. 5) et de finalité
+déterminée (art. 6). Les plateformes de tutorat sont donc tenues de mettre en place des
+politiques de confidentialité robustes et des mesures techniques de sécurité renforcées.
+La directive européenne Digital Services Act (DSA), entrée en vigueur progressivement depuis
+février 2024, impose aux plateformes numériques des règles strictes en matière de transparence
+algorithmique, de modération des contenus et de traçabilité des prestataires. Cette
+réglementation vise à lutter contre les abus de marché et à protéger les usagers, en particulier les
+mineurs, contre les contenus illicites ou non adaptés.
+Le futur AI Act européen, prévu pour 2025, visera à réguler les systèmes d’intelligence artificielle.
+Il imposera la traçabilité des contenus générés par l’IA, la supervision humaine obligatoire pour
+les systèmes à haut risque (comme les outils de traduction médicale ou juridique), et des audits
+de conformité des outils utilisés.
+3.PORTER
+MENACE DES NOUVEAUX
+ENTRANTS (3/5)INTENSITÉ CONCURENTIELLE
+(5/5) 
+POUVOIRS DE
+NÉGOCIATION  DES
+FOURNISSEURS (2/5)
+MENACES DES SUBSTITUTS (4/5)  POUVOIRS NÉGOCIATION
+DES CLIENTS (4/5) 
+14
+
+intensité concurrentielle 
+Le marché du tutorat en France en 2025 se caractérise par une intensité concurrentielle
+particulièrement élevée, alimentée par une croissance soutenue, une fragmentation de l'offre et
+une standardisation des services.
+En 2024, le secteur du soutien scolaire en France était estimé à environ 2 milliards d'euros, avec
+plus de 40 millions d'heures de cours consommées annuellement. Ce marché est desservi par
+une multitude d'acteurs, allant des entreprises établies aux plateformes en ligne, en passant par
+un grand nombre de tuteurs indépendants. Par exemple, la plateforme Clevermate compte plus
+de 24 000 étudiants-tuteurs.
+Les principaux acteurs du marché incluent Acadomia, qui, avec un chiffre d'affaires de 110
+millions d'euros, détient environ 50 % du marché traditionnel du soutien scolaire. Superprof, une
+plateforme en ligne, revendique plus de 2 millions d'utilisateurs en France, ce qui représente
+environ 25 % du marché en ligne. GoStudent, bien qu'implanté plus récemment, gagne rapidement
+du terrain avec un positionnement premium et une stratégie européenne agressive.
+La croissance du marché est également alimentée par des facteurs tels que la digitalisation de
+l'apprentissage, l'individualisation croissante des parcours académiques et la demande accrue
+pour des formats flexibles et adaptés aux contraintes des étudiants. Par exemple, le marché
+mondial des services de tutorat en ligne était évalué à 7,75 milliards USD en 2023 et devrait
+enregistrer un taux de croissance annuel composé de 14,82 % au cours de la période de prévision
+jusqu'en 2029.
+La concurrence est exacerbée par la standardisation des services proposés, rendant difficile la
+différenciation entre les acteurs. Cependant, certains cherchent à se démarquer en proposant des
+services spécialisés, tels que la préparation aux concours ou le soutien en langues rares. Cette
+spécialisation permet de justifier un positionnement tarifaire supérieur et de s'extraire de la
+concurrence basée principalement sur les prix.
+Les barrières à la sortie sont relativement faibles pour les acteurs digitaux, en raison de faibles
+investissements initiaux et de coûts fixes limités. Cependant, pour les entreprises établies avec
+des infrastructures physiques, les coûts liés à la fermeture de centres ou à la résiliation de
+contrats peuvent constituer des obstacles significatifs. Cela incite certaines entreprises
+traditionnelles à opérer une transformation digitale pour rester compétitives, ce qui intensifie la
+pression concurrentielle sur les canaux numériques.
+La majorité des services restent standardisés, avec des offres similaires en termes de structure
+et de tarification. Cette uniformité limite les leviers de différenciation et intensifie la concurrence
+sur les prix. Toutefois, l'émergence de services spécialisés et personnalisés offre des
+opportunités pour se démarquer et répondre à des besoins spécifiques du marché.
+15
+
+
+Pouvoir de négociation des fournisseurs 
+Le marché du tutorat repose sur une multitude de micro-fournisseurs : enseignants indépendants,
+étudiants-tuteurs, professeurs certifiés, voire plateformes spécialisées en marque blanche. En
+France, on dénombre plusieurs dizaines de milliers de prestataires individuels actifs à titre
+d'exemple, Superprof revendique plus de 22 000 profils disponibles en région Île-de-France. Cette
+forte atomisation du côté fournisseur réduit significativement leur pouvoir de négociation face
+aux plateformes et aux clients finaux.
+Les coûts de changement de fournisseurs sont très faibles pour les plateformes : il est facile
+d'intégrer ou de remplacer un tuteur au sein d’un catalogue. Toutefois, certains prestataires de
+niche (ex : experts en mathématiques supérieures, langues rares ou coaching de thèse) peuvent
+avoir un pouvoir accru grâce à leur spécialisation. La différenciation reste modeste sur le marché
+généraliste, à l’exception de certifications ou expériences spécifiques (agrégation, doctorat,
+bilinguisme).
+Dans un modèle B2B2C (plateformes travaillant avec des établissements scolaires ou des
+entreprises), les coûts d’acquisition, de formation et de vérification des profils constituent une
+barrière indirecte à la substitution rapide des fournisseurs. Plus une plateforme investit dans la
+qualification et la fidélisation de ses tuteurs, moins elle dépend de fournisseurs en flux tendu,
+renforçant ainsi son autonomie et sa capacité à négocier.
+Pouvoir de négociation des clients 
+Le pouvoir de négociation des clients (parents, étudiants, établissements) est particulièrement
+élevé. Plusieurs facteurs structurants l’expliquent :
+Le niveau de concentration est faible : les clients sont très nombreux, avec peu de poids
+individuel, mais l’offre étant pléthorique, ils ont un large pouvoir de choix.
+Le marché est très transparent : plateformes comme Superprof, GoStudent ou Sherpas
+permettent de filtrer, comparer, noter, recommander… rendant la mise en concurrence directe
+systématique.
+Les coûts de transfert sont faibles à inexistants : il est très simple de passer d’un tuteur à un
+autre ou d’une plateforme à une autre sans perte de données ni contraintes contractuelles.
+Le niveau de standardisation des services est élevé : les cours particuliers sont souvent
+perçus comme homogènes, sauf lorsqu’il y a une forte personnalisation, ce qui pousse les
+clients à comparer uniquement sur le prix ou les avis.
+Ce pouvoir pousse les plateformes à adopter une logique de valeur perçue maximale via des
+leviers de personnalisation, de gamification, de retours d’expérience ou d’algorithmes de
+matching. L’expérience utilisateur devient donc un enjeu différenciateur stratégique.
+16
+
+Menace des nouveaux entrants 
+La barrière à l’entrée économique est faible sur ce marché, notamment sur le segment plateforme
+digitale. Un MVP fonctionnel de type marketplace peut être lancé avec moins de 30 000 €
+d’investissement initial, grâce à l’utilisation de solutions no-code ou white label.
+Cependant, les vraies barrières compétitives sont ailleurs :
+La réputation de la marque est un actif stratégique majeur dans un marché basé sur la
+confiance. Acadomia, Superprof ou GoStudent bénéficient d’une notoriété installée.
+Les effets de réseau sont puissants : plus une plateforme a de tuteurs et d’utilisateurs, plus sa
+proposition de valeur s’enrichit (matching, recommandations, retours qualitatifs).
+Les économies d’échelle jouent à plein : en marketing digital (SEO, SEA), en acquisition
+payante (CPC, affiliation), ou en automatisation des parcours clients.
+Le segment premium (coaching, mémoire, soutiens complexes) demeure plus difficile à pénétrer
+sans expertises ou référencements reconnus. De plus, le marché connaît un taux de croissance
+dynamique, évalué à +9 % par an sur le digital learning, ce qui attire beaucoup d’initiatives mais
+augmente la pression concurrentielle sur les entrants non différenciés.
+Menaces des produits de substitution 
+La menace de substitution est particulièrement vive avec :
+Les solutions automatisées (ex. : ChatGPT, Scribbr, Grammarly, traducteurs IA).
+Les ressources gratuites (cours en ligne, forums, MOOC, YouTube, Discords d’étudiants).
+Les aides institutionnelles (tutorat universitaire, missions locales, accompagnements
+étudiants gratuits dans certaines villes ou universités).
+Ces solutions présentent un rapport qualité/prix très compétitif : coût nul ou très faible,
+accessibilité immédiate, personnalisation croissante via l’IA.
+Néanmoins, elles ne couvrent ni l’aspect humain, ni l’accompagnement individualisé, ni
+l’encadrement récurrent, éléments clefs pour les étudiants en difficulté ou les étrangers en
+processus d’intégration. Les coûts de conversion sont donc faibles, mais les limites
+pédagogiques créent une opportunité de repositionnement pour des offres hybrides combinant
+tech + humain.
+17
+
+
+NOMOFFRE
+PRINCIPALECIBLEFONCTIONNEME
+NT (€)FORCES FAIBLESSES
+SUPERPROFCours particuliers
+et aide aux devoirsÉèves et
+étudiants de
+tous les niveauxCommission ou
+forfaitBeaucoup de
+profs, diversité
+des matières,
+flexibilitéPas de suivi a
+long terme
+d’après les avis,
+échanges pas
+très structurés
+LES SHERPASCours particuliers
+en ligne avec des
+étudiantsLycéens et
+étudiantTarif horaire
+selon le tuteurs
+(fixer par le
+tuteur)Proximité
+générationnelle,
+plateforme
+intuitiveVariabilité dans
+la qualité des
+cours, absence
+d'outils
+numériques
+avancés
+PROFEXPRESSSoutien scolaire en
+ligne par des
+enseignants
+qualifiéÉlèves de
+primaire
+jusqu”au lycéeAbonnement
+possible a
+travers des
+entreprises ou
+des
+collectivitésDisponibilité
+7j/7, intégration
+de l'IA pour
+l'aide aux
+devoirsAccès restreint
+MEETINCLASSCours en petits
+groupes avec des
+enseignants
+qualifiésÉlèves du
+primaire au
+lycée.Tarification par
+séance ou
+forfaitApprentissage
+collaboratif,
+tarifs
+abordablesMoins adapté
+pour un
+accompagneme
+nt individuel
+4.ANALYSE DE LA CONCURRENCE
+Plateforme concurrentes qui propose:
+Du soutien académique
+Une mise en relation étudiant/mentor
+De la relecture/coaching
+Des outils éducatifs numériques
+Concurrents Direct  
+18
+
+NOMOFFRE
+PRINCIPALECIBLEFONCTIONNEME
+NT (€)FORCES FAIBLESSES
+ACADOMIASoutien scolaire à
+domicile ou en
+visioCollege, lycée,
+etudiantForfaitBonne
+réputation,
+enseignants
+qualifiéPrix élevé, peu
+digitalisé
+COURS THALÈSPlutôt du coaching
+academiqueEtudiant, prepa,
+licenceForfait assez
+chereQualité, bon
+réseau, assez
+exigent, très
+bon suiviassez sélectif,
+pas très flexible
+SCRIBBR  ANTIDOTERelecture
+automatique ou
+humaine,
+correction avec l’IAEtudiants,
+chercheursFreemium /
+Forfait
+PonctuelIA performante,
+gain de temps,
+tres accessiblePas
+d’interaction
+humaine, pas de
+pédagogie
+COMEUP
+MALT
+FIVERRPrestations
+freelances
+(relecture,
+traduction
+trouvable sur le
+site)Étudiants, auto-
+entrepreneursPrix libre /
+commission /
+Bas prix Tarifs
+attractifs, large
+choix de
+freelancesQualité inégale,
+absence de
+cadre
+pédagogique,
+pas de
+certitudes4.ANALYSE DE LA CONCURRENCE
+Concurrents Indirect 
+Analyse Fonctionnelle  
+NOMOFFRE
+PRINCIPALECIBLEFONCTIONNEME
+NT (€)FORCES FAIBLESSES
+ONBOARDING  
+PERSONNALISÉOUI N O N N O N N O N N O N
+MATCHING INTELLIGENT OUI N O N N O N N O N N O N
+COACHING OUI OUI OUI OUI OUI
+RELECTURE IA + HUMAINE OUI N O N N O N OUI N O N
+PARCOURS STRUCTURÉ OUI N O N N O N N O N N O N
+INTERFACE MOBILE ET WEB OUI OUI OUI N O N OUI
+COMMUNAUTÉ ÉTUDIANTE OUI N O N N O N N O N N O N
+19
+
+
+4.BENCKMARK DES CONCURRENTS
+CRITÈRE SUPERPROF LES SHERPAS PROFEXPRESS MEETINCLASS AMI
+SPÉ ACADÉMIQUE - + - - + +
+DIGITALISATION ET IA - - + - + +
+UX / ERGONOMIE + + - + ++
+COACHING ET SUIVI - - - - + +
+TARIF ÉTUDIANT + + - + + +
+ETHIQUE ET TRANSPARENCE + + ? ? ++
+COMMUNAUTÉ - - - - +
+PERSONNALISATION DU
+PARCOURS - - - - + +
+CRITÈRE A M I SUPERPROF LES SHERPAS PROFEXPRESS MEETINCLASS
+MISE EN RELATIONAutomatique via
+matching IAManuelle Manuelle Via une entreprise Manuelle
+RELECTURE / COACHING IA + humainProfesseur
+particulierHumain IA + coaching Humain
+OUTILS NUMÉRIQUESIA, agenda,
+documents, …Limite : profil et
+contactMessagerie IA intégrée X
+SUIVI STRUCTURÉ Ludique X X X X
+PERSONNALISATION DU
+PARCOURSFormulaire +
+matchingX X X X
+CIBLE PRINCIPALEÉtudiants post-
+bac /
+master/thèseTout public Lycée / prépaÉlèves collège et
+lycéeÉlèves collège
+et lycée
+INTERFACE UX /
+ERGONOMIEModerne, mobile
+et intuitiveBasique Basique Peu ergonomique Basique
+COMMUNAUTÉ /
+ENTRAIDEPrésente
+(forums, réseau)X X X X
+TARIFAccessible /
+ajustéeVariables selon le
+profForfaits Par abonnement Forfaits
+POSITIONNEMENT
+ÉTHIQUEAnti ghostwriting,
+bienveillanceX X IA X
+2 0
+
+
+O r i g ' a m i s
+A M I
+L e s
+s h e r p a s
+M e e t i n
+C l a s s
+S u p e r
+P r o fP r o f
+E x p r e s s
+215.MAPPING CONCURRENTIEL
+Spécialisation académiques
+Digitalisation/IA
+Le mapping concurrentiel révèle qu’AMI se positionne de façon unique en alliant une forte
+spécialisation académique à un haut degré de digitalisation. Contrairement aux acteurs
+traditionnels comme Superprof ou Les Sherpas, plus généralistes et peu outillés
+technologiquement, AMI mise sur une expertise dédiée à l’enseignement supérieur et sur des
+outils numériques avancés (IA, matching intelligent, parcours structuré). Cette double orientation
+lui permet de répondre de manière plus précise et efficace aux besoins actuels des étudiants.
+
+
+Le secteur du soutien scolaire en ligne connaît une transformation structurelle portée par la
+digitalisation de l’éducation, la demande croissante de personnalisation pédagogique, et
+l’émergence d’une concurrence de plus en plus différenciée. Dans ce contexte, il est fondamental
+d’identifier les groupes stratégiques qui structurent le secteur. Ces groupes correspondent à des
+ensembles d’acteurs partageant des caractéristiques similaires en termes de modèle
+économique, de niveau d’intégration des services, de posture pédagogique et de création de
+valeur perçue par les clients. Cette typologie permet non seulement de comprendre les logiques
+de performance des concurrents, mais aussi d’orienter de manière ciblée les manœuvres
+stratégiques à adopter.
+226.GROUPES STRATÉGIQUES
+Ce premier groupe regroupe des acteurs tels
+que SuperProf et Meet in Class positionnés
+comme des plateformes facilitatrices de mise
+en relation directe entre professeurs
+particuliers et élèves. Le modèle économique
+repose principalement sur une logique de
+commission ou d’abonnement mensuel. Le
+service est faiblement intégré : il ne
+comprend ni sélection pédagogique
+rigoureuse, ni encadrement post-séance, ni
+reporting des progrès. L’approche est
+orientée « volume », avec une forte
+dépendance au référencement naturel et à la
+liberté laissée aux utilisateurs dans le choix
+des professeurs. Ces plateformes adoptent
+une logique de désintermédiation,
+capitalisant sur la variété de l’offre, la
+réactivité et la flexibilité. Le deuxième groupe regroupe des entreprises
+telles que Les Sherpas, Groupe Réussite et
+Acadomia Online. Ces acteurs misent sur une
+stratégie de différenciation fondée sur la
+qualité et l’accompagnement pédagogique.
+Leur modèle est caractérisé par une sélection
+rigoureuse des enseignants, un suivi
+personnalisé des élèves, et une démarche
+pédagogique structurée. Ils s’adressent
+souvent à une clientèle premium ou à des
+élèves visant l’excellence (prépas, mentions,
+grandes écoles). Le coût des prestations est
+plus élevé, mais justifié par une promesse de
+valeur basée sur la réussite, le progrès
+mesurable et la réassurance parentale. 
+En revanche, il garantit une plus grande fidélisation des clients, une meilleure satisfaction, et un
+bouche-à-oreille performant. Ce groupe se positionne clairement dans une logique de création de
+valeur durable, orientée sur la confiance, l’expertise et la pédagogie sur mesure. La performance
+de ces acteurs repose sur leur capacité à allier excellence académique, relation humaine et
+stratégie marketing émotionnelle.
+
+Le troisième groupe est composé d’acteurs tels que ProfExpress, Kartable et SchoolMouv, dont le
+positionnement repose sur l’industrialisation du contenu éducatif. Ces entreprises s’appuient sur
+une logique de scalabilité maximale via des contenus pré-produits (fiches, vidéos, quiz), souvent
+distribués en B2C ou en B2B (collectivités, établissements). Le modèle économique repose sur
+l’abonnement, la licence ou la souscription à des parcours éducatifs. Le niveau d’intervention
+humaine est faible : l’élève navigue de manière autonome dans une plateforme conçue pour
+optimiser l’expérience d’apprentissage.
+Ces plateformes misent sur la technologie pour offrir une valeur ajoutée basée sur l’accessibilité,
+la flexibilité et l’interactivité. Elles peuvent s’appuyer sur des outils d’analyse des données
+d’apprentissage (learning analytics) pour personnaliser l’expérience utilisateur. Leur avantage
+compétitif réside dans leur capacité à atteindre de très larges audiences à faible coût marginal,
+ce qui en fait des modèles économiquement très attractifs à grande échelle. Toutefois, elles
+souffrent parfois d’un manque de lien humain et de contextualisation pédagogique, ce qui limite
+leur pertinence pour des élèves ayant besoin d’accompagnement individualisé.
+Au regard des groupes existants et des capacités distinctives internes de l’entreprise, la stratégie
+la plus pertinente est celle de la différenciation ciblée. L’entreprise ne peut concurrencer les
+acteurs low-cost sur le terrain du prix sans dégrader sa qualité. Il est donc stratégique de se
+démarquer par la valeur plutôt que par le coût.
+Groupe 2
+Groupe 1 
+Groupe 3Niveau de digitalisation
+Niveau de spécialisation
+AXE X
+Axe X (horizontal) : Niveau de
+digitalisation & d’innovation technologique
+Mesure l’intégration d’outils
+technologiques dans les services.
+À gauche : plateformes classiques
+avec peu d’automatisation.
+À droite : solutions avancées avec
+automatisation, IA, UX fluide et
+interfaces modernes.AXE Y
+Axe Y (vertical) : Niveau de spécialisation
+de la cible
+Évalue si l’offre est généraliste ou
+ciblée.
+En bas : plateformes généralistes pour
+un public large.
+En haut : acteurs spécialisés ciblant
+des segments précis (ex. étudiants
+étrangers).
+23
+
+
+Le secteur du tutorat, notamment en ligne, connaît une croissance soutenue depuis plusieurs
+années. Cependant, cette dynamique s'accompagne d'une intensification de la concurrence, qui
+place aujourd’hui le marché dans une logique d’Océan Rouge. Les principaux acteurs sont des
+plateformes comme Superprof, GoStudent, Acadomia, ou encore des indépendants actifs sur les
+réseaux sociaux ou via des microservices. La concurrence se fait principalement sur les prix, la
+disponibilité des tuteurs, la qualité perçue de l’accompagnement, et la variété des matières
+proposées.
+Le marché est largement standardisé : les offres de tutorat se concentrent majoritairement sur des
+cours particuliers à l’heure, souvent proposés de manière ponctuelle ou selon un forfait d’heures.
+Les plateformes cherchent à séduire à la fois les élèves et les parents, en mettant en avant des
+critères traditionnels comme la qualification du tuteur, le tarif horaire ou les avis clients. Cette
+homogénéité des services génère une guerre des prix et une difficulté à construire une
+différenciation durable.
+Limites de la stratégie actuelle  
+La stratégie dominante dans ce marché montre plusieurs signes de saturation. D’abord, la pression
+sur les marges est constante : les plateformes prélèvent une commission importante sur les
+revenus des tuteurs, tout en devant conserver des prix compétitifs pour les familles. Ensuite, la
+différenciation est faible, car la majorité des acteurs proposent des services similaires sans
+innovation de fond. En outre, les plateformes sont souvent perçues comme de simples
+intermédiaires, sans réelle valeur ajoutée pédagogique ou stratégique.
+Ce modèle conduit à une faible fidélisation des utilisateurs, qui passent d’une plateforme à l’autre
+en fonction du prix ou de la disponibilité. La croissance dépend principalement de la capacité à
+recruter de nouveaux tuteurs et élèves, ce qui alourdit les coûts d’acquisition. Enfin, le modèle
+repose souvent sur des services réactifs (à la demande), plutôt que sur un accompagnement
+structurel de long terme, ce qui limite l’impact pédagogique.
+2 48.LES OCÉANS 
+
+Dans cette nouvelle logique Océan Bleu, la proposition de valeur de l’entreprise se différencie
+radicalement des standards du marché. Elle ne se limite plus à “fournir un tuteur”, mais devient un
+acteur du parcours scolaire de l’élève, en proposant un accompagnement sur mesure, à la fois
+pédagogique, méthodologique et émotionnel.
+Ce positionnement repose sur plusieurs piliers : une relation continue entre l’élève et un tuteur-
+référent, un système de suivi personnalisé avec indicateurs de progression, des outils numériques
+d’auto-évaluation, et une approche humaniste centrée sur la confiance et l’autonomie. Cette
+stratégie crée un espace concurrentiel inédit, dans lequel la valeur perçue repose sur
+l’engagement à long terme et la transformation réelle de l’élève, plutôt que sur une simple
+performance ponctuelle.
+Évaluation des risques et de la faisabilité  
+La mise en œuvre d’une stratégie Océan Bleu implique certains risques à anticiper. D’abord, elle
+suppose de repenser le modèle économique : passer d’un paiement à l’heure à un abonnement ou
+un forfait mensuel peut déstabiliser certains clients habitués à une tarification simple. De plus, il
+faut former les tuteurs à une posture nouvelle, plus proche du mentorat que de la prestation
+classique, ce qui peut nécessiter des investissements humains et pédagogiques.
+Cependant, cette stratégie est techniquement et humainement faisable si l’entreprise s’appuie sur
+des outils numériques de suivi, une sélection rigoureuse des tuteurs, et un cadre pédagogique
+solide. Elle peut aussi bénéficier d’un levier de différenciation puissant pour se positionner
+comme une alternative premium, innovante et centrée sur la réussite durable. Le modèle peut être
+testé à petite échelle, avec une offre pilote, avant un déploiement plus large.
+2 57.ANALYSE DE LA CONCURRENCE
+DIMENSIONSTRATÉGIE ACTUELLE (OCÉAN
+ROUGE)STRATÉGIE PROPOSÉE
+(OCÉAN BLEU)
+MODÈLE ÉCONOMIQUEPaiement à l’heure, commission
+sur mise en relationAbonnement mensuel, parcours
+personnalisé
+DIFFÉRENCIATION Faible : prix, avis, disponibilitéForte : accompagnement long
+terme, approche holistique
+RELATION AVEC
+L'ÉTUDIANTPonctuelle, transactionnelle Continue, relation de confiance
+OUTILS PÉDAGOGIQUES Limités ou absentsIntégrés : suivi, bilans, auto-
+évaluation
+POSITIONNEMENT Prestataire de service Partenaire de réussite scolaire
+CROISSANCE Basée sur volumeBasée sur valeur ajoutée et
+fidélisation
+POTENTIEL DE MARGE FaiblePlus élevé grâce à la valeur
+perçue
+
+26DIAGNOSTIC INTERNE 3
+1. S W O T
+F O R C E S
+Marché ciblé donc plus facilement
+atteignable (stratégie de promotion)
+Positionnement spécialisé
+Un marché en forte croissance : Le soutien
+scolaire en France représente 2 milliards
+d’euros, avec des croissances annuelles de
+20 à 25 % chez certains acteurs
+Appétence parentale forte : Une famille
+dépense en moyenne 1 500 € par an en
+cours particuliers avant crédit d’impôt
+Les familles investissent en moyenne 1 500
+€ par an en soutien scolaire, bénéficiant de
+dispositifs fiscaux incitatifsF A I B L E S S E S
+Notoriété limitée 
+Gestion de la qualité des mentors 
+Manque de structuration du marché actuel
+: 70 à 80 % du soutien scolaire reste
+informel, sans cadre contractuel ni qualité
+pédagogique garantie
+Tension budgétaire chez les étudiants :
+revenus moyens de 919 € par mois, avec
+75 % dépendants de leurs parents
+Concurrence gratuite ou associative :
+dispositifs associatifs ou aides aux devoirs
+gratuits peuvent capter une partie des
+étudiants les plus précaires
+Certains mentors peuvent être réticents à
+l’usage d’applications numériques pour
+l’accompagnement (pour des retraités par
+exemple).
+Coût d’acquisition client élevé : convaincre
+étudiants et mentors de rejoindre la
+plateforme demande un investissement
+marketing important, notamment dans un
+secteur où les offres gratuites ou peu
+coûteuses sont nombreuseO P P O R T U N I T É S
+M E N A C E S
+Marché compétitif
+Fluctuations économiques (inflation)
+Risque de désintermédiation : les étudiants
+peuvent vouloir contacter les mentors en
+dehors de la plateforme pour éviter les frais
+Barrières culturelles et linguistiques :
+potentielle difficulté d’adoption pour
+certains profils d’étudiants internationaux.
+Complexité réglementaire : exigences liées
+à la protection des données (RGPD), à la
+gestion des paiements et à la
+responsabilité pédagogiquePlusieurs aides au financement d’un prof
+particulier : exonération d'impôt, chèque
+famille nombreuse, CPF
+Croissance du marché du tutorat en ligne :
+Le marché mondial du tutorat en ligne est
+en pleine expansion, avec une croissance
+annuelle estimée à 29,8 % entre 2025 et
+2034, passant de 48,87 milliards USD en
+2024 à 663,42 milliards USD en 2034
+Augmentation du nombre d’étudiants en
+France
+Partenariats stratégiques : universités,
+grandes écoles, CROUS
+Crise des universités : 60 universités sur 75
+en déficit, 25 % de postes d’enseignants
+vacants dans certaines disciplines
+
+
+2 72. 4P
+4 PP R O D U I T
+P R I XP L A C EP R O M O T I
+O N
+Gratuit : accès aux fonctionnalités de base
+(jalons, rappels, outils simples)
+Paiement one-shot : pour des besoins
+ponctuels (coaching, relecture)
+Abonnement mensuel :
+Étudiants : accès illimité aux jalons,
+replay, templates premium, IA, support
+prioritaire
+Mentors : badge top mentor, mise en
+avant, factures automatiques, outils
+avancés
+Paiement fractionné possible (ex : 10
+€/mois sur 4 mois pour mémoire)
+Tarifs ajustés selon profil, type de service,
+fréquencePlateforme numérique d’accompagnement
+académique hybride (mobile + web)
+Double interface :
+Étudiants : création de parcours
+personnalisés, jalons, rappels, accès à
+des fiches de révision, templates, IA
+(générateur d’intro/conclusion), visios,
+suivi mentor
+Mentors : outils pédagogiques, agenda
+synchronisé, messagerie, statistiques,
+facturation, rédaction fiches révision
+Fonctionnalités-clés :
+Parcours jalonnés et gamifiés
+Match entre besoin exprimé et profil
+mentor
+Interface fluide et ergonomique
+Espace communautaire de partageCanaux :
+Communication ciblée en milieu
+académique
+Référencement via stores
+(Apple/Google), plateformes
+éducatives
+Partenariats avec écoles, universités,
+associations
+Stratégie ambassadeurs
+(étudiants/mentors)
+Participation à salons, forums,
+événements étudiant100 % en ligne, via :
+Application mobile (usage nomade,
+rapide)
+Plateforme web (confort, outils
+complexes, suivi documents)
+Distribution directe B2C (sans
+intermédiaire)
+Disponibilité 24/7 – prise de RDV en
+temps réel
+Stockage sécurisé (cloud européen
+RGPD compliant)
+Intégration possible dans dispositifs
+d’établissements ou CROUS, résidences
+étudiantes, mutuelle étudiante
+
+
+283. LE DIAGNOSTIC DES RESSOURCES ET DES
+COMPÉTENCES 
+NATURE DES
+RESSOURCESCOMPOSANTS
+HUMAINESL’équipe est composée de profils qualifiés, internalisés dès le lancement :
+développeur fullstack, UX/UI designer, directrice artistique, cheffe de
+projet/marketing, ainsi qu’une autre experte marketing à mi-temps.
+FINANCIÈRESLe besoin de financement initial est estimé à environ 109 900 €. Il est couvert
+par un mix équilibré : apports personnels, subventions publiques (Région, BPI),
+prêts d’honneur et partenariats. La gestion de trésorerie est prudente avec une
+marge de sécurité (15 %) intégrée dès l’amorçage. Aucune dette à court terme
+n’est engagée à ce stade.
+MATÉRIELLESL’infrastructure matérielle est volontairement légère : matériel informatique
+racheté de façon optimisée, outils en ligne mutualisés (SaaS), locaux dans un
+espace de coworking à Grenoble. Aucun investissement lourd n’est requis pour
+la production. 
+ORGANISATIO
+NNELLESOrig’amis repose sur une organisation agile. Le pilotage est assuré par la
+cheffe de projet en lien direct avec le développeur, la DA et l’UX. Les outils de
+gestion (Notion, Slack, Trello) assurent un suivi fluide. Les livrables sont testés
+par cycles courts. La coordination interne est fluide et alignée avec les
+ressources limitées de l’amorçage.
+TECHNOLOGIQ
+UESLe développement de la plateforme est assuré en interne. L’architecture est
+modulaire, évolutive, et intègre des API d’intelligence artificielle. La propriété
+intellectuelle du code est détenue par l’équipe. L'UX est conçue pour un usage
+simple et autonome, dès la première version.
+RÉPUTATIONN
+ELLESLa marque Orig’amis est en cours de structuration, avec une identité forte et
+une direction artistique soignée. Une stratégie d’influence ciblée sur les
+étudiants, les BDE et les mentors est prévue. Le projet bénéficie déjà d’un
+positionnement différenciant sur un besoin clair, avec un storytelling
+accessible. Des possibilités de partenariats avec écoles, mutuelles et
+incubateurs sont actuellement étudiées par l’équipe.
+
+
+294. CHAINE DE VALEUR
+Infrastructure et Systèmes
+ → SaaS propriétaire, cloud sécurisé, API & IA intégrées
+Gestion RH & Formation
+ → Recrutement mentor, LMS interne, animation communauté
+Développement technologique
+ → IA adaptative, matching cognitif, dashboards KPIs
+Approvisionnement & Contenus
+ → Bibliothèque contextualisée, open data, ML supervisé
+Logistique
+ → Flux de
+contenu,
+infrastructure
+des séances,
+support techProduction
+ → Séances
+hybrides,
+coaching
+visio IA,
+parcours
+adaptatifsCommerce
+ → Freemium,
+CRM
+comportement
+al, marketing
+par personaService
+ → Suivi IA,
+fidélisation,
+accompagn
+ement
+socio-
+émotionnelMarge 
+Accompagnement
+personnalisé
+Automatisation et
+efficience I A
+Fidélisation et flexibilité
+des par cours
+Positionnement
+différencié et pricing
+maîtrisé
+FONCTIONS DE
+SOUTIEN COMPOSANTS
+INFRASTRUCT
+URE ET
+SYSTÈMEArchitecture SaaS propriétaire (solution logicielle en ligne accessible via
+abonnement, développée en interne), scalable (qui peut gérer une montée
+en charge sans perte de performance) et sécurisée (normes RGPD,
+chiffrement des données).
+Intégration API (interfaces logicielles permettant la connexion à d'autres
+outils) avec systèmes d’IA (correcteurs, Learning management system).
+Hébergement cloud (stockage en ligne externalisé) avec redondance
+géographique (sauvegardes sur plusieurs sites) pour éviter toute perte de
+données.
+GESTION DES
+RESSOURCES
+HUMAINES
+(GRH)Recrutement de mentors par tests de compétences + entretiens en
+situation réelle.
+LMS interne (Learning Management System : plateforme de formation en
+ligne) pour développer soft skills et pédagogie.
+Animation de communauté (partages de pratiques entre mentors,
+événements) pour maintenir l’engagement
+
+
+30FONCTIONS DE SOUTIEN COMPOSANTS
+DÉVELOPPEMENT
+TECHNOLOGIQUEIA pédagogique adaptative (intelligence artificielle qui
+personnalise les parcours d'apprentissage selon le profil de
+l'élève).
+Matching cognitif (algorithmes qui associent élèves et
+mentors selon leur mode de fonctionnement).
+Tableau de bord décisionnel (interface qui donne des
+indicateurs clés de performance pour piloter les opérations).
+APPROVISIONNEMENT Bibliothèque de contenus contextualisés (exercices réels,
+corrigés types), validés par des experts du métier.
+Open-data (données en libre accès) exploité pour nourrir l’IA.
+Enrichissement continu par machine learning supervisé (l’IA
+apprend à partir de corrections humaines validées).
+FONCTION PRINCIPALES COMPOSANTS
+PRODUCTIONSéances hybrides (mélange d’auto-apprentissage et
+accompagnement humain).
+Coaching en visio avec structuration par IA (plan de séance
+proposé par l’algorithme).
+Parcours ajustés selon la progression, avec retour immédiat et
+plan d'action.
+COMMERCIALISATIONFreemium (accès gratuit à une partie du service pour attirer
+l’utilisateur puis le convertir).
+CRM comportemental (Customer Relationship Management :
+outil de suivi de la relation client basé sur ses actions).
+Marketing ciblé par persona (profil-type d'utilisateur) : terminale
+stressée, étudiant en reconversion, etc.
+SERVICESuivi automatisé et proactif (alertes IA en cas d’absence ou de
+sous-performance).
+Système de fidélisation (parrainage, points, club
+d’ambassadeurs).
+Accompagnement socio-émotionnel (gestion du stress,
+confiance en soi, méthodes de travail).
+
+
+Marges 
+La qualité de l’accompagnement personnalisé (valeur perçue),
+La digitalisation des process (automatisation = réduction des coûts),
+LA l’efficience du matching IA/mentor (temps réduit, efficacité pédagogique),
+La capacité à fidéliser les étudiants via des parcours évolutifs, flexibles, à valeur ajoutée,
+Une stratégie de différenciation ciblée maîtrisée (positionnement unique, justification du prix).
+L’analyse de la chaîne de valeur d’Orig’amis révèle une organisation à forte intensité servicielle, où
+l’expérience utilisateur, l’innovation technopédagogique et la qualité de l’accompagnement
+humain représentent les compétences fondamentales. Dans ce cadre, la stratégie de
+différenciation ciblée est celle qui maximise le potentiel stratégique de l'entreprise, en lui
+permettant de se positionner comme un acteur premium de l’accompagnement éducatif
+personnalisé, tout en s’adressant à une niche clairement définie : les étudiants en enseignement
+supérieur en quête de soutien méthodologique, motivationnel et académique.
+La différenciation ciblée repose ici sur la valeur perçue élevée du service : une plateforme hybride
+combinant intelligence artificielle et expertise humaine, un onboarding (accueil digital) intuitif, une
+messagerie intégrée, des outils d’auto-évaluation, une personnalisation des parcours et une
+interaction fluide avec des mentors sélectionnés. L’innovation pédagogique assistée par IA
+(comme la génération automatisée de quiz ou l’analyse sémantique de documents) constitue un
+différenciateur technologique clé, mais toujours mis au service d’une pédagogie humaine et
+éthique. Ce positionnement est en rupture avec les plateformes généralistes ou standardisées de
+cours particuliers.
+3 1Cette stratégie oriente plusieurs décisions clés de
+management. D’abord, Orig’amis doit renforcer en
+interne ses ressources immatérielles différenciatrices :
+UX/UI design, ingénierie pédagogique, gestion de
+communauté de mentors. Ensuite, l’entreprise doit
+structurer un système de qualité mentor autour de
+critères stricts (expérience, soft skills, retours
+utilisateurs, certifications internes), avec une logique
+de labellisation progressive. Ce capital humain est au
+cœur de la valeur ajoutée d’Orig’amis. Parallèlement,
+les outils IA doivent rester au service de la pédagogie
+et non l’inverse, en favorisant une IA augmentée
+(assistance, complémentarité, optimisation), non
+substitutive.
+Certaines activités non différenciantes sont
+externalisées pour soutenir cette différenciation : par
+exemple, le développement de briques technologiques
+génériques (chatbot, système de paiement) ou la
+localisation multilingue. Cette externalisation tactique
+libère des ressources pour investir dans les actifs à
+forte valeur stratégique.
+
+La stratégie de différenciation ciblée implique aussi de refuser la guerre des prix. Le modèle
+tarifaire d’Origami repose sur la perception de qualité : flexibilité, transparence, abonnement
+adapté et garanties (paiement après validation du mémoire, par exemple). Des options freemium
+(boîte à outils gratuite, forum communautaire) permettent de nourrir l’entrée de tunnel sans diluer
+la valeur de l’offre cœur. La gestion fine du cycle de vie utilisateur (LTV) doit permettre une
+fidélisation à long terme, à travers des parcours suivis, des feedbacks NPS (mesure la probabilité
+que les clients recommandent le service), et une logique de progression accompagnée.
+Enfin, plusieurs facteurs clés de succès (FCS) doivent être consolidés pour soutenir cette
+stratégie :
+Excellence opérationnelle dans le pilotage des rendez-vous, visios, documents partagés
+(logistique aval).
+Réputation des mentors, pilotée par un système d’évaluation transparente.
+Innovation pédagogique responsable, intégrée de manière cohérente.Protection des données
+(conformité RGPD) comme socle de confiance.
+Partenariats éducatifs ciblés (universités, BDE, CROUS) pour légitimer l’approche.
+3 2
+
+
+CIBLER POUR
+MIEUX
+CONVERTIR
+3 3
+
+34La population étudiante visée regroupe des apprenants en formation post-bac, de niveau BTS,
+BUT, Licence, Master, Doctorat, généralement âgés de 18 à 30 ans, avec quelques profils en
+reconversion au-delà de 30 ans.
+Ils peuvent être inscrits dans :
+des universités publiques ou privées
+des écoles spécialisées (commerce, ingénierie, santé)
+des formations à distance (CNED, e-learning, MOOC)
+ou des cursus en alternance
+Leurs revenus sont souvent limités : bourse d’étude, soutien familial ou revenus de contrats
+étudiants (stage, tutorat, CDD universitaire, etc.). Le niveau de revenu est en général inférieur à
+1000€/mois, sauf pour les doctorants contractuels (1600 à 2000€ brut/mois).
+Leur statut marital est majoritairement célibataire, ou en couple sans enfants. Le genre est mixte,
+avec une légère dominance féminine dans les filières SHS et lettres, et masculine en sciences
+dures. Ces étudiants sont en formation supérieure à temps plein ou en contrat doctoral.
+1.Comportemental 
+Ce public est dans une logique de projet à moyen ou long
+terme, avec des échéances académiques précises : rédaction
+de mémoire, soutenance, dépôt de thèse, validation d’un
+stage, etc. Leur fréquence d'utilisation attendue de la
+plateforme sera modérée à élevée selon le projet (de 1
+session ponctuelle à 3,5 RDV par mois sur plusieurs mois).
+Leur niveau de digitalisation est élevé : habitués à utiliser des
+outils numériques complexes (Drive, Notion, Zotero, LaTeX,
+ChatGPT, etc.), ils attendent une expérience fluide, fiable,
+simple, mais aussi encadrée, car la pression académique
+génère un besoin de structure.
+Leur pouvoir d’achat est limité, mais la valeur perçue de l’aide
+est élevée, surtout si elle est liée à la réussite du diplôme. Ils
+sont prêts à payer pour un service :
+Qui augmente leurs chances de validation
+Qui leur fait gagner du temps
+Qui les rassure dans un contexte exigeant
+Le canal de recommandation majeur est le bouche-à-oreille
+académique, et les communautés étudiantes en ligne
+(Discord, LinkedIn, forums, groupes campus).1.ANALYSE DE LA SEGMENTATION CLIENT
+Les étudiants
+
+35
+2. Psychographique 
+Ce public est ambitieux, mais souvent en proie au doute. Il
+est conscient de la complexité des attendus académiques et
+souffre de solitude face à des tâches comme : la définition
+d’une problématique, la rédaction structurée, l’usage correct
+des références, la soutenance orale
+Leur style de vie est structuré autour de trois sphères : étude
+/ travail / pression mentale. Leur charge cognitive est élevée.
+Ils valorisent la concentration, la rigueur, la clarté, mais aussi
+la bienveillance.
+Leur personnalité oscille entre :
+Bosseur(se) isolé(e) : cherche à tout faire
+seul·e, mais se perd dans la masse
+Perfectionniste anxieux(se) : paralysé·e par
+la peur de mal faire
+Ambitieux(se) stratégique : veut le diplôme
+et l’excellence avec les bons outilsLeurs valeurs incluent : mérite, transmission,
+reconnaissance, autonomie.
+Leurs besoins clés :
+Avoir un interlocuteur compétent à qui
+poser des questions
+Un accompagnement étape par étape
+Des conseils clairs, ciblés, adaptés à leur
+domaine
+Dédramatiser le projet, gagner en sérénité
+Yasmine
+BoughanemBiographie :
+Yasmine, 20 ans, célibataire, vit en résidence universitaire à Rennes. En deuxième année de Licence LEA (Langues
+étrangères appliquées), elle étudie dans un université publique à forte autonomie et bénéficie de peu de suivi
+pédagogique. 
+Très connectée, elle passe plusieurs heures par jour sur TikTok et Instagram, suit des influenceurs “student life hacks”, et
+utilise Notion pour organiser ses cours ainsi que Google Docs pour les travaux de groupe.
+Freins : Objectifs :
+Besoins :Procrastination : Elle étudie souvent à la
+dernière minute, ce qui la stresse et nuit à son
+efficacité.
+Manque de confiance : Elle doute de ses
+compétences, surtout à l’écrit, et craint de ne
+pas être “assez bonne” pour demander de l’aide.
+Budget serré : Son budget étudiant très limité la
+rend réticente à investir dans des services
+payants à moins d’un bénéfice immédiat.Réussir ses partiels et valider sa Licence sans
+redoublement.
+Améliorer ses méthodes de travail pour
+gagner en autonomie et en organisation.
+Se préparer pour son futur Master en
+renforçant ses compétences.
+Cadre bienveillant : Un accompagnement “comme une grande sœur / un grand frère” qui ne l’infantilise
+pas.
+Conseils concrets et rapides : Structurer ses exposés, corriger ses rapports sans faute, et gagner
+confiance à l’oral.
+Formats courts et visuels : Coaching express, relecture rapide, contenus pédagogiques simplifiés avec un
+impact immédiat.“J’ai besoin de conseils
+rapides et concrets, dans un
+cadre bienveillant, pour
+structurer mes exposés,
+corriger mes travaux et
+gagner en confiance sans
+dépasser mon petit budget.”Persona
+Cible primaire
+
+3 6
+Les étudiants en Master et en Doctorat représentent une population stratégique, à la croisée des
+enjeux académiques et professionnels. Ils sont âgés en moyenne de 22 à 35 ans, parfois plus
+lorsqu’il s’agit de doctorants en reprise d’étude ou en parcours professionnel (CIFRE, HDR, thèse
+professionnelle, etc.). Ils évoluent dans un univers exigeant où la rigueur intellectuelle, la charge
+de travail autonome et la pression à la performance sont omniprésentes.
+Ces étudiants sont engagés dans des projets à long terme comprenant les mémoires de
+recherche, mémoire professionnel, thèse disciplinaire ou interdisciplinaire. Le niveau d’attente de
+leurs encadrants est élevé, les normes universitaires sont strictes, et l’isolement est fréquent.
+C’est dans cette zone de tension que se créer un besoin profond d’accompagnement structuré,
+sur-mesure, humain et expert.
+Leur revenu est souvent modeste, bien que plus stable que pour des étudiants en Licence ou BTS.
+Les étudiants en Master vivent généralement de bourses, d’emplois étudiants, ou de revenus liés
+aux stages de fin d’étude. Les doctorants, eux, sont parfois sous contrat doctoral public (1700€
+brut en moyenne), ou bénéficient de financements CIFRE(Le dispositif des Conventions
+industrielles de formation par la recherche). Une partie non négligeable cumule thèse et activité
+salariée, au détriment de leur équilibre.
+Pour ces profils, chaque euro investi dans leur accompagnement doit avoir du sens. Ils sont prêts
+à payer si le retour sur investissement est clair : meilleure note, gain de temps, sérénité, réussite à
+la soutenance, publication, insertion professionnelle. Ils sont sensibles à une offre qualitative,
+segmentée par besoin précis, et refusent les promesses creuses ou les discours généralistes.
+1.Comportemental 
+Ces étudiants ont une maîtrise numérique avancée. Ils
+utilisent quotidiennement des outils en ligne. Ils savent
+chercher de l’information, mais ne savent pas toujours
+structurer, prioriser, planifier.
+Ils vivent des pics d’anxiété à l’approche des deadlines
+(rendu de mémoire, pré-soutenance, échéances doctorales,
+etc.). Beaucoup sont confrontés à des syndromes
+fréquents : syndrome de l’imposteur, surcharge cognitive,
+procrastination perfectionniste. Le besoin de soutien
+humain, émotionnel et méthodologique est énorme, mais
+rarement comblé par les structures universitaires, souvent
+débordées.
+Leur comportement d’usage se structure selon le cycle de leur projet :
+En début de projet : besoin de cadrage, méthodo, bibliographie
+En phase de rédaction : besoin de relecture, correction, reformulation
+En fin de parcours : besoin de coaching oral, storytelling, mise en forme, défense devant juryCoeur de cible : étudiants en master et doctorat
+
+3 72. Psychographique 
+La psychologie de ces étudiants est marquée par une
+ambition réelle, mais aussi par une solitude intellectuelle et
+émotionnelle. Ils vivent souvent leur mémoire ou leur thèse
+comme une épreuve décisive : “personne ne peut vraiment
+m’aider”, pensent-ils. Ils sont tiraillés entre le désir de bien
+faire, le manque de retours concrets de leurs encadrants, et
+une incertitude constante sur la qualité de leur travail.
+Ils valorisent la reconnaissance académique, la légitimité
+intellectuelle, la clarté argumentaire. Ce sont des
+chercheurs en devenir, des profils curieux, critiques,
+souvent passionnés, mais rarement outillés pour les
+exigences formelles imposées.
+Leur style de vie est souvent déséquilibré, structuré autour de longues phases de travail
+personnel, avec peu de respiration. Ils sacrifient parfois leur vie sociale ou personnelle au profit
+du travail universitaire. D'où l'importance de leur offrir un cadre, un rythme, un allié de confiance.
+Leur profil psychologique se répartit en 3
+grandes typologies :
+Le ou la perfectionniste épuisé(e) : ultra-
+exigeant(e), paralysé(e) par la peur de mal
+faire.
+Le ou la solitaire désorienté(e) : intelligent(e),
+mais perdu(e) sans cadre ni feedback.
+L’ambitieux(se) stratégique : veut transformer
+son mémoire ou sa thèse en tremplin
+professionnel ou académique.
+Ils cherchent donc :
+Des experts disponibles, qui comprennent
+les enjeux disciplinaires
+Des conseils humains, concrets,
+contextualisés
+Une structuration du projet, pas juste une
+aide ponctuelle
+Des retours bienveillants mais exigeants
+Un espace de respiration, pour sortir de leur
+solitude
+
+38
+Persona
+Nos mentors représentent la force vive de notre plateforme. Ils sont à la fois prestataires de
+service, accompagnants, pédagogues et partenaires de réussite. L’objectif est de leur proposer
+une plateforme exclusive et qualitative, orientée étudiants uniquement, qui valorise leur expertise,
+leur offre de la visibilité ciblée et leur permet de monétiser leurs compétences intellectuelles et
+humaines.
+Les mentors que nous visons se répartissent en plusieurs grandes catégories : 
+les professionnels en activités : consultants, cadres, managers ou experts spécialisés
+(marketing, finances, médecines, recherche scientifique). Ils cherchent à transmettre leur
+savoir et à diversifier leurs sources de revenus. 
+Les enseignants vacataires, doctorants expérimentés ou jeunes chercheurs : profils
+académiques familiers du système universitaire, désireux de monétiser leur expérience
+pédagogique en dehors des circuits classiques. 
+Les indépendants ( freelances) : relecteurs professionnels, coachs en communication orale,
+traducteurs, ayant déjà une activité libérale ou auto-entrepreneuriale et souhaitant accéder à
+une clientèle ultra ciblée ( étudiants).  
+Leur statut professionnel varie : une partie importante travaille en freelance, souvent sous statut
+d’auto-entrepreneur, tandis que d’autres sont salariés dans des structures privées ou publiques et
+cherchent une activité complémentaire, intellectuellement stimulante. Cible secondaire : les mentors
+Coeur de cible
+Antoine
+LefèvreBiographie :
+Antoine, 28 ans, célibataire et sans enfant, vit à Lyon en colocation avec deux autres doctorants. Il en est à la 3 ᵉ  année
+de son doctorat en science politique. Très connecté au monde académique, il utilise Mendeley, LaTeX, participe à des
+groupes Slack de doctorants et suit des webinars spécialisés.
+Il travaille de manière méthodique sur sa thèse, donne des TD à des étudiants de licence et cherche à publier dans des
+revues scientifiques. Pour enrichir sa pratique, il écoute aussi des podcasts sur la recherche et la prise de parole en
+public.
+Freins : Objectifs :
+Besoins :Manque de feedback : Il souffre d’un
+encadrement insuffisant et redoute de
+progresser sans retours critiques.
+Difficulté de vulgarisation : Il lit beaucoup mais
+peine à rendre ses idées accessibles hors du
+cercle académique.
+Perfectionnisme et temps limité : Il craint que les
+services soient trop généralistes ou
+approximatifs et veut optimiser chaque minute.
+Isolement intellectuel : Il peut manquer de
+motivation sans un regard extérieur exigeant
+mais constructif.Terminer sa thèse avec un niveau
+d’exigence élevé.
+Obtenir une publication scientifique
+reconnue.
+Décrocher une bourse post-doc ou un poste
+d’enseignant-chercheur.
+Accompagnement pointu : relecture critique, structuration argumentaire, simulations d’oraux de
+soutenance.
+Service ultra-spécialisé : professionnel, qualitatif, avec preuves de qualité (témoignages, expertises
+académiques).
+Sparring partner académique : une relation stimulante pour lever son perfectionnisme et maintenir sa
+motivation.“J’ai besoin d’un regard
+expert et exigeant pour
+structurer mes arguments,
+peaufiner ma thèse et
+réussir mes publications,
+tout en optimisant chaque
+intervention.”
+
+3 9Côté situation personnelle, ces mentors sont soit célibataires, soit en couple, parfois avec des
+enfants pour les plus expérimentés, ce qui les pousse à rechercher une certaine flexibilité dans
+l'organisation de leur temps. Leur niveau de revenu mensuel est très variable : les enseignants
+vacataires ou jeunes indépendants peuvent gagner entre 1 200 et 2 000 euros par mois, tandis
+que les consultants ou experts confirmés peuvent dépasser les 3 000 voire 5 000 euros. 
+L’accompagnement des étudiants n’est donc pas pour eux une source de revenus principale, mais
+plutôt une activité secondaire à forte valeur symbolique, tournée vers la transmission.
+1. C o m p o r t e m e n t a l 
+Les mentors adoptent un comportement professionnel, structuré
+et exigeant. Ils ont l’habitude de gérer leur emploi du temps, leurs
+projets et leurs clients en toute autonomie. La plupart d’entre eux
+sont familiers des plateformes en ligne, mais expriment souvent
+une insatisfaction face aux solutions existantes. Des
+plateformes comme Malt, Fiverr ou Superprof sont perçues
+comme trop généralistes, trop orientées vers la mise en
+concurrence ou des prestations à bas prix, sans réelle
+valorisation de l’expertise intellectuelle. Les mentors souhaitent
+un cadre spécialisé, dédié uniquement aux étudiants, avec des
+missions cadrées, qualifiées et sérieuses. Ils refusent de perdre
+du temps avec des demandes vagues, non professionnalisées,
+ou mal rémunérées.
+En moyenne, ils sont prêts à s’engager sur une à cinq missions
+par mois, selon leur disponibilité et leur préférence. Certains
+interviennent de façon ponctuelle pour relire un mémoire ou
+entraîner à une soutenance, tandis que d’autres préfèrent établir
+un accompagnement régulier, semaine après semaine. Ils sont
+familiers avec les outils numériques (visioconférence, outils
+collaboratifs, paiements en ligne, gestion de plannings) et
+attendent une interface claire, simple, qui leur permet de
+travailler de manière efficace, sans lourdeur administrative. Ils
+souhaitent choisir les profils d’étudiants avec lesquels ils
+travaillent, et pouvoir refuser les projets qui ne correspondent
+pas à leur domaine d’expertise ou à leurs standards de qualité.
+D’un point de vue économique, les mentors cherchent avant tout une juste reconnaissance de leur
+compétence. Ils n’acceptent pas la logique de la course au tarif le plus bas. Ils valorisent leur
+temps, leur savoir-faire, et souhaitent que la plateforme leur permette de structurer leur activité
+sans être contraints par une logique purement commerciale. Ce sont des profils orientés qualité,
+qui privilégient la pertinence et l’impact de leur accompagnement à la quantité de missions
+réalisées.
+
+4 0
+2. Psychographique 
+Psychologiquement, les mentors sont des profils
+engagés, animés par des valeurs fortes. Ce qui les
+pousse à accompagner des étudiants, ce n’est pas
+seulement un besoin financier ou professionnel, mais une
+volonté réelle de transmettre, d’aider, de guider. Ils ont
+eux-mêmes traversé le système universitaire, souvent
+sans accompagnement, et souhaitent aujourd’hui offrir à
+d’autres ce qu’ils auraient aimé recevoir. Ils valorisent la
+progression, le mérite, le travail intellectuel, et souhaitent
+contribuer à la réussite d’une nouvelle génération
+d’étudiants.
+Leur style de vie est généralement souple,
+souvent basé sur le télétravail, les horaires
+flexibles, la liberté de choisir leurs
+engagements. Ils ne recherchent pas une
+plateforme qui leur impose un rythme ou des
+normes, mais un espace qui respecte leur
+autonomie tout en les aidant à structurer leur
+activité. Ils sont indépendants, organisés, et
+très attachés à la qualité des relations qu’ils
+entretiennent avec les étudiants : ils
+souhaitent être des partenaires, des soutiens,
+des coachs de fond, pas de simples
+prestataires à exécuter une tâche.
+Leur personnalité est marquée par une double exigence : bienveillance et rigueur. Ils sont
+pédagogues, disponibles, mais aussi fermes sur le respect du cadre et sur le sérieux des projets
+proposés. Ils attendent des étudiants une implication réelle, une motivation visible, et une envie
+d’avancer. De leur côté, ils s’investissent pleinement quand ils sentent qu’ils peuvent avoir un
+impact. Leur attachement à la réussite des étudiants est sincère, mais repose sur une relation de
+confiance mutuelle.
+Leurs centres d’intérêt sont souvent liés à l’éducation, au développement personnel, à la
+communication, à la transmission des savoirs. Beaucoup s’intéressent également aux questions
+sociales, à l’égalité des chances, à l’insertion professionnelle. Ils trouvent un véritable sens à
+s’engager dans une mission qui aide concrètement un jeune à réussir son mémoire, à valider son
+diplôme, à oser parler en public, ou à croire en ses capacités.
+
+41
+Persona
+Les étudiants étrangers en France ont généralement entre 18 et 35 ans, avec une concentration
+marquée sur les niveaux licence (12 %), master (17 %) et doctorat (41%). Une part significative
+suit un cursus en alternance, démontrant une volonté d’intégrer la vie professionnelle française
+tout en poursuivant leurs études. Leurs revenus sont très hétérogènes : certains bénéficient de
+bourses (700 à 1000€), d’un soutien familial, ou exercent un emploi étudiant (entre 900 et 1500€
+en alternance), tandis que d’autres, plus précaires, vivent avec moins de 500€. Leur situation
+familiale varie : beaucoup sont célibataires, mais on compte aussi des étudiants en couple ou
+parents isolés. Ces étudiants viennent d’horizons variés : pays du Maghreb (Maroc, Algérie,
+Tunisie), Afrique subsaharienne (Côte d'Ivoire, Cameroun, Sénégal), Asie (Chine), et Europe (Italie,
+Espagne), apportant une diversité culturelle importante. Malgré cette diversité, ils partagent un
+besoin commun : réussir leur parcours académique dans un pays étranger, souvent loin de leur
+soutien habituel.Étudiants internationaux
+Eric MorelBiographie :
+Eric, 42 ans, marié et père d’un enfant, vit à Nantes dans une maison de ville.
+ Consultant en stratégie de communication et coach en prise de parole, il est indépendant depuis 6 ans et accompagne
+des professionnels et des étudiants pour améliorer leurs compétences oratoires et rédactionnelles. Il intervient aussi
+ponctuellement comme vacataire dans des écoles de commerce et à l’université.
+Il utilise au quotidien Zoom, Notion, Canva, PowerPoint et Trello. Il publie régulièrement sur LinkedIn et participe à des
+podcasts autour de la prise de parole et du personal branding. Parallèlement, il suit l’évolution des tendances
+pédagogiques et des outils numériques, propose des ateliers en ligne, des coachings individuels et développe une
+newsletter dédiée à la communication efficace.
+Freins : Objectifs :
+Besoins :Qualité des missions : Il refuse les
+prestations au rabais ou mal cadrées
+(brief flou, objectifs non définis).
+Motivation des apprenants : Il craint
+d’avoir à éduquer des étudiants non
+préparés ou démotivés.
+Sécurisation des revenus : Il tient à
+garantir une rémunération juste et un
+cadre contractuel solide.Diversifier sa clientèle : Attirer des profils
+jeunes, motivés et à forte marge de
+progression.
+Impact éducatif : Valoriser la transmission
+et jouer un rôle clé dans la réussite
+académique de ses élèves.
+Visibilité professionnelle : Renforcer sa
+notoriété dans le milieu éducatif et se
+positionner comme expert.
+Plateforme dédiée : Un environnement en ligne professionnel et spécialisé, qui valorise l’expertise
+des mentors.
+Étudiants investis : Des apprenants cherchant un véritable coaching (oral de mémoire, thèse,
+concours).
+Conditions claires : Un cadre de mission structuré (brief précis, objectifs définis, rémunération
+garantie).“Je veux accompagner des
+étudiants motivés, dans
+des missions stimulant
+intellectuellement, tout en
+sécurisant mes revenus et
+en valorisant mon
+expertise.”Cible secondaire
+
+4 21.Comportemental
+Le comportement d’usage des étudiants internationaux varie selon
+leurs cursus et leur niveau de maîtrise du français ou de l’anglais.
+Ceux engagés dans des programmes complexes comme les
+mémoires, thèses ou projets professionnels utilisent fréquemment
+des services d’aide académique, notamment pour la relecture, la
+structuration ou la traduction de leurs travaux. Leur fréquence
+d’achat est donc régulière (1 à 3 fois par semestre), mais elle peut
+devenir intensive lors des périodes clés du calendrier universitaire
+(remise de mémoire, soutenance, candidatures). Leur niveau de vie
+reste modeste pour la majorité, ce qui les pousse à chercher des
+solutions à bon rapport qualité/prix, tout en refusant les services
+impersonnels ou automatisés. Ils sont généralement très
+connectés : familiers des outils digitaux, ils utilisent naturellement
+des plateformes mobiles ou web, à condition que celles-ci soient
+accessibles, simples, transparentes et rassurantes. Leur
+comportement d’achat est fortement influencé par les
+recommandations d’autres étudiants ou les relais institutionnels
+(écoles, associations).
+2. Psychographique
+Les étudiants internationaux mènent une vie souvent marquée par
+la complexité et la résilience. Logement précaire, longues
+démarches administratives longues, barrière linguistique, solitude
+: tout cela construit un quotidien qui nécessite une forte capacité
+d’adaptation. Malgré cela, ils font preuve d’une grande motivation :
+ils valorisent énormément l’éducation, perçue comme un levier de
+mobilité sociale, d’indépendance financière et de reconnaissance.
+Leur personnalité reflète un esprit combatif, autonome, mais aussi
+en quête de soutien et de repères. Ils recherchent une expérience
+universitaire réussie, mais aussi humaine et intégrée. Leurs
+valeurs sont tournées vers l’autonomie, la réussite, et la dignité
+dans l’effort. Le respect, la clarté, l’accompagnement empathique
+sont essentiels à leurs yeux. Ils s’intéressent à la culture française,
+aux rencontres, aux événements communautaires, mais le temps
+leur manque. C’est pourquoi ils recherchent des services
+accessibles, efficaces, et surtout adaptés à leur réalité. Un service
+qui anticipe leurs contraintes, qui les accompagne de façon ciblée
+et humaine, devient pour eux un véritable catalyseur de réussite.
+
+43
+Persona
+Lin WeiBiographie :
+Eric, 42 ans, marié et père d’un enfant, vit à Nantes dans une maison de ville.
+ Consultant en stratégie de communication et coach en prise de parole, il est indépendant depuis 6 ans et accompagne
+des professionnels et des étudiants pour améliorer leurs compétences oratoires et rédactionnelles. Il intervient aussi
+ponctuellement comme vacataire dans des écoles de commerce et à l’université.
+Il utilise au quotidien Zoom, Notion, Canva, PowerPoint et Trello. Il publie régulièrement sur LinkedIn et participe à des
+podcasts autour de la prise de parole et du personal branding. Parallèlement, il suit l’évolution des tendances
+pédagogiques et des outils numériques, propose des ateliers en ligne, des coachings individuels et développe une
+newsletter dédiée à la communication efficace.
+Freins : Objectifs :
+Besoins :Barrière linguistique et difficulté à
+comprendre certaines consignes
+universitaires
+Manque de réseau local pour demander
+de l’aide (amis, professeurs)
+Stress culturel et académique (rythme,
+autonomie attendue)
+Peur de se tromper dans la méthodologie
+académique française
+Budget limité Réussir son mémoire de fin d’études
+malgré la barrière de la langue
+Obtenir un stage en entreprise française
+Mieux s’intégrer dans l’environnement
+académique francophone
+Structurer ses projets d’étude de façon
+claire et méthodique
+Gagner en autonomie dans la gestion de
+ses tâches universitaires
+Un outil simple et visuel pour planifier son mémoire étape par étape
+Des templates clairs et adaptés au contexte académique français
+Du soutien pédagogique (exemples, relectures, mentors)
+Des ressources traduites ou compréhensibles pour un non-natif
+Une plateforme disponible sur mobile, intuitive et sans surcharge visuelle“Je veux réussir ici, mais
+parfois j’ai juste besoin
+qu’on m’explique les
+attentes de façon claire 
+et que je puisse avancer
+étape par étape, sans me
+perdre. “
+2.STRATÉGIE DE CIBLAGE 
+ Notre application adopte un ciblage double et complémentaire, conçu pour créer une relation
+d'accompagnement de qualité entre deux types d'utilisateurs : les étudiants, bénéficiaires finaux
+du service, et les mentors, professionnels indépendants ou experts académiques mobilisés pour
+les soutenir. Ce modèle repose sur une vision claire : construire un environnement pédagogique
+où chaque étudiant, quel que soit son niveau ou son parcours, peut accéder à un
+accompagnement personnalisé, humain et structurant.
+Le choix du marketing différencié s’impose naturellement dans le cadre de notre projet, car il nous
+permet de répondre de manière précise et pertinente aux attentes de deux cibles très différentes
+mais complémentaires : les étudiants et les mentors. Les étudiants ont besoin d’un
+accompagnement personnalisé selon leur niveau, leur projet et leur discipline, tandis que les
+mentors recherchent une plateforme valorisante, professionnelle et flexible pour transmettre leur
+expertise. En optant pour cette stratégie, nous pouvons adapter notre message, notre interface et
+notre parcours utilisateur à chaque public, sans diluer notre positionnement. Cela nous permet de
+proposer une solution spécialisée, humaine et sur mesure, tout en renforçant la cohérence de
+notre marque et la qualité de l’expérience utilisateur.Cible tertiaire
+
+É T U D E
+Q U A L I T A T I F
+E T
+Q U A N T I T A T I F
+4 4
+
+4 5
+1. M E N T O R S
+Dans le cadre du développement de la plateforme Orig'amis, cette étude qualitative vise à mieux
+comprendre les attentes, pratiques et freins des professionnels de la relecture, de la correction et
+de l’accompagnement académique. À travers une série d’entretiens semi-directifs menés auprès
+de profils variés, cette enquête cherche à déterminer les conditions d’adhésion à un
+environnement numérique pensé pour structurer, valoriser et fluidifier leur activité, tout en
+respectant leurs spécificités.
+Quatre axes majeurs se sont imposés dans l’analyse, constituant à la fois des hypothèses
+fondatrices et des tendances structurelles. Le premier concerne la place essentielle du lien
+humain. Pour de nombreux mentors, l’activité repose d’abord sur une rencontre, un échange, une
+écoute. Le service ne précède pas la relation : il en découle. Certains provoquent même ces
+moments de contact dans des lieux publics, persuadés que la confiance est le socle de tout
+accompagnement. Cette posture rend la projection dans un dispositif numérique conditionnée à
+sa capacité à préserver ce lien. Comme l’exprime un répondant : “Ce n’est pas un service que je
+vends, c’est une histoire que j’écris avec quelqu’un.”
+Le deuxième thème récurrent concerne les parcours atypiques des mentors, souvent motivés par
+un besoin de transmission, d’utilité sociale ou de reconversion. Beaucoup ont exercé dans
+l’enseignement, le médico-social, la culture ou la fonction publique, et abordent le mentorat
+comme un prolongement de leur engagement personnel. Loin d’une logique marchande, cette
+activité prend la forme d’une contribution sociale, d’un espace d’échange ou de valorisation de
+l’expérience. “Mes clients ont traversé la tempête. Écrire leur histoire, c’est les aider à tourner une
+page”, témoigne un mentor. Cette approche implique des attentes fortes en termes de
+reconnaissance, de relation et de pertinence des projets.
+Un troisième constat fort porte sur le caractère informel et peu structuré du marché. Faute de
+repères partagés, les mentors bricolent leurs tarifs, ajustent leurs méthodes au cas par cas, et
+fonctionnent souvent par intuition ou expérience. Peu utilisent de plateformes spécialisées.
+Certains établissent leurs devis uniquement après analyse d’un échantillon de texte. D’autres
+adaptent leurs conditions selon le public, le niveau académique ou l’urgence. Le flou qui entoure
+la profession complique sa valorisation et limite la possibilité d’en faire une activité pérenne. “J’ai
+inventé un tarif la première fois. Maintenant, je demande toujours un échantillon”, confie un
+participant.
+Enfin, si les outils numériques restent peu utilisés, ils ne sont pas rejetés en bloc. Plusieurs
+mentors expriment un intérêt pour une solution centralisée, à condition qu’elle respecte leur
+autonomie, leur manière de travailler et leur vision du métier. Ce qui est rejeté, ce n’est pas le
+numérique en tant que tel, mais la logique algorithmique, impersonnelle ou commerciale qui
+l’accompagne trop souvent. L’attente porte sur un outil simple, humain, transparent et ciblé sur
+des projets cohérents. Comme le dit un répondant : “Je n’ai jamais travaillé avec une plateforme.
+Mais si elle respecte ma manière de faire, pourquoi pas.”
+
+4 6
+Les données recueillies confirment donc l’existence d’un profil de mentor ancré dans la relation,
+motivé par le sens, en demande de reconnaissance et ouvert à des outils numériques à condition
+qu’ils respectent ses valeurs. L’activité est exercée dans un cadre souvent informel, avec des
+pratiques hétérogènes mais une cohérence profonde : celle d’un métier de lien, de structuration,
+et d’accompagnement intellectuel et humain. Une plateforme comme Orig'amis pourrait répondre
+à cette attente si elle proposait une interface fluide, un public ciblé, une autonomie respectée, et
+des modalités de valorisation adaptées.
+Les principales limites de cette étude résident dans la nature qualitative du corpus et le profil des
+répondants, plutôt engagés et volontaires. Cette orientation peut conduire à une survalorisation
+du lien humain ou à une prudence excessive vis-à-vis du numérique. Toutefois, la cohérence des
+discours et la clarté des attentes fournissent une base solide pour orienter le design stratégique
+de la solution.
+V E R B A T I M C O D E C A T É G O R I E T H È M E
+“Ce n’est pas un service que je vends, c’est
+une histoire que j’écris avec quelqu’un.”relation d’engagement Lien interpersonnel Rencontre & confiance
+“Je vais au marché avec une pancarte. Là, les
+gens s’arrêtent.”prospection sociale Relation directe Rencontre & confiance
+“Mes clients ont traversé la tempête. Écrire
+leur histoire, c’est les aider à tourner une
+page.”utilité sociale Transmission & impact Parcours engagés
+“Je travaille un seul projet à la fois, le matin,
+dans la discipline.”autonomie de rythme Pratiques personnelles Parcours engagés
+“J’ai inventé un tarif la première fois.
+Maintenant, je demande toujours un
+échantillon.”devis au cas par cas Tarification intuitive Marché informel
+“Je ne saurais pas combien demander, je
+regarde d’abord le texte.”évaluation préalable Marché flou Marché informel
+“Je n’ai jamais travaillé avec une plateforme.
+Mais si elle respecte ma manière de faire,
+pourquoi pas.”condition d’adhésionOutil perçu comme
+neutreNumérique perçu
+comme utile
+“Je pourrais aller sur une plateforme, si elle
+respecte ma manière de faire.”ouverture modérée Autonomie et éthiqueNumérique perçu
+comme utile
+
+4 7
+2. ETUDIANTS
+Dans le cadre de l’étude qualitative visant à affiner notre compréhension du marché cible et à
+valider notre offre, quatre hypothèses ont été formulées. Elles visent à explorer en profondeur les
+usages, les frustrations et les attentes des étudiants post-bac (de Bac+2 jusqu’au doctorat), en
+lien avec leur expérience académique et numérique.
+La première hypothèse suppose que les étudiants ont recours à une pluralité d’outils numériques
+non spécialisés (calendriers, notes, messageries, documents partagés) pour organiser leur vie
+étudiante, mais qu’ils en tirent une expérience peu satisfaisante. Cette hypothèse permet de
+valider la pertinence d’une application centralisée et pensée pour les usages spécifiques des
+étudiants, en s’assurant qu’elle réponde à une réelle lacune.
+La deuxième hypothèse avance que les étudiants rencontrent des difficultés à maintenir une
+organisation constante, notamment face à la charge de travail, à la procrastination ou au manque
+de visibilité sur leurs priorités. Cette hypothèse vise à mieux comprendre les comportements et
+les points de friction dans leur quotidien, afin de concevoir des fonctionnalités réellement utiles et
+adaptées.
+La troisième hypothèse explore l’idée que les étudiants ressentent un manque
+d’accompagnement individualisé tout au long de leur parcours. Alors que de nombreuses
+solutions proposent des outils génériques, il semble émerger un besoin de guidance
+personnalisée, notamment pour renforcer la motivation ou clarifier les objectifs. Cette hypothèse
+permet d’identifier des attentes encore peu couvertes par l’offre actuelle.
+Enfin, la quatrième hypothèse suppose que l’adhésion des étudiants à une solution numérique
+éducative dépend fortement de l’expérience utilisateur (UX/UI) perçue comme fluide, intuitive et
+visuellement engageante. Ce critère, souvent sous-estimé dans les outils pédagogiques, pourrait
+constituer un facteur clé de différenciation, tant en termes de rétention que de satisfaction.
+L’entretien qualitatif mené auprès d’étudiants post-bac à doctorat a pour objectif principal de
+valider l’adéquation de l’offre envisagée avec les besoins réels du terrain, à travers une approche
+exploratoire centrée utilisateur. En mobilisant des techniques d’écoute active et d’investigation
+ouverte, cette démarche vise à identifier les comportements, les routines et les modes de
+résolution de problèmes adoptés par les étudiants dans leur quotidien académique. Par ailleurs,
+l’entretien cherche à faire émerger des attentes implicites et des besoins latents encore non
+adressés par les solutions existantes, notamment en matière d’organisation, de soutien
+pédagogique ou de charge mentale. Il s’agit également de comprendre les leviers d’adhésion ou
+de rejet à une offre numérique d’accompagnement afin de définir des axes de valeur
+différenciante et des éléments de design stratégique. Ces entretiens nourriront une phase
+ultérieure de la proposition de valeur, de priorisation fonctionnelle et d’orientation stratégique de
+l’entreprise.
+
+4 8Tableau de synthèse du codage (extrait ) : 
+V E R B A T I M C O D E   C A T É G O R I E  T H È M E
+P R I N C I P A L  
+J’utilise Google Agenda mais
+j’oublie souvent de le regarderusage d'outils mais
+non intégréFragmentation des
+outilsFragmentation
+numérique et
+désorganisation
+Je suis toujours à la bourre même
+si j’ai des planningsdifficulté à suivre
+planningProcrastination et
+instabilitéDifficulté
+d’organisation
+J’aimerais un outil qui me suive
+comme un coachbesoin de guidanceAccompagnement
+personnaliséAccompagnement
+individualisé et
+motivationnel
+Si c’est moche ou galère, je
+désinstalle directexigence esthétique Sensibilité à l’UX/UIAttentes vis-à-vis de
+l’ergonomie des
+outils
+Je ne sais pas par quoi
+commencer quand j’ai trop de
+chosesmanque de
+priorisationDésorientation
+cognitiveDifficulté
+d’organisation
+Les profs sont là mais pas
+vraiment présentsabsence de soutien
+humainIsolement et manque
+de mentoratAccompagnement
+individualisé et
+motivationnel
+Une appli avec mes cours, mes
+deadlines, mes objectifs, ça serait
+topbesoin de
+centralisationSolution tout-en-un
+attendueFragmentation
+numérique et besoin
+d’un outil centralisé
+Je suis toujours à la bourre même
+si j’ai des planningsdifficulté à suivre
+planningProcrastination et
+instabilitéDifficulté
+d’organisation
+Je veux qu’un professionnel me
+suive, pas juste une IA ou une appbesoin de relation
+humaineSuivi humain et
+mentoratAccompagnement
+individualisé
+
+
+4 9
+Quand je suis bloqué,
+j’aimerais qu’un tuteur puisse
+me dire si je suis sur la bonne
+voiebesoin de
+validation régulièreAttente de
+feedback humainSuivi personnalisé
+& évaluation
+formative
+J’ai besoin qu’on me dise où j’en
+suis, sinon je me décourage vitebesoin de repèresAuto-évaluation /
+suivi continuSuivi et pilotage de la
+progression
+Je me sens vite submergée,
+surtout avant les oraux, c’est
+angoissantperte de confianceBaisse d’estime liée à
+la surcharge
+cognitiveConséquences
+émotionnelles de la
+désorganisation
+Une appli qui m’aide à écrire mon
+mémoire ou me préparer aux
+soutenances, ce serait parfaitsoutien académique
+non disciplinaireAide ciblée hors
+contenus
+pédagogiquesSoutien transversal
+et non scolaire
+Un vrai accompagnement, comme
+les enfants ont des devoirs avec
+leurs parents, mais adapté à nousmétaphore du
+soutien parentalBesoin
+d’encadrement
+émotionnelAccompagnement
+empathique
+Je veux pouvoir faire un point
+chaque semaine, même si c’est
+juste un quiz ou un récapbesoin de rituel de
+suiviFeedback régulier /
+auto-positionnementSuivi et pilotage de la
+progression
+Je suis seul devant mon ordi, c’est
+pas motivantisolement numériqueManque de lien
+humainAccompagnement
+individualisé et 
+motivationnel
+Je veux une appli où je peux parler
+à quelqu’un, pas juste cliquerrejet de la solution
+100 % automatiséeRecherche
+d’interaction humaine
+réelleNécessité d’un lien
+humain dans les
+outils 
+Quand je suis bloqué, j’aimerais
+qu’un tuteur puisse me dire si je
+suis sur la bonne voiebesoin de validation
+régulièreAttente de feedback
+humainSuivi personnalisé &
+évaluation formative
+J’ai besoin qu’on me dise où j’en
+suis, sinon je me décourage vitebesoin de repèresAuto-évaluation /
+suivi continuSuivi et pilotage de la
+progression
+
+5 0
+À l’issue du codage manuel qualitatif réalisé selon une démarche inductive, plusieurs thèmes
+majeurs ont émergé, traduisant la complexité des besoins et des pratiques organisationnelles des
+étudiants interrogés. Ces thèmes structurent la compréhension fine de leur quotidien, et
+s’articulent directement avec les hypothèses initiales de l’étude.
+Le premier thème, la fragmentation des outils numériques et l’expérience utilisateur
+insatisfaisante, renvoie à l’usage dispersé d’applications généralistes (Google Agenda, Notion,
+Excel, etc.) qui, faute d’intégration cohérente, induisent une surcharge cognitive et une inefficacité
+perçue. Ce thème regroupe les sous-catégories suivantes : diversité des outils utilisés, absence
+de centralisation, oubli ou non-consultation des plannings. Loin d’optimiser la productivité, cette
+dispersion accentue le sentiment de désorganisation. Les propos des participants révèlent un
+consensus clair : “Je note tout dans plein d’endroits, mais je n’arrive pas à suivre”.
+Le deuxième thème, les difficultés structurelles d’organisation et de constance dans le travail, met
+en lumière une instabilité chronique dans la gestion du temps et des priorités. Les étudiants
+expriment une forte tendance à la procrastination, souvent liée à une surcharge de tâches non
+hiérarchisées. Cette instabilité est nourrie par un déficit d’outils adaptés à la planification
+académique dynamique. Les sous-catégories identifiées incluent : incapacité à tenir un planning,
+manque de repères temporels, difficulté à prioriser. Ce thème confirme l’hypothèse d’une tension
+entre la volonté d’être organisé et la réalité de parcours hétérogènes, rythmés par des imprévus.
+Un troisième thème fort est celui de la demande croissante d’un accompagnement individualisé
+et humain. Loin de vouloir uniquement des solutions automatisées, de nombreux étudiants
+expriment le besoin d’un lien régulier avec un tuteur ou un professionnel. Les sous-catégories
+associées comprennent : besoin de feedback personnalisé, valorisation d’un lien humain, rejet
+des outils impersonnels. Cette orientation s’illustre par des verbatims tels que « J’ai besoin que
+quelqu’un valide ce que je fais, même une fois par semaine ». Ce besoin, transversal à tous les
+niveaux d’études, renforce la pertinence d’une plateforme combinant outils numériques et
+accompagnement humain.
+Le quatrième thème est relatif aux effets psychologiques négatifs induits par la désorganisation
+ou l’isolement numérique. Les participants évoquent fréquemment des épisodes de stress
+intense, de perte de confiance, voire de découragement face à l’ampleur des tâches et à l’absence
+de soutien. Ce thème s’exprime à travers les sous-catégories suivantes : stress académique,
+perte de confiance en soi, isolement face au numérique. Cette dimension met en lumière une
+tension entre les injonctions à l’autonomie et la réalité d’un besoin d’encadrement émotionnel non
+reconnu par les outils existants.
+
+5 1
+Ces cinq thèmes, bien que distincts, convergent autour d’un constat central : l’absence d’un outil
+centralisé, personnalisé, et humainement ancré, capable d’articuler productivité, suivi, soutien
+émotionnel et ergonomie. Si les divergences apparaissent principalement dans le degré
+d’autonomie souhaité ou dans la nature de l’accompagnement attendu (numérique vs humain), le
+consensus est fort quant à la lacunité de l’offre actuelle. Ces résultats nourrissent ainsi la
+réflexion sur la conception d’une solution hybride, intégrant à la fois des fonctionnalités de
+pilotage, de suivi individuel et d’accompagnement empathique, en cohérence avec la
+problématique initiale.
+L’analyse qualitative révèle des dynamiques discursives profondément enracinées dans la
+représentation sociale de l’autonomie étudiante. Si l'autonomie est souvent valorisée en surface
+dans les discours (“je dois m’organiser seul”,” c’est à moi de gérer”), elle est simultanément
+perçue comme une charge psychologique, générant stress, désorientation et culpabilité en cas
+d’échec organisationnel. Ce paradoxe révèle une tension entre l’idéal d’indépendance universitaire
+et les conditions concrètes de sa mise en œuvre.Enfin, un cinquième thème transversal émerge : la nécessité d’un soutien transversal non
+disciplinaire, notamment dans les moments clés du parcours académique comme la rédaction de
+mémoire, la préparation des soutenances ou la méthodologie de recherche. Ce thème regroupe
+les dimensions suivantes : manque de support pour les tâches métacognitives, absence de
+méthodologie, besoin de structuration externe. Il traduit une attente d’accompagnement « adulte
+», distinct d’une aide scolaire enfantine, comme le souligne ce verbatim : “J’aimerais avoir un
+guide, pas un prof, mais quelqu’un qui m’aide à structurer ce que je fais “
+
+
+5 2
+Les résultats confirment pleinement la première hypothèse : les étudiants utilisent une pluralité
+d’outils numériques non spécialisés, mais cette diversité est perçue comme une fragmentation
+préjudiciable, entraînant confusion, surcharge mentale et abandon rapide des dispositifs.
+L’absence d’un outil centralisé, pensé pour les usages réels des étudiants, crée une friction
+organisationnelle constante. Ce constat renforce la pertinence d’une solution intégrée.
+La deuxième hypothèse sur la difficulté à maintenir une organisation stable est également
+validée. Cette instabilité découle moins d’un manque de volonté que d’un manque de dispositifs
+adaptatifs, capables de prendre en compte les rythmes réels de travail, les baisses de motivation,
+ou les imprévus académiques. La charge mentale liée à la gestion individuelle du travail est
+fortement ressentie.Verbatims représentatifs 
+Sur la fragmentation des outils :
+ “J’ai un Google Agenda, des notes sur mon téléphone, un Trello pour un projet… mais au final je
+me perds. Je ne sais plus où regarder.” (Étudiant·e en M1, ingénierie)
+Sur les difficultés à maintenir une organisation :
+ “Je fais un planning chaque semaine et je le respecte jamais. Ça me démoralise en fait.”
+(Étudiante en PACES)
+Sur le besoin de soutien humain :
+ “Je voudrais juste qu’une personne me demande comment j’avance, pas pour me juger, juste
+pour me faire penser à continuer.” (Étudiant·e en L3)
+Sur l’impact psychologique :
+ “J’ai l’impression d’être débordée pour des choses que je devrais savoir gérer seule… mais
+personne nous a appris.” (Étudiante en M2 ingénierie d’affaires)
+Sur l’attente d’un accompagnement non scolaire :
+ “C’est pas du soutien scolaire que je veux, c’est quelqu’un qui m’aide à structurer mon mémoire,
+qui comprend les exigences. “ (Doctorant SHS)Les données suggèrent également une logique d’action réparatrice : les étudiants cherchent des
+solutions non pas pour améliorer une organisation déjà existante, mais pour réparer un
+fonctionnement défaillant, souvent construit par tâtonnements (“J’ai testé plusieurs applis mais
+j’ai abandonné”). Cela illustre un rapport expérientiel et pragmatique aux outils numériques, où
+l’utilité perçue l’emporte largement sur la sophistication fonctionnelle.
+Par ailleurs, la volonté d’accompagnement, bien que présente à tous les niveaux d’étude, varie
+selon les strates académiques. Les étudiants en licence expriment un besoin de guidance
+structurante, souvent associée à une forte insécurité organisationnelle. À l’inverse, les masterants
+et doctorants valorisent un accompagnement réflexif ou méthodologique, davantage lié à la
+gestion de projets complexes (mémoire, thèse, soutenances). Cette variation suggère une logique
+d’ajustement des attentes selon le niveau de maturité académique.
+
+5 3
+Par ailleurs, la relation enquêteur-enquêté dans le cadre d’entretiens semi-directifs peut avoir
+influencé les réponses. Bien que des techniques de relance neutre aient été mobilisées pour
+minimiser les projections interprétatives, le chercheur doit reconnaître sa posture impliquée, tant
+dans la conduite des entretiens que dans l’étape de codage et d’interprétation.
+Cette subjectivité n’est pas une faiblesse en soi, mais doit être intégrée dans une posture
+réflexive. En effet, dans une recherche qualitative, l’objectivité ne repose pas sur l’effacement du
+chercheur, mais sur sa capacité à rendre transparentes ses décisions méthodologiques, à
+documenter le cheminement analytique, et à trianguler les données (verbatims, schémas de
+codage, mémo analytique) pour renforcer la robustesse de l’analyse.Ensuite, le biais de sélection constitue une autre limite. Les participants ont été recrutés sur la
+base du volontariat, ce qui peut introduire un effet de désirabilité sociale : les individus les plus
+concernés par les questions d’organisation ou de mal-être ont potentiellement été surreprésentés,
+ce qui pourrait influencer la tonalité globale des résultats.La troisième hypothèse, portant sur le besoin d’accompagnement personnalisé est largement
+confirmée par les données recueillies.. Il ne s’agit pas d’une attente infantilisante mais d’un désir
+d’interaction structurante, de feedback, de guidance ou simplement d’un tiers bienveillant. Ce
+besoin émerge comme un facteur-clé, particulièrement dans les moments critiques (soutenance,
+mémoire, orientation…).
+Quant à la quatrième hypothèse, elle est nuancée : si l’UX/UI est effectivement mentionnée
+comme condition d’adhésion (“si c’est compliqué, j’arrête direct”), ce critère semble secondaire
+par rapport à l’utilité perçue et à la capacité de personnalisation. Autrement dit, une interface
+séduisante ne compense pas un manque de pertinence fonctionnelle.
+Comme toute recherche qualitative, cette étude présente un ensemble de limites
+méthodologiques qu’il convient de reconnaître pour évaluer avec justesse la portée des résultats.
+Tout d’abord, la taille de l’échantillon (20 participants répartis entre licence, master et doctorat) a
+permis une diversité de points de vue, mais la saturation théorique ne peut être pleinement
+garantie, notamment sur certains profils spécifiques comme les doctorants, sous-représentés
+dans l’échantillon.
+
+5 4L’analyse croisée des données issues du questionnaire quantitatif mené auprès d’étudiants du
+supérieur permet de valider avec rigueur les hypothèses formulées dans l’étude qualitative
+exploratoire. Cette convergence entre approches empiriques confirme la pertinence stratégique
+du positionnement d’Orig’amis et alimente de manière fondée sa proposition de valeur.Cette étude qualitative met en lumière les tensions vécues par les étudiants dans leur
+organisation quotidienne, révélant un écart structurel entre les attentes institutionnelles
+d’autonomie et les réalités vécues en termes de charge mentale, dispersion cognitive et solitude
+organisationnelle. Les données recueillies permettent de valider, dans leur globalité, les
+hypothèses posées au départ : fragmentation des outils, difficulté à maintenir une organisation
+stable, manque d’accompagnement personnalisé, et importance stratégique de l’expérience
+utilisateur.
+À l’issue de cette étude qualitative, plusieurs recommandations stratégiques peuvent être
+formulées afin de guider le développement d’une solution numérique véritablement alignée avec
+les attentes des étudiants. Il apparaît essentiel de concevoir un outil centralisé, ergonomique et
+contextuellement pertinent, intégrant des fonctionnalités d’organisation intelligentes (calendrier,
+gestion de tâches, rappels, synchronisation des deadlines), mais également des dispositifs
+d’accompagnement personnalisés. Une attention particulière devrait être portée à l’intégration
+d’un système de suivi tutoré, qu’il soit humain ou automatisé, afin d’apporter une forme de
+guidance continue, non infantilisante, particulièrement valorisée dans les témoignages. De plus,
+l’application devrait proposer des modules de soutien non académiques (ex. : aide à la rédaction
+de mémoire, préparation d’oraux, gestion du stress) répondant à des besoins encore peu couverts
+par les solutions actuelles. Pour renforcer l'engagement et prévenir les effets indésirables tels
+que le stress, la démotivation ou la perte de confiance en soi, il serait judicieux d’intégrer des
+outils d’auto-évaluation régulière, de feedback motivationnel, ainsi qu’une interface fluide et
+esthétiquement soignée (UX/UI). Enfin, une approche itérative centrée sur les retours utilisateurs,
+combinée à une logique de personnalisation évolutive, permettra d’assurer une réelle adhésion et
+une utilité perçue durable.
+
+
+5 5Enfin, les critères d’adhésion à une solution numérique sont étroitement corrélés à la qualité de
+l’interface et de l’expérience utilisateur. Plus de deux tiers des étudiants reconnaissent avoir
+abandonné une application jugée peu intuitive ou visuellement peu engageante. Cette donnée
+vient appuyer l’hypothèse selon laquelle l’ergonomie, l’apparence et la fluidité d’usage constituent
+des facteurs déterminants de fidélisation. Une solution pédagogique même pertinente, si elle
+souffre d’une interface peu soignée, voit son adoption compromise.Les résultats mettent également en lumière un besoin fortement exprimé d’accompagnement
+personnalisé. Plus de 80 % des répondants affirment souhaiter bénéficier d’un suivi régulier au
+cours de leur parcours, et une majorité significative indique préférer un mentor humain à une
+application exclusivement automatisée. Ce besoin est particulièrement affirmé pour la
+préparation des mémoires, des soutenances, ou la structuration des projets longs. Il traduit une
+attente de guidance structurée, incarnée et contextualisée, qui renforce l’idée que l’outil
+numérique seul ne suffit pas à répondre aux défis organisationnels du quotidien étudiant.Une première tendance nette se dégage autour de l’usage d’outils numériques d’organisation. Une
+très large majorité des étudiants interrogés (plus de 85 %) déclare utiliser des supports
+numériques variés pour planifier leurs tâches académiques : Google Agenda, Notion, Trello, ou
+simples blocs-notes digitaux. Cependant, moins de la moitié d’entre eux (environ 41 %) se dit
+satisfaite de ce système. Cette insatisfaction traduit une expérience d’usage morcelée, peu
+centralisée, et perçue comme inefficace. Elle vient confirmer l’hypothèse selon laquelle la pluralité
+d’outils non spécialisés produit un effet de fragmentation, source de confusion et de surcharge
+cognitive.
+Cette impression de désorganisation se double d’une difficulté à maintenir une constance dans la
+gestion du travail. Près de deux étudiants sur trois déclarent ne pas parvenir à respecter leurs
+plannings sur la durée, en grande partie en raison de la procrastination, du manque de visibilité
+sur les priorités, ou d’un sentiment général de débordement. Les réponses recueillies témoignent
+d’une instabilité structurelle dans les modes d’organisation, particulièrement marquée à
+l’approche des échéances académiques clés. Cette donnée confirme le diagnostic qualitatif
+relatif à la faiblesse des dispositifs actuels en matière de soutien à l’autonomie étudiante.
+
+
+5 6En définitive, les résultats quantitatifs objectivent avec clarté les intuitions qualitatives
+précédemment formulées. Ils attestent de la présence d’un besoin non adressé sur le marché :
+celui d’un outil centralisé, personnalisable et humainement incarné, permettant de répondre à la
+fois aux enjeux organisationnels, motivationnels et relationnels du parcours étudiant. La
+cohérence entre les deux démarches confère au projet Orig’amis une assise empirique solide, et
+en renforce la légitimité en tant qu’innovation d’usage à haute valeur ajoutée.
+
+
+STRATÉGIE
+MARKETING 
+5 7
+
+581.STRATÉGIE MARKETING 
+AMI adopte une stratégie marketing hybride, combinant une forte présence digitale à des
+partenariats de terrain. L’objectif est d’installer AMI comme une référence innovante, bienveillante
+et efficace dans l’accompagnement des étudiants de l’enseignement supérieur. La marque
+s’adresse à ses différentes cibles (étudiants post-bac, master/thèse, mentors, établissements
+partenaires) à travers un ton accessible et une posture experte, centrée sur la réussite
+individuelle.
+La promesse d’AMI est claire : offrir un espace structurant, personnalisable et intelligent, alliant
+accompagnement humain, outils numériques avancés et intelligence artificielle. AMI se
+positionne comme une alternative au tutorat classique, en proposant un "compagnon d’étude"
+évolutif, humain et éthique.
+Le modèle économique est freemium : l’accès aux fonctionnalités de base (profil, fiches,
+matching, ressources) est gratuit, tandis qu’un abonnement Premium (à partir de 7,99 €/mois)
+permet de débloquer des services avancés : coaching visio, parcours personnalisés, relecture IA +
+mentor, suivi de progression, communauté active et lives méthodo.
+La stratégie de communication se déploie en trois phases :
+Phase 1 : Lancement : teasing via réseaux
+sociaux, présence en salons étudiants, mini-
+diagnostics en stand, webinaires gratuits
+(“Structurer son mémoire”).
+Phase 2 : Acquisition : marketing d’influence
+(TikTok, Insta, YouTube), ambassadeurs
+étudiants, CRM personnalisé selon les profils (ex.
+terminale en stress vs doctorant).
+Phase 3 : Fidélisation : gamification, newsletters
+pédagogiques, communauté Discord, lives
+réguliers avec mentors, programme de
+parrainage.
+La distribution est 100 % numérique, via application mobile et plateforme web, avec un
+déploiement progressif dans les établissements via partenariats éducatifs (BDE, CROUS,
+universités). L’objectif initial : bâtir une base d’utilisateurs actifs et prescripteurs, avec un taux de
+conversion cible de 6 % à 12 mois.
+
+592. PLAN DE PRODUCTION
+Plan de production
+L’application AMI est développée en interne par une équipe pluridisciplinaire, avec recours
+ponctuel à des prestataires spécialisés. La production est structurée autour de trois grands volets
+:
+Développement technique de l’application (web + mobile)
+Création de contenus méthodologiques et interactifs (fiches, guides, templates IA)
+Gestion et amélioration continue de l’expérience utilisateur
+Phases de livraison 
+Prototypage UX/UI (maquettes, parcours utilisateurs)
+Développement du MVP (matching, visio, profils mentors)
+Beta test avec panel étudiant/mentor
+Lancement officiel et évolutions continues selon retours utilisateursÉquipe projet 
+Développeur Fullstack
+UX/UI designer
+Directrice artistique
+Chef de projet / marketing
+Responsable communication 
+digitale (mi-temps)Ressources clés 
+Hébergement sécurisé (RGPD
+compliant)
+Base de données et CRM
+comportemental
+Outils collaboratifs et d’analyse UX
+Plateforme de gestion projet
+(Notion, Slack, Trello)
+3. PLAN DE COMMUNICATION
+Le content marketing est au cœur de la stratégie de notoriété et de conversion d’Orig'amis. Il vise
+à apporter des réponses aux étudiants en difficulté, tout en valorisant l’expertise des mentors. Il
+ne s’agit pas simplement de publier des articles optimisés SEO, mais bien de créer une
+expérience éditoriale complète et cohérente, qui accompagne chaque cible dans sa prise de
+décision.
+Le blog sera organisé selon les intentions de recherche des utilisateurs. Pour les étudiants, des
+contenus pratiques comme "Comment clarifier une problématique de mémoire", "Comment
+s’organiser quand il ne reste que 10 jours avant le rendu", ou encore "Les erreurs à éviter lors de
+sa soutenance PowerPoint" permettront de répondre à des situations concrètes. Pour les
+mentors, des formats plus qualitatifs tels que des portraits d’experts, partages de méthodologie,
+ou encore études de cas, mettront en valeur leur savoir-faire tout en renforçant leur attachement
+à la plateforme.
+
+60Ces contenus seront enrichis par des ressources téléchargeables, telles que des fiches pratiques,
+templates ou mini-guides, accessibles en échange d’un email. Ces lead magnets permettront
+d’alimenter une base de données qualifiée, qui entrera ensuite dans un tunnel email scénarisé.
+Chaque cible recevra une séquence dédiée : conseils personnalisés, témoignages d’utilisateurs,
+incitations à l’action claires.
+Enfin, des webinaires mensuels animés par les mentors viendront compléter la stratégie, en
+créant un rendez-vous régulier avec la communauté. Ces sessions en ligne, gratuites, aborderont
+des sujets comme "Structurer son mémoire sans paniquer" ou "Convaincre en soutenance :
+méthode express".
+Les réseaux sociaux seront structurés selon une approche différenciée entre les étudiants et les
+mentors. Sur TikTok, Instagram et Facebook, la marque adoptera un ton accessible et
+bienveillant, avec des formats courts à forte valeur ajoutée. L’objectif est de capter l’attention
+d’étudiants stressés, souvent perdus, en leur proposant des conseils utiles en moins de 30
+secondes, des témoignages de réussite, des sketchs ou des "avant/après" de coaching.
+Des séries permettront de structurer la ligne éditoriale : "Mémoire Minute" (une astuce par
+semaine), "Mentor Talks" (mini-interviews d’experts), ou encore "Les fails de mémoire" (anecdotes
+pédagogiques). 
+Du côté des mentors, la communication sera centrée sur LinkedIn et Facebook. On y mettra en
+avant des parcours inspirants, des réflexions sur la transmission du savoir, et des retours
+d’expérience concrets sur leur travail avec Orig'amis. L’objectif ici est double : crédibiliser la
+plateforme auprès de professionnels et susciter de nouvelles candidatures.
+Pour renforcer sa légitimité, Orig’amis activera un programme d’ambassadeurs dans les
+principales villes universitaires. Il s’agira de recruter des étudiants engagés, actifs sur les réseaux,
+et prêts à témoigner de leur expérience avec la plateforme. En contrepartie, ils bénéficieront d’un
+accès privilégié aux services, de récompenses matérielles et d’une reconnaissance officielle.
+Ils relayeront les campagnes, distribueront des flyers lors d’événements clés, et participeront à
+des formats de contenu type stories, vlogs, retours d’expérience.. En parallèle, Orig’amis nouera
+des partenariats avec des micro-influenceurs spécialistes de la vie étudiante, afin de produire des
+contenus sincères et proches du quotidien : "J’ai testé Orig'amis avant ma soutenance", "Un
+mentor m’a sauvé mon mémoire".
+Même dans une logique très digitale, la présence physique reste stratégique, notamment en
+période de rentrée ou d’examen. Orig’amis misera donc sur une visibilité bien ciblée dans les
+bibliothèques universitaires, les résidences étudiantes, les cafétérias et autres lieux de passage.
+Des affiches, flyers au format smartphone (avec QR code cliquable), ainsi que des goodies utiles
+(surligneurs, post-its, tote bags) viendront soutenir la reconnaissance de marque. La marque
+participera également à des événements de rentrée ou des salons de l’enseignement supérieur,
+avec une table mobile animée par un ou deux mentors, proposant des mini-diagnostics mémoire
+sur place.
+Enfin, des partenariats pédagogiques seront envisagés avec certaines écoles et associations
+étudiantes. L’idée n’est pas de promouvoir directement l’offre, mais de proposer des ateliers
+gratuits de 30 minutes autour de la réussite académique, créant ainsi une première interaction
+avec la marque.
+
+
+6 1
+PLAN DE 
+FINANCEMENTS
+
+
+6 2
+2. PLAN DE FINANCEMENT
+Le démarrage d’Origami repose sur une stratégie d’amorçage mesurée, portée par une équipe
+fondatrice pluridisciplinaire pleinement investie. Afin de concilier maîtrise budgétaire et qualité
+d’exécution, le choix a été fait d’internaliser toutes les expertises clés du projet dès la phase de
+conception : développement, UX/UI, création de contenus, direction artistique et stratégie
+marketing.
+Chaque membre s’engage sur un temps plein ou partiel, avec une rémunération ajustée,
+volontairement contenue dans un esprit entrepreneurial. Mathieu, développeur fullstack, assume
+à lui seul le développement complet de l’application (MVP), son déploiement et sa maintenance
+post-lancement. Son implication stratégique justifie une valorisation salariale adaptée.
+À ses côtés, Marion (pilotage produit et coordination), Lylia (identité visuelle) et Capucine ( UX UI)
+composent l’ossature du projet, avec une implication quotidienne. Leur rémunération, fixée au
+niveau du SMIC chargé, assure stabilité et engagement tout en permettant un investissement fort
+dans la durée.
+Seïla, contributrice ponctuelle au développement de la stratégie marketing et à l’animation de la
+communauté, rejoint l’équipe de manière souple, avec un accès partagé au coworking et une
+présence modulable selon les besoins de développement.
+Cette stratégie sobre mais ambitieuse assure un lancement cohérent, aligné avec la vision du
+projet et sa logique de croissance progressive.
+Abonnements étudiants 
+Free : nombre de parcours et de jalons limités
+Payant : 
+Création illimitée de parcours : accès sans restriction au système de planification multi-
+projets (ex. mémoire, stage, soutenance).
+Nombre de jalons illimités : déploiement d’un accompagnement structuré sur mesure, avec
+planification fine des étapes de chaque projet.
+Accès aux templates experts : modèles de parcours prêts à l'emploi adaptés aux exigences
+académiques : mémoire universitaire, VAE, projet professionnel, etc.
+Replay des visioconférences : archivage des sessions de mentorat en ligne avec possibilité de
+relecture à tout moment.
+Transcription & résumé IA : génération automatique (via IA) de la transcription textuelle et du
+résumé de chaque échange mentorat.
+Support prioritaire : accès prioritaire au service client, avec engagement de réponse sous 24
+heures ouvrées.
+Navigation sans publicité : interface utilisateur allégée de toute publicité commerciale,
+assurant un environnement de travail optimal.
+
+63
+Pour souscription à un abonnement annuel : 1 cours en visio de son choix offert
+Abonnement mentor 
+Mise en avant dans les résultats : priorité d’affichage dans les recherches d’étudiants, comme
+sur les “Top profils”
+Badge “Top Mentor” : affiché sur la fiche, visible partout (génère +30 % de clics)
+Statistiques d’activité: suivi du nombre de missions, taux de satisfaction, revenus mensuels
+Téléchargement automatique de factures: générées en PDF avec infos URSSAF, compatible
+compta micro-entreprise
+Accès à la bibliothèque pédagogique premium : fiches, templates de feedback, outils de suivi,
+guides de méthodo
+1.Court terme (0-6 mois) : 
+Objectif : MVP fonctionnel, contenus fondateurs, onboarding des premiers mentors, lancement
+et retour utilisateursFormule Tarif Détail
+Mensuel 7,99 € /mois Sans engagement
+Annuel 5,99 € /mois (71,88 € /an) Soit -25 % = ~2 mois “offerts”
+Formule Prix TTC Détail
+Mensuel (sans engagement) 15,99 € /mois Sans engagement
+Annuel (engagement 12 mois)11,99 € /mois →  71,88 € /an -25 % = ~2 mois offerts
+Poste de dépense Montant estimé Détails
+Rémunération Dev - Mathieu  
+(6 mois)18 000€Développement complet du MVP + maint
+Rémunération Marketing 
+(6 mois) - Marion, Seïla mi-temps18 000€Acquisition, contenu, stratégie réseaux so
+Rémunération UX UI 
+(6 mois) - Capucine18 000€UX UI
+
+64
+Rémunération DA (6 mois) - Lylia 16 000€branding, maquettes, charte visuelle
+Coworking (4 postes – 6 mois) 6 000€Espaces mutualisés à Grenoble
+Outils IA + licences techniques 
++ hébergement3 500€Notion, Figma, Stripe, IA, suite Adobe
+Accompagnement juridique & RGPD 2 000€Mise en conformité, CGU, politique de con
+Marketing et prospection 10 000€Ads, influence, salon, print, réseaux sociau
+Trésorerie de précaution 4 000€Couverture imprévus
+Matériel informatique 
+(rachat personnel)3 000€Rachat optimisé fiscalement (achat PC via
+Marge de sécurité (15 %) 11 400€Écarts, retards, imprévus techniques
+Total estimé 109 900
+Sour ces de financement pr évues  
+Source de financement Montant visé Commentaire
+Apports personnels des fondateurs 5 000€Autofinancement
+Subventions publiques (BPI, Région 55 000€Innovation pédagogique, amorçage numériqu
+Prêt d’honneur / bancaire 30 000€Réseau Entreprendre, PGE, France Active
+Partenariats, préventes ou mécéna 16 900€Offre Early Access, appuis d’entreprises ou éco
+Total financement prévisionnel 86 900€
+
+65
+1 .Moyen terme (6-18 mois)
+Objectif : Lancement des abonnements, développement de parcours 
+personnalisés, amélioration UX, montée en charge marketing
+Poste principal Budget estimé
+Développement de nouveaux modules 10 000€
+Communication & influence ciblée 6 000€
+Support utilisateur & animation mentorat 4 000€
+RGPD, outils et suivi qualité 2 000€
+Total moyen terme 22 000€
+1 .Long terme (18-36 mois)
+Objectif : Extension nationale, consolidation de l’équipe, outils communautaires, 
+lancement B2B (entreprises & alternance)
+Poste principal Budget estimé
+Extension IA / outils collaboratifs 15 000€
+Nouvelles fonctionnalités personnalisées 20 000€
+Communication à échelle nationale 10 000€
+Revalorisation salaires 20 000€
+Renfort équipe (support, B2B, dev junior) 15 000€
+Total long terme 80 000€
+
+66
+2. Seuil de rentabilité prévisionnel sur 3 ans
+Catégorie Données clés Commentaires
+Coûts totaux projet 211 900€Inclut les dépenses liées au développement i
+Objectif de chiffre d≥ 211 900 € Seuil de rentabilité sur trois ans basé sur l’hy
+Répartition des sou- 50 % abonnements étudian
+- 25 % abonnements mentor
+- 25 % commissions sur presModèle hybride combinant revenus récurren
+Objectifs mensuels moyens à atteindre pour rentabilité (sur 36 mois)
+Source de revenu CA cible totalRevenu 
+unitaire moyenVolume moyen 
+requis / moisHypothèses retenues
+Abonnements étudia 105 950€6,50 € / utilisateurEnviron 452 abonnéPrix catalogue : 7,99 € / mo
+Abonnements mento 52 975€17 € / utilisateur Environ 87 abonnés Prix catalogue : 15,99 € / m
+Commissions sur séa 52 975€6 € / séance Environ 245 rendez-Hypothèse : 20 % de comm
+
+
+67SUR 3 ANSPRÉVISIONNEL 
+Entreprise Orig’amisCOMPTE DE 
+RÉSULTAT
+N N+1 N+2 Détails calculs
+PRODUITS
+D’EXPLOITATION
+Abonnements
+étudiants105 950 135 000 160 000452 / 580 / 680 x 6,5 € x 12
+mois
+Abonnements
+mentors52 975 66 000 80 00087 / 110 / 135 x 17 € x 12
+mois
+Commissions
+séances (20 %)52 975 60 000 75 000245 / 280 / 350 séances x
+6 € x 12 mois
+Subventions
+publiques35 000 15 000 5 000Subventions BPI, Région,
+etc.
+Partenariats &
+mécénat16 900 10 000 5 000Mécénat d’entreprises,
+écoles partenaires
+TOTAL PRODUITS 263 800 286 000 325 000Somme des produits  
+ci-dessus
+
+68N N+1 N+2 Détails calculs
+CHARGES
+D’EXPLOITATION
+Salaires 70 000 100 000 125 000Fondateurs + équipe (dev,
+produit, support, etc.)
+Charges sociales 28 000 40 000 50 000 40 % des salaires
+Marketing / influence /
+salons18 000 20 000 25 000Campagnes, salons
+étudiants, publicité digitale
+Licences, IA, hébergement 3 500 5 000 6 000Notion,  
+hébergement web...
+Coworking, bureaux 6 000 8 000 10 000Bureaux partagés, salles de
+réunion
+Matériel amorti 3 000 1 000 1 000Amortissement PC
+fondateurs & dev  
+Juridique / RGPD / INPI 3 000 2 000 2 000Dépôt INPI, CGU, politique
+RGPD
+Divers (banques, outils,
+autres)5 000 6 000 7 000SaaS, frais bancaires, outils
+métiers
+TOTAL CHARGES
+D’EXPLOITATION136 500 182 000 226 000Somme des charges
+d’exploitation
+Entreprise Orig’amisCOMPTE DE 
+RÉSULTATSUR 3 ANSPRÉVISIONNEL 
+
+69Entreprise Orig’amisN N+1 N+2 Détails calculs
+RÉSULTAT
+D’EXPLOITATION127 300 104 000 99 000 Produits – Charges
+Impôts sur les bénéfices
+(~15 %)19 095 15 600 14 85015 % du résultat
+d’exploitation
+RÉSULTAT NET 108 205 88 400 84 150Résultat après impôt, à
+reporter dans le passif du
+bilanCOMPTE DE 
+RÉSULTATSUR 3 ANSPRÉVISIONNEL 
+
+7 0ACTIF N N+1 N+2 Détails calculs
+ACTIF IMMOBILISÉ
+Immobilisations
+corporelles3 000 2 000 1 000Matériel (PC) amorti sur 3
+ans linéaire
+ACTIF CIRCULANT
+Créances clients 8 000 10 000 12 0004 % du CA facturé, délai
+moyen de règlement
+Trésorerie (banques,
+caisses)140 205 228 605 310 755En cohérence avec plan de
+trésorerie (fin d’année)
+TOTAL ACTIF 151 205 240 605 323 755Actif immobilisé +
+circulantSUR 3 ANSPRÉVISIONNEL BILAN 
+PRÉVISIONNEL
+Entreprise Orig’amis
+
+7 1SUR 3 ANSPRÉVISIONNEL BILAN 
+PRÉVISIONNEL
+Entreprise Orig’amisPASSIF N N+1 N+2 Détails calculs
+CAPITAUX PROPRES
+Capital social 5 000 0 0Apport initial des
+fondateurs
+Réserve / Résultat
+antérieur0 108 205 196 605Résultats cumulés des
+années précédentes
+Créances clients 8 000 10 000 12 0004 % du CA facturé, délai
+moyen de règlement
+Résultat net exercice 108 205 88 400 84 150Repris du compte de
+résultat
+DETTES COURANTES
+Charges à payer 38 000 39 000 38 000 Passif d’exploitation
+TOTAL PASSIF 151 205 240 605 323 755 Capitaux propres + dettes
+
+72FLUX DE
+TRÉSORERIEN N+1 N+2 Détails calculs
+REVENUS
+Apport en capital
+fondateurs5 000 0 0 Apport initial  
+Subventions
+encaissées35 000 15 000 5 000 Aides publiques
+Chiffre d’affaires
+encaissé223 800 260 000 295 000Total produits
+d’exploitation –
+subventions
+TOTAL
+ENCAISSEMENTS263 800 275 000 300 000Somme de tous les flux
+entrants
+DÉCAISSEMENTS
+(CHARGES)
+Charges
+d’exploitation-115 000 -180 000 -225 000Charges totales hors
+amortissement &
+provisions
+Impôts sur bénéfices
+(IS)0 -6 600 -7 850 IS payé sur le résultat N-1
+TOTAL
+DÉCAISSEMENT  -115 000 -186 600 -232 850
+SOLDE DE CLÔTURE 140 205 228 605 310 755Solde précédent +
+encaissements –
+décaissementsSUR 3 ANSPRÉVISIONNEL PLAN 
+DE TRÉSORERIE
+Entreprise Orig’amis
+
+7 3
+BUSINESS 
+MODEL
+
+
+7 4
+PARTENAIRES CLÉS ACTIVITÉS CLÉS PROPOSITION DE
+VALEUR RELATION CLIENT SEGMENTS DE
+CLIENTS
+RESSOURCES CANAUX DE
+DISTRIBUTION
+STRUCTURE DE COÛTSREVENUSAlliance str atégique entr e entr eprise non concurr entes :  
+Ment ors cer tifiés / exper ts académiques
+Ils ne sont pas concurr ents mais complémentair es à la
+plateforme : ils appor tent l’ exper tise pédagogique nécessair e.
+Établissements par tenair es (univ ersités, écoles)
+Alliances pour co-dé velopper ou r ecommander l’usage
+d’Orig’ amis aupr ès d’ étudiants.  
+Consultants pédagogiques externes
+Appor tent un sa voir spécifique ( VAE, mémoir e, etc.) pour
+enrichir les par cours pr oposés.
+Joint-v entur es pour dé velopper de nouv elles activités :  
+Développeurs / agence tech  
+Collabor ation continue pour dé velopper des fonctionnalités I A,
+planning intelligent, outils de suivi.
+API de tr anscription I A 
+Intégr ation pour cr éer une v aleur diff érenciante dans les
+services ment orat.
+Relations acheteur-fournisseur  
+Héber geur (ex. A WS, O VH)
+Infrastructur e ser veur fiable pour héber ger la plateforme.
+App St ore / Pla y Store
+Distribution de l’ application, conformité mobile.
+API de paiement (ex. Stripe, Alma)
+Traitement des paiements r écurr ents + paiements en plusieurs
+fois.
+Service de v érification d’identité (ex. Onfido)
+Sécurité et fiabilité des pr ofils (ment ors notamment).
+Licences Adobe  
+Outils pr ofessionnels pour pr oduir e les visuels (UX, templates).
+Juriste RGPD / DPO externe
+Mise en conformité légale et pr otection des données
+personnellesGestion et optimisation de la plateforme / r éseau :  
+Développement et maintenance technique du pr oduit (back-end /
+front-end / I A).
+Gestion des fonctionnalités SaaS (abonnements, paiements,
+réser vations).
+Sécurisation des données, conformité RGPD .
+Animation et modér ation du r éseau utilisateurs (ment ors /
+étudiants).
+Stratégie de cr oissance de la base utilisateurs (eff et réseau).
+Analyse de données d’usage pour amélior er l’expérience.
+Résolution de pr oblèmes pédagogiques personnalisés :  
+Création et mise à jour des par cours types (templates, jalons).
+Développement de contenus pédagogiques et outils d’ aide à la
+planification.
+Formation et suivi qualitatif des ment ors.
+Suppor t utilisateur pour gar antir l’ efficacité des par cours.
+Traitement I A des échanges (tr anscription, r ésumés, analyses).Étudiants :   
+Accompagnement personnalisé, humain et flexible pour
+surmonter les lacunes du système univ ersitair e (relectur e,
+coaching, or al, orientation, etc.).
+Soutien socio-émotionnel pour r ompr e l’isolement, r enfor cer la
+confiance et r etrouver de la motiv ation.
+Accès à un r éseau bienv eillant de ment ors sélectionnés selon
+leurs besoins (pr ofil, matièr e, par cours).
+Outils intelligents (I A) pour gagner du temps, planifier
+efficacement, et pr ogresser plus ser einement.
+Promesse principale : Tu n’es plus seul·e face à tes études.
+Origami te guide à chaque étape, à t on rythme.
+Ment or : 
+Valorisation de leur exper tise via une plateforme structur ée,
+éthique et pédagogique (a vis, cer tification, visibilité).
+Sour ce de r evenus flexible (inter vention ponctuelle ou r égulièr e,
+liber té d'engagement).
+Accès à des missions qualifiées et adaptées à leurs compétences
+grâce au matching I A.
+Outils pr ofessionnels (Learning Management System,
+communauté, animation) pour monter en compétence et se sentir
+utile.
+Promesse principale : Transmettez, gagnez, pr ogressez. Origami
+donne du sens et de la v aleur à v otre savoir.
+Proposition de v aleur : Origami cr ée un lien dir ect entr e étudiants en
+quête de soutien et ment ors bienv eillants, pour un accompagnement
+personnalisé, humain et intelligent, au ser vice de la r éussite de
+chacun.Relations a vec les étudiants :  
+Service aut omatisé :
+ FAQ intelligente, chatbot pour les questions fr équentes (RD V,
+tarifs…), mails aut omatisés pour r appels, f eedbacks et
+recommandations.
+Communauté :
+ Groupe Discor d priv é pour échanges entr e étudiants, liv es
+animés par des ment ors.
+Self-ser vice :
+ Réser vation aut onome via la plateforme, accès libr e aux
+ressour ces pédagogiques (fiches, vidéos, modèles…).  
+Relations a vec les ment ors
+Assistance ciblée :
+ Chaque ment or a un conseiller dédié (gestion RH, planning,
+pédagogie), a vec un suivi mensuel.
+Communauté :
+ Forum entr e ment ors, par tage de bonnes pr atiques,
+webinair es de formation continue.Cœur de cible : Étudiants Master et Doct orat
+Âgés de 22 à 35 ans en master ou doct orat 
+ Projets longs : mémoir e, thèse, soutenance
+ Besoin for t de structur ation, de f eedback, de soutien
+humain
+Budget limité mais pr êt à inv estir si r etour sur
+investissement clair
+Digitalisés, exigeants, souv ent isolés émotionnellement et
+cognitiv ement
+Cible primair e : Étudiants post-bac à bac+3  
+Étudiants en B TS, BUT , Licence, r econv ersion pr ofessionnel,
+formations à distance ou en alternance
+ Moins expérimentés, besoin d’ aide à la méthodo et à la
+rédaction de base
+Faible pouv oir d’ achat
+Usage ponctuel ou modér é selon la pr ession académique
+Canal d’ accès : bouche-à-or eille, Discor d, forums étudiants
+Cible secondair e : Ment ors / exper ts pédagogiques
+Profils v ariés : doct orants, cher cheurs, consultants,
+freelances pédagogiques
+Désir de tr ansmettr e, valoriser leur sa voir, structur er leur
+activité
+Attente for te de qualité, de cadr e spécialisé, de r elation
+respectueuse
+Disponibles pour 1 à 5 missions par mois
+Refus de la logique “low-cost” ou impersonnelle
+Cible ter tiaire : Étudiants internationaux
+ Âgés de 18 à 35 ans, div ersité cultur elle (Afrique, Asie,
+Europe)
+Besoin d’ accompagnement linguistique, r édactionnel,
+cultur el
+Contexte de pr écarité et d’isolement
+Forte motiv ation à r éussir
+Attente de bienv eillance, clar té, efficacité, personnalisation
+Les étudiants et ment ors pr éfèrent :
+Des formules sans engagement (mensuelles), pour tester le ser vice.
+Des abonnements annuels à tarif r éduit, pour bénéficier d’ avantages ex clusifs.
+Des pr estations ponctuelles, pour des besoins ciblés, pa yées à l’usage.   
+ Étudiants (prix catalogue) :
+Formule mensuelle : 7,99 € / mois – sans engagement.
+Formule annuelle : 5,99 € / mois soit 71,88 € / an (économie de 25 %).   
+ Ment ors :
+Formule mensuelle : 15,99 € / mois – sans engagement.
+Formule annuelle : 11,99 € / mois soit 71,88 € / an (économie de 25 %).
+ Prestations ponctuelles :
+Tarification à l’ acte : les étudiants paient pour un ser vice (ex. séance de ment orat), et la plateforme pr élève une commission fix e sur chaque mission r éalisée (br okerage f ee).
+50 % : r evenus r écurr ents via les abonnements étudiants (modèle SaaS).
+25 % : r evenus r écurr ents via les abonnements ment ors.
+25 % : r evenus tr ansactionnels, via les commissions sur les pr estations one-shot.  
+Type de flux de r evenus utilisés :
+Subscription f ees : accès illimité à des ser vices via abonnement.
+Brokerage f ees : commissions sur les pr estations ponctuelles.
+Fixed pricing : tarifs définis par formule (mensuel / annuel).
+Usage-based pricing : paiement à l’ acte sur ser vices ponctuels.   
+Les prix catalogue est défini en fonction des car actéristiques du ser vice pr oposé et des spécificités du segment de clientèle ciblé (ex emple pouv oir d’ achat).Coûts fix es :  
+Salair es (de v, design, mark eting, D A) : 70 000 €  
+Coworking et locaux : 6 000 € / an
+Outils et licences (Adobe, Notion, Stripe, etc.) : 3 500 €  
+Juridique et RGPD : 3 000 €
+Trésor erie de pr écaution : 4 000 €
+Marge de sécurité : 11 400 €
+Coûts v ariables :  
+Commissions Stripe : 2 % du CA
+Mark eting à la per formance : 10 000 € (N)
+Suppor t utilisateur (fr eelance, outils) : 2 000 € / anDigitaux :   
+Plateforme web, réseaux sociaux, Google Ads, newsletters.
+Physiques :  
+Salons étudiants, bibliothèques, résidences, événements
+campus.
+Partenariats :  
+ BDE, mutuelles étudiantes, cartes étudiantes (ISIC, YEP’S…).
+ Acquisition & conversion :
+SEO/SEA, influence étudiante, landing pages ciblées.
+Webinaires, contenus gratuits (guides, vidéos), offres promo
+BDE.
+ 
+Livraison :  
+Visios planifiables, outils intégrés.
+Accès libre aux ressources pédagogiques.
+ Support & fidélisation :  
+Chat & email, CRM automatisé, programme de parrainage.
+Suivi personnalisé, communauté Discord.Humaines :  
+Développeur fullstack : MVP , évolutions, maintenance
+UX/UI designer : inter face & expérience
+Mark eting & acquisition : cr oissance, par tenariats étudiants
+Direction ar tistique : image & char te gr aphique
+Suppor t utilisateur : assistance & f eedback
+Coor dination ment ors : gestion du r éseau d’ accompagnants
+Fondateurs : str atégie, pr oduit, opér ations
+Matérielles :  
+Postes informatiques, coworking à Gr enoble
+Matériel visio, ser veurs cloud (scalables)
+Immatérielles :  
+Plateforme pr opriétair e (code, IP)
+Algorithmes I A (tr anscription, matching)
+Templates, guides, base de données ment ors/étudiants
+Identité gr aphique, mar que déposée
+Conformité RGPD/CGU, tableaux de bor d & KPIs
+Financièr es : 
+Appor ts personnels : 5 000 €
+Subventions : 55 000 € (BPI, Région, E dTech)
+Prêts : 30 000 €
+Préventes/mécénat : 16 900 €
+Trésor erie de pr écaution : 4 000 €
+Marge de sécurité : 11 400 €
+
+7 5
+ANALYSES 
+ET ÉTUDES 
+UX - U
+
+
+761.BENCHMARK
+GUIDAGECHARGE DE
+TRAVAILCONTRÔLE EXPLICITE ADAPTABILITÉCOMPATIBILIT
+É
+Les utilisateurs
+sont informés de
+leur position dans
+le site grâce à des
+indicateurs visuels
+et des titres de
+page clairs.
+Le site informe les
+utilisateurs de ce
+qui se passe,
+renforçant la
+confiance.Le site utilise une
+palette de couleurs
+sobres et une
+typographie lisible,
+ce qui renforce la
+crédibilité et la
+lisibilité.La
+présentation claire
+réduit la charge
+cognitive de
+l’utilisateur.Les coordonnées
+(téléphone, formulaire
+de contact) sont
+facilement accessibles,
+facilitant la prise de
+contact.Les utilisateurs
+peuvent facilement
+obtenir de l’aide ou des
+informations
+supplémentaires.Les
+utilisateurs ont la
+possibilité d’initier des
+actions (comme
+contacter un conseiller)
+de manière directe.Le site propose des
+solutions adaptées à
+divers publics (élèves,
+étudiants, adultes,
+professionnels), avec
+des contenus
+spécifiques pour
+chacun.Le site s’adapte
+aux besoins variés des
+utilisateurs et l’interface
+prend en compte les
+caractéristiques et les
+préférences des
+utilisateursLe menu
+principal est
+bien organisé,
+avec des
+rubriques
+distinctes pour
+chaque niveau
+scolaire
+(primaire,
+collège, lycée,
+supérieur,
+adulte),
+facilitant l’accès
+rapide aux
+informations
+pertinentes.L’int
+erface est
+cohérente avec
+les attentes et
+les habitudes
+des utilisateurs.
+GUIDAGE CONTRÔLE EXPLICITE ADAPTABILITÉ
+Présence d’un discours très
+institutionnel, peu engageant, peu
+interactif.Faible stimulation à interagir
+avec la plateforme.Pas de tableau de bord personnalisé
+ou de logique de suivi des progrès, pas
+de "relation" suivie avec un mentor.Prise de contact uniquement via
+formulaire ou appel, pas d’assistance
+instantanée, ni de mise en relation
+directe (ex. chat, visio, choix de
+mentor).Faible réactivité, peu
+d’autonomie dans la prise de contact.Acadomia
+Pertinence : Notr e besoin est similair e et le ser vice qu’il pr opose est de la mise en r elation
+avec un exper t dans le domaine scolair e.
+Points forts
+Points faibles
+
+
+77GUIDAGECHARGE DE
+TRAVAILCONTRÔLE
+EXPLICITEADAPTABILITÉ COMPATIBILITÉ
+ L'utilisateur peut
+rechercher un prof
+par matière,
+localisation, niveau,
+format (en ligne ou
+présentiel).Interface
+adaptative aux
+besoins spécifiques.Les champs de
+formulaire sont bien
+étiquetés, les filtres
+clairs, les
+suggestions
+s'affichent en temps
+réel (ex. :
+suggestions de villes
+ou matières).Si un
+champ est
+manquant ou mal
+rempli, des
+messages d’erreur
+s’affichent en rouge
+près du champ
+concerné.L'utilisateur peut
+rechercher un prof
+par matière,
+localisation, niveau,
+format (en ligne ou
+présentiel).L'utilisate
+ur est libre de
+construire sa propre
+recherche.Peu de
+friction dans la
+création de compte,
+messages envoyés
+en quelques
+clics. L’utilisateur
+sent qu’il maîtrise
+l’action, peut
+contacter plusieurs
+profils, choisir son
+canal. Le système
+accompagne
+l’utilisateur dans ses
+actions.Présentation
+structurée des
+profils avec photo,
+biographie, méthode,
+parcours, avis
+vérifiés.Les attentes
+de l’utilisateur sont
+comblées par des
+informations claires
+et
+contextualisées.L’inf
+ormation est claire,
+humaine et facile à
+lire.L’utilisateur est
+orienté dans sa
+recherche, difficile
+de se perdre.Filtres
+par tarifs, avis,
+expérience, réponse
+rapide, disponibilité,
+etc.Interface bien
+conçue, adaptée au
+mobile, rapide à
+charger, et
+visuellement
+cohérente.= pas de
+surcharge cognitive.
+GESTION DES ERREURS ADAPTABILITÉ CONTRÔLE EXPLICITE CHARGE DE TRAVAIL
+Lorsqu’une recherche ne
+donne pas de résultat, le
+message est sobre ("Aucun
+résultat trouvé") sans aide
+concrète à la reformulation
+(pas de suggestions
+alternatives).L’erreur 404
+est générique et ne
+propose pas de redirection
+utile ou de moteur de
+recherche interne.Le site s’adresse à tout le
+monde (adultes, élèves,
+pro), ce qui empêche une
+vraie personnalisation pour
+les étudiants en études
+supérieures (mémoire,
+thèse…).L’interface ne tient
+pas compte de parcours
+universitaires complexes.Pas de tableau de bord ou
+de suivi
+structuré.L’utilisateur n’a
+pas d’outils de gestion de
+projets ou historiqueAbsence de suggestion
+dynamiqueSi aucun
+professeur ne correspond,
+l’utilisateur doit
+reconfigurer ses critères
+sans aideSuperprof
+Pertinence : Notr e besoin est similair e et le ser vice qu’il pr opose est de la mise en r elation
+avec un pr ofesseur par ticulier .
+Points forts
+Points faibles
+
+
+782.INTERVIEWS UX
+Hypothèses 
+Besoin d’un accompagnement ponctuel mais spécialisé
+Hypothèse : Les étudiants ont un besoin occasionnel, mais ciblé, d’accompagnement sur des
+projets académiques complexes comme les mémoires, les thèses ou les présentations orales.
+L’appui des enseignants est utile mais limité
+Hypothèse : Les étudiants sollicitent principalement leurs professeurs ou leurs amis pour de
+l’aide, mais aimeraient un soutien plus expert ou plus disponible.
+Les fonctionnalités prioritaires sont la prise de rendez-vous et la relecture
+Hypothèse : Une fonctionnalité de prise de rendez-vous avec des mentors, accompagnée d’un
+module de relecture ou coaching, répond aux attentes des étudiants.
+Les formats privilégiés sont le chat écrit et la visio
+Hypothèse : Les formats d’accompagnement préférés sont asynchrones ou semi-synchrones,
+comme le chat, et la visio pour les séances plus complexes.
+Un onboarding ultra-personnalisé est pertinent
+Hypothèse : Proposer un parcours d’onboarding avec choix de niveau d’études, type de diplôme,
+domaine, type de projet, besoin spécifique et type de mentor est non seulement pertinent, mais
+attendu pour créer un sentiment de "sur-mesure".
+
+7 9
+CRITÈRE ARTHUR BENJAMIN LÉA M NEJMA LÉA G
+ProfilÉtudiant
+engagé mais
+démotivé en
+autonomieScientifique,
+chercheur de
+sensÉtudiante UX
+pragmatiqueDéveloppeuse
+en masterÉtudiante
+introvertie et
+autonome
+Blocages
+principauxDémarrage,
+manque de
+structureCompréhensio
+n des mathsManque
+d'intérêt pour
+certaines
+matièresProjets flous,
+manque
+d'organisationMaths, charge
+mentale
+Attentes vis-à-
+vis d’un
+mentorBienveillance,
+pédagogie,
+clartéNiveau adapté,
+bonnes
+explicationsClarté, écoute,
+pas forcément
+expertSuivi
+méthodologiqu
+e régulierPas
+d’interaction
+directe
+souhaitée
+Formats
+préférésVisio, tableau
+blanc,
+synthèse écriteVisio, partage
+d’écran,
+correction
+ponctuelleVisio courte +
+synthèse, ou
+vidéos selon
+matièresVisio hebdo ou
+chatVidéos, fiches,
+app
+asynchrone
+Rapport à
+l’autonomieBesoin d’aide
+pour se lancerSemi-
+autonomeAutonome si
+intérêtBesoin de
+structureTrès
+autonome
+Usage du
+numériqueUtilise des
+apps
+éducatives
+classiquesForums,
+parfois apps
+de coursAirbnb/Uber
+Eats pour
+inspiration UXTrello, Notion,
+apps de visioPhotomath,
+apps discrètes
+Rapport à
+l’interfaceLudique mais
+claireSimple,
+fonctionnelleSobre, lisible,
+efficaceStructurée,
+fluideMinimaliste,
+zéro friction
+Sensibilité au
+prix10-15
+€/séance, 30
+€/mois maxFlexible,
+dépend du
+formatAccepte de
+payer si qualité
+au rendez-
+vous20 €/h si bien
+cibléPas évoqué,
+peu intéresséeRésultats et comparatifs des entretiens
+
+80Conclusion
+1. Un besoin partagé : prévenir l'abandon académique en cas d'isolement
+Tous les étudiants interrogés ont été confrontés à des situations où ils se sont sentis seuls face à
+un projet, un sujet difficile ou un manque d'encadrement. L'application doit fournir un point
+d'entrée rapide et rassurant pour inciter à l'action et éviter l'immobilisme.
+2. Des profils variés nécessitant une personnalisation
+Certains étudiants (comme Arthur, Nejma) recherchent un suivi régulier, tandis que d'autres
+(comme Léa G, Léa M) préfèrent éviter tout engagement social ou un encadrement trop
+présentiel. Il est crucial de proposer différents niveaux d'interaction :
+- Autonomie complète (via vidéos, fiches, IA)
+- Soutien ponctuel (via chat, messagerie)
+- Mentorat humain (via visioconférence ou suivi à long terme)
+3. Importance de l'aspect visuel sans compromettre l'accessibilité aux contenus
+Les interfaces trop ludiques, rigides ou complexes sont rejetées. Les étudiants souhaitent une
+interface fluide, épurée favorisant une navigation rapide. L'aspect visuel peut être attrayant (à
+l'instar de Duolingo), mais ne doit jamais nuire à la clarté des informations.
+4. Accès direct et structuré aux ressources
+Les utilisateurs demandent des explications concrètes, organisées par niveau et matière,
+facilement accessibles à tout moment. Il est essentiel de mettre en place des filtres efficaces par
+niveau d'étude, par difficulté, par profil d'étudiant. De plus, il faut permettre un accès rapide aux
+informations essentielles (recherche, favoris, historique, progression visible).
+5. Accompagnement humain flexible et sur demande
+L'assistance humaine doit être proposée en tant qu'option, et non comme une obligation. Elle doit
+s'intégrer de manière fluide dans le parcours de l'utilisateur, être activée par ce dernier et adaptée
+à son style d'apprentissage.
+Retour sur nos hypothèses
+Hypothèse : Les étudiants ont un besoin occasionnel, mais ciblé, d’accompagnement sur des
+projets académiques complexes comme les mémoires, les thèses ou les présentations orales.
+L'hypothèse selon laquelle les étudiants ont besoin d'un accompagnement spécialisé et ponctuel
+a été validée et nuancée. Ces besoins sont souvent liés à des projets spécifiques tels que les
+start-ups, les mémoires, les business plans ou les maths, et se concentrent principalement lors de
+périodes clés comme les remises, les examens ou les blocages. Il est important que cet
+accompagnement soit activable à la demande, sans engagement à long terme, tout en
+démontrant une expertise adaptée au contexte (niveau d'études, matière, objectif).
+
+
+81Hypothèse : Les formats d’accompagnement préférés
+sont asynchrones ou semi-synchrones, comme le
+chat, et la visio pour les séances plus complexes.
+En ce qui concerne les formats privilégiés pour
+l'accompagnement, le chat écrit et la visio sont
+populaires, mais leur utilisation varie selon les profils
+étudiés. Il est important de laisser à l'utilisateur la
+possibilité de choisir son format préféré et de
+permettre une transition fluide entre les différents
+modes de communication.
+Hypothèse : Proposer un parcours d’onboarding avec
+choix de niveau d’études, type de diplôme, domaine,
+type de projet, besoin spécifique et type de mentor est
+non seulement pertinent, mais attendu pour créer un
+sentiment de "sur-mesure".
+Enfin, l'idée d'un onboarding ultra-personnalisé a été
+fortement validée. Les étudiants souhaitent un
+accompagnement ajusté à leur filière, niveau et type
+de besoins. Il est crucial de prendre en compte le style
+d'apprentissage, les préférences de format et le degré
+d'autonomie souhaité pour offrir une expérience sur
+mesure.
+Hypothèse : Les étudiants sollicitent principalement
+leurs professeurs ou leurs amis pour de l’aide, mais
+aimeraient un soutien plus expert ou plus disponible.
+L'implication des enseignants dans cet
+accompagnement s'avère utile mais limitée, selon
+plusieurs témoignages. Les étudiants trouvent les
+enseignants peu accessibles, pas assez concrets ou
+parfois distants. Ils se tournent alors vers leurs amis
+ou des forums, mais cette approche manque de
+structure et de pédagogie. Ainsi, il est nécessaire de
+mettre en place un tiers de confiance capable d'aider
+sans jugement et de vulgariser les concepts.
+Hypothèse : Une fonctionnalité de prise de rendez-
+vous avec des mentors, accompagnée d’un module
+de relecture ou coaching, répond aux attentes des
+étudiants. Les fonctionnalités prioritaires telles que la
+prise de rendez-vous et la relecture ont été
+partiellement validées. Si la prise de rendez-vous est
+souvent demandée, certains préfèrent des ressources
+à la demande plutôt qu'un suivi humain. Il est donc
+essentiel de proposer plusieurs portes d'entrée pour
+répondre aux besoins variés des étudiants.
+
+
+8 23. CARTE EMPATHIE
+4. PERSONAS UX
+
+
+83Personas 
+Nous essayons dans cette partie de définir des personas à l’aide des entretiens
+effectués afin de pouvoir comprendre les utilisateurs.
+Profil de l'utilisateur - Maya, 23 ans, première année de master en communication. 
+Elle suit un cursus en alternance, ce qui lui permet de consacrer une partie de son
+temps à ses études, une autre à son entreprise d'accueil, et le reste à ses projets
+personnels. Maya est une étudiante curieuse et engagée, bien que sa
+concentration puisse varier en fonction des matières abordées. Lorsqu'un sujet
+l'intéresse, elle se plonge volontiers dedans avec enthousiasme, effectue des
+recherches complémentaires et fait preuve d'une grande autonomie. En revanche,
+face à des matières techniques qu'elle ne maîtrise pas ou ne comprend pas, elle
+peut rapidement se décourager. Dans ces cas-là, elle éprouve des difficultés à
+s'organiser seule, notamment lorsque les consignes sont floues ou que le projet
+est insuffisamment encadré.
+Afin de répondre à ses besoins, Maya recherche un accompagnement ponctuel et
+ciblé, qu'elle serait en mesure d'activer selon ses besoins. Elle n'est pas intéressée
+par un suivi prolongé ou des rendez-vous réguliers. Son idéal serait de pouvoir
+poser des questions simples via un chat, de bénéficier d'explications claires, de
+préférence sous forme de vidéos ou de tutoriels illustrés. Elle apprécie également
+les fiches de révision synthétiques, qu'elle peut consulter rapidement. En revanche,
+elle n'apprécie pas les applications qui multiplient les rappels, les procédures
+d'inscription complexes ou les interfaces surchargées.
+Sur internet, Maya utilise fréquemment des outils tels que Notion, Canva ou Trello,
+et elle privilégie les plateformes bien structurées comme Airbnb ou Doctolib, où la
+navigation est intuitive et transparente. L'esthétique des interfaces est un critère
+important pour elle : elle préfère un design clair, agréable, légèrement ludique mais
+sans excès. Bien qu'une touche de gamification puisse la motiver, cela n'est pas
+essentiel à ses yeux. Elle attend d'une application qu'elle soit bien pensée,
+personnalisable dans le contenu (profil, parcours, préférences de format), mais
+pas dans la forme (pas besoin d'avatars ou de thèmes visuels).
+Pour se sentir rassurée, Maya recherche des interfaces claires qui lui indiquent où
+elle en est, ce qu'elle a déjà accompli et ce qui reste à faire. Elle aimerait avoir
+accès aux profils des mentors disponibles, en connaître les spécialités et la
+personnalité, et pouvoir choisir celui qui correspond le mieux à ses attentes. Pour
+Maya, la plateforme idéale serait un outil de soutien intelligent et flexible, loin des
+plateformes éducatives rigides.
+
+
+8 4Profil de l'utilisateur - Lucie, 24 ans en Master 1 Sciences de l’information et de la
+communication.
+Lucie est une personne organisée en quête d'efficacité. Elle est actuellement en
+cours à l’UGA et son objectif principal est de rédiger son mémoire de fin d'année
+tout en gérant sa vie sociale. Malgré sa bonne autonomie, Lucie a besoin d'un
+cadre clair pour avancer.
+Pour atteindre ses objectifs, Lucie souhaite structurer son mémoire avec l'aide
+d'un mentor pédagogue, éviter de perdre du temps à chercher les bonnes
+ressources ou les bonnes personnes, gagner en clarté méthodologique sur un
+projet long et complexe, conserver la maîtrise de son emploi du temps et pouvoir
+échanger de manière fluide et ciblée, sans plateforme lourde ni formalisme.
+Lucie rencontre différents freins et frustrations, tels que trop de plateformes ou
+d'outils peu ergonomiques, un parcours utilisateur mal pensé, des interactions
+humaines trop formelles ou rigides, des ressources génériques mal adaptées à
+son domaine d'études et la difficulté d'organiser ses idées sans guidance claire.
+Pour répondre à ses besoins spécifiques, Lucie recherche un onboarding rapide et
+précis, un mentor fiable et bien présenté, un accompagnement semi-flexible, la
+possibilité d'ajuster son plan de travail à tout moment via une IA ou des modèles
+et la facilité de partager ses documents tout en gardant une trace des échanges.
+En termes d'habitudes numériques, Lucie utilise Notion, Google Docs et Trello pour
+organiser ses projets, est attentive à l'ergonomie des interfaces.
+Profil de l'utilisateur - Lucas, 29 ans, diplômé d’un master en management de
+projet. 
+Il dispense des cours de manière indépendante. Organisé, rigoureux et familiarisé
+avec les outils numériques tels que Google Agenda, Notion et Trello, il utilise ces
+derniers pour planifier ses projets. Il apprécie les plateformes telles que Doctolib
+et Airbnb pour leur clarté, leurs filtres de recherche et leur efficacité.
+Pour Lucas, une plateforme de qualité doit lui permettre de visualiser les objectifs
+de ses élèves, de planifier ses créneaux de manière simple et de répondre à des
+demandes ciblées. Il souhaite pouvoir personnaliser son accompagnement en
+fonction des profils, ce qui nécessite des informations précises et facilement
+accessibles sur les étudiants. Il accorde de l'importance aux interfaces épurées, à
+la navigation fluide et aux fonctionnalités bien organisées.
+Lucas est prudent face aux interfaces désordonnées, aux profils peu détaillés et
+aux séances manquant de structure. Il recherche une application qui le soutienne
+dans la préparation de ses cours tout en lui offrant une certaine flexibilité.
+
+
+854. OBJECTIFS UX
+Créer un espace de partage non intimidant
+L’étudiant peut poser une question ou lire celles
+d’autres sans pression.
+Indicateurs : taux de première publication ou
+réponse dans la communauté > 25 % des
+utilisateurs actifs, retour positif dans les retours
+qualitatifs (“je me sens à l’aise”).
+Laisser l’utilisateur libre face aux rappels
+Les notifications doivent soutenir l’engagement
+sans être perçues comme envahissantes.
+Indicateurs : taux de désactivation < 20 %, taux
+d'ouverture > 40 %, score de satisfaction
+“fréquence des rappels”.Créer un engagement rapide dès l’inscription 
+L’étudiant doit se sentir compris et orienté dès ses premières minutes sur la plateforme.
+Indicateurs : taux de complétion de l’onboarding > 80 %, taux d’activation d’un 1er contenu ou d’un
+mentor recommandé < 10 min.
+Permettre une recherche simple, inspirante et crédible des mentors
+Les étudiants doivent pouvoir naviguer facilement dans les profils et se sentir en confiance pour
+envisager un contact futur.
+ Indicateurs : temps moyen passé sur la page de consultation des mentors, taux de clic sur CTA
+profil, scroll moyen > 2 profils.
+Offrir une ressource immédiate même sans interaction humaine
+L'étudiant peut apprendre ou débloquer un point sans avoir à contacter quelqu’un.
+Indicateurs : taux de consultation des fiches de révision, taux de clic sur le CTA en bas de la fiche.
+Rendre la relation mentor simple et accessible
+Un étudiant premium doit pouvoir trouver, contacter, échanger et planifier une visio en quelques
+étapes.
+Indicateurs : délai moyen entre matching et prise de contact < 24h, taux de prise de RDV après
+consultation profil > 40 %.
+Proposer une communication adaptée aux rythmes étudiants
+Le chat et la visio doivent être complémentaires, pas redondants ni intrusifs.
+Indicateurs : usage régulier du chat, conversion chat →  visio (cohérence des usages).
+Structurer les projets longs pour réduire la charge mentale
+Le parcours mémoire (ou autre) doit donner un sentiment d’encadrement sans rigidité.
+Indicateurs : taux d’utilisation des templates, taux de complétion des jalons, feedback sur l’utilité
+perçue (“ça m’a aidé à structurer”).
+
+
+86Créer un espace personnel fluide et fonctionnel
+Les documents, messages, rendez-vous doivent être accessibles rapidement, sans surcharge
+cognitive.
+Indicateurs : taux d’usage des outils de gestion de documents, temps moyen d’accès à une
+ressource déjà utilisée < 10 s.
+Fluidifier l’intégration des mentors
+Un mentor doit pouvoir créer son profil et ajouter ses diplômes sans friction.
+ Indicateurs : taux de complétion du profil > 80 %, taux d’ajout de pièces justificatives > 60 %.
+Offrir un contrôle sur ses interactions
+Le mentor doit pouvoir refuser poliment, filtrer les demandes et ne recevoir que ce qui lui
+correspond.
+Indicateurs : taux d’utilisation des filtres de réception de projets, score de satisfaction “qualité des
+demandes reçues”.
+Rendre la création de contenu attractive et utile
+Le blog/fiches doit être simple à utiliser, gratifiant, et favoriser la visibilité.
+Indicateurs : nombre moyen de fiches créées par mentor, taux de clic sur leurs CTA, mentions
+reçues dans la communauté.
+
+
+875. PARCOURS UTILISATEURS
+Parcours 1 : Maya (étudiante en freemium) veut réviser pour son partiel de
+marketing digital
+Besoins : Révision rapide, sans contact humain, format clair et visuel
+Freins : Peu de temps, n’aime pas les notifications, pas envie de s’inscrire à une visio
+Parcours :
+Interface d’accueil →  Tableau de bord récapitulatif
+1.Elle voit une fiche intitulée “Inbound marketing”
+2.Elle clique : fiche claire, exemples concrets, pas trop longue
+3.En bas, un CTA lui propose : “Besoin d’approfondir ? Contacte un mentor spécialisé” → elle
+l’ignore
+Interface “Cours” →  filtre par "Webmarketing" + "Révision"
+1.Elle ajoute 2 fiches en favoris
+2.Le lendemain, elle retourne sur l'app →  reprend ses fiches via “Mes favoris”
+Objectifs UX activés : accès rapide, contenu autonome, pas de friction social
+Parcours 2 : Lucie (étudiante premium) prépare un mémoire et cherche un
+accompagnement humain
+Besoins : Structurer son projet, avancer avec un mentor, sans interface encombrée
+Freins : Trop de plateformes, peur de perdre du temps à chercher “la bonne
+personne”
+
+88Parcours :
+Onboarding personnalisé
+1.Niveau : Master 1
+2.Domaine : Sciences de l’Information-communication
+3.Objectif : Accompagnement mémoire
+Interface “Mentors” →  Matching intelligent
+1.Elle consulte un profil, lit ses mots-clés, expériences, avis
+2.Elle clique sur “ C o n t a c t e r ” 
+3.Création de son compte à partir des premières infos du onboarding
+Messagerie 
+1.Message pré-rempli qu’elle adapte
+2.Réponse du mentor sous 24h →  elle confirme une première visio
+3.Se rend sur la visio grâce au lien dans la discussion avec son mentor
+4.Paye un abonnement  → elle active la fonctionnalité “partage” pour envoyer
+son parcours à son mentor
+Projets →  Elle active un parcours “mémoire” 
+1.Jalons proposés automatiquement (ex : plan, revue de littérature, rédaction)
+2.Elle personnalise les étapes via l’IA : suppression/ajout de jalons
+3.Elle dépose ses documents dans l’espace sécurisé pour chaque jalon
+Objectifs UX activés : personnalisation, fluidité des échanges, encadrement sans
+rigidité
+
+Parcours 3 : Lucas (mentor) veut gérer son agenda et publier une fiche
+Besoins : Être contacté par des profils sérieux, valoriser son expertise, ga
+gner du temps
+Freins : Trop de messages génériques, profils flous, manque de contrôle
+Parcours :
+Onboarding mentor →  Création de son compte
+1.Domaine : gestion de projet
+2.Diplôme téléversé
+3.Il définit son tarif (20€/h) et précise : “Accompagnement long uniquement”
+4.Agenda synchronisé → définit ses créneaux : mercredis et samedis 14h–18h
+Accueil  
+1.Publication d’une fiche : “Structurer un plan de mémoire” avec CTA vers son
+profil
+Messagerie
+1.Notification : nouvelle demande de Chloé (profil complet + sujet clair)
+2.Il accepte, planifie un appel via le module de rendez-vous intégré
+3.Après 2 rendez-vous, Chloé ajoute un avis positif à son profil → Il gagne en
+visibilité, reçoit de nouvelles demandes filtrées automatiquement
+Objectifs UX activés : autonomie, clarté des interactions, valorisation du mentorat
+89
+
+9 06. MAQUETTE BASSE FIDÉLITÉ
+
+
+9 1
+
+
+9 2
+BIBLIO-
+GRAPHIE ET
+ANNEXES
+
+
+93B i b l i o g r a p h i e
+Acadomia. (2023). Les bonnes notes. Le Parisien.
+https://www.cdn.acadomia.fr/docs/le_parisien_2_03_les_bonnes_notes.pdf
+Aladom. (2024). Les cours particuliers : un secteur en plein essor.
+https://www.aladom.fr/actualites/secteur-service/10323/les-cours-particuliers-un-secteur-en-
+plein-
+essor/#:~:text=Aujourd'hui%20en%20France%2C%20le,la%20demande%20de%20soutien%20scol
+aire.
+Businesscoot. (2024). Le marché du soutien scolaire - France.
+https://www.businesscoot.com/fr/etude/le-marche-du-soutien-scolaire-france
+Campus Matin. (2024). Quels est le poids de la filière EdTech en France ? Les 5 points à retenir
+d'une étude de référence. https://www.campusmatin.com/numerique/edtechs/quels-est-le-poids-
+de-la-filiere-edtech-en-france-les-5-points-a-retenir-d-une-etude-de-
+reference.html#:~:text=En%202021%2C%20lors%20de%20la,d'affaires%20de%20la%20fili%C3%A
+8re.
+Capital. (2024). Déduction d'impôt : cours particuliers. https://www.capital.fr/votre-
+argent/deduction-impot-cours-particuliers-1374957
+Didask. (2025). Supports pédagogiques : comment les optimiser avec l'IA pédagogique.
+https://www.didask.com/post/supports-pedagogiques-comment-les-optimiser-avec-ia-
+pedagogique
+Edtech Actu. (2024). Superprof vise 100 millions d'euros de chiffre d'affaires en 2025.
+https://edtechactu.com/outils-collaboratifs/superprof-vise-100-millions-deuros-de-chiffre-
+daffaires-en-
+2025/#:~:text=Avec%20un%20chiffre%20d'affaires,le%20secteur%20du%20soutien%20scolaire.
+Edtech Capital. (2024). Évolution du marché du soutien scolaire en France. https://edtech-
+capital.com/evolution-marche-soutien-scolaire-france
+Eduscol. (2025). L'utilisation du numérique à l'école. https://www.education.gouv.fr/l-utilisation-
+du-numerique-l-ecole-12074
+Ekole. (2024). RSE : définition et enjeux dans le secteur éducatif. https://www.ekole.fr/blog/rse-
+definition-enjeux-secteur-educatif
+Études et Analyses. (2025). Les meilleures applications pour planifier et suivre l'avancement de
+son mémoire. https://www.etudes-et-analyses.com/blog/gestion-de-projet/les-meilleures-
+applications-planifier-suivre-avancement-son-memoire-27-01-2025.html
+
+
+94FasterCapital. (2024). Impact environnemental des services de tutorat : services de tutorat et
+économie verte - la voie vers l'entrepreneuriat durable.
+https://fastercapital.com/fr/contenu/Impact-environnemental-des-services-de-tutorat---services-
+de-tutorat-et-economie-verte---la-voie-vers-l-entrepreneuriat-durable.html
+France Universités. (2024). L'université en chiffres. https://franceuniversites.fr/luniversite-en-
+chiffres/#:~:text=62%20%25%20des%20%C3%A9tudiants%20inscrits%20en,des%20apprentis%20
+en%202020%2F2021)
+Fundamental Business Insights. (2024). Online Tutoring Market.
+https://www.fundamentalbusinessinsights.com/fr/industry-report/online-tutoring-market-10649
+IH2EF. (2024). Les mondes numériques : une clé de professionnalisation pour les enseignants de
+demain. https://www.ih2ef.gouv.fr/les-mondes-numeriques-une-cle-de-professionnalisation-pour-
+les-enseignants-de-demain-0
+INSEE. (2024). Statistiques sur le soutien scolaire. https://www.insee.fr/fr/statistiques/6676244
+L'Express Franchise. (2024). Le soutien scolaire : un marché en pleine expansion.
+https://lexpress-franchise.com/articles/le-soutien-scolaire-un-marche-en-pleine-expansion/
+Le Monde. (2024). Des coupes budgétaires redoutées dans les universités et la recherche.
+https://www.lemonde.fr/campus/article/2024/10/01/des-coupes-budgetaires-redoutees-dans-
+les-universites-et-la-recherche_6340521_4401467.html
+Le Monde. (2025). De la vocation à l'abandon : les chiffres derrière la crise du métier
+d'enseignant. https://www.lemonde.fr/les-decodeurs/article/2025/01/09/de-la-vocation-a-l-
+abandon-les-chiffres-derriere-la-crise-du-metier-d-enseignant_6489005_4355770.html
+Le Monde. (2024). Enseignement supérieur : un rapport pointe l'explosion du nombre de
+vacataires. https://www.lemonde.fr/societe/article/2024/04/11/enseignement-superieur-un-
+rapport-pointe-l-explosion-du-nombre-de-vacataires_6227158_3224.html
+Le Monde. (2024). On a atteint un point quasi-ingérable : les universitaires croulent sous les
+heures complémentaires. https://www.lemonde.fr/campus/article/2024/10/23/on-a-atteint-un-
+point-quasi-ingerable-les-universitaires-croulent-sous-les-heures-
+complementaires_6358441_4401467.html
+L'Étudiant. (2024). La solitude, je l'ai ressentie tout au long de mon premier semestre : les
+étudiants témoignent de leur isolement à l'université. https://www.letudiant.fr/etudes/fac/la-
+solitude-je-lai-ressentie-tout-au-long-de-mon-premier-semestre-les-etudiants-temoignent-de-leur-
+isolement-a-luniversite.html
+L'Étudiant. (2024). Le mentorat : un outil de politique jeunesse aux effets modérés.
+https://www.letudiant.fr/educpros/actualite/le-mentorat-un-outil-de-politique-jeunesse-aux-
+effets-moderes.html
+
+
+95Notion. (2024). Thesis Planning Template. https://www.notion.com/fr/templates/thesis-
+planning?
+Observatoire des Territoires. (2024). Part des jeunes non insérés ni en emploi ni scolarisés
+(NEET). https://www.observatoire-des-territoires.gouv.fr/part-des-jeunes-non-inseres-ni-en-
+emploi-ni-scolarises-neet?
+Opigno. (2024). Enrichir l'expérience d'apprentissage grâce au contenu interactif.
+https://www.opigno.org/fr/blog/enrichir-lexperience-dapprentissage-grace-au-contenu-interactif
+OVE National. (2024). Observatoire de la vie étudiante. https://www.ove-national.education.fr/
+PMarketResearch. (2024). Étude de marché sur le tutorat en ligne dans le monde et en France.
+https://pmarketresearch.com/fr/rapports/etude-de-marche-sur-le-tutorat-en-ligne-dans-le-monde-
+et-en-france/?add-to-cart=10894
+Publicis Groupe. (2024). Sobriété énergétique : Razorfish France et Green IT dévoilent les
+enseignements du 1er baromètre de l'empreinte environnementale des sites internet.
+https://france.publicisgroupe.com/sobriete-energetique-razorfish-france-et-green-it-devoilent-les-
+enseignements-du-1er-barometre-de-lempreinte-environnementale-des-sites-internet-barometre-
+de-lecoconception/
+Rédacteur Mémoire. (2024). L'importance de la planification dans la rédaction d'un mémoire de
+Master 2. https://redacteurmemoire.com/limportance-de-la-planification-dans-la-redaction-dun-
+memoire-de-master-2/?
+Reussir Sa These. (2024). Les relations avec son directeur de thèse : pourquoi est-ce parfois si
+difficile ? https://reussirsathese.com/les-relations-avec-son-directeur-de-these-pourquoi-est-ce-
+parfois-si-difficile
+SENAT. (2024). Budget 2025 : enseignement supérieur. https://www.senat.fr/rap/l24-144-
+317/l24-144
+
+
+9 6
+A n n e x e s
+Prototypage : AMI vf - Wireframes
+Dossier Figma : https://www.figma.com/design/6mK5ONoiCM5IUTVHFC89bu/AMI-vf?node-
+id=0-1&t=xwT3otUr85pDdgO3-1
+Charte graphique : https://docs.google.com/document/d/1yG2gh-
+xC7wEg58NWtJJKTFC4QCFN977L7-ILAW9y0Jk/edit?usp=sharing  
+
+ 
+Bonjour, Je suis (prénom nom), étudiant(e) en première année de MBA ….à my Digital
+School Grenoble. Je vous remercie d’avoir accepté cet entretien. 
+L’objectif de cet entretien est de recueillir votre avis sur les besoins des étudiants 
+étrangers en matière d’accompagnement linguistique et administratif en France. 
+Notre entretien durera approximativement 30 minutes. 
+Je ne suis ni le porteur de ce projet ni le spécialiste du domaine. Je ne cherche pas à 
+vous vendre quoi que ce soit. Je suis là seulement pour vous poser quelques questions 
+et vous écouter, connaître votre avis, qu’il soit positif ou négatif… Je ne suis pas là pour 
+juger vos opinions. 
+Avant de commencer ,il est important que vous lisez et signez le formulaire de 
+consentement avant que nous ne commencions. Il vous informe de la manière dont 
+nous allons collecter, enregistrer, stocker et analyser vos données. Je vous laisse en 
+prendre connaissance. 
+IMPORTANT - A LIRE ATTENTIVEMENT 
+Dans le cadre de la conception d’une plateforme numérique de mise en relation entre
+étudiants du supérieur et mentors qualifiés (enseignants vacataires, cadres en
+reconversion, indépendants, retraités actifs, etc.), nous menons actuellement une étude
+exploratoire auprès de potentiels mentors. 
+L’objectif de cet entretien est de mieux comprendre vos motivations, vos attentes, vos 
+expériences passées en matière d’accompagnement ou d’enseignement, ainsi que les 
+freins que vous pourriez rencontrer dans le cadre d’un engagement de mentorat, 
+ponctuel ou régulier. Vos retours nous aideront à concevoir une plateforme utile, juste, 
+valorisante et adaptée à vos besoins réels. 
+Il vous sera demandé d’évoquer vos expériences personnelles, vos motivations, votre 
+disponibilité, vos préférences en termes de relation pédagogique, ainsi que vos attentes 
+vis-à-vis d’un outil numérique d’accompagnement. 
+Avec votre accord, l’entretien pourra être enregistré (audio uniquement) à des fins 
+d’analyse. L’ensemble des propos recueillis sera strictement confidentiel, les données 
+seront anonymisées, stockées sur un serveur sécurisé, et les enregistrements seront 
+supprimés 2 ans après transcription intégrale. Les données pourront être 
+conservées pendant une durée maximale de quinze ans à des fins de recherche et 
+d’amélioration du service. 
+Conformément à la loi Informatique et Libertés (n°78-17 du 6 janvier 1978 modifiée) et 
+au Règlement Général sur la Protection des Données (RGPD), vous disposez d’un droit 
+d’accès, de rectification ou de suppression des informations vous concernant.  
+Introduction 
+9 71.QUESTIONNAIRE QUALITATIF ETUDIANT
+
+
+----------------------------------------
+Avez-vous des questions avant de commencer ?
+- Si oui : écoute et répond
+- Si non : Très bien, dans ces cas-là, nous allons pouvoir commencer. 
+- 
+DÉCLENCHER L'enregistrement ! Je confirme que j’ai bien pris connaissance des informations ci-dessus et donne mon
+consentement pour 
+⃣participer à la recherche 
+⃣autoriser l’enregistrement audio de l’entretien 
+Signature  Projet Orig’amis 
+📧 lyliazedek06@gmail.com 
+Vous pouvez utiliser cette adresse pour toute question relative à la recherche. 
+Merci d’accepter de participer à cet entretien. Il n’y a pas de bonnes ou de mauvaises 
+réponses. Soyez spontané(e) et sincère ! 
+Votre aide nous est très précieuse ! 
+Consentement Votre participation est entièrement volontaire : vous pouvez refuser de participer ou
+vous retirer à tout moment, sans justification. Pour toute demande ou pour exercer vos
+droits, vous pouvez contacter la responsable du projet : 
+Lylia Zedek 
+Peux-tu me raconter ton parcours
+académique jusqu’à aujourd’hui ?  
+Pour commencer, pourriez-vous
+vous présenter en quelques mots ?  
+Nom / tranche d’âge 
+Quels sont vos centres d'intérêt ?  
+Présentation
+Profil  
+Questions  
+Relances / Remarques 
+● 
+● 
+9 8
+
+
+Comment vis-tu ton quotidien
+d’étudiant(e) ? 
+Quelles sont tes habitudes de 
+travail et d’organisation ? 
+Quels outils ou ressources 
+utilises-tu aujourd’hui pour t’aider 
+dans tes études ? 
+Peux-tu me parler des moments où
+tu rencontres des difficultés dans
+tes études ? 
+Comment réagis-tu lorsque tu es en 
+difficulté ou en manque de 
+motivation ? 
+Quels sont les aspects les plus 
+stressants ou frustrants dans ta vie 
+étudiante ? 
+Qu’est-ce qui te freine dans ton 
+efficacité ou dans ta progression 
+académique ?  
+● Qu’est-ce qui fonctionne bien pour toi 
+dans ce que tu utilises ? 
+● Y a-t-il des choses que tu aurais aimé 
+découvrir plus tôt dans ton parcours ? 
+Thème 1 : 
+difficultés, 
+frictions et 
+freins ● Comment fais-tu face à ces 
+situations ? 
+  
+● Y a-t-il des moments où tu aurais 
+aimé être mieux accompagné(e) ? 
+● À quoi ressemblerait pour toi une 
+aide vraiment utile dans ces 
+moments-là ? 
+9 9
+
+
+ 
+Thème 2 : 
+Attentes, 
+besoins et 
+manques 
+● Peux-tu imaginer un service digital qui 
+t’apporte de la valeur au quotidien ?  
+Comment te sens-tu face aux outils
+numériques qui proposent un
+accompagnement personnalisé ?
+Quelle place accordes-tu à la
+technologie dans ton parcours
+d’étude ?
+Qu’est-ce qui te donne confiance
+dans un outil ou une application
+d’aide aux études ?  
+Si tu pouvais créer un outil idéal 
+pour t’aider dans tes études, que 
+proposerait-il ? 
+Qu’est-ce que tu recherches mais 
+que tu ne trouves pas aujourd’hui ? 
+Peux-tu me décrire une situation où 
+tu t’es dit : « il manque quelque 
+chose » ? 
+Qu’aimerais-tu qu’on améliore dans 
+ton expérience d’étudiant(e) ? ●  Qu’est-ce qui te ferait gagner du temps,
+du confort ou de la sérénité ? 
+● Qu’est-ce qui 
+pourrait transformer positivement ta
+manière d’apprendre ou de t’organiser ? 
+ 
+Thème 3 :
+Rapport aux
+outils
+numériques
+et à
+l’accompagn
+ement 
+1 0 0
+
+
+Perception de
+la valeur,
+utilité et
+engagement Quelle serait pour toi la bonne
+manière d’être accompagné sans
+que ce soit trop intrusif ? 
+Seriez-vous à l’aise pour recommander ce type d’outil à vos amis étudiants? Pourquoi ou
+pourquoi pas ?  Relance : Quels éléments vous inciteraient à recommander – ou au
+contraire à ne pas recommander – l’application Ami?  
+Qu’est-ce qui rend un service
+vraiment utile à tes yeux ? 
+Dans quelles conditions 
+aurais-tu envie d’utiliser un 
+outil d’aide aux études 
+régulièrement ? 
+Qu’est-ce qui te motiverait à 
+recommander une application 
+à d’autres étudiants ? 
+À quoi ressemblerait une 
+solution qui mérite que tu 
+investisses du temps ou de 
+l’argent ? 
+Avez-vous des suggestions ou idées d’amélioration pour que l’application soit 
+réellement utile et adaptée aux besoins des étudiants et des mentors ? 
+ Relance : Quels aspects de la plateforme devraient être repensés pour mieux s’adapter à vos
+pratiques actuelles ? 
+Pour conclure, si vous rencontriez un autre étudiant qui cherche du soutien dans ses
+études (relecture, méthodo, orientation...), que lui diriez-vous à propos de l’application
+Orig’amis ? ● Comment aimerais-tu qu’un outil d’aide 
+s’adapte à ta manière de travailler ? 
+● Qu’est-ce qui ferait la différence entre 
+une solution que tu testes… et une que
+tu adoptes ? 
+● Qu’est-ce qui t’encouragerait à 
+t’engager avec ce type d’outil sur le
+long terme ?  
+Thème 4 
+ 
+Conclusion 
+Relance : À votre avis, qu’est-ce qui pourrait motiver un étudiant à l’utiliser 
+régulièrement (ex. simplicité, qualité des échanges, personnalisation…) ? Relance : Y a-t-il des fonctionnalités précises que vous aimeriez voir ajoutées, ajustées 
+ou simplifiées pour optimiser votre expérience ? 
+1 0 1
+
+
+ Relance : Y a-t-il un message ou un conseil que vous aimeriez transmettre à un utilisateur
+potentiel ? Souhaitez-vous ajouter quelque chose que nous n’aurions pas abordé et qui
+vous semble important concernant ce projet ? 
+Merci beaucoup pour le temps que vous avez consacré à cet entretien et pour vos 
+retours, qui seront précieux dans le développement d’Orig'amis. 
+1 0 2
+
+
+ 
+Bonjour, Je suis (prénom nom), étudiant(e) en première année de MBA ….à my Digital
+School Grenoble. Je vous remercie d’avoir accepté cet entretien. 
+L’objectif de cet entretien est de recueillir votre avis sur les besoins des étudiants 
+étrangers en matière d’accompagnement linguistique et administratif en France. 
+Notre entretien durera approximativement 30 minutes. 
+Je ne suis ni le porteur de ce projet ni le spécialiste du domaine. Je ne cherche pas à 
+vous vendre quoi que ce soit. Je suis là seulement pour vous poser quelques questions 
+et vous écouter, connaître votre avis, qu’il soit positif ou négatif… Je ne suis pas là pour 
+juger vos opinions. 
+Avant de commencer ,il est important que vous lisez et signez le formulaire de 
+consentement avant que nous ne commencions. Il vous informe de la manière dont 
+nous allons collecter, enregistrer, stocker et analyser vos données. Je vous laisse en 
+prendre connaissance. 
+IMPORTANT - A LIRE ATTENTIVEMENT 
+Dans le cadre de la conception d’une plateforme numérique de mise en relation entre
+étudiants du supérieur et mentors qualifiés (enseignants vacataires, cadres en
+reconversion, indépendants, retraités actifs, etc.), nous menons actuellement une étude
+exploratoire auprès de potentiels mentors. 
+L’objectif de cet entretien est de mieux comprendre vos motivations, vos attentes, vos 
+expériences passées en matière d’accompagnement ou d’enseignement, ainsi que les 
+freins que vous pourriez rencontrer dans le cadre d’un engagement de mentorat, 
+ponctuel ou régulier. Vos retours nous aideront à concevoir une plateforme utile, juste, 
+valorisante et adaptée à vos besoins réels. 
+Il vous sera demandé d’évoquer vos expériences personnelles, vos motivations, votre 
+disponibilité, vos préférences en termes de relation pédagogique, ainsi que vos attentes 
+vis-à-vis d’un outil numérique d’accompagnement. 
+Avec votre accord, l’entretien pourra être enregistré (audio uniquement) à des fins 
+d’analyse. L’ensemble des propos recueillis sera strictement confidentiel, les données 
+seront anonymisées, stockées sur un serveur sécurisé, et les enregistrements seront 
+supprimés 2 ans après transcription intégrale. Les données pourront être 
+conservées pendant une durée maximale de quinze ans à des fins de recherche et 
+d’amélioration du service. 
+Conformément à la loi Informatique et Libertés (n°78-17 du 6 janvier 1978 modifiée) et 
+au Règlement Général sur la Protection des Données (RGPD), vous disposez d’un droit 
+d’accès, de rectification ou de suppression des informations vous concernant.  
+Introduction 
+1 0 32.QUESTIONNAIRE QUALITATIF MENTOR
+
+
+----------------------------------------
+Avez-vous des questions avant de commencer ?
+- Si oui : écoute et répond
+- Si non : Très bien, dans ces cas-là, nous allons pouvoir commencer. 
+- 
+DÉCLENCHER L'enregistrement ! Je confirme que j’ai bien pris connaissance des informations ci-dessus et donne mon
+consentement pour 
+⃣participer à la recherche 
+⃣autoriser l’enregistrement audio de l’entretien 
+Signature  Directrice Marketing & Communication – Projet Orig’amis 
+📧 mdosjoub@outlook.fr 
+Vous pouvez utiliser cette adresse pour toute question relative à la recherche. 
+Merci d’accepter de participer à cet entretien. Il n’y a pas de bonnes ou de mauvaises 
+réponses. Soyez spontané(e) et sincère ! 
+Votre aide nous est très précieuse ! 
+Consentement Votre participation est entièrement volontaire : vous pouvez refuser de participer ou
+vous retirer à tout moment, sans justification. Pour toute demande ou pour exercer vos
+droits, vous pouvez contacter la responsable du projet : 
+Marion Dosjoub 
+Depuis combien de temps
+exercez-vous ce métier ?  
+Pour commencer, pourriez-vous vous
+présenter en quelques mots ?  
+Nom / tranche d’âge 
+Quelle est votre profession ? Quels sont vos centres d'intérêt ?  
+Présentation
+Profil  
+Questions  
+Relances / Remarques 
+● 
+● 
+● 
+1 0 4
+
+
+Pourquoi avoir choisi d’exercer ce
+métier ? 
+Pouvez-vous me parler de votre
+expérience en relecture ou correction
+de documents ? 
+Avec quel client travaillez-vous 
+habituellement ? 
+Avez-vous déjà relu des mémoires, 
+thèses, rapports de stage ou autres 
+documents académiques ? 
+Avez-vous déjà relu des documents 
+dans l’urgence, avec des délais 
+courts ? Si oui, comment gérez-vous 
+ces situations ? ● Qu’est-ce qui vous attire dans votre 
+profession ? 
+● Avez-vous une spécialité ou un
+domaine de prédilection ? (ex.
+sciences humaines, droit, médecine,
+langues, etc.) 
+● Travaillez-vous principalement sur la 
+forme (orthographe, grammaire,
+typographie) ou aussi sur le fond
+(clarté des idées, structuration,
+reformulation…) ? Des étudiants,
+des chercheurs, des professionnels
+? Plutôt B2B / B2C ? 
+●  A quelle fréquence ? Travaillez-vous
+plus souvent avec des étudiants de
+licence, de master, de doctorat ? Ou
+bien aussi avec des chercheurs, des
+enseignants ? 
+● Travaillez-vous principalement avec 
+des étudiants francophones ou
+également avec des étudiants
+internationaux, dont le français n’est
+pas la langue maternelle ? 
+●  À quelle fréquence ces situations se
+présentent-elles dans votre activité ?
+Comment gérez-vous la pression du 
+temps tout en garantissant la qualité
+de votre travail ? Merci pour cette présentation. Passons maintenant à votre propre expérience en tant que relecteur, ce qui
+nous permettra de mieux comprendre votre métier, vos besoins et les défis auxquels vos étudiants
+peuvent être confrontés. 
+ 
+Merci pour ces éléments de contexte, peut-on désormais rentrer plus dans le détail des différenst aspects 
+de votre profession ? 
+● Fonctionnez-vous 
+l’heure, au forfait ? à la page, à 
+Thème 2 : 
+Tarifs, Quels sont vos tarifs habituels ? Thème 1 :
+Expérience et
+clientèle 
+1 0 5
+
+
+modalités et
+gestion de la
+charge de
+travail 
+ 
+Il est intéressant de voir ces aspects importants de votre métier, peut-on maintenant aborder les besoins
+concrets que vous rencontreriez sur une application telle que la nôtre ?  
+Est-ce que vos tarifs varient en 
+fonction du type de document ou du 
+niveau académique 
+Avez-vous une charge de travail 
+régulière ou variable selon les 
+périodes ? 
+Quel est votre statut actuel pour vos 
+activités de relecture ou correction ? 
+Connaissez-vous d’autres personnes 
+qui ont ce même métier ? Si oui, 
+échangez-vous des pratiques ? 
+Comment communiquez-vous auprès 
+de vos clients habituellement ? ● Licence, master, doctorat ? 
+● Plateformes Leboncoin, facebook, 
+bouche à oreille 
+● Comment ont-ils entendu parler de 
+vous ? 
+● Estimez-vous être assez visibles ? ● Par exemple, plus de travail en fin 
+d’année scolaire ? 
+● Comment gérez-vous cette charge de 
+travail soudaine ? 
+● Êtes-vous autoentrepreneur, salarié
+dans une entreprise, en libéral, ou 
+exercez-vous
+manière cette
+informelle activité de
+ou 
+complémentaire ? 
+● Est-ce qu’il y a des outils numériques
+que vous trouvez particulièrement
+efficaces ? 
+● Avez-vous des exemples concrets où 
+ces outils ont réellement fait la 
+différence ? 
+1 0 6
+
+ 
+Thème 4 
+Perception de
+la valeur et de
+la mission  
+Thème 3 :
+Attentes
+vis-à-vis
+d'une
+application
+de mise en
+relation 
+ 
+Après ce que je vous ai présenté du
+projet Orig'amis, qu’en pensez-vous
+globalement ?  
+Avez-vous déjà utilisé des
+plateformes pour proposer vos
+services ? 
+Qu’est-ce qui vous freine ou vous 
+dérange dans ces plateformes 
+Si une application proposait de vous 
+mettre en relation avec des étudiants 
+du supérieur pour de la 
+relecture/correction ? 
+Quels seraient pour vous les 
+éléments indispensables pour que 
+cette application vous soit utile 
+Quel serait un facteur différenciant 
+fort qui vous ferait choisir notre 
+application plutôt qu’une autre ? ● 
+● ● Comme Superprof, Malt, 
+5euros.com? 
+● Qu’en avez-vous pensé ? 
+ Commissions, visibilité, gestion des
+clients, manque de sérieux des
+demandes… ? 
+●  
+Liberté de fixer vos tarifs, peu de
+commission, profil précis des
+étudiants, paiement sécurisé,
+plateforme intuitive, etc.) ? 
+● Un accompagnement plus humain,
+une communauté, un support ? 
+● Une plateforme plus claire ou plus 
+simple à utiliser ? Qu'est-ce qui vous inciterait à vous
+inscrire ? 
+● Trouvez-vous que ce type
+d’application répond à un besoin réel
+?
+Voyez-vous une vraie utilité dans
+votre secteur / dans le quotidien
+étudiant ? ● 
+1 0 7
+
+
+ 
+Selon vous, quels types de besoins
+académiques ou professionnels ont
+aujourd’hui les étudiants que vous
+accompagnez ou pourriez
+accompagner ? 
+Quelles fonctionnalités vous 
+paraissent les plus utiles ? 
+Selon vous, à quels moments 
+ou dans quelles situations les 
+étudiants auraient le plus 
+besoin d’un mentor comme 
+vous via cette plateforme ? 
+Quels obstacles ou limites 
+imaginez-vous à l’utilisation de cette 
+application (de votre côté ou du côté 
+étudiant) ? 
+Qu’est-ce qui vous semble le 
+plus pertinent ou différenciant 
+dans le projet Orig'amis ? 
+Avez-vous des suggestions ou idées d’amélioration pour que l’application soit
+réellement utile et adaptée aux besoins des étudiants et des mentors ?  
+● 
+●  
+● Problèmes de confiance (sélection 
+des mentors, protection des 
+données) ? 
+● Risque de comparaison ou 
+concurrence avec d’autres mentors ? 
+Le respect de votre autonomie (choix
+des missions, tarifs, calendrier) ? 
+Le fait de pouvoir accompagner
+spécifiquement des étudiants du
+supérieur ? ● Quelles difficultés reviennent souvent
+dans leurs travaux (langue, structure,
+argumentation, méthodologie…) ? 
+● Qu’est-ce qui manque aujourd’hui 
+dans l’offre d’accompagnement 
+pour les étudiants du supérieur ? 
+● Une gestion simplifiée des missions 
+(disponibilités, messagerie, 
+documents, paiements, etc.) ? 
+● Un historique ou un espace partagé 
+avec chaque étudiant ? 
+Des outils pour valoriser votre activité 
+(avis, notation, badges, certificat) ? ● 
+● Préparation de mémoire ou de 
+soutenance ? 
+● Entrée en master, rédaction de lettre 
+de motivation, dossiers ? 
+ 
+Conclusion 
+Relance : Quels aspects de la plateforme devraient être repensés pour mieux s’adapter 
+à vos pratiques actuelles ? 
+1 0 8
+
+
+ Relance : Y a-t-il un message ou un conseil que vous aimeriez transmettre à un utilisateur
+potentiel ? Souhaitez-vous ajouter quelque chose que nous n’aurions pas abordé et qui
+vous semble important concernant ce projet ? 
+Merci beaucoup pour le temps que vous avez consacré à cet entretien et pour vos 
+retours, qui seront précieux dans le développement d’Orig'amis.  Relance : Quels éléments vous inciteraient à recommander – ou au contraire à ne pas
+recommander – l’application Orig'amis ? 
+Relance : À votre avis, qu’est-ce qui pourrait motiver un étudiant à l’utiliser 
+régulièrement (ex. simplicité, qualité des échanges, personnalisation…) ? Pour conclure,
+si vous rencontriez un étudiant qui cherche du soutien dans ses études (relecture,
+méthodo, orientation...), que lui diriez-vous à propos de l’application Orig'amis ?  Relance : Y a-t-il des fonctionnalités précises que vous aimeriez voir ajoutées, ajustées ou
+simplifiées pour optimiser votre expérience ? Seriez-vous à l’aise pour recommander ce
+type d’outil à vos étudiants ou à vos collègues ? Pourquoi ou pourquoi pas ? 
+1 0 9
+
+
+110Objectif : explorer plus en profondeur les attentes fonctionnelles, le parcours utilisateur idéal et
+la perception de valeur de l’app AMI.
+Contexte étudiant
+Peux-tu me parler d’un moment où tu as eu du mal à avancer sur un devoir ou un projet ?
+Qu’est-ce qui t’a manqué ?
+Quelles sont les matières ou types de projets pour lesquels tu aurais besoin de quelqu’un pour
+t’accompagner ?
+Attentes vis-à-vis de l’application
+Si tu pouvais décrire ton accompagnement scolaire/académique idéal, comment ça se
+passerait ?
+Quelles fonctionnalités seraient absolument nécessaires selon toi ?
+De quelle manière est-ce qu’on pourrait dématérialiser les fonctions essentielles de l’aide
+scolaire/académique pour toi ?
+As-tu déjà bénéficié d’un prof particulier ou d’un tuteur ? Quelle était ton expérience ?
+Est-ce que tu as déjà utilisé des applications ou sites d’aides scolaires ? Quelle était ton
+expérience ?
+Parcours utilisateur
+Lors de ton inscription, qu’est-ce qui serait important de te demander pour bien te proposer un
+accompagnement ? (niveau, domaine, types de projets, etc.)
+Comment aimerais-tu que l’app te rappelle ou t’aide à organiser ton travail ?
+À quoi devrait ressembler ton tableau de bord personnel sur l’application ? Pourrais-tu le
+dessiner ?
+Comment aimerais-tu que l’app te propose des mentors ou des ressources ?
+(recommandations ? filtres ? mots-clés ?)
+As-tu déjà utilisé des plateformes de mise en relation comme Superprof, AirBNB ou Doctolib
+pour trouver de l’aide ou des services ?
+Si oui, comment s’est passée l’expérience ? Qu’est-ce qui t’a plu ou déplu ?3.QUESTIONNAIRE UX/UI
+
+
+111Qu’est-ce qui t’a freiné à utiliser (ou à continuer d’utiliser) ce genre de plateformes ?
+Est-ce important pour toi que la personne avec qui tu es mis(e) en relation soit
+experte dans ton domaine ? Pourquoi ?
+Direction artistique
+Si tu devais imaginer l’univers visuel d’une app d’accompagnement étudiant, quelles couleurs,
+quelles formes, quelle ambiance te parleraient ?
+Préfères-tu une application épurée ou plus “fun” et personnalisée ? Pourquoi ?
+Peux-tu citer des apps ou sites que tu trouves particulièrement agréables à utiliser
+(visuellement ou globalement) ?
+Qu’est-ce qui, visuellement, te donne confiance dans une application ou une plateforme ?
+Que penses-tu de l’idée de pouvoir personnaliser son espace utilisateur (avatar, fond, code
+couleur, etc.) ?
+Le mentor idéal
+Imaginons que tu demandes de l’aide pour un mémoire : comment visualises-tu la première
+prise de contact avec ton mentor dans l’app ?
+Une fois en contact avec un mentor, que souhaiterais-tu pouvoir faire dans ton espace
+d’échange ?
+Comment imagines-tu ton "mentor" ? Quel profil te semble crédible et rassurant ?
+Quelle serait pour toi la valeur ajoutée d’un mentor par rapport à un professeur ou un ami ?
+Si tu avais un mentor qui t’aide sur un projet, de quelle manière voudrais-tu qu’il t’aide ? (visio,
+écrit, rdv présentiel, un peu tout)
+Modèle économique
+Est-ce que tu serais prêt(e) à payer pour un accompagnement personnalisé ? Si oui, dans
+quels cas ?
+Si certaines fonctionnalités étaient gratuites et d’autres payantes, lesquelles devraient rester
+accessibles à tous selon toi ?
+Si tu devais recommander l’application à un ami ; à qui est-ce cela s'adresse et qu’est-ce que
+tu lui dirais ?

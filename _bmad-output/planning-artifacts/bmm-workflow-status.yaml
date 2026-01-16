@@ -1,0 +1,20 @@
+generated: "2026-01-16T09:56:12+01:00"
+project: "Orig'ami"
+project_type: "web"
+project_level: "TBD"
+selected_track: "method"
+field_type: "greenfield"
+workflow_path: "_bmad/bmm/workflows/workflow-status/paths/method-greenfield.yaml"
+workflow_completed_at: "2026-01-16T12:00:02+01:00"
+workflow_status:
+  brainstorm-project: skipped
+  research: skipped
+  product-brief: _bmad-output/planning-artifacts/product-brief-Orig'ami-2026-01-16.md
+  prd: _bmad-output/planning-artifacts/prd.md
+  create-ux-design: _bmad-output/planning-artifacts/ux-design-specification.md
+  create-ux-design_completed_at: "2026-01-16T12:00:02+01:00"
+  create-architecture: _bmad-output/planning-artifacts/architecture.md
+  create-epics-and-stories: required
+  test-design: optional
+  implementation-readiness: required
+  sprint-planning: required
