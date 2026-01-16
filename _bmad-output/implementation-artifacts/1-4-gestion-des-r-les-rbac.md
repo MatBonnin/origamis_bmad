@@ -17,20 +17,52 @@ so that contrôler les accès selon les profils.
 
 ## Tasks / Subtasks
 
-- [ ] Implémenter l’API/logiciel correspondant (AC: #1)
-- [ ] Implémenter l’UI/flux associé (AC: #1)
-- [ ] Ajouter tests unitaires/integ (AC: #1)
+- [ ] Definir schema roles et relations (roles, user_roles) si non existant (AC: #1)
+- [ ] Ajouter guard RBAC + decorator `@Roles(...)` (AC: #2)
+- [ ] Exposer endpoints admin pour assignation des roles (AC: #1)
+- [ ] UI admin minimale pour changer roles utilisateur (AC: #1)
+- [ ] Messages d'erreur standardises (AC: #2)
+- [ ] Tests API (assignation, accès interdit), tests UI basiques (AC: #1, #2)
 
 ## Dev Notes
 
-- Stack: Next.js (front) + NestJS (API), TypeScript
-- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma)
-- Auth: NextAuth 4.24.13 + JWT + RBAC
-- API: REST + Swagger + WebSocket
-- Conventions: snake_case DB, camelCase JSON, enveloppe {data, error}
-- UX: responsive + WCAG 2.1 AA + pages publiques SEO
-- Cible: modules auth, users, onboarding
-- Contexte RGPD pour consentement
+### Contexte et contraintes non negociables
+
+- Stack: Next.js (App Router) + NestJS, TypeScript.
+- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma).
+- Auth: NextAuth 4.24.13 + JWT + RBAC.
+- API: REST + Swagger + WebSocket, enveloppe `{ data, error }`.
+- Conventions: `snake_case` en DB, `camelCase` en JSON, endpoints pluriel.
+
+### Roles & Acces
+
+- Roles: `etudiant`, `mentor`, `admin`, `support`.
+- Toutes les routes protegees doivent verifier JWT + RBAC.
+- Message d'erreur: `{ error: { code: "FORBIDDEN", message } }`.
+
+### API Contracts (admin roles)
+
+- `GET /admin/users` -> `{ data: { users }, error: null }`
+- `PATCH /admin/users/:id/roles` -> `{ data: { user }, error: null }`
+- Erreurs: `{ error: { code, message, details? } }`
+
+### Project Structure Notes
+
+- Web: `apps/web/src/features/admin/users` (table + role picker).
+- API: `apps/api/src/modules/admin` + `modules/auth` (guards/decorators).
+- DTOs partages: `packages/shared/src/schemas`.
+
+### Testing Requirements
+
+- API: tests RBAC (admin ok, non admin refuse).
+- API: tests assignation roles et validation.
+- Web: tests UI (role change + feedback).
+
+### Do / Don't
+
+- Do: proteger endpoints admin avec guard RBAC.
+- Do: journaliser action sensible (assignation role).
+- Don't: permettre auto-promotion a admin sans garde-fou.
 
 ### Project Structure Notes
 

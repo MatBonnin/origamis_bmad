@@ -16,20 +16,58 @@ so that recevoir les alertes que je souhaite.
 
 ## Tasks / Subtasks
 
-- [ ] Implémenter l’API/logiciel correspondant (AC: #1)
-- [ ] Implémenter l’UI/flux associé (AC: #1)
-- [ ] Ajouter tests unitaires/integ (AC: #1)
+- [ ] Ajouter table/champs preferences notifications via Prisma migration (AC: #1)
+- [ ] Exposer endpoints REST lecture/mise a jour preferences (AC: #1)
+- [ ] UI preferences (toggles) + feedback success/erreur (AC: #1)
+- [ ] Integrer application des preferences dans emission notifications (AC: #1)
+- [ ] Tests API + UI (auth, sauvegarde, application) (AC: #1)
 
 ## Dev Notes
 
-- Stack: Next.js (front) + NestJS (API), TypeScript
-- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma)
-- Auth: NextAuth 4.24.13 + JWT + RBAC
-- API: REST + Swagger + WebSocket
-- Conventions: snake_case DB, camelCase JSON, enveloppe {data, error}
-- UX: responsive + WCAG 2.1 AA + pages publiques SEO
-- Cible: modules auth, users, onboarding
-- Contexte RGPD pour consentement
+### Contexte et contraintes non negociables
+
+- Stack: Next.js (App Router) + NestJS, TypeScript.
+- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma).
+- Auth: NextAuth 4.24.13 + JWT + RBAC.
+- API: REST + Swagger + WebSocket, enveloppe `{ data, error }`.
+- Conventions: `snake_case` en DB, `camelCase` en JSON.
+- UX: responsive + WCAG 2.1 AA.
+
+### API Contracts (preferences)
+
+- `GET /users/me/notification-preferences` -> `{ data: { preferences }, error: null }`
+- `PATCH /users/me/notification-preferences` -> `{ data: { preferences }, error: null }`
+- Erreurs: `{ error: { code, message, details? } }`
+
+### Donnees (minimum)
+
+- `notification_preferences`: `user_id`, `email_enabled`, `push_enabled`, `in_app_enabled`.
+- Conventions `snake_case`.
+
+### Validation & UX
+
+- Toggles accesibles (label + role switch).
+- Feedback success/erreur, `aria-live`.
+
+### Application
+
+- Les envois futurs doivent respecter les preferences (pas d'envoi si desactive).
+
+### Project Structure Notes
+
+- Web: `apps/web/src/features/notifications/preferences`.
+- API: `apps/api/src/modules/notifications` ou `modules/users`.
+- DTOs partages: `packages/shared/src/schemas`.
+
+### Testing Requirements
+
+- API: tests GET/PATCH, auth required.
+- Integration: une notification n'est pas envoyee si preference desactivee.
+
+### Do / Don't
+
+- Do: charger les preferences par defaut a l'inscription.
+- Don't: envoyer des notifications ignorees par user.
 
 ### Project Structure Notes
 

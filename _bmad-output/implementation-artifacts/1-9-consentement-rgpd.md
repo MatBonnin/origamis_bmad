@@ -17,20 +17,60 @@ so that contrôler l’usage de mes données.
 
 ## Tasks / Subtasks
 
-- [ ] Implémenter l’API/logiciel correspondant (AC: #1)
-- [ ] Implémenter l’UI/flux associé (AC: #1)
-- [ ] Ajouter tests unitaires/integ (AC: #1)
+- [ ] Ajouter schema consentement (version, dates) via Prisma migration (AC: #1, #2)
+- [ ] Enregistrer consentement a l'inscription (AC: #1)
+- [ ] Exposer endpoints REST lecture/retire consentement (AC: #2)
+- [ ] UI: checkbox consentement + page gestion (AC: #1, #2)
+- [ ] Definir impact du retrait (blocage fonctionnalites ou mode restreint) (AC: #2)
+- [ ] Tests API + UI (enregistrement, retrait, message impact) (AC: #1, #2)
 
 ## Dev Notes
 
-- Stack: Next.js (front) + NestJS (API), TypeScript
-- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma)
-- Auth: NextAuth 4.24.13 + JWT + RBAC
-- API: REST + Swagger + WebSocket
-- Conventions: snake_case DB, camelCase JSON, enveloppe {data, error}
-- UX: responsive + WCAG 2.1 AA + pages publiques SEO
-- Cible: modules auth, users, onboarding
-- Contexte RGPD pour consentement
+### Contexte et contraintes non negociables
+
+- Stack: Next.js (App Router) + NestJS, TypeScript.
+- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma).
+- Auth: NextAuth 4.24.13 + JWT + RBAC.
+- API: REST + Swagger + WebSocket, enveloppe `{ data, error }`.
+- Conventions: `snake_case` en DB, `camelCase` en JSON.
+- UX: responsive + WCAG 2.1 AA.
+
+### API Contracts (consentement)
+
+- `GET /users/me/consent` -> `{ data: { consent }, error: null }`
+- `POST /users/me/consent` -> `{ data: { consent }, error: null }`
+- `POST /users/me/consent/withdraw` -> `{ data: { consent }, error: null }`
+
+### Donnees (minimum)
+
+- `consents`: `user_id`, `consent_version`, `consented_at`, `withdrawn_at`.
+- Conventions `snake_case`.
+
+### Impact retrait
+
+- Informer l'utilisateur des impacts (ex: services limites).
+- Bloquer actions sensibles si consentement retire.
+
+### Validation & UX
+
+- Checkbox consentement obligatoire a l'inscription (avec lien politique).
+- Message clair lors du retrait, `aria-live` pour feedback.
+
+### Project Structure Notes
+
+- Web: `apps/web/src/features/settings/consent`.
+- API: `apps/api/src/modules/users` ou `modules/compliance`.
+- DTOs partages: `packages/shared/src/schemas`.
+
+### Testing Requirements
+
+- API: consent create/withdraw, auth required.
+- Web: affichage statut + confirmation retrait + message impact.
+
+### Do / Don't
+
+- Do: stocker la version du texte de consentement.
+- Don't: supprimer les preuves de consentement.
 
 ### Project Structure Notes
 

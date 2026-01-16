@@ -16,20 +16,60 @@ so that gagner du temps dans la configuration.
 
 ## Tasks / Subtasks
 
-- [ ] Implémenter l’API/logiciel correspondant (AC: #1)
-- [ ] Implémenter l’UI/flux associé (AC: #1)
-- [ ] Ajouter tests unitaires/integ (AC: #1)
+- [ ] Definir regles de suggestion a partir des reponses onboarding (AC: #1)
+- [ ] Exposer endpoint pour recuperer suggestion (AC: #1)
+- [ ] Exposer endpoint pour accepter/modifier la suggestion (AC: #1)
+- [ ] UI: ecran suggestion avec accept/editer (AC: #1)
+- [ ] Persister la suggestion et le choix final (AC: #1)
+- [ ] Tests API + UI (suggestion, acceptation, edition) (AC: #1)
 
 ## Dev Notes
 
-- Stack: Next.js (front) + NestJS (API), TypeScript
-- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma)
-- Auth: NextAuth 4.24.13 + JWT + RBAC
-- API: REST + Swagger + WebSocket
-- Conventions: snake_case DB, camelCase JSON, enveloppe {data, error}
-- UX: responsive + WCAG 2.1 AA + pages publiques SEO
-- Cible: modules auth, users, onboarding
-- Contexte RGPD pour consentement
+### Contexte et contraintes non negociables
+
+- Stack: Next.js (App Router) + NestJS, TypeScript.
+- DB: PostgreSQL 17 + Prisma 7.2.0 (migrations Prisma).
+- Auth: NextAuth 4.24.13 + JWT + RBAC.
+- API: REST + Swagger + WebSocket, enveloppe `{ data, error }`.
+- Conventions: `snake_case` en DB, `camelCase` en JSON.
+- UX: responsive + WCAG 2.1 AA.
+
+### API Contracts (profil type)
+
+- `GET /onboarding/profile-suggestion` -> `{ data: { suggestion }, error: null }`
+- `POST /onboarding/profile-suggestion/accept` -> `{ data: { profile }, error: null }`
+- `PATCH /onboarding/profile-suggestion` -> `{ data: { profile }, error: null }`
+
+### Regles (minimum)
+
+- Basé sur domaine, niveau, objectifs.
+- Regles deterministes (pas d'IA pour MVP).
+
+### Donnees (minimum)
+
+- `profile_suggestions`: `user_id`, `suggestion_json`, `accepted_at`.
+- `users`: champs profil mis a jour apres acceptation/edition.
+
+### Validation & UX
+
+- Ecran clair avec CTA unique "Accepter" + option "Modifier".
+- Feedback success/erreur accessible.
+
+### Project Structure Notes
+
+- Web: `apps/web/src/features/onboarding/suggestion`.
+- API: `apps/api/src/modules/onboarding`.
+- DTOs partages: `packages/shared/src/schemas`.
+
+### Testing Requirements
+
+- API: suggestion disponible apres onboarding complet.
+- Web: affichage suggestion + accept/modify.
+
+### Do / Don't
+
+- Do: garder une trace de la suggestion proposee.
+- Don't: bloquer l'utilisateur s'il choisit de modifier.
 
 ### Project Structure Notes
 
