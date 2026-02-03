@@ -1,0 +1,61 @@
+// Prisma schema for Orig'AMI
+// Convention: snake_case for tables and columns
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model users {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  password_hash String
+  first_name    String
+  last_name     String
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+
+  user_roles user_roles[]
+  sessions   sessions[]
+
+  @@map("users")
+}
+
+model roles {
+  id   String @id @default(uuid())
+  name String @unique // etudiant, mentor, admin, support
+
+  user_roles user_roles[]
+
+  @@map("roles")
+}
+
+model user_roles {
+  id      String @id @default(uuid())
+  user_id String
+  role_id String
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  role roles @relation(fields: [role_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, role_id])
+  @@map("user_roles")
+}
+
+model sessions {
+  id            String   @id @default(uuid())
+  user_id       String
+  token         String   @unique
+  expires_at    DateTime
+  created_at    DateTime @default(now())
+  last_used_at  DateTime @default(now())
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([expires_at])
+  @@map("sessions")
+}

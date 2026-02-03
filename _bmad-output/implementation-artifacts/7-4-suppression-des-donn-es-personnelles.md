@@ -12,7 +12,9 @@ so that exercer mon droit RGPD.
 
 ## Acceptance Criteria
 
-1. Given un utilisateur authentifié When il demande la suppression de ses données Then la demande est enregistrée And un processus de suppression est déclenché
+- 1. Given un utilisateur authentifié When il demande la suppression de ses données Then la demande est enregistrée And un processus de suppression est déclenché
+
+## Tasks / Subtasks
 
 - [ ] Endpoint `POST /users/:id/request-deletion` -> queues suppressions (AC: #1)
 - [ ] Workflow `DELETE /users/:id/data` triggered after review + export log (AC: #1)

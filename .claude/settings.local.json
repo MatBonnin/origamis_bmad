@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm add:*)",
+      "Bash(npx prisma init)",
+      "Bash(npx prisma generate:*)",
+      "Bash(node ./node_modules/prisma/build/index.js generate:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(npm run prisma:generate:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(timeout:*)"
+    ]
+  }
+}

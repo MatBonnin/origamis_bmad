@@ -12,7 +12,9 @@ so that garantir la qualité des mentors.
 
 ## Acceptance Criteria
 
-1. Given un mentor en attente de validation When l’admin valide le profil Then le mentor devient visible et actif
+- 1. Given un mentor en attente de validation When l’admin valide le profil Then le mentor devient visible et actif
+
+## Tasks / Subtasks
 
 - [ ] Créer workflow validation (awaited mentors en `pending_review`) (AC: #1)
 - [ ] Endpoint admin `POST /mentors/:id/validate`, `PATCH /mentors/:id/status` (AC: #1)
