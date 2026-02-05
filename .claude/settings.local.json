@@ -10,7 +10,8 @@
       "Bash(npm run prisma:generate:*)",
       "Bash(npm install)",
       "Bash(npm install:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(npm test:*)"
     ]
   }
 }
