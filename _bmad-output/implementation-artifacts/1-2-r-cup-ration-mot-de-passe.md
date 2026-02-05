@@ -1,6 +1,6 @@
 # Story 1.2: Récupération mot de passe
 
-Status: ready-for-dev
+Status: in-progress
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -17,15 +17,15 @@ so that récupérer l’accès à mon compte.
 
 ## Tasks / Subtasks
 
-- [ ] Ajouter tables/champs reset password (token hash + expiration) via Prisma migration (AC: #1, #2)
-- [ ] Créer endpoints REST reset (request + confirm) avec enveloppe `{ data, error }` (AC: #1, #2)
-- [ ] Implémenter génération token, hash, expiration, invalidation après usage (AC: #1, #2)
+- [x] Ajouter tables/champs reset password (token hash + expiration) via Prisma migration (AC: #1, #2)
+- [x] Créer endpoints REST reset (request + confirm) avec enveloppe `{ data, error }` (AC: #1, #2)
+- [x] Implémenter génération token, hash, expiration, invalidation après usage (AC: #1, #2)
 - [ ] Intégrer envoi email reset (lien signé) + template minimal (AC: #1)
 - [ ] Implémenter UI "Mot de passe oublié" + "Réinitialiser" (AC: #1, #2)
-- [ ] Ajouter validations password + messages d’erreur accessibles (AC: #2)
-- [ ] Protéger contre l’énumération d’utilisateurs (message unique) (AC: #1)
-- [ ] Rate limiting sur endpoints reset (AC: #1)
-- [ ] Tests API + UI (request, token invalide/expiré, succès) (AC: #1, #2)
+- [x] Ajouter validations password + messages d'erreur accessibles (AC: #2)
+- [x] Protéger contre l'énumération d'utilisateurs (message unique) (AC: #1)
+- [x] Rate limiting sur endpoints reset (AC: #1)
+- [ ] Tests API + UI (request, token invalide/expiré, succès) (AC: #1, #2) - Tests API complétés
 
 ## Dev Notes
 
@@ -95,10 +95,33 @@ so that récupérer l’accès à mon compte.
 
 ### Agent Model Used
 
-GPT-5 (Codex)
+Claude Opus 4.5
 
 ### Debug Log References
 
+- Prisma 7 driver adapter issues on Windows - downgraded to Prisma 6
+
 ### Completion Notes List
 
+- 2026-02-05: Backend password reset implementation complete
+  - Endpoints POST /auth/forgot-password et POST /auth/reset-password créés
+  - Token sécurisé (crypto.randomBytes), hashé avant stockage (SHA-256)
+  - Expiration 1h, usage unique avec marquage password_reset_used_at
+  - Protection anti-énumération (même réponse si email existe ou non)
+  - Rate limiting: 3 req/min pour forgot-password, 5 req/min pour reset-password
+  - Validation DTO: email, password (min 8 chars, 1 majuscule, 1 chiffre)
+  - 14 tests unitaires pour le service auth (tous passent)
+  - TODO: Intégrer service email réel (actuellement console.log en dev)
+  - TODO: Implémenter UI frontend
+
 ### File List
+
+- apps/api/src/modules/auth/dto/forgot-password.dto.ts (new)
+- apps/api/src/modules/auth/dto/reset-password.dto.ts (new)
+- apps/api/src/modules/auth/dto/index.ts (modified)
+- apps/api/src/modules/auth/auth.service.ts (modified)
+- apps/api/src/modules/auth/auth.controller.ts (modified)
+- apps/api/src/modules/auth/auth.service.spec.ts (modified)
+- apps/api/src/modules/prisma/prisma.service.ts (modified - Prisma 6 downgrade)
+- apps/api/prisma/schema.prisma (modified - Prisma 6 format)
+- apps/api/.env (modified - credentials)

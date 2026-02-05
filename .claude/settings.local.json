@@ -11,7 +11,23 @@
       "Bash(npm install)",
       "Bash(npm install:*)",
       "Bash(timeout:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(npx prisma migrate:*)",
+      "WebSearch",
+      "Bash(npm run prisma:push:*)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:postgres@localhost:5432/origami?schema=public\" npx prisma db push:*)",
+      "Bash(npx prisma db push:*)",
+      "Bash(docker exec:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npm ls:*)",
+      "WebFetch(domain:www.prisma.io)",
+      "Bash(npx dotenv:*)",
+      "Bash(set:*)",
+      "Bash(DEBUG=\"*\" npx prisma db push:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm uninstall:*)",
+      "Bash(export DATABASE_URL=\"postgresql://postgres:postgres@localhost:5432/origami?schema=public\")",
+      "Bash(npx tsc:*)"
     ]
   }
 }

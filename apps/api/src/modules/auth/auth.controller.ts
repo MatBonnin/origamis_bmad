@@ -13,8 +13,16 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, AuthResponseDto, UserResponseDto } from './dto';
+import {
+  RegisterDto,
+  LoginDto,
+  AuthResponseDto,
+  UserResponseDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from './dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
@@ -86,5 +94,53 @@ export class AuthController {
   })
   async getMe(@CurrentUser() user: UserResponseDto) {
     return { data: user, error: null };
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 requests per minute
+  @ApiOperation({ summary: 'Demander une réinitialisation de mot de passe' })
+  @ApiResponse({
+    status: 200,
+    description: 'Email de réinitialisation envoyé (si le compte existe)',
+    schema: {
+      properties: {
+        data: {
+          type: 'object',
+          properties: { ok: { type: 'boolean', example: true } },
+        },
+        error: { nullable: true },
+      },
+    },
+  })
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    const result = await this.authService.forgotPassword(dto);
+    return { data: result, error: null };
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 requests per minute
+  @ApiOperation({ summary: 'Réinitialiser le mot de passe avec un token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Mot de passe réinitialisé avec succès',
+    schema: {
+      properties: {
+        data: {
+          type: 'object',
+          properties: { ok: { type: 'boolean', example: true } },
+        },
+        error: { nullable: true },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Token invalide ou expiré',
+  })
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    const result = await this.authService.resetPassword(dto);
+    return { data: result, error: null };
   }
 }

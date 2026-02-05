@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model users {
@@ -17,6 +18,11 @@ model users {
   last_name     String
   created_at    DateTime     @default(now())
   updated_at    DateTime     @updatedAt
+
+  // Password reset fields
+  password_reset_token_hash String?
+  password_reset_expires_at DateTime?
+  password_reset_used_at    DateTime?
 
   user_roles user_roles[]
   sessions   sessions[]
