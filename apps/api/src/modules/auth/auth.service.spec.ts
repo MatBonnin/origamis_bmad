@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../prisma';
+import { MailService } from '../mail';
 
 jest.mock('bcrypt');
 
@@ -34,12 +35,17 @@ describe('AuthService', () => {
     sign: jest.fn(),
   };
 
+  const mockMailService = {
+    sendPasswordResetEmail: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: JwtService, useValue: mockJwtService },
+        { provide: MailService, useValue: mockMailService },
       ],
     }).compile();
 
@@ -195,10 +201,11 @@ describe('AuthService', () => {
       expect(mockPrismaService.users.update).not.toHaveBeenCalled();
     });
 
-    it('should generate token and update user if email exists', async () => {
-      const mockUser = { id: 'user-1', email: 'test@example.com' };
+    it('should generate token, update user and send email if email exists', async () => {
+      const mockUser = { id: 'user-1', email: 'test@example.com', first_name: 'John' };
       mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
       mockPrismaService.users.update.mockResolvedValue(mockUser);
+      mockMailService.sendPasswordResetEmail.mockResolvedValue(undefined);
 
       const result = await service.forgotPassword(forgotPasswordDto);
 
@@ -211,6 +218,11 @@ describe('AuthService', () => {
           password_reset_used_at: null,
         }),
       });
+      expect(mockMailService.sendPasswordResetEmail).toHaveBeenCalledWith(
+        'test@example.com',
+        expect.any(String),
+        'John',
+      );
     });
   });
 

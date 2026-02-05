@@ -16,12 +16,14 @@ import {
   ForgotPasswordDto,
   ResetPasswordDto,
 } from './dto';
+import { MailService } from '../mail';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponseDto> {
@@ -186,9 +188,12 @@ export class AuthService {
       },
     });
 
-    // TODO: Send email with reset link containing the token
-    // For now, log the token in development
-    console.log(`[DEV] Password reset token for ${user.email}: ${token}`);
+    // Send password reset email
+    await this.mailService.sendPasswordResetEmail(
+      user.email,
+      token,
+      user.first_name,
+    );
 
     return { ok: true };
   }

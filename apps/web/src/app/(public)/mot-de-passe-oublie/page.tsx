@@ -1,33 +1,20 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { signIn } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import styles from './page.module.css';
+import styles from '../connexion/page.module.css';
 
 interface FormErrors {
   email?: string;
-  password?: string;
   general?: string;
 }
 
-export default function ConnexionPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+export default function MotDePasseOubliePage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const emailRef = useRef<HTMLInputElement>(null);
   const errorSummaryRef = useRef<HTMLDivElement>(null);
-
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
-
-  useEffect(() => {
-    const error = searchParams.get('error');
-    if (error) {
-      setErrors({ general: 'Une erreur est survenue lors de la connexion' });
-    }
-  }, [searchParams]);
 
   useEffect(() => {
     if (Object.keys(errors).length > 0 && errorSummaryRef.current) {
@@ -38,16 +25,11 @@ export default function ConnexionPage() {
   const validateForm = (formData: FormData): FormErrors => {
     const newErrors: FormErrors = {};
     const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
 
     if (!email) {
-      newErrors.email = 'L\'email est requis';
+      newErrors.email = "L'email est requis";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = 'Veuillez entrer un email valide';
-    }
-
-    if (!password) {
-      newErrors.password = 'Le mot de passe est requis';
     }
 
     return newErrors;
@@ -62,25 +44,28 @@ export default function ConnexionPage() {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      const firstErrorField = validationErrors.email ? emailRef.current : null;
-      firstErrorField?.focus();
+      emailRef.current?.focus();
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const result = await signIn('credentials', {
-        email: formData.get('email'),
-        password: formData.get('password'),
-        redirect: false,
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/auth/forgot-password`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.get('email') }),
+        }
+      );
 
-      if (result?.error) {
-        setErrors({ general: result.error });
-      } else if (result?.ok) {
-        router.push(callbackUrl);
-        router.refresh();
+      const result = await response.json();
+
+      if (result.error) {
+        setErrors({ general: result.error.message });
+      } else {
+        setIsSuccess(true);
       }
     } catch {
       setErrors({ general: 'Une erreur inattendue est survenue' });
@@ -91,12 +76,32 @@ export default function ConnexionPage() {
 
   const hasErrors = Object.keys(errors).length > 0;
 
+  if (isSuccess) {
+    return (
+      <main className={styles.main}>
+        <div className={styles.container}>
+          <h1 className={styles.title}>Email envoyé</h1>
+          <p className={styles.subtitle}>
+            Si un compte existe avec cette adresse email, vous recevrez un lien
+            de réinitialisation dans quelques instants.
+          </p>
+          <p className={styles.subtitle}>
+            Pensez à vérifier vos spams si vous ne voyez pas l&apos;email.
+          </p>
+          <Link href="/connexion" className={styles.submitButton} style={{ display: 'block', textAlign: 'center', textDecoration: 'none', marginTop: '1.5rem' }}>
+            Retour à la connexion
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className={styles.main}>
       <div className={styles.container}>
-        <h1 className={styles.title}>Connexion</h1>
+        <h1 className={styles.title}>Mot de passe oublié</h1>
         <p className={styles.subtitle}>
-          Connectez-vous pour accéder à votre espace
+          Entrez votre adresse email pour recevoir un lien de réinitialisation
         </p>
 
         {hasErrors && (
@@ -115,11 +120,6 @@ export default function ConnexionPage() {
               {errors.email && (
                 <li>
                   <a href="#email">{errors.email}</a>
-                </li>
-              )}
-              {errors.password && (
-                <li>
-                  <a href="#password">{errors.password}</a>
                 </li>
               )}
             </ul>
@@ -149,47 +149,19 @@ export default function ConnexionPage() {
             )}
           </div>
 
-          <div className={styles.field}>
-            <label htmlFor="password" className={styles.label}>
-              Mot de passe
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              autoComplete="current-password"
-              aria-describedby={errors.password ? 'password-error' : undefined}
-              aria-invalid={errors.password ? 'true' : undefined}
-              className={`${styles.input} ${errors.password ? styles.inputError : ''}`}
-              disabled={isLoading}
-            />
-            {errors.password && (
-              <p id="password-error" className={styles.fieldError} role="alert">
-                {errors.password}
-              </p>
-            )}
-          </div>
-
-          <div style={{ textAlign: 'right', marginTop: '-0.5rem' }}>
-            <Link href="/mot-de-passe-oublie" className={styles.link} style={{ fontSize: '0.875rem' }}>
-              Mot de passe oublié ?
-            </Link>
-          </div>
-
           <button
             type="submit"
             className={styles.submitButton}
             disabled={isLoading}
             aria-busy={isLoading}
           >
-            {isLoading ? 'Connexion en cours...' : 'Se connecter'}
+            {isLoading ? 'Envoi en cours...' : 'Envoyer le lien'}
           </button>
         </form>
 
         <p className={styles.footerText}>
-          Pas encore de compte ?{' '}
-          <Link href="/inscription" className={styles.link}>
-            Créer un compte
+          <Link href="/connexion" className={styles.link}>
+            Retour à la connexion
           </Link>
         </p>
       </div>
