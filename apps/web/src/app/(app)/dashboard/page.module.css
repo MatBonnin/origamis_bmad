@@ -50,3 +50,21 @@
   margin: 0;
   color: #1a1a2e;
 }
+
+.adminActions {
+  margin-top: 1.5rem;
+}
+
+.adminLink {
+  display: inline-block;
+  padding: 0.55rem 0.85rem;
+  border-radius: 8px;
+  background: #1d4ed8;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.adminLink:hover {
+  background: #1e40af;
+}

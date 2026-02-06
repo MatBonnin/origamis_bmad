@@ -1,5 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { authOptions } from '@/lib/auth';
 import styles from './page.module.css';
 
@@ -30,6 +31,14 @@ export default async function DashboardPage() {
             <dt>Rôle(s)</dt>
             <dd>{session.user.roles.join(', ')}</dd>
           </dl>
+
+          {session.user.roles.includes('admin') && (
+            <div className={styles.adminActions}>
+              <Link href="/admin/utilisateurs" className={styles.adminLink}>
+                Gerer les roles utilisateurs
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </main>
