@@ -82,6 +82,7 @@ so that préciser mon profil et mes besoins.
 - _bmad-output/planning-artifacts/prd.md
 - _bmad-output/planning-artifacts/architecture.md
 - _bmad-output/planning-artifacts/ux-design-specification.md
+- doc_origami\maquette\Creation de compte  (Maquette de l(onboarding en noir en blanc, a mettre en couleur)
 
 ## Dev Agent Record
 

@@ -1,66 +1,83 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from 'next/link';
+import styles from './page.module.css';
 
 export default function Home() {
   return (
     <div className={styles.page}>
+      <header className={styles.header}>
+        <p className={styles.brand}>Orig'AMI</p>
+        <nav className={styles.nav}>
+          <Link href="/connexion" className={styles.navLink}>
+            Connexion
+          </Link>
+          <Link href="/inscription" className={styles.navCta}>
+            Inscription
+          </Link>
+        </nav>
+      </header>
+
       <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
+        <section className={styles.hero}>
+          <p className={styles.kicker}>Mentorat etudiant</p>
+          <h1>Construis ton parcours avec un mentor adapte a tes objectifs.</h1>
           <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+            Orig'AMI aide les etudiants a trouver un mentor, structurer leur progression
+            et avancer avec des jalons concrets.
           </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+          <div className={styles.ctas}>
+            <Link href="/inscription" className={styles.primary}>
+              Commencer maintenant
+            </Link>
+            <Link href="/connexion" className={styles.secondary}>
+              J'ai deja un compte
+            </Link>
+          </div>
+        </section>
+
+        <section className={styles.section} aria-labelledby="how-it-works">
+          <h2 id="how-it-works">Comment ca marche</h2>
+          <div className={styles.steps}>
+            <article className={styles.card}>
+              <h3>1. Definis ton besoin</h3>
+              <p>Onboarding guide pour clarifier niveau, objectifs et priorites.</p>
+            </article>
+            <article className={styles.card}>
+              <h3>2. Trouve ton mentor</h3>
+              <p>Recommandations et recherche ciblee selon ton profil.</p>
+            </article>
+            <article className={styles.card}>
+              <h3>3. Passe a l'action</h3>
+              <p>Sessions, jalons et suivi de progression sur la duree.</p>
+            </article>
+          </div>
+        </section>
+
+        <section className={styles.section} aria-labelledby="benefits">
+          <h2 id="benefits">Pourquoi Orig'AMI</h2>
+          <ul className={styles.benefits}>
+            <li>Un accompagnement personnalise pour etudiants et jeunes diplomes.</li>
+            <li>Des objectifs mesurables avec une progression visible.</li>
+            <li>Une plateforme centralisee: messagerie, rendez-vous, suivi.</li>
+          </ul>
+        </section>
+
+        <section className={styles.finalCta} aria-labelledby="cta-title">
+          <h2 id="cta-title">Pret a accelerer ton parcours ?</h2>
+          <p>Inscris-toi gratuitement et complete ton profil en quelques minutes.</p>
+          <div className={styles.ctas}>
+            <Link href="/inscription" className={styles.primary}>
+              Creer mon compte
+            </Link>
+            <Link href="/connexion" className={styles.secondary}>
+              Me connecter
+            </Link>
+          </div>
+        </section>
       </main>
+
+      <footer className={styles.footer}>
+        <p>Orig'AMI - Plateforme de mentorat etudiant</p>
+      </footer>
     </div>
   );
 }
