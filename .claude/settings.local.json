@@ -27,7 +27,11 @@
       "WebFetch(domain:github.com)",
       "Bash(npm uninstall:*)",
       "Bash(export DATABASE_URL=\"postgresql://postgres:postgres@localhost:5432/origami?schema=public\")",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "Bash(ls:*)",
+      "Bash(npx nest build:*)",
+      "Bash(npm run lint:*)"
     ]
   }
 }

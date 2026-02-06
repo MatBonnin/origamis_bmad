@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -12,7 +12,7 @@ interface FormErrors {
   general?: string;
 }
 
-export default function ConnexionPage() {
+function ConnexionForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -194,5 +194,19 @@ export default function ConnexionPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+export default function ConnexionPage() {
+  return (
+    <Suspense fallback={
+      <main className={styles.main}>
+        <div className={styles.container}>
+          <p className={styles.subtitle}>Chargement...</p>
+        </div>
+      </main>
+    }>
+      <ConnexionForm />
+    </Suspense>
   );
 }

@@ -24,6 +24,12 @@ model users {
   password_reset_expires_at DateTime?
   password_reset_used_at    DateTime?
 
+  // Profile fields
+  level      String?   // User's level (e.g., "debutant", "intermediaire", "avance")
+  objectives String[]  // List of objectives
+  bio        String?   // Short bio (max 500 chars)
+  avatar_url String?   // URL to avatar image
+
   user_roles user_roles[]
   sessions   sessions[]
 
