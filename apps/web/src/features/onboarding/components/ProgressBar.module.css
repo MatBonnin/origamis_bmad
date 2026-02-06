@@ -1,0 +1,36 @@
+.container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a0aec0;
+  transition: color 0.2s ease;
+}
+
+.label.active {
+  color: #36529b;
+}
+
+.track {
+  height: 6px;
+  background-color: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background-color: #36529b;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}

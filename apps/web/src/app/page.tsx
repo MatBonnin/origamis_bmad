@@ -10,7 +10,7 @@ export default function Home() {
           <Link href="/connexion" className={styles.navLink}>
             Connexion
           </Link>
-          <Link href="/inscription" className={styles.navCta}>
+          <Link href="/onboarding" className={styles.navCta}>
             Inscription
           </Link>
         </nav>
@@ -25,7 +25,7 @@ export default function Home() {
             et avancer avec des jalons concrets.
           </p>
           <div className={styles.ctas}>
-            <Link href="/inscription" className={styles.primary}>
+            <Link href="/onboarding" className={styles.primary}>
               Commencer maintenant
             </Link>
             <Link href="/connexion" className={styles.secondary}>
@@ -65,7 +65,7 @@ export default function Home() {
           <h2 id="cta-title">Pret a accelerer ton parcours ?</h2>
           <p>Inscris-toi gratuitement et complete ton profil en quelques minutes.</p>
           <div className={styles.ctas}>
-            <Link href="/inscription" className={styles.primary}>
+            <Link href="/onboarding" className={styles.primary}>
               Creer mon compte
             </Link>
             <Link href="/connexion" className={styles.secondary}>

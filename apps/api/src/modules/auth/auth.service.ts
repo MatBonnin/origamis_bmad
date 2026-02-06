@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma';
 import {
   RegisterDto,
@@ -58,13 +59,29 @@ export class AuthService {
     }
 
     // Create user with role
-    const onboardingData =
+    // Handle onboarding data based on role and whether data was provided
+    const hasOnboardingData = dto.onboardingData && (
+      dto.onboardingData.domain ||
+      dto.onboardingData.level ||
+      dto.onboardingData.graduationYear ||
+      (dto.onboardingData.objectives && dto.onboardingData.objectives.length > 0)
+    );
+
+    const onboardingCreate =
       dto.role === 'etudiant'
         ? {
             onboarding: {
               create: {
-                step: 1,
-                answers_json: {},
+                step: hasOnboardingData ? 5 : 1,
+                completed_at: hasOnboardingData ? new Date() : null,
+                answers_json: hasOnboardingData
+                  ? ({
+                      domain: dto.onboardingData?.domain || null,
+                      level: dto.onboardingData?.level || null,
+                      graduationYear: dto.onboardingData?.graduationYear || null,
+                      objectives: dto.onboardingData?.objectives || [],
+                    } as Prisma.InputJsonValue)
+                  : ({} as Prisma.InputJsonValue),
               },
             },
           }
@@ -81,7 +98,7 @@ export class AuthService {
             role_id: role.id,
           },
         },
-        ...onboardingData,
+        ...onboardingCreate,
       },
       include: {
         user_roles: {

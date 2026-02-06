@@ -5,8 +5,35 @@ import {
   MaxLength,
   Matches,
   IsIn,
+  IsOptional,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+export class OnboardingDataDto {
+  @ApiPropertyOptional({ example: 'informatique' })
+  @IsOptional()
+  @IsString()
+  domain?: string;
+
+  @ApiPropertyOptional({ example: 'master-1' })
+  @IsOptional()
+  @IsString()
+  level?: string;
+
+  @ApiPropertyOptional({ example: '2025' })
+  @IsOptional()
+  @IsString()
+  graduationYear?: string;
+
+  @ApiPropertyOptional({ example: ['academic-writing', 'time-management'] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  objectives?: string[];
+}
 
 export class RegisterDto {
   @ApiProperty({ example: 'john.doe@example.com' })
@@ -37,4 +64,10 @@ export class RegisterDto {
   @ApiProperty({ example: 'etudiant', enum: ['etudiant', 'mentor'] })
   @IsIn(['etudiant', 'mentor'], { message: 'Le rôle doit être etudiant ou mentor' })
   role: 'etudiant' | 'mentor';
+
+  @ApiPropertyOptional({ type: OnboardingDataDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => OnboardingDataDto)
+  onboardingData?: OnboardingDataDto;
 }

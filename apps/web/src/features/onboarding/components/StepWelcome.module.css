@@ -1,0 +1,79 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background-color: #36529b;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+}
+
+.logoText {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 560px) {
+  .featuresGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.button {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.875rem 1.5rem;
+  background-color: #36529b;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  min-height: 44px;
+}
+
+.button:hover {
+  background-color: #2a4080;
+}
+
+.button:focus {
+  outline: 2px solid #36529b;
+  outline-offset: 2px;
+}
+
+.footer {
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: #5a6785;
+  text-align: center;
+  max-width: 400px;
+}
+
+.link {
+  color: #36529b;
+  text-decoration: underline;
+}
+
+.link:hover {
+  text-decoration: none;
+}

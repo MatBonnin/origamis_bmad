@@ -1,0 +1,93 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #00064f;
+  margin: 0 0 0.5rem;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #5a6785;
+  margin: 0 0 2rem;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 700px;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.buttons {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+.buttonOutline,
+.buttonFilled {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.buttonOutline {
+  background-color: white;
+  color: #00064f;
+  border: 1px solid #d9e2f0;
+}
+
+.buttonOutline:hover {
+  background-color: #f8fbff;
+  border-color: #36529b;
+}
+
+.buttonFilled {
+  background-color: #36529b;
+  color: white;
+  border: none;
+}
+
+.buttonFilled:hover:not(:disabled) {
+  background-color: #2a4080;
+}
+
+.buttonFilled:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.buttonOutline:focus,
+.buttonFilled:focus {
+  outline: 2px solid #36529b;
+  outline-offset: 2px;
+}
