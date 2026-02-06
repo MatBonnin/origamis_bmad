@@ -31,7 +31,8 @@
       "Bash(npm run build:*)",
       "Bash(ls:*)",
       "Bash(npx nest build:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(taskkill:*)"
     ]
   }
 }

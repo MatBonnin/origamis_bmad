@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma';
 import { OnboardingStateDto, UpdateOnboardingStepDto } from './dto';
 
@@ -32,7 +33,7 @@ export class OnboardingService {
       where: { user_id: userId },
       data: {
         step: dto.step,
-        answers_json: mergedAnswers,
+        answers_json: mergedAnswers as Prisma.InputJsonValue,
       },
     });
 

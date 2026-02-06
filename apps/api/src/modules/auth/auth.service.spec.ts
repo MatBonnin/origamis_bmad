@@ -29,6 +29,9 @@ describe('AuthService', () => {
       findUnique: jest.fn(),
       create: jest.fn(),
     },
+    notification_preferences: {
+      createMany: jest.fn(),
+    },
   };
 
   const mockJwtService = {
@@ -79,6 +82,7 @@ describe('AuthService', () => {
       mockPrismaService.users.findUnique.mockResolvedValue(null);
       mockPrismaService.roles.findUnique.mockResolvedValue(mockRole);
       mockPrismaService.users.create.mockResolvedValue(mockUser);
+      mockPrismaService.notification_preferences.createMany.mockResolvedValue({ count: 9 });
       mockJwtService.sign.mockReturnValue('jwt-token');
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
@@ -104,6 +108,7 @@ describe('AuthService', () => {
       mockPrismaService.roles.findUnique.mockResolvedValue(null);
       mockPrismaService.roles.create.mockResolvedValue(mockRole);
       mockPrismaService.users.create.mockResolvedValue(mockUser);
+      mockPrismaService.notification_preferences.createMany.mockResolvedValue({ count: 9 });
       mockJwtService.sign.mockReturnValue('jwt-token');
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
@@ -118,11 +123,13 @@ describe('AuthService', () => {
       mockPrismaService.users.findUnique.mockResolvedValue(null);
       mockPrismaService.roles.findUnique.mockResolvedValue(mockRole);
       mockPrismaService.users.create.mockResolvedValue(mockUser);
+      mockPrismaService.notification_preferences.createMany.mockResolvedValue({ count: 9 });
       mockJwtService.sign.mockReturnValue('jwt-token');
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
       await service.register(registerDto);
 
+      // Verify onboarding is created for student
       expect(mockPrismaService.users.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
@@ -132,20 +139,21 @@ describe('AuthService', () => {
                 answers_json: {},
               }),
             }),
-            notification_preferences: expect.objectContaining({
-              createMany: expect.objectContaining({
-                data: expect.arrayContaining([
-                  expect.objectContaining({
-                    channel: 'email',
-                    category: 'messages',
-                    enabled: true,
-                  }),
-                ]),
-              }),
-            }),
           }),
         }),
       );
+
+      // Verify notification preferences are created separately
+      expect(mockPrismaService.notification_preferences.createMany).toHaveBeenCalledWith({
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            user_id: 'user-1',
+            channel: 'email',
+            category: 'messages',
+            enabled: true,
+          }),
+        ]),
+      });
     });
   });
 

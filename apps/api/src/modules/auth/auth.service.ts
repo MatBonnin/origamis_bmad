@@ -81,17 +81,6 @@ export class AuthService {
             role_id: role.id,
           },
         },
-        notification_preferences: {
-          createMany: {
-            data: NOTIFICATION_CATEGORIES.flatMap((category) =>
-              NOTIFICATION_CHANNELS.map((channel) => ({
-                channel,
-                category,
-                enabled: true,
-              })),
-            ),
-          },
-        },
         ...onboardingData,
       },
       include: {
@@ -101,6 +90,18 @@ export class AuthService {
           },
         },
       },
+    });
+
+    // Create default notification preferences
+    await this.prisma.notification_preferences.createMany({
+      data: NOTIFICATION_CATEGORIES.flatMap((category) =>
+        NOTIFICATION_CHANNELS.map((channel) => ({
+          user_id: user.id,
+          channel,
+          category,
+          enabled: true,
+        })),
+      ),
     });
 
     // Generate JWT token

@@ -25,7 +25,7 @@ export class OnboardingStateDto {
   @ApiProperty({ example: 2 })
   step: number;
 
-  @ApiProperty({ type: 'object' })
+  @ApiProperty({ type: 'object', additionalProperties: true })
   answers: Record<string, unknown>;
 
   @ApiProperty({ example: false })

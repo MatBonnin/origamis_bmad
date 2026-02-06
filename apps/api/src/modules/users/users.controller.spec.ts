@@ -20,6 +20,7 @@ describe('UsersController', () => {
     firstName: 'John',
     lastName: 'Doe',
     roles: ['etudiant'],
+    createdAt: new Date('2024-01-01'),
   };
 
   const mockProfile = {
@@ -129,7 +130,7 @@ describe('UsersController', () => {
 
     it('should update notification preferences wrapped in data envelope', async () => {
       const dto = {
-        preferences: [{ channel: 'push', category: 'rdv', enabled: false }],
+        preferences: [{ channel: 'push' as const, category: 'rdv' as const, enabled: false }],
       };
       const preferences = dto.preferences;
       mockUsersService.updateNotificationPreferences.mockResolvedValue({ preferences });
