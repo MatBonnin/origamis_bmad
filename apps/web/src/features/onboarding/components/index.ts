@@ -1,4 +1,3 @@
-export { ProgressBar } from './ProgressBar';
 export { FeatureCard } from './FeatureCard';
 export { SelectableCard } from './SelectableCard';
 export { ProfileCard } from './ProfileCard';

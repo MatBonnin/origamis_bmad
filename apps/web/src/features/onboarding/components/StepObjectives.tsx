@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui';
 import { SelectableCard } from './SelectableCard';
 import { objectives } from '../constants/objectives';
 import styles from './StepObjectives.module.css';
@@ -39,17 +40,12 @@ export function StepObjectives({
       </div>
 
       <div className={styles.buttons}>
-        <button type="button" className={styles.buttonOutline} onClick={onBack}>
+        <Button variant="outline" size="lg" onClick={onBack}>
           Retour
-        </button>
-        <button
-          type="button"
-          className={styles.buttonFilled}
-          onClick={onNext}
-          disabled={!canContinue}
-        >
+        </Button>
+        <Button size="lg" onClick={onNext} disabled={!canContinue}>
           Continuer
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -1,0 +1,108 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.label {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-900);
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  height: 52px;
+  padding: var(--spacing-3) var(--spacing-4);
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  color: var(--color-primary-900);
+  background-color: var(--color-white);
+  border: 2px solid var(--color-neutral-500);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.input::placeholder {
+  color: var(--color-neutral-500);
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--color-primary-700);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent-500);
+  box-shadow: 0 0 0 3px rgba(242, 159, 8, 0.25);
+}
+
+.input:disabled {
+  background-color: var(--color-neutral-100);
+  cursor: not-allowed;
+}
+
+/* With left icon */
+.inputWrapper .leftIcon + .input {
+  padding-left: 3rem;
+}
+
+/* With right icon or element */
+.inputWrapper:has(.rightIcon) .input,
+.inputWrapper:has(.rightElement) .input {
+  padding-right: 3rem;
+}
+
+/* Error state */
+.hasError .input {
+  border-color: var(--color-error);
+}
+
+.hasError .input:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25);
+}
+
+/* Icons */
+.leftIcon,
+.rightIcon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-neutral-700);
+  pointer-events: none;
+}
+
+.leftIcon {
+  left: var(--spacing-4);
+}
+
+.rightIcon {
+  right: var(--spacing-4);
+}
+
+.rightElement {
+  position: absolute;
+  right: var(--spacing-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hint & Error text */
+.hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-700);
+}
+
+.error {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-error);
+}

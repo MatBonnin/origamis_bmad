@@ -3,7 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
-import { ProgressBar } from './components/ProgressBar';
+import Image from 'next/image';
+import logo from '@/app/assets/logo.png';
+import { ProgressBar } from '@/components/ui';
 import { StepWelcome } from './components/StepWelcome';
 import { StepProfileChoice } from './components/StepProfileChoice';
 import { StepAcademicPath } from './components/StepAcademicPath';
@@ -283,13 +285,19 @@ export function PublicOnboardingWizard() {
 
   return (
     <main className={styles.main}>
-      <div className={styles.container}>
+      <header className={styles.header}>
+        <div className={styles.logo}>
+          <Image src={logo} alt="Orig'AMI" height={48} priority />
+        </div>
         <div className={styles.progressWrapper}>
           <ProgressBar
-            currentStep={getProgressStep()}
-            totalSteps={effectiveTotalSteps}
+            value={getProgressStep()}
+            max={effectiveTotalSteps - 1}
+            labels={['Debut', 'Profil', 'Fin']}
           />
         </div>
+      </header>
+      <div className={styles.container}>
         <div className={styles.content}>{renderStep()}</div>
       </div>
     </main>

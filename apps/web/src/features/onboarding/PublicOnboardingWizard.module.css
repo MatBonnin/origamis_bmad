@@ -1,23 +1,39 @@
 .main {
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem 1rem;
-  background-color: white;
+  flex-direction: column;
+  background-color: var(--color-white);
 }
 
-.container {
+.header {
   width: 100%;
-  max-width: 800px;
+  background-color: var(--color-neutral-50);
+  padding: var(--spacing-6) 0 0;
+  border-bottom: 1px solid var(--color-neutral-500);
+}
+
+.logo {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-6);
 }
 
 .progressWrapper {
   width: 100%;
-  margin-bottom: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-4) var(--spacing-6);
+}
+
+.container {
+  flex: 1;
+  width: 100%;
+  max-width: var(--container-lg);
+  margin: 0 auto;
+  padding: var(--spacing-8) var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .content {
@@ -28,6 +44,6 @@
 }
 
 .loading {
-  font-size: 1rem;
-  color: #5a6785;
+  font-size: var(--font-size-md);
+  color: var(--color-neutral-700);
 }

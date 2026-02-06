@@ -1,6 +1,7 @@
 'use client';
 
 import { GraduationCap, Pencil } from 'lucide-react';
+import { Button } from '@/components/ui';
 import { ProfileCard } from './ProfileCard';
 import styles from './StepProfileChoice.module.css';
 
@@ -42,17 +43,12 @@ export function StepProfileChoice({
       </div>
 
       <div className={styles.buttons}>
-        <button type="button" className={styles.buttonOutline} onClick={onBack}>
+        <Button variant="outline" size="lg" onClick={onBack}>
           Retour
-        </button>
-        <button
-          type="button"
-          className={styles.buttonFilled}
-          onClick={onNext}
-          disabled={!profileType}
-        >
+        </Button>
+        <Button size="lg" onClick={onNext} disabled={!profileType}>
           Continuer
-        </button>
+        </Button>
       </div>
     </div>
   );

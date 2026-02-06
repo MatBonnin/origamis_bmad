@@ -1,14 +1,127 @@
+/* ==========================================
+   ORIG'AMI Design System - Global Theme
+   ========================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ===================
+     Color Palette
+     =================== */
+
+  /* Primary Colors */
+  --color-primary-900: #00064F;
+  --color-primary-700: #36529B;
+  --color-primary-500: #3A68AD;
+
+  /* Accent Colors */
+  --color-accent-500: #F29F08;
+  --color-accent-300: #F9CF83;
+  --color-accent-700: #8C3900;
+
+  /* Neutral Colors */
+  --color-neutral-900: #171717;
+  --color-neutral-700: #525252;
+  --color-neutral-500: #B4B4B4;
+  --color-neutral-200: #E5E5E5;
+  --color-neutral-100: #F5F5F5;
+  --color-neutral-50: #EBF0F7;
+  --color-white: #FFFFFF;
+
+  /* Semantic Colors */
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-error-light: #FEE2E2;
+
+  /* ===================
+     Typography
+     =================== */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --font-size-xs: 0.75rem;      /* 12px */
+  --font-size-sm: 0.8125rem;    /* 13px */
+  --font-size-base: 0.9375rem;  /* 15px */
+  --font-size-md: 1rem;         /* 16px */
+  --font-size-lg: 1.125rem;     /* 18px */
+  --font-size-xl: 1.25rem;      /* 20px */
+  --font-size-2xl: 1.5rem;      /* 24px */
+  --font-size-3xl: 1.75rem;     /* 28px */
+  --font-size-4xl: 2rem;        /* 32px */
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* ===================
+     Spacing
+     =================== */
+  --spacing-1: 0.25rem;   /* 4px */
+  --spacing-2: 0.5rem;    /* 8px */
+  --spacing-3: 0.75rem;   /* 12px */
+  --spacing-4: 1rem;      /* 16px */
+  --spacing-5: 1.25rem;   /* 20px */
+  --spacing-6: 1.5rem;    /* 24px */
+  --spacing-8: 2rem;      /* 32px */
+  --spacing-10: 2.5rem;   /* 40px */
+  --spacing-12: 3rem;     /* 48px */
+
+  /* ===================
+     Border Radius
+     =================== */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-full: 9999px;
+
+  /* ===================
+     Shadows
+     =================== */
+  --shadow-sm: 0 1px 2px rgba(0, 6, 79, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 6, 79, 0.1);
+  --shadow-lg: 0 6px 20px rgba(0, 6, 79, 0.12);
+  --shadow-xl: 0 10px 30px rgba(0, 6, 79, 0.15);
+  --shadow-accent: 0 4px 12px rgba(242, 159, 8, 0.35);
+  --shadow-accent-lg: 0 6px 20px rgba(242, 159, 8, 0.45);
+
+  /* ===================
+     Transitions
+     =================== */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* ===================
+     Z-Index
+     =================== */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+
+  /* ===================
+     Layout
+     =================== */
+  --container-sm: 560px;
+  --container-md: 768px;
+  --container-lg: 900px;
+  --container-xl: 1200px;
+
+  --min-touch-target: 44px;
+
+  /* Legacy support */
+  --background: var(--color-white);
+  --foreground: var(--color-neutral-900);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ===================
+   Base Styles
+   =================== */
 
 html,
 body {
@@ -19,7 +132,9 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -35,8 +150,20 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+/* ===================
+   Focus Styles
+   =================== */
+
+:focus-visible {
+  outline: 3px solid var(--color-accent-500);
+  outline-offset: 2px;
+}
+
+/* ===================
+   Selection
+   =================== */
+
+::selection {
+  background-color: var(--color-accent-300);
+  color: var(--color-primary-900);
 }

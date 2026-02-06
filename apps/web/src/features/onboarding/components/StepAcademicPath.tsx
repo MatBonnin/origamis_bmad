@@ -1,5 +1,6 @@
 'use client';
 
+import { Button, Select, Card, CardHeader, CardTitle, CardContent } from '@/components/ui';
 import { domains, levels, graduationYears } from '../constants/academicOptions';
 import styles from './StepAcademicPath.module.css';
 
@@ -33,81 +34,44 @@ export function StepAcademicPath({
         Ces informations nous aident a trouver les mentors les plus adaptes
       </p>
 
-      <div className={styles.card}>
-        <h2 className={styles.cardTitle}>Formation actuelle</h2>
-
-        <div className={styles.fields}>
-          <div className={styles.field}>
-            <label htmlFor="domain" className={styles.label}>
-              Domaine d&apos;etudes
-            </label>
-            <select
-              id="domain"
-              className={styles.select}
+      <Card className={styles.card}>
+        <CardHeader>
+          <CardTitle>Formation actuelle</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className={styles.fields}>
+            <Select
+              label="Domaine d'etudes"
+              options={domains}
               value={domain}
               onChange={(e) => onChangeDomain(e.target.value)}
-            >
-              <option value="">Selectionnez un domaine</option>
-              {domains.map((d) => (
-                <option key={d.value} value={d.value}>
-                  {d.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className={styles.field}>
-            <label htmlFor="level" className={styles.label}>
-              Niveau d&apos;etudes
-            </label>
-            <select
-              id="level"
-              className={styles.select}
+              placeholder="Selectionnez un domaine"
+            />
+            <Select
+              label="Niveau d'etudes"
+              options={levels}
               value={level}
               onChange={(e) => onChangeLevel(e.target.value)}
-            >
-              <option value="">Selectionnez un niveau</option>
-              {levels.map((l) => (
-                <option key={l.value} value={l.value}>
-                  {l.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className={styles.field}>
-            <label htmlFor="graduationYear" className={styles.label}>
-              Annee de diplome prevue
-            </label>
-            <select
-              id="graduationYear"
-              className={styles.select}
+              placeholder="Selectionnez un niveau"
+            />
+            <Select
+              label="Annee de diplome prevue"
+              options={graduationYears}
               value={graduationYear}
               onChange={(e) => onChangeGraduationYear(e.target.value)}
-            >
-              <option value="">Selectionnez une annee</option>
-              {graduationYears.map((y) => (
-                <option key={y.value} value={y.value}>
-                  {y.label}
-                </option>
-              ))}
-            </select>
+              placeholder="Selectionnez une annee"
+            />
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       <div className={styles.buttons}>
-        <button type="button" className={styles.buttonOutline} onClick={onBack}>
+        <Button variant="outline" size="lg" onClick={onBack}>
           Retour
-        </button>
-        <button
-          type="button"
-          className={styles.buttonFilled}
-          onClick={onNext}
-          disabled={!canContinue}
-        >
+        </Button>
+        <Button size="lg" onClick={onNext} disabled={!canContinue}>
           Continuer
-        </button>
+        </Button>
       </div>
     </div>
   );

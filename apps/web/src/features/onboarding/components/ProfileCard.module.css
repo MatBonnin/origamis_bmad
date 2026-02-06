@@ -3,57 +3,65 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 2rem 1.5rem;
-  background-color: #f8fbff;
-  border: 2px solid #d9e2f0;
-  border-radius: 12px;
+  padding: var(--spacing-8) var(--spacing-6);
+  background-color: var(--color-neutral-100);
+  border: 2px solid var(--color-neutral-500);
+  border-radius: var(--radius-2xl);
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal), transform var(--transition-normal), background-color var(--transition-normal);
   width: 100%;
-  min-height: 200px;
+  min-height: 220px;
 }
 
 .card:hover {
-  border-color: #36529b;
-  box-shadow: 0 4px 12px rgba(0, 6, 79, 0.08);
-  transform: translateY(-2px);
+  border-color: var(--color-primary-500);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+  background-color: var(--color-neutral-50);
 }
 
 .card:focus {
-  outline: 2px solid #36529b;
+  outline: 3px solid var(--color-accent-500);
   outline-offset: 2px;
 }
 
 .card.selected {
-  border-color: #36529b;
-  background-color: #eef3ff;
+  border-color: var(--color-accent-500);
+  background-color: var(--color-neutral-50);
+  box-shadow: 0 4px 16px rgba(242, 159, 8, 0.25);
 }
 
 .iconWrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
-  background-color: #36529b;
-  border-radius: 50%;
-  margin-bottom: 1rem;
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-primary-700) 100%);
+  border-radius: var(--radius-full);
+  margin-bottom: var(--spacing-5);
+  box-shadow: 0 4px 12px rgba(0, 6, 79, 0.25);
+}
+
+.card.selected .iconWrapper {
+  background: linear-gradient(135deg, var(--color-accent-500) 0%, var(--color-accent-300) 100%);
+  box-shadow: var(--shadow-accent);
 }
 
 .icon {
-  color: white;
+  color: var(--color-white);
 }
 
 .title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #00064f;
-  margin: 0 0 0.5rem;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-900);
+  margin: 0 0 var(--spacing-3);
 }
 
 .description {
-  font-size: 0.875rem;
-  color: #5a6785;
+  font-size: var(--font-size-base);
+  color: var(--color-neutral-700);
   margin: 0;
-  line-height: 1.5;
+  line-height: var(--line-height-normal);
 }

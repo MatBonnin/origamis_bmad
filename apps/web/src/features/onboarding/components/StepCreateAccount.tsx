@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Button, Input } from '@/components/ui';
 import styles from './StepCreateAccount.module.css';
 
 interface StepCreateAccountProps {
@@ -48,6 +49,17 @@ export function StepCreateAccount({
     }
   };
 
+  const TogglePasswordButton = (
+    <button
+      type="button"
+      className={styles.togglePassword}
+      onClick={() => setShowPassword(!showPassword)}
+      aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+    >
+      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+    </button>
+  );
+
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>Creons votre compte</h1>
@@ -57,101 +69,53 @@ export function StepCreateAccount({
         {error && <div className={styles.error}>{error}</div>}
 
         <div className={styles.row}>
-          <div className={styles.field}>
-            <label htmlFor="firstName" className={styles.label}>
-              Prenom
-            </label>
-            <div className={styles.inputWrapper}>
-              <User className={styles.inputIcon} size={18} />
-              <input
-                id="firstName"
-                type="text"
-                className={styles.input}
-                value={firstName}
-                onChange={(e) => onChangeFirstName(e.target.value)}
-                placeholder="Jean"
-                required
-              />
-            </div>
-          </div>
-
-          <div className={styles.field}>
-            <label htmlFor="lastName" className={styles.label}>
-              Nom
-            </label>
-            <div className={styles.inputWrapper}>
-              <User className={styles.inputIcon} size={18} />
-              <input
-                id="lastName"
-                type="text"
-                className={styles.input}
-                value={lastName}
-                onChange={(e) => onChangeLastName(e.target.value)}
-                placeholder="Dupont"
-                required
-              />
-            </div>
-          </div>
+          <Input
+            label="Prenom"
+            value={firstName}
+            onChange={(e) => onChangeFirstName(e.target.value)}
+            placeholder="Jean"
+            leftIcon={<User size={18} />}
+            required
+          />
+          <Input
+            label="Nom"
+            value={lastName}
+            onChange={(e) => onChangeLastName(e.target.value)}
+            placeholder="Dupont"
+            leftIcon={<User size={18} />}
+            required
+          />
         </div>
 
-        <div className={styles.field}>
-          <label htmlFor="email" className={styles.label}>
-            Email
-          </label>
-          <div className={styles.inputWrapper}>
-            <Mail className={styles.inputIcon} size={18} />
-            <input
-              id="email"
-              type="email"
-              className={styles.input}
-              value={email}
-              onChange={(e) => onChangeEmail(e.target.value)}
-              placeholder="jean.dupont@email.com"
-              required
-            />
-          </div>
-        </div>
+        <Input
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => onChangeEmail(e.target.value)}
+          placeholder="jean.dupont@email.com"
+          leftIcon={<Mail size={18} />}
+          required
+        />
 
-        <div className={styles.field}>
-          <label htmlFor="password" className={styles.label}>
-            Mot de passe
-          </label>
-          <div className={styles.inputWrapper}>
-            <Lock className={styles.inputIcon} size={18} />
-            <input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              className={styles.input}
-              value={password}
-              onChange={(e) => onChangePassword(e.target.value)}
-              placeholder="Votre mot de passe"
-              required
-            />
-            <button
-              type="button"
-              className={styles.togglePassword}
-              onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-          <span className={styles.hint}>
-            8 caracteres minimum, avec au moins une majuscule et un chiffre
-          </span>
-        </div>
+        <Input
+          label="Mot de passe"
+          type={showPassword ? 'text' : 'password'}
+          value={password}
+          onChange={(e) => onChangePassword(e.target.value)}
+          placeholder="Votre mot de passe"
+          leftIcon={<Lock size={18} />}
+          rightElement={TogglePasswordButton}
+          hint="8 caracteres minimum, avec au moins une majuscule et un chiffre"
+          required
+        />
 
         <div className={styles.buttons}>
-          <button type="button" className={styles.buttonOutline} onClick={onBack}>
+          <Button type="button" variant="outline" size="lg" onClick={onBack}>
             Retour
-          </button>
-          <button
-            type="submit"
-            className={styles.buttonFilled}
-            disabled={!canSubmit}
-          >
-            {isLoading ? 'Creation en cours...' : 'Creer mon compte'}
-          </button>
+          </Button>
+          <Button type="submit" size="lg" disabled={!canSubmit} isLoading={isLoading}>
+            Creer mon compte
+          </Button>
         </div>
       </form>
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { GraduationCap, Video, Users, Route } from 'lucide-react';
+import { Button } from '@/components/ui';
 import { FeatureCard } from './FeatureCard';
 import styles from './StepWelcome.module.css';
 
@@ -34,9 +35,10 @@ const features = [
 export function StepWelcome({ onNext }: StepWelcomeProps) {
   return (
     <div className={styles.container}>
-      <div className={styles.logo}>
-        <span className={styles.logoText}>AMI</span>
-      </div>
+      <h1 className={styles.title}>Bienvenue sur Orig&apos;AMI</h1>
+      <p className={styles.subtitle}>
+        La plateforme qui connecte etudiants et mentors pour reussir ensemble
+      </p>
 
       <div className={styles.featuresGrid}>
         {features.map((feature) => (
@@ -49,9 +51,11 @@ export function StepWelcome({ onNext }: StepWelcomeProps) {
         ))}
       </div>
 
-      <button type="button" className={styles.button} onClick={onNext}>
-        Commencer
-      </button>
+      <div className={styles.buttonWrapper}>
+        <Button size="lg" onClick={onNext}>
+          Commencer
+        </Button>
+      </div>
 
       <p className={styles.footer}>
         En continuant, vous acceptez nos{' '}
