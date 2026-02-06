@@ -28,7 +28,6 @@
 .card.selected {
   border-color: var(--color-accent-500);
   background-color: var(--color-neutral-50);
-  box-shadow: 0 4px 16px rgba(242, 159, 8, 0.25);
 }
 
 .iconWrapper {
@@ -37,15 +36,13 @@
   justify-content: center;
   width: 72px;
   height: 72px;
-  background: linear-gradient(135deg, var(--color-primary-900) 0%, var(--color-primary-700) 100%);
+  background-color: var(--color-primary-900);
   border-radius: var(--radius-full);
   margin-bottom: var(--spacing-5);
-  box-shadow: 0 4px 12px rgba(0, 6, 79, 0.25);
 }
 
 .card.selected .iconWrapper {
-  background: linear-gradient(135deg, var(--color-accent-500) 0%, var(--color-accent-300) 100%);
-  box-shadow: var(--shadow-accent);
+  background-color: var(--color-accent-500);
 }
 
 .icon {

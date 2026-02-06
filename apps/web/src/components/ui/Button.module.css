@@ -23,33 +23,29 @@
    =================== */
 
 .primary {
-  background: linear-gradient(135deg, var(--color-accent-500) 0%, var(--color-accent-300) 100%);
+  background-color: var(--color-accent-500);
   color: var(--color-primary-900);
-  box-shadow: var(--shadow-accent);
 }
 
 .primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-accent-lg);
+  background-color: #D98E07;
 }
 
 .primary:active:not(:disabled) {
-  transform: translateY(0);
+  background-color: #C07F06;
 }
 
 .secondary {
-  background: linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-primary-500) 100%);
+  background-color: var(--color-primary-700);
   color: var(--color-white);
-  box-shadow: var(--shadow-md);
 }
 
 .secondary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  background-color: var(--color-primary-900);
 }
 
 .secondary:active:not(:disabled) {
-  transform: translateY(0);
+  background-color: var(--color-primary-900);
 }
 
 .outline {

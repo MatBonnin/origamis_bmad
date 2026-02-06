@@ -22,10 +22,9 @@
   justify-content: center;
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-primary-500) 100%);
+  background-color: var(--color-primary-700);
   border-radius: var(--radius-full);
   margin-bottom: var(--spacing-4);
-  box-shadow: 0 2px 8px rgba(54, 82, 155, 0.3);
 }
 
 .icon {
