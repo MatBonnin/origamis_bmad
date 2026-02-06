@@ -58,6 +58,18 @@ export class AuthService {
     }
 
     // Create user with role
+    const onboardingData =
+      dto.role === 'etudiant'
+        ? {
+            onboarding: {
+              create: {
+                step: 1,
+                answers_json: {},
+              },
+            },
+          }
+        : {};
+
     const user = await this.prisma.users.create({
       data: {
         email: dto.email.toLowerCase(),
@@ -80,6 +92,7 @@ export class AuthService {
             ),
           },
         },
+        ...onboardingData,
       },
       include: {
         user_roles: {

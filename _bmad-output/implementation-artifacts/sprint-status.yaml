@@ -46,7 +46,7 @@ development_status:
   1-3-gestion-du-profil-utilisateur: done
   1-4-gestion-des-r-les-rbac: review
   1-5-pr-f-rences-de-notifications: review
-  1-6-onboarding-tudiant-guid: ready-for-dev
+  1-6-onboarding-tudiant-guid: review
   1-7-profil-type-propos: ready-for-dev
   1-8-modification-des-besoins-apr-s-onboarding: ready-for-dev
   1-9-consentement-rgpd: ready-for-dev

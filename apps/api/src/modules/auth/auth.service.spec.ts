@@ -126,6 +126,12 @@ describe('AuthService', () => {
       expect(mockPrismaService.users.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
+            onboarding: expect.objectContaining({
+              create: expect.objectContaining({
+                step: 1,
+                answers_json: {},
+              }),
+            }),
             notification_preferences: expect.objectContaining({
               createMany: expect.objectContaining({
                 data: expect.arrayContaining([

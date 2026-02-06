@@ -117,7 +117,12 @@ export default function InscriptionPage() {
       });
 
       if (signInResult?.ok) {
-        router.push('/dashboard');
+        const selectedRole = formData.get('role');
+        if (selectedRole === 'etudiant') {
+          router.push('/onboarding');
+        } else {
+          router.push('/dashboard');
+        }
         router.refresh();
       } else {
         // Si la connexion échoue, rediriger vers la page de connexion

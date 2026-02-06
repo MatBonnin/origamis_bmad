@@ -8,6 +8,7 @@ import { MailModule } from './modules/mail';
 import { UsersModule } from './modules/users';
 import { AdminModule } from './modules/admin';
 import { NotificationsModule } from './modules/notifications';
+import { OnboardingModule } from './modules/onboarding';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { NotificationsModule } from './modules/notifications';
     UsersModule,
     AdminModule,
     NotificationsModule,
+    OnboardingModule,
   ],
   providers: [
     {

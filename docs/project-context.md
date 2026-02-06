@@ -75,3 +75,7 @@ See `.env.example` at root for required variables:
 - `NEXTAUTH_URL` - NextAuth base URL
 - `NEXTAUTH_SECRET` - NextAuth secret key
 - `API_PORT` - NestJS API port (default: 4000)
+
+## Branding Assets
+
+- Main logo: `apps/web/src/app/assets/logo.png`

@@ -33,8 +33,24 @@ model users {
   user_roles user_roles[]
   sessions   sessions[]
   notification_preferences notification_preferences[]
+  onboarding onboarding?
 
   @@map("users")
+}
+
+model onboarding {
+  id          String   @id @default(uuid())
+  user_id     String   @unique
+  step        Int      @default(1)
+  answers_json Json    @default("{}")
+  completed_at DateTime?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("onboarding")
 }
 
 enum notification_channel {

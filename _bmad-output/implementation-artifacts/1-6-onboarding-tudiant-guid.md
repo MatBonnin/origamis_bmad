@@ -1,6 +1,6 @@
 # Story 1.6: Onboarding étudiant guidé
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -17,12 +17,12 @@ so that préciser mon profil et mes besoins.
 
 ## Tasks / Subtasks
 
-- [ ] Definir schema onboarding (steps + reponses) via Prisma migration (AC: #1, #2)
-- [ ] Exposer endpoints REST pour progression et completion (AC: #1, #2)
-- [ ] UI onboarding multi-etapes avec stepper (AC: #1, #2)
-- [ ] Enregistrer chaque etape (autosave) + reprise (AC: #1)
-- [ ] Marquer onboarding complete et rediriger dashboard (AC: #2)
-- [ ] Tests API + UI (progression, reprise, completion) (AC: #1, #2)
+- [x] Definir schema onboarding (steps + reponses) via Prisma migration (AC: #1, #2)
+- [x] Exposer endpoints REST pour progression et completion (AC: #1, #2)
+- [x] UI onboarding multi-etapes avec stepper (AC: #1, #2)
+- [x] Enregistrer chaque etape (autosave) + reprise (AC: #1)
+- [x] Marquer onboarding complete et rediriger dashboard (AC: #2)
+- [x] Tests API + UI (progression, reprise, completion) (AC: #1, #2)
 
 ## Dev Notes
 
@@ -65,6 +65,7 @@ so that préciser mon profil et mes besoins.
 - Web: `apps/web/src/features/onboarding`.
 - API: `apps/api/src/modules/onboarding`.
 - DTOs partages: `packages/shared/src/schemas`.
+- Branding: logo principal disponible dans `apps/web/src/app/assets/logo.png`.
 
 ### Testing Requirements
 
@@ -91,7 +92,42 @@ so that préciser mon profil et mes besoins.
 GPT-5 (Codex)
 
 ### Debug Log References
+- `npm test -- --runInBand src/modules/onboarding/onboarding.service.spec.ts src/modules/onboarding/onboarding.controller.spec.ts src/modules/auth/auth.service.spec.ts` -> PASS (22 tests)
+- `npm run test` (apps/web) -> PASS (5 tests UI)
 
 ### Completion Notes List
+- Schema onboarding ajoute (`onboarding` avec `step`, `answers_json`, `completed_at`) + migration SQL.
+- Module API onboarding implemente avec endpoints:
+- `GET /onboarding/me`
+- `PATCH /onboarding/step`
+- `POST /onboarding/complete`
+- Reprise automatique implementee via lecture de l'etat onboarding existant.
+- Autosave par etape implemente via `PATCH /onboarding/step` lors de la navigation.
+- Completion onboarding implementee avec redirection dashboard.
+- Flux inscription ajuste: apres creation/connexion auto, un etudiant est redirige vers `/onboarding`.
+- L'emplacement du logo a ete documente (`apps/web/src/app/assets/logo.png`) dans le contexte projet.
 
 ### File List
+- `apps/api/prisma/schema.prisma`
+- `apps/api/prisma/migrations/202602061500_add_onboarding/migration.sql`
+- `apps/api/src/app.module.ts`
+- `apps/api/src/modules/onboarding/onboarding.module.ts`
+- `apps/api/src/modules/onboarding/onboarding.controller.ts`
+- `apps/api/src/modules/onboarding/onboarding.controller.spec.ts`
+- `apps/api/src/modules/onboarding/onboarding.service.ts`
+- `apps/api/src/modules/onboarding/onboarding.service.spec.ts`
+- `apps/api/src/modules/onboarding/dto/onboarding.dto.ts`
+- `apps/api/src/modules/onboarding/dto/index.ts`
+- `apps/api/src/modules/onboarding/index.ts`
+- `apps/api/src/modules/auth/auth.service.ts`
+- `apps/api/src/modules/auth/auth.service.spec.ts`
+- `apps/web/src/app/(app)/onboarding/page.tsx`
+- `apps/web/src/features/onboarding/OnboardingWizard.tsx`
+- `apps/web/src/features/onboarding/OnboardingWizard.module.css`
+- `apps/web/src/features/onboarding/__tests__/OnboardingWizard.test.tsx`
+- `apps/web/src/app/(public)/inscription/page.tsx`
+- `docs/project-context.md`
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`
+
+## Change Log
+- 2026-02-06: Story 1.6 implementee (schema onboarding, endpoints API, wizard UI multi-etapes, autosave/reprise, completion avec redirection, tests API/UI).
