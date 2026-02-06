@@ -11,6 +11,12 @@ describe('UsersService', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
     },
+    notification_preferences: {
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      createMany: jest.fn(),
+      upsert: jest.fn(),
+    },
   };
 
   const mockUser = {
@@ -219,6 +225,75 @@ describe('UsersService', () => {
           data: { objectives: [] },
         }),
       );
+    });
+  });
+
+  describe('notification preferences', () => {
+    it('should return notification preferences and create defaults if missing', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue({ id: 'user-1' });
+      mockPrismaService.notification_preferences.findMany
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([
+          { channel: 'email', category: 'messages', enabled: true },
+          { channel: 'push', category: 'rdv', enabled: false },
+        ]);
+
+      const result = await service.getNotificationPreferences('user-1');
+
+      expect(mockPrismaService.notification_preferences.createMany).toHaveBeenCalled();
+      expect(result.preferences).toEqual([
+        { channel: 'email', category: 'messages', enabled: true },
+        { channel: 'push', category: 'rdv', enabled: false },
+      ]);
+    });
+
+    it('should update notification preferences with upsert', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue({ id: 'user-1' });
+      mockPrismaService.notification_preferences.findMany
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([
+          { channel: 'email', category: 'messages' },
+        ])
+        .mockResolvedValueOnce([
+          { channel: 'email', category: 'messages', enabled: false },
+        ]);
+
+      const result = await service.updateNotificationPreferences('user-1', {
+        preferences: [{ channel: 'email', category: 'messages', enabled: false }],
+      });
+
+      expect(mockPrismaService.notification_preferences.upsert).toHaveBeenCalledWith({
+        where: {
+          user_id_channel_category: {
+            user_id: 'user-1',
+            channel: 'email',
+            category: 'messages',
+          },
+        },
+        update: { enabled: false },
+        create: {
+          user_id: 'user-1',
+          channel: 'email',
+          category: 'messages',
+          enabled: false,
+        },
+      });
+      expect(result.preferences).toEqual([
+        { channel: 'email', category: 'messages', enabled: false },
+      ]);
+    });
+
+    it('should return true by default when preference does not exist', async () => {
+      mockPrismaService.notification_preferences.findMany.mockResolvedValue([]);
+      mockPrismaService.notification_preferences.findUnique.mockResolvedValue(null);
+
+      const enabled = await service.isNotificationEnabled(
+        'user-1',
+        'email',
+        'system',
+      );
+
+      expect(enabled).toBe(true);
     });
   });
 });

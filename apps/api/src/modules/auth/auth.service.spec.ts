@@ -113,6 +113,34 @@ describe('AuthService', () => {
         data: { name: 'etudiant' },
       });
     });
+
+    it('should initialize default notification preferences on registration', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue(null);
+      mockPrismaService.roles.findUnique.mockResolvedValue(mockRole);
+      mockPrismaService.users.create.mockResolvedValue(mockUser);
+      mockJwtService.sign.mockReturnValue('jwt-token');
+      (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
+
+      await service.register(registerDto);
+
+      expect(mockPrismaService.users.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            notification_preferences: expect.objectContaining({
+              createMany: expect.objectContaining({
+                data: expect.arrayContaining([
+                  expect.objectContaining({
+                    channel: 'email',
+                    category: 'messages',
+                    enabled: true,
+                  }),
+                ]),
+              }),
+            }),
+          }),
+        }),
+      );
+    });
   });
 
   describe('login', () => {

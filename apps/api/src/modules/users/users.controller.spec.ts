@@ -10,6 +10,8 @@ describe('UsersController', () => {
   const mockUsersService = {
     getProfile: jest.fn(),
     updateProfile: jest.fn(),
+    getNotificationPreferences: jest.fn(),
+    updateNotificationPreferences: jest.fn(),
   };
 
   const mockUser = {
@@ -106,6 +108,42 @@ describe('UsersController', () => {
       expect(result.data.level).toBe('avance');
       expect(result.data.objectives).toEqual(['Nouvel objectif']);
       expect(result.data.avatarUrl).toBe('https://avatar.com/img.jpg');
+    });
+  });
+
+  describe('notification preferences', () => {
+    it('should return notification preferences wrapped in data envelope', async () => {
+      const preferences = [
+        { channel: 'email', category: 'messages', enabled: true },
+      ];
+      mockUsersService.getNotificationPreferences.mockResolvedValue({ preferences });
+
+      const result = await controller.getNotificationPreferences(mockUser);
+
+      expect(result).toEqual({
+        data: { preferences },
+        error: null,
+      });
+      expect(usersService.getNotificationPreferences).toHaveBeenCalledWith('user-1');
+    });
+
+    it('should update notification preferences wrapped in data envelope', async () => {
+      const dto = {
+        preferences: [{ channel: 'push', category: 'rdv', enabled: false }],
+      };
+      const preferences = dto.preferences;
+      mockUsersService.updateNotificationPreferences.mockResolvedValue({ preferences });
+
+      const result = await controller.updateNotificationPreferences(mockUser, dto);
+
+      expect(result).toEqual({
+        data: { preferences },
+        error: null,
+      });
+      expect(usersService.updateNotificationPreferences).toHaveBeenCalledWith(
+        'user-1',
+        dto,
+      );
     });
   });
 });

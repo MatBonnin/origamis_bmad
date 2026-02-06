@@ -17,6 +17,10 @@ import {
   ResetPasswordDto,
 } from './dto';
 import { MailService } from '../mail';
+import {
+  NOTIFICATION_CATEGORIES,
+  NOTIFICATION_CHANNELS,
+} from '../users/dto/notification-preferences.dto';
 
 @Injectable()
 export class AuthService {
@@ -63,6 +67,17 @@ export class AuthService {
         user_roles: {
           create: {
             role_id: role.id,
+          },
+        },
+        notification_preferences: {
+          createMany: {
+            data: NOTIFICATION_CATEGORIES.flatMap((category) =>
+              NOTIFICATION_CHANNELS.map((channel) => ({
+                channel,
+                category,
+                enabled: true,
+              })),
+            ),
           },
         },
       },

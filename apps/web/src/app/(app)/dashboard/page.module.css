@@ -55,6 +55,24 @@
   margin-top: 1.5rem;
 }
 
+.preferencesActions {
+  margin-top: 1.25rem;
+}
+
+.preferencesLink {
+  display: inline-block;
+  padding: 0.55rem 0.85rem;
+  border-radius: 8px;
+  background: #36529b;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.preferencesLink:hover {
+  background: #243f84;
+}
+
 .adminLink {
   display: inline-block;
   padding: 0.55rem 0.85rem;

@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth';
 import { MailModule } from './modules/mail';
 import { UsersModule } from './modules/users';
 import { AdminModule } from './modules/admin';
+import { NotificationsModule } from './modules/notifications';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AdminModule } from './modules/admin';
     AuthModule,
     UsersModule,
     AdminModule,
+    NotificationsModule,
   ],
   providers: [
     {

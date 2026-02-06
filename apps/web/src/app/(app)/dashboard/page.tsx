@@ -32,6 +32,12 @@ export default async function DashboardPage() {
             <dd>{session.user.roles.join(', ')}</dd>
           </dl>
 
+          <div className={styles.preferencesActions}>
+            <Link href="/preferences-notifications" className={styles.preferencesLink}>
+              Gerer mes preferences de notifications
+            </Link>
+          </div>
+
           {session.user.roles.includes('admin') && (
             <div className={styles.adminActions}>
               <Link href="/admin/utilisateurs" className={styles.adminLink}>

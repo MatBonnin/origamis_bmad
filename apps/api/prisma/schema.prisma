@@ -32,8 +32,35 @@ model users {
 
   user_roles user_roles[]
   sessions   sessions[]
+  notification_preferences notification_preferences[]
 
   @@map("users")
+}
+
+enum notification_channel {
+  email
+  push
+  in_app
+}
+
+enum notification_category {
+  messages
+  rdv
+  system
+}
+
+model notification_preferences {
+  id       String                @id @default(uuid())
+  user_id  String
+  channel  notification_channel
+  category notification_category
+  enabled  Boolean               @default(true)
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, channel, category])
+  @@index([user_id])
+  @@map("notification_preferences")
 }
 
 model roles {
