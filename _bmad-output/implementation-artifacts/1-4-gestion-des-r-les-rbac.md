@@ -1,6 +1,6 @@
 # Story 1.4: Gestion des rôles (RBAC)
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -17,12 +17,12 @@ so that contrôler les accès selon les profils.
 
 ## Tasks / Subtasks
 
-- [ ] Definir schema roles et relations (roles, user_roles) si non existant (AC: #1)
-- [ ] Ajouter guard RBAC + decorator `@Roles(...)` (AC: #2)
-- [ ] Exposer endpoints admin pour assignation des roles (AC: #1)
-- [ ] UI admin minimale pour changer roles utilisateur (AC: #1)
-- [ ] Messages d'erreur standardises (AC: #2)
-- [ ] Tests API (assignation, accès interdit), tests UI basiques (AC: #1, #2)
+- [x] Definir schema roles et relations (roles, user_roles) si non existant (AC: #1)
+- [x] Ajouter guard RBAC + decorator `@Roles(...)` (AC: #2)
+- [x] Exposer endpoints admin pour assignation des roles (AC: #1)
+- [x] UI admin minimale pour changer roles utilisateur (AC: #1)
+- [x] Messages d'erreur standardises (AC: #2)
+- [x] Tests API (assignation, accès interdit), tests UI basiques (AC: #1, #2)
 
 ## Dev Notes
 
@@ -78,7 +78,46 @@ so that contrôler les accès selon les profils.
 GPT-5 (Codex)
 
 ### Debug Log References
+- `npm test -- --runInBand src/modules/admin/admin.service.spec.ts src/modules/admin/admin.controller.spec.ts src/modules/admin/dto/update-user-roles.dto.spec.ts src/common/guards/roles.guard.spec.ts` -> PASS (12 tests)
+- `npm test -- --runInBand` -> echec non bloquant sur suite existante `password-reset.schema.spec.ts` (Prisma Query Engine cross-platform windows/linux)
+- `npm run lint` (api/web) -> non bloquant, environnement ESLint incomplet localement
+- `npm run test` (apps/web) -> PASS (vitest, test UI basique role change + feedback)
 
 ### Completion Notes List
+- Schema RBAC deja present (`roles`, `user_roles`) verifie et reutilise.
+- Module admin ajoute avec endpoints proteges:
+- `GET /admin/users`
+- `PATCH /admin/users/:id/roles`
+- Garde-fou ajoute: un admin ne peut pas modifier ses propres roles.
+- Journalisation de securite ajoutee sur assignation de roles.
+- `RolesGuard` renvoie des erreurs standardisees `FORBIDDEN` avec message explicite.
+- UI admin minimale ajoutee (liste utilisateurs + checkboxes de roles + sauvegarde via API).
+- Tests UI basiques ajoutes pour verifier le changement de role et le feedback de succes.
 
 ### File List
+- `apps/api/src/app.module.ts`
+- `apps/api/src/common/guards/roles.guard.ts`
+- `apps/api/src/common/guards/roles.guard.spec.ts`
+- `apps/api/src/modules/admin/admin.module.ts`
+- `apps/api/src/modules/admin/admin.controller.ts`
+- `apps/api/src/modules/admin/admin.controller.spec.ts`
+- `apps/api/src/modules/admin/admin.service.ts`
+- `apps/api/src/modules/admin/admin.service.spec.ts`
+- `apps/api/src/modules/admin/dto/update-user-roles.dto.ts`
+- `apps/api/src/modules/admin/dto/update-user-roles.dto.spec.ts`
+- `apps/api/src/modules/admin/dto/index.ts`
+- `apps/api/src/modules/admin/index.ts`
+- `apps/web/src/app/(app)/dashboard/page.tsx`
+- `apps/web/src/app/(app)/dashboard/page.module.css`
+- `apps/web/src/app/(app)/admin/utilisateurs/page.tsx`
+- `apps/web/src/features/admin/users/AdminUsersManager.tsx`
+- `apps/web/src/features/admin/users/AdminUsersManager.module.css`
+- `apps/web/src/features/admin/users/__tests__/AdminUsersManager.test.tsx`
+- `apps/web/src/test/setup.ts`
+- `apps/web/vitest.config.ts`
+- `apps/web/package.json`
+- `package-lock.json`
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`
+
+## Change Log
+- 2026-02-06: Implementation RBAC admin terminee, endpoints et UI admin minimaux livres, erreurs FORBIDDEN standardisees, tests API RBAC et tests UI basiques ajoutes.
