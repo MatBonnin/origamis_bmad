@@ -8,8 +8,28 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Enable CORS
+  const corsOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+    : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+
+      // In development, allow any localhost/local IP
+      const isDev = process.env.NODE_ENV !== 'production';
+      if (isDev && (origin.includes('localhost') || origin.includes('127.0.0.1') || /^http:\/\/192\.168\.\d+\.\d+/.test(origin))) {
+        return callback(null, true);
+      }
+
+      // Check against allowed origins
+      if (corsOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    },
     credentials: true,
   });
 
@@ -40,9 +60,12 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   const port = process.env.API_PORT || 4000;
-  await app.listen(port);
+  const host = process.env.API_HOST || '0.0.0.0'; // Listen on all interfaces
+  await app.listen(port, host);
 
-  console.log(`🚀 API running on http://localhost:${port}`);
+  console.log(`🚀 API running on port ${port} (listening on all interfaces)`);
+  console.log(`   Local:   http://localhost:${port}`);
+  console.log(`   Network: http://<your-ip>:${port}`);
   console.log(`📚 Swagger docs: http://localhost:${port}/api/docs`);
 }
 

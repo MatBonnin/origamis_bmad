@@ -32,7 +32,9 @@
       "Bash(ls:*)",
       "Bash(npx nest build:*)",
       "Bash(npm run lint:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(curl:*)",
+      "Bash(find:*)"
     ]
   }
 }

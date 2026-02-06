@@ -128,8 +128,17 @@ export default function InscriptionPage() {
         // Si la connexion échoue, rediriger vers la page de connexion
         router.push('/connexion?registered=true');
       }
-    } catch {
-      setErrors({ general: 'Une erreur inattendue est survenue' });
+    } catch (error) {
+      console.error('Registration error:', error);
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        setErrors({
+          general: `Impossible de contacter le serveur API (${API_URL}). Vérifiez que l'API est démarrée et accessible.`
+        });
+      } else if (error instanceof Error) {
+        setErrors({ general: `Erreur: ${error.message}` });
+      } else {
+        setErrors({ general: 'Une erreur inattendue est survenue' });
+      }
     } finally {
       setIsLoading(false);
     }
