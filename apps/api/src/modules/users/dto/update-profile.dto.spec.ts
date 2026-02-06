@@ -121,6 +121,12 @@ describe('UpdateProfileDto', () => {
       expect(errors.length).toBe(0);
     });
 
+    it('should fail with invalid avatar URL', async () => {
+      const dto = createDto({ avatarUrl: 'not-a-url' });
+      const errors = await validate(dto);
+      expect(errors.length).toBeGreaterThan(0);
+    });
+
     it('should fail with avatarUrl exceeding 500 chars', async () => {
       const dto = createDto({ avatarUrl: 'https://example.com/' + 'a'.repeat(500) });
       const errors = await validate(dto);

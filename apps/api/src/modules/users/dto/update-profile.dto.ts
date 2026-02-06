@@ -5,6 +5,7 @@ import {
   MaxLength,
   MinLength,
   IsIn,
+  IsUrl,
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -58,6 +59,7 @@ export class UpdateProfileDto {
   })
   @IsOptional()
   @IsString()
+  @IsUrl({}, { message: "L'URL de l'avatar doit être une URL valide" })
   @MaxLength(500, { message: "L'URL de l'avatar ne peut pas dépasser 500 caractères" })
   avatarUrl?: string;
 }

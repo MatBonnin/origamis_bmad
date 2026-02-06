@@ -45,6 +45,11 @@ export default function ProfilPage() {
   const errorSummaryRef = useRef<HTMLDivElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
   const firstNameRef = useRef<HTMLInputElement>(null);
+  const lastNameRef = useRef<HTMLInputElement>(null);
+  const levelRef = useRef<HTMLSelectElement>(null);
+  const objectivesRef = useRef<HTMLDivElement>(null);
+  const bioRef = useRef<HTMLTextAreaElement>(null);
+  const avatarUrlRef = useRef<HTMLInputElement>(null);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -104,6 +109,7 @@ export default function ProfilPage() {
     const newErrors: FormErrors = {};
     const firstName = formData.get('firstName') as string;
     const lastName = formData.get('lastName') as string;
+    const level = formData.get('level') as string;
     const bio = formData.get('bio') as string;
     const avatarUrl = formData.get('avatarUrl') as string;
 
@@ -117,6 +123,10 @@ export default function ProfilPage() {
       newErrors.lastName = 'Le nom est requis';
     } else if (lastName.length > 100) {
       newErrors.lastName = 'Le nom ne peut pas dépasser 100 caractères';
+    }
+
+    if (level && !['debutant', 'intermediaire', 'avance'].includes(level)) {
+      newErrors.level = 'Le niveau doit être debutant, intermediaire ou avance';
     }
 
     if (bio && bio.length > 500) {
@@ -136,6 +146,41 @@ export default function ProfilPage() {
     return newErrors;
   };
 
+  const focusFirstError = (validationErrors: FormErrors) => {
+    if (validationErrors.firstName) {
+      firstNameRef.current?.focus();
+      return;
+    }
+    if (validationErrors.lastName) {
+      lastNameRef.current?.focus();
+      return;
+    }
+    if (validationErrors.level) {
+      levelRef.current?.focus();
+      return;
+    }
+    if (validationErrors.objectives) {
+      const objectiveInput = objectivesRef.current?.querySelector('input');
+      if (objectiveInput instanceof HTMLInputElement) {
+        objectiveInput.focus();
+      } else {
+        objectivesRef.current?.focus();
+      }
+      return;
+    }
+    if (validationErrors.bio) {
+      bioRef.current?.focus();
+      return;
+    }
+    if (validationErrors.avatarUrl) {
+      avatarUrlRef.current?.focus();
+      return;
+    }
+    if (validationErrors.general) {
+      errorSummaryRef.current?.focus();
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrors({});
@@ -146,8 +191,7 @@ export default function ProfilPage() {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-      const firstErrorField = validationErrors.firstName ? firstNameRef.current : null;
-      firstErrorField?.focus();
+      focusFirstError(validationErrors);
       return;
     }
 
@@ -355,6 +399,7 @@ export default function ProfilPage() {
                 Nom
               </label>
               <input
+                ref={lastNameRef}
                 type="text"
                 id="lastName"
                 name="lastName"
@@ -377,6 +422,7 @@ export default function ProfilPage() {
               Niveau
             </label>
             <select
+              ref={levelRef}
               id="level"
               name="level"
               defaultValue={profile.level || ''}
@@ -404,6 +450,8 @@ export default function ProfilPage() {
               role="group"
               aria-labelledby="objectives-label"
               id="objectives"
+              ref={objectivesRef}
+              tabIndex={-1}
             >
               {objectives.map((objective, index) => (
                 <div key={index} className={styles.objectiveItem}>
@@ -451,6 +499,7 @@ export default function ProfilPage() {
               Bio
             </label>
             <textarea
+              ref={bioRef}
               id="bio"
               name="bio"
               defaultValue={profile.bio || ''}
@@ -475,6 +524,7 @@ export default function ProfilPage() {
               URL de l&apos;avatar
             </label>
             <input
+              ref={avatarUrlRef}
               type="url"
               id="avatarUrl"
               name="avatarUrl"

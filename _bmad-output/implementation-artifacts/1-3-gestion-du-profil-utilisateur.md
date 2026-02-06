@@ -1,6 +1,6 @@
 # Story 1.3: Gestion du profil utilisateur
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -100,6 +100,7 @@ Claude Opus 4.5
 - API returns { data, error } envelope format
 - All 73 tests pass (no regressions)
 - TypeScript compiles without errors
+- Review fixes: validate avatarUrl format server-side + add DTO test, align profile UI palette, tighten client-side level validation and error focus
 
 ### File List
 
@@ -121,3 +122,4 @@ Claude Opus 4.5
 ## Change Log
 
 - 2026-02-06: Implemented profile management feature - schema migration, REST API endpoints, UI page, tests
+- 2026-02-06: Applied code review fixes (validation, UI focus, palette alignment)
