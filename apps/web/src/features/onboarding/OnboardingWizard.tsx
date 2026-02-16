@@ -278,7 +278,7 @@ export function OnboardingWizard({ accessToken }: Props) {
           {step === 4 && (
             <>
               <h2>Validation finale</h2>
-              <p>Validez pour terminer l'onboarding et acceder au dashboard.</p>
+              <p>Validez pour terminer l&apos;onboarding et acceder au dashboard.</p>
               <dl className={styles.summary}>
                 <dt>Domaine</dt>
                 <dd>{answers.domain || '-'}</dd>

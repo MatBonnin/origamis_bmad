@@ -1,7 +1,9 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { authOptions } from '@/lib/auth';
 import { MentorSearch } from '@/features/mentors/search';
+import styles from './page.module.css';
 
 export default async function MentorsPage() {
   const session = await getServerSession(authOptions);
@@ -10,5 +12,14 @@ export default async function MentorsPage() {
     redirect('/connexion?callbackUrl=/mentors');
   }
 
-  return <MentorSearch accessToken={session.accessToken} />;
+  return (
+    <div className={styles.container}>
+      <div className={styles.actions}>
+        <Link href="/mentors/profil" className={styles.profileLink}>
+          Configurer mon profil mentor
+        </Link>
+      </div>
+      <MentorSearch accessToken={session.accessToken} />
+    </div>
+  );
 }

@@ -1,6 +1,6 @@
 # Story 2.4: Profil mentor (expertise & tarifs)
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -16,11 +16,11 @@ so that être proposé aux étudiants adaptés.
 
 ## Tasks / Subtasks
 
-- [ ] Ajouter module mentor (profil, expertise, tarifs, disponibilités) (AC: #1)
-- [ ] Exposer endpoints `GET /mentors/me`, `POST /mentors/me`, `PATCH /mentors/me` (AC: #1)
-- [ ] Validation des champs (compétences, tarifs, langues, disponibilités) (AC: #1)
-- [ ] UI tableau de bord mentor (formulaire + aperçu dispo) (AC: #1)
-- [ ] Tester flux complet (création, mise à jour, validations) (AC: #1)
+- [x] Ajouter module mentor (profil, expertise, tarifs, disponibilités) (AC: #1)
+- [x] Exposer endpoints `GET /mentors/me`, `POST /mentors/me`, `PATCH /mentors/me` (AC: #1)
+- [x] Validation des champs (compétences, tarifs, langues, disponibilités) (AC: #1)
+- [x] UI tableau de bord mentor (formulaire + aperçu dispo) (AC: #1)
+- [x] Tester flux complet (création, mise à jour, validations) (AC: #1)
 
 ## Dev Notes
 
@@ -92,6 +92,70 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
+- `npm test --workspace=apps/api -- mentors.controller.spec.ts mentors-self.service.spec.ts mentor-self-profile.dto.spec.ts mentors-profile.service.spec.ts` (PASS)
+- `npm test --workspace=apps/web -- MentorSettings.test.tsx MentorSearch.test.tsx MentorProfile.test.tsx` (PASS)
+- `npm test --workspace=apps/api` (PASS, 26 suites)
+- `npm test --workspace=apps/web` (PASS, 10 fichiers)
+- `npm run lint --workspace=apps/api` (FAIL: erreurs lint pre-existantes hors scope story)
+- `npm run lint --workspace=apps/web` (PASS avec warnings pre-existants)
+
 ### Completion Notes List
 
+- Ajout du self-service mentor dans le module `mentors` avec RBAC mentor:
+  - `GET /mentors/me`
+  - `POST /mentors/me`
+  - `PATCH /mentors/me`
+- Nouveau service `MentorsSelfService`:
+  - verification role mentor
+  - creation/mise a jour du profil mentor (domain, competences, niveaux, bio)
+  - gestion tarifs avec validation `min < max` et devise ISO uppercase
+  - gestion disponibilites (bool, prochaine dispo UTC, slots hebdomadaires)
+  - persistance metadata mentor (langues, certifications, tarifs, slots) dans `user_needs.needs_json.mentorProfile`
+  - publication du profil pour la recherche (`is_validated = true`)
+- Validation champs ajoutee via DTO class-validator + validations metier service:
+  - competences/languages/certifications (tableaux string bornes)
+  - tarifs (entiers positifs, min strictement inferieur a max)
+  - disponibilites (ISO UTC suffixe `Z`, slots `startTime < endTime`)
+- UI dashboard mentor ajoutee:
+  - page `mentors/profil` authentifiee
+  - formulaire sections Resume / Tarifs / Disponibilites
+  - apercu public dynamique
+  - feedback accessible `aria-live` success/error
+  - mode creation (POST) et mode mise a jour (PATCH)
+- Stabilisation regression web:
+  - correction expectation test onboarding (`/profile-suggestion`)
+  - correction lint `react/no-unescaped-entities` dans `OnboardingWizard`
+
+### Implementation Plan
+
+- Etendre le module API `mentors` avec un service dedie self-profile sans impacter les endpoints publics de recherche/profil.
+- Exposer le contrat REST `mentors/me` en enveloppe `{ data, error }` avec guards JWT + Roles.
+- Ajouter une UI de configuration mentor dans le flux app auth (`/mentors/profil`) en reutilisant le design system interne.
+- Verifier le flux complet create/update/validation via tests API et UI, puis lancer les regressions globales.
+
 ### File List
+
+- apps/api/src/modules/mentors/mentors.controller.ts (modified)
+- apps/api/src/modules/mentors/mentors.controller.spec.ts (modified)
+- apps/api/src/modules/mentors/mentors.module.ts (modified)
+- apps/api/src/modules/mentors/index.ts (modified)
+- apps/api/src/modules/mentors/dto/index.ts (modified)
+- apps/api/src/modules/mentors/dto/mentor-self-profile.dto.ts (new)
+- apps/api/src/modules/mentors/dto/mentor-self-profile.dto.spec.ts (new)
+- apps/api/src/modules/mentors/mentors-self.service.ts (new)
+- apps/api/src/modules/mentors/mentors-self.service.spec.ts (new)
+- apps/web/src/features/mentors/settings/MentorSettings.tsx (new)
+- apps/web/src/features/mentors/settings/MentorSettings.module.css (new)
+- apps/web/src/features/mentors/settings/index.ts (new)
+- apps/web/src/features/mentors/settings/__tests__/MentorSettings.test.tsx (new)
+- apps/web/src/app/(app)/mentors/profil/page.tsx (new)
+- apps/web/src/app/(app)/mentors/page.tsx (modified)
+- apps/web/src/app/(app)/mentors/page.module.css (new)
+- apps/web/src/features/onboarding/__tests__/OnboardingWizard.test.tsx (modified)
+- apps/web/src/features/onboarding/OnboardingWizard.tsx (modified)
+- _bmad-output/implementation-artifacts/2-4-profil-mentor-expertise-tarifs.md (modified)
+- _bmad-output/implementation-artifacts/sprint-status.yaml (modified)
+
+## Change Log
+
+- 2026-02-16: Story 2.4 implementee (API self-service mentor `mentors/me`, validations expertise/tarifs/langues/disponibilites, UI dashboard mentor avec apercu, tests API/UI/regression).

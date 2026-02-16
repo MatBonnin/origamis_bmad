@@ -1,8 +1,11 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Get,
   Param,
+  Patch,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -13,19 +16,23 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators';
-import { JwtAuthGuard } from '../../common/guards';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { JwtAuthGuard, RolesGuard } from '../../common/guards';
 import { UserResponseDto } from '../auth/dto';
 import { MatchingService } from '../matching';
 import {
+  CreateMentorSelfProfileDto,
   GetMentorReviewsQueryDto,
   GetMentorsSearchQueryDto,
   GetRecommendationsQueryDto,
+  UpdateMentorSelfProfileDto,
 } from './dto';
 import { MentorsProfileService } from './mentors-profile.service';
 import {
   MentorSearchFilters,
   MentorsSearchService,
 } from './mentors-search.service';
+import { MentorsSelfService } from './mentors-self.service';
 
 interface ParsedFilters {
   domains?: string[];
@@ -42,6 +49,7 @@ export class MentorsController {
     private readonly matchingService: MatchingService,
     private readonly mentorsSearchService: MentorsSearchService,
     private readonly mentorsProfileService: MentorsProfileService,
+    private readonly mentorsSelfService: MentorsSelfService,
   ) {}
 
   @Get('recommendations')
@@ -89,6 +97,44 @@ export class MentorsController {
   @ApiResponse({ status: 200, description: 'Facettes de filtres recuperees' })
   async getMentorFilterFacets() {
     const data = await this.mentorsSearchService.getFilterFacets();
+    return { data, error: null };
+  }
+
+  @Get('me')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Recuperer le profil mentor du compte connecte' })
+  @ApiResponse({ status: 200, description: 'Profil mentor recupere' })
+  async getMyMentorProfile(@CurrentUser() user: UserResponseDto) {
+    const data = await this.mentorsSelfService.getMyProfile(user.id);
+    return { data, error: null };
+  }
+
+  @Post('me')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Creer le profil mentor du compte connecte' })
+  @ApiResponse({ status: 201, description: 'Profil mentor cree' })
+  async createMyMentorProfile(
+    @CurrentUser() user: UserResponseDto,
+    @Body() dto: CreateMentorSelfProfileDto,
+  ) {
+    const data = await this.mentorsSelfService.createMyProfile(user.id, dto);
+    return { data, error: null };
+  }
+
+  @Patch('me')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({
+    summary: 'Mettre a jour le profil mentor du compte connecte',
+  })
+  @ApiResponse({ status: 200, description: 'Profil mentor mis a jour' })
+  async updateMyMentorProfile(
+    @CurrentUser() user: UserResponseDto,
+    @Body() dto: UpdateMentorSelfProfileDto,
+  ) {
+    const data = await this.mentorsSelfService.updateMyProfile(user.id, dto);
     return { data, error: null };
   }
 

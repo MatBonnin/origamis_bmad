@@ -3,6 +3,7 @@ import { MatchingService } from '../matching';
 import { MentorsController } from './mentors.controller';
 import { MentorsProfileService } from './mentors-profile.service';
 import { MentorsSearchService } from './mentors-search.service';
+import { MentorsSelfService } from './mentors-self.service';
 
 describe('MentorsController', () => {
   const mockMatchingService = {
@@ -16,6 +17,11 @@ describe('MentorsController', () => {
     getMentorProfile: jest.fn(),
     getMentorReviews: jest.fn(),
   };
+  const mockMentorsSelfService = {
+    getMyProfile: jest.fn(),
+    createMyProfile: jest.fn(),
+    updateMyProfile: jest.fn(),
+  };
 
   let controller: MentorsController;
 
@@ -24,6 +30,7 @@ describe('MentorsController', () => {
       mockMatchingService as unknown as MatchingService,
       mockMentorsSearchService as unknown as MentorsSearchService,
       mockMentorsProfileService as unknown as MentorsProfileService,
+      mockMentorsSelfService as unknown as MentorsSelfService,
     );
     jest.clearAllMocks();
   });
@@ -158,6 +165,69 @@ describe('MentorsController', () => {
         page: 1,
         limit: 5,
       },
+    );
+  });
+
+  it('returns current mentor profile for authenticated mentor', async () => {
+    mockMentorsSelfService.getMyProfile.mockResolvedValue({
+      profile: { mentorId: 'mentor-1' },
+    });
+
+    const responsePromise = controller.getMyMentorProfile({
+      id: 'mentor-1',
+    } as never);
+    await expect(responsePromise).resolves.toHaveProperty('error', null);
+    await expect(responsePromise).resolves.toHaveProperty('data');
+
+    expect(mockMentorsSelfService.getMyProfile).toHaveBeenCalledWith(
+      'mentor-1',
+    );
+  });
+
+  it('creates current mentor profile', async () => {
+    const payload = {
+      domain: 'informatique',
+      expertiseTags: ['react'],
+      tariffs: { min: 30, max: 45, currency: 'EUR' },
+      availability: { isAvailable: true },
+    };
+
+    mockMentorsSelfService.createMyProfile.mockResolvedValue({
+      profile: { mentorId: 'mentor-1' },
+    });
+
+    const responsePromise = controller.createMyMentorProfile(
+      { id: 'mentor-1' } as never,
+      payload as never,
+    );
+    await expect(responsePromise).resolves.toHaveProperty('error', null);
+    await expect(responsePromise).resolves.toHaveProperty('data');
+
+    expect(mockMentorsSelfService.createMyProfile).toHaveBeenCalledWith(
+      'mentor-1',
+      payload,
+    );
+  });
+
+  it('updates current mentor profile', async () => {
+    const payload = {
+      expertiseTags: ['react', 'typescript'],
+      tariffs: { min: 40, max: 60, currency: 'EUR' },
+    };
+    mockMentorsSelfService.updateMyProfile.mockResolvedValue({
+      profile: { mentorId: 'mentor-1' },
+    });
+
+    const responsePromise = controller.updateMyMentorProfile(
+      { id: 'mentor-1' } as never,
+      payload as never,
+    );
+    await expect(responsePromise).resolves.toHaveProperty('error', null);
+    await expect(responsePromise).resolves.toHaveProperty('data');
+
+    expect(mockMentorsSelfService.updateMyProfile).toHaveBeenCalledWith(
+      'mentor-1',
+      payload,
     );
   });
 });

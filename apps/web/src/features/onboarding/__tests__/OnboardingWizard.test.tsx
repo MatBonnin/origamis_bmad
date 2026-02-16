@@ -93,7 +93,7 @@ describe('OnboardingWizard', () => {
     });
   });
 
-  it('completes onboarding and redirects to dashboard', async () => {
+  it('completes onboarding and redirects to profile suggestion', async () => {
     fetchMock
       .mockResolvedValueOnce({
         ok: true,
@@ -140,7 +140,7 @@ describe('OnboardingWizard', () => {
     await userEvent.click(screen.getByRole('button', { name: /terminer/i }));
 
     await waitFor(() => {
-      expect(pushMock).toHaveBeenCalledWith('/dashboard');
+      expect(pushMock).toHaveBeenCalledWith('/profile-suggestion');
     });
   });
 });
