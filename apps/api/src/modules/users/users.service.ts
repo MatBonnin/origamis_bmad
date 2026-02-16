@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma';
 import {
+  ConsentResponseDto,
+  ConsentWithdrawResponseDto,
   NotificationCategory,
   NotificationChannel,
   NotificationPreferencesResponseDto,
@@ -8,6 +10,8 @@ import {
   NOTIFICATION_CHANNELS,
   UpdateNotificationPreferencesDto,
   UpdateProfileDto,
+  UpdateUserNeedsDto,
+  UserNeedsResponseDto,
   UserProfileResponseDto,
 } from './dto';
 
@@ -156,6 +160,134 @@ export class UsersService {
     });
 
     return this.mapUserToProfileResponse(user);
+  }
+
+  async getNeeds(userId: string): Promise<UserNeedsResponseDto> {
+    await this.assertUserExists(userId);
+
+    const record = await this.prisma.user_needs.findUnique({
+      where: { user_id: userId },
+    });
+
+    if (!record) {
+      return {
+        objectives: [],
+        domain: null,
+        level: null,
+        graduationYear: null,
+        updatedAt: new Date(),
+      };
+    }
+
+    const needs = record.needs_json as Record<string, unknown>;
+    return {
+      objectives: (needs.objectives as string[]) || [],
+      domain: (needs.domain as string) || null,
+      level: (needs.level as string) || null,
+      graduationYear: (needs.graduationYear as string) || null,
+      updatedAt: record.updated_at,
+    };
+  }
+
+  async updateNeeds(
+    userId: string,
+    dto: UpdateUserNeedsDto,
+  ): Promise<UserNeedsResponseDto> {
+    await this.assertUserExists(userId);
+
+    // Load existing needs for merge
+    const existing = await this.prisma.user_needs.findUnique({
+      where: { user_id: userId },
+    });
+
+    const existingNeeds = existing
+      ? (existing.needs_json as Record<string, unknown>)
+      : { objectives: [], domain: null, level: null, graduationYear: null };
+
+    const mergedNeeds = {
+      objectives: dto.objectives !== undefined ? dto.objectives : (existingNeeds.objectives as string[]) || [],
+      domain: dto.domain !== undefined ? dto.domain : (existingNeeds.domain as string) || null,
+      level: dto.level !== undefined ? dto.level : (existingNeeds.level as string) || null,
+      graduationYear: dto.graduationYear !== undefined ? dto.graduationYear : (existingNeeds.graduationYear as string) || null,
+    };
+
+    const record = await this.prisma.user_needs.upsert({
+      where: { user_id: userId },
+      create: {
+        user_id: userId,
+        needs_json: mergedNeeds,
+        needs_updated: true,
+      },
+      update: {
+        needs_json: mergedNeeds,
+        needs_updated: true,
+      },
+    });
+
+    const needs = record.needs_json as Record<string, unknown>;
+    return {
+      objectives: (needs.objectives as string[]) || [],
+      domain: (needs.domain as string) || null,
+      level: (needs.level as string) || null,
+      graduationYear: (needs.graduationYear as string) || null,
+      updatedAt: record.updated_at,
+    };
+  }
+
+  async getConsent(userId: string): Promise<ConsentResponseDto> {
+    await this.assertUserExists(userId);
+
+    const consent = await this.prisma.consents.findFirst({
+      where: { user_id: userId },
+      orderBy: { consented_at: 'desc' },
+    });
+
+    if (!consent) {
+      return {
+        hasActiveConsent: false,
+        consentVersion: null,
+        consentedAt: null,
+        withdrawnAt: null,
+      };
+    }
+
+    return {
+      hasActiveConsent: consent.withdrawn_at === null,
+      consentVersion: consent.consent_version,
+      consentedAt: consent.consented_at,
+      withdrawnAt: consent.withdrawn_at,
+    };
+  }
+
+  async withdrawConsent(userId: string): Promise<ConsentWithdrawResponseDto> {
+    await this.assertUserExists(userId);
+
+    const consent = await this.prisma.consents.findFirst({
+      where: { user_id: userId, withdrawn_at: null },
+      orderBy: { consented_at: 'desc' },
+    });
+
+    if (!consent) {
+      throw new NotFoundException({
+        code: 'NO_ACTIVE_CONSENT',
+        message: 'Aucun consentement actif trouvé',
+      });
+    }
+
+    const now = new Date();
+    await this.prisma.consents.update({
+      where: { id: consent.id },
+      data: { withdrawn_at: now },
+    });
+
+    return {
+      hasActiveConsent: false,
+      withdrawnAt: now,
+      impactMessage:
+        'En retirant votre consentement, les fonctionnalites suivantes seront desactivees : ' +
+        'matching de mentors, messagerie, prise de rendez-vous et notifications. ' +
+        'Vous pourrez toujours consulter votre compte, telecharger vos donnees et demander leur suppression.',
+    };
   }
 
   private mapUserToProfileResponse(user: {

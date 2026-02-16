@@ -267,17 +267,17 @@ export default function ProfilPage() {
 
   if (status === 'loading' || isLoading) {
     return (
-      <main className={styles.main}>
+      <div className={styles.main}>
         <div className={styles.container}>
           <div className={styles.loading}>Chargement...</div>
         </div>
-      </main>
+      </div>
     );
   }
 
   if (!profile) {
     return (
-      <main className={styles.main}>
+      <div className={styles.main}>
         <div className={styles.container}>
           {hasErrors && (
             <div
@@ -295,12 +295,12 @@ export default function ProfilPage() {
             &larr; Retour au tableau de bord
           </Link>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className={styles.main}>
+    <div className={styles.main}>
       <div className={styles.container}>
         <div className={styles.header}>
           <h1 className={styles.title}>Mon profil</h1>
@@ -557,6 +557,6 @@ export default function ProfilPage() {
           </div>
         </form>
       </div>
-    </main>
+    </div>
   );
 }

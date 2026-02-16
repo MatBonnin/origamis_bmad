@@ -48,9 +48,10 @@ development_status:
   1-5-pr-f-rences-de-notifications: review
   1-6-onboarding-tudiant-guid: review
   1-7-profil-type-propos: review
-  1-8-modification-des-besoins-apr-s-onboarding: ready-for-dev
-  1-9-consentement-rgpd: ready-for-dev
+  1-8-modification-des-besoins-apr-s-onboarding: review
+  1-9-consentement-rgpd: review
   1-10-landing-page-vitrine: review
+  1-11-layout-app-authentifi: review
   epic-1-retrospective: optional
 
   epic-2: in-progress

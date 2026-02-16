@@ -129,14 +129,14 @@ export function AdminUsersManager({ accessToken, currentUserId }: AdminUsersMana
 
   if (loading) {
     return (
-      <main className={styles.main}>
+      <div className={styles.main}>
         <div className={styles.container}>Chargement...</div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className={styles.main}>
+    <div className={styles.main}>
       <div className={styles.container}>
         <div className={styles.header}>
           <h1 className={styles.title}>Administration des roles</h1>
@@ -192,6 +192,6 @@ export function AdminUsersManager({ accessToken, currentUserId }: AdminUsersMana
           Note: un administrateur ne peut pas modifier ses propres roles.
         </p>
       </div>
-    </main>
+    </div>
   );
 }

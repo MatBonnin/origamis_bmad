@@ -1,7 +1,5 @@
 .main {
-  min-height: 100vh;
-  padding: 2rem;
-  background: #f3f4f6;
+  padding: var(--spacing-6);
 }
 
 .container {

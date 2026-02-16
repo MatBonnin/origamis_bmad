@@ -10,6 +10,7 @@ describe('RegisterDto', () => {
       firstName: 'John',
       lastName: 'Doe',
       role: 'etudiant',
+      consentGiven: true,
       ...data,
     });
   };
@@ -91,6 +92,27 @@ describe('RegisterDto', () => {
       const dto = createDto({ lastName: '' });
       const errors = await validate(dto);
       expect(errors.some((e) => e.property === 'lastName')).toBe(true);
+    });
+  });
+
+  describe('consentGiven validation', () => {
+    it('should pass with consentGiven true', async () => {
+      const dto = createDto({ consentGiven: true });
+      const errors = await validate(dto);
+      expect(errors.filter((e) => e.property === 'consentGiven')).toHaveLength(0);
+    });
+
+    it('should fail with consentGiven false', async () => {
+      const dto = createDto({ consentGiven: false });
+      const errors = await validate(dto);
+      expect(errors.some((e) => e.property === 'consentGiven')).toBe(true);
+    });
+
+    it('should fail without consentGiven', async () => {
+      const dto = createDto({});
+      delete (dto as Record<string, unknown>).consentGiven;
+      const errors = await validate(dto);
+      expect(errors.some((e) => e.property === 'consentGiven')).toBe(true);
     });
   });
 

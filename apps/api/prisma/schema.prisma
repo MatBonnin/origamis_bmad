@@ -35,6 +35,8 @@ model users {
   notification_preferences notification_preferences[]
   onboarding onboarding?
   profile_suggestion profile_suggestions?
+  user_needs user_needs?
+  consents   consents[]
 
   @@map("users")
 }
@@ -114,6 +116,33 @@ model sessions {
   @@index([user_id])
   @@index([expires_at])
   @@map("sessions")
+}
+
+model consents {
+  id               String    @id @default(uuid())
+  user_id          String
+  consent_version  String    @default("1.0")
+  consented_at     DateTime  @default(now())
+  withdrawn_at     DateTime?
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("consents")
+}
+
+model user_needs {
+  id             String   @id @default(uuid())
+  user_id        String   @unique
+  needs_json     Json     @default("{}")
+  needs_updated  Boolean  @default(false)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("user_needs")
 }
 
 model profile_suggestions {

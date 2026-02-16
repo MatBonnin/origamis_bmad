@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Post,
   Patch,
   Body,
   UseGuards,
@@ -16,6 +17,7 @@ import {
   NotificationPreferencesResponseDto,
   UpdateNotificationPreferencesDto,
   UpdateProfileDto,
+  UpdateUserNeedsDto,
   UserProfileResponseDto,
 } from './dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -125,5 +127,64 @@ export class UsersController {
   ) {
     const preferences = await this.usersService.updateNotificationPreferences(user.id, dto);
     return { data: { preferences: preferences.preferences }, error: null };
+  }
+
+  @Get('me/needs')
+  @ApiOperation({ summary: 'Obtenir les besoins de l\'utilisateur connecté' })
+  @ApiResponse({
+    status: 200,
+    description: 'Besoins récupérés avec succès',
+    schema: {
+      properties: {
+        data: { $ref: '#/components/schemas/UserNeedsResponseDto' },
+        error: { nullable: true },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: 'Non authentifié' })
+  async getNeeds(@CurrentUser() user: UserResponseDto) {
+    const needs = await this.usersService.getNeeds(user.id);
+    return { data: needs, error: null };
+  }
+
+  @Patch('me/needs')
+  @ApiOperation({ summary: 'Mettre à jour les besoins de l\'utilisateur connecté' })
+  @ApiResponse({
+    status: 200,
+    description: 'Besoins mis à jour avec succès',
+    schema: {
+      properties: {
+        data: { $ref: '#/components/schemas/UserNeedsResponseDto' },
+        error: { nullable: true },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Données invalides' })
+  @ApiResponse({ status: 401, description: 'Non authentifié' })
+  async updateNeeds(
+    @CurrentUser() user: UserResponseDto,
+    @Body() dto: UpdateUserNeedsDto,
+  ) {
+    const needs = await this.usersService.updateNeeds(user.id, dto);
+    return { data: needs, error: null };
+  }
+
+  @Get('me/consent')
+  @ApiOperation({ summary: 'Obtenir le statut de consentement RGPD' })
+  @ApiResponse({ status: 200, description: 'Statut du consentement récupéré' })
+  @ApiResponse({ status: 401, description: 'Non authentifié' })
+  async getConsent(@CurrentUser() user: UserResponseDto) {
+    const consent = await this.usersService.getConsent(user.id);
+    return { data: consent, error: null };
+  }
+
+  @Post('me/consent/withdraw')
+  @ApiOperation({ summary: 'Retirer le consentement RGPD' })
+  @ApiResponse({ status: 200, description: 'Consentement retiré avec succès' })
+  @ApiResponse({ status: 401, description: 'Non authentifié' })
+  @ApiResponse({ status: 404, description: 'Aucun consentement actif' })
+  async withdrawConsent(@CurrentUser() user: UserResponseDto) {
+    const result = await this.usersService.withdrawConsent(user.id);
+    return { data: result, error: null };
   }
 }

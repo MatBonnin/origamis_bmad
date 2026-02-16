@@ -1,7 +1,5 @@
 .main {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #ebf0f7 0%, #f5f5f5 100%);
-  padding: 2rem 1rem;
+  padding: var(--spacing-6);
 }
 
 .container {

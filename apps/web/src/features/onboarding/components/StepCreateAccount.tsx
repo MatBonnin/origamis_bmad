@@ -10,10 +10,12 @@ interface StepCreateAccountProps {
   lastName: string;
   email: string;
   password: string;
+  consentGiven: boolean;
   onChangeFirstName: (value: string) => void;
   onChangeLastName: (value: string) => void;
   onChangeEmail: (value: string) => void;
   onChangePassword: (value: string) => void;
+  onChangeConsent: (value: boolean) => void;
   onBack: () => void;
   onSubmit: () => void;
   isLoading: boolean;
@@ -25,10 +27,12 @@ export function StepCreateAccount({
   lastName,
   email,
   password,
+  consentGiven,
   onChangeFirstName,
   onChangeLastName,
   onChangeEmail,
   onChangePassword,
+  onChangeConsent,
   onBack,
   onSubmit,
   isLoading,
@@ -40,7 +44,7 @@ export function StepCreateAccount({
     /[A-Z]/.test(password) &&
     /[0-9]/.test(password);
 
-  const canSubmit = firstName && lastName && email && isValidPassword && !isLoading;
+  const canSubmit = firstName && lastName && email && isValidPassword && consentGiven && !isLoading;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,6 +112,23 @@ export function StepCreateAccount({
           hint="8 caracteres minimum, avec au moins une majuscule et un chiffre"
           required
         />
+
+        <label className={styles.consentLabel}>
+          <input
+            type="checkbox"
+            checked={consentGiven}
+            onChange={(e) => onChangeConsent(e.target.checked)}
+            className={styles.consentCheckbox}
+            required
+          />
+          <span className={styles.consentText}>
+            J&apos;accepte les{' '}
+            <a href="/politique-confidentialite" target="_blank" rel="noopener noreferrer" className={styles.consentLink}>
+              conditions d&apos;utilisation et la politique de confidentialite
+            </a>{' '}
+            (RGPD)
+          </span>
+        </label>
 
         <div className={styles.buttons}>
           <Button type="button" variant="outline" size="lg" onClick={onBack}>

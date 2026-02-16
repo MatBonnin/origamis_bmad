@@ -17,15 +17,15 @@ export default function ProfileSuggestionPage() {
 
   if (status === 'loading' || !session?.accessToken) {
     return (
-      <main style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
         Chargement...
-      </main>
+      </div>
     );
   }
 
   return (
-    <main>
+    <div>
       <ProfileSuggestion accessToken={session.accessToken} />
-    </main>
+    </div>
   );
 }

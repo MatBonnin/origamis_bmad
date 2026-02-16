@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <main className={styles.main}>
+    <div className={styles.main}>
       <div className={styles.container}>
         <h1 className={styles.title}>
           Bienvenue, {session.user.firstName} !
@@ -47,6 +47,6 @@ export default async function DashboardPage() {
           )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

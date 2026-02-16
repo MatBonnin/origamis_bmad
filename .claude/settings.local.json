@@ -36,7 +36,9 @@
       "Bash(curl:*)",
       "Bash(find:*)",
       "Bash(npx jest:*)",
-      "Bash(npx next lint)"
+      "Bash(npx next lint)",
+      "Bash(npx next build)",
+      "Bash(npx vitest:*)"
     ]
   }
 }

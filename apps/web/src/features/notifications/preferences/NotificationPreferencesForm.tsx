@@ -117,14 +117,14 @@ export function NotificationPreferencesForm({ accessToken }: Props) {
 
   if (loading) {
     return (
-      <main className={styles.main}>
+      <div className={styles.main}>
         <div className={styles.container}>Chargement...</div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className={styles.main}>
+    <div className={styles.main}>
       <div className={styles.container}>
         <div className={styles.header}>
           <h1 className={styles.title}>Preferences de notifications</h1>
@@ -185,6 +185,6 @@ export function NotificationPreferencesForm({ accessToken }: Props) {
           {saving ? 'Enregistrement...' : 'Enregistrer mes preferences'}
         </button>
       </div>
-    </main>
+    </div>
   );
 }

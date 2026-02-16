@@ -32,6 +32,14 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponseDto> {
+    // Verify GDPR consent
+    if (!dto.consentGiven) {
+      throw new BadRequestException({
+        code: 'CONSENT_REQUIRED',
+        message: 'Le consentement RGPD est obligatoire pour créer un compte',
+      });
+    }
+
     // Check if user already exists
     const existingUser = await this.prisma.users.findUnique({
       where: { email: dto.email.toLowerCase() },
@@ -106,6 +114,14 @@ export class AuthService {
             role: true,
           },
         },
+      },
+    });
+
+    // Create GDPR consent record
+    await this.prisma.consents.create({
+      data: {
+        user_id: user.id,
+        consent_version: '1.0',
       },
     });
 

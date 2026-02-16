@@ -12,6 +12,10 @@ describe('UsersController', () => {
     updateProfile: jest.fn(),
     getNotificationPreferences: jest.fn(),
     updateNotificationPreferences: jest.fn(),
+    getNeeds: jest.fn(),
+    updateNeeds: jest.fn(),
+    getConsent: jest.fn(),
+    withdrawConsent: jest.fn(),
   };
 
   const mockUser = {
@@ -145,6 +149,76 @@ describe('UsersController', () => {
         'user-1',
         dto,
       );
+    });
+  });
+
+  describe('getNeeds', () => {
+    it('should return needs wrapped in data envelope', async () => {
+      const mockNeeds = {
+        objectives: ['academic-writing'],
+        domain: 'informatique',
+        level: 'master-1',
+        graduationYear: '2026',
+        updatedAt: new Date(),
+      };
+      mockUsersService.getNeeds.mockResolvedValue(mockNeeds);
+
+      const result = await controller.getNeeds(mockUser);
+
+      expect(result).toEqual({ data: mockNeeds, error: null });
+      expect(usersService.getNeeds).toHaveBeenCalledWith('user-1');
+    });
+  });
+
+  describe('updateNeeds', () => {
+    it('should update and return needs wrapped in data envelope', async () => {
+      const dto = { objectives: ['career-guidance'], domain: 'sciences' };
+      const updatedNeeds = {
+        objectives: ['career-guidance'],
+        domain: 'sciences',
+        level: null,
+        graduationYear: null,
+        updatedAt: new Date(),
+      };
+      mockUsersService.updateNeeds.mockResolvedValue(updatedNeeds);
+
+      const result = await controller.updateNeeds(mockUser, dto);
+
+      expect(result).toEqual({ data: updatedNeeds, error: null });
+      expect(usersService.updateNeeds).toHaveBeenCalledWith('user-1', dto);
+    });
+  });
+
+  describe('getConsent', () => {
+    it('should return consent status wrapped in data envelope', async () => {
+      const mockConsent = {
+        hasActiveConsent: true,
+        consentVersion: '1.0',
+        consentedAt: new Date(),
+        withdrawnAt: null,
+      };
+      mockUsersService.getConsent.mockResolvedValue(mockConsent);
+
+      const result = await controller.getConsent(mockUser);
+
+      expect(result).toEqual({ data: mockConsent, error: null });
+      expect(usersService.getConsent).toHaveBeenCalledWith('user-1');
+    });
+  });
+
+  describe('withdrawConsent', () => {
+    it('should withdraw consent and return result in data envelope', async () => {
+      const mockResult = {
+        hasActiveConsent: false,
+        withdrawnAt: new Date(),
+        impactMessage: 'Test impact message',
+      };
+      mockUsersService.withdrawConsent.mockResolvedValue(mockResult);
+
+      const result = await controller.withdrawConsent(mockUser);
+
+      expect(result).toEqual({ data: mockResult, error: null });
+      expect(usersService.withdrawConsent).toHaveBeenCalledWith('user-1');
     });
   });
 });

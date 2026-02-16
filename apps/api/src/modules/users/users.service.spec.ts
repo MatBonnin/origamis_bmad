@@ -17,6 +17,15 @@ describe('UsersService', () => {
       createMany: jest.fn(),
       upsert: jest.fn(),
     },
+    user_needs: {
+      findUnique: jest.fn(),
+      upsert: jest.fn(),
+    },
+    consents: {
+      findFirst: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
   };
 
   const mockUser = {
@@ -294,6 +303,266 @@ describe('UsersService', () => {
       );
 
       expect(enabled).toBe(true);
+    });
+  });
+
+  describe('getNeeds', () => {
+    it('should return default empty needs when no record exists', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.user_needs.findUnique.mockResolvedValue(null);
+
+      const result = await service.getNeeds('user-1');
+
+      expect(result).toEqual({
+        objectives: [],
+        domain: null,
+        level: null,
+        graduationYear: null,
+        updatedAt: expect.any(Date),
+      });
+    });
+
+    it('should return stored needs when record exists', async () => {
+      const mockNeeds = {
+        id: 'needs-1',
+        user_id: 'user-1',
+        needs_json: {
+          objectives: ['academic-writing', 'career-guidance'],
+          domain: 'informatique',
+          level: 'master-1',
+          graduationYear: '2026',
+        },
+        needs_updated: false,
+        created_at: new Date('2024-01-01'),
+        updated_at: new Date('2024-01-02'),
+      };
+      mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.user_needs.findUnique.mockResolvedValue(mockNeeds);
+
+      const result = await service.getNeeds('user-1');
+
+      expect(result).toEqual({
+        objectives: ['academic-writing', 'career-guidance'],
+        domain: 'informatique',
+        level: 'master-1',
+        graduationYear: '2026',
+        updatedAt: new Date('2024-01-02'),
+      });
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue(null);
+
+      await expect(service.getNeeds('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('updateNeeds', () => {
+    it('should upsert needs and set needs_updated flag', async () => {
+      const now = new Date();
+      mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.user_needs.findUnique.mockResolvedValue(null);
+      mockPrismaService.user_needs.upsert.mockResolvedValue({
+        id: 'needs-1',
+        user_id: 'user-1',
+        needs_json: {
+          objectives: ['academic-writing'],
+          domain: 'informatique',
+          level: null,
+          graduationYear: null,
+        },
+        needs_updated: true,
+        created_at: now,
+        updated_at: now,
+      });
+
+      const result = await service.updateNeeds('user-1', {
+        objectives: ['academic-writing'],
+        domain: 'informatique',
+      });
+
+      expect(mockPrismaService.user_needs.upsert).toHaveBeenCalledWith({
+        where: { user_id: 'user-1' },
+        create: {
+          user_id: 'user-1',
+          needs_json: {
+            objectives: ['academic-writing'],
+            domain: 'informatique',
+            level: null,
+            graduationYear: null,
+          },
+          needs_updated: true,
+        },
+        update: {
+          needs_json: {
+            objectives: ['academic-writing'],
+            domain: 'informatique',
+            level: null,
+            graduationYear: null,
+          },
+          needs_updated: true,
+        },
+      });
+      expect(result.objectives).toEqual(['academic-writing']);
+      expect(result.domain).toBe('informatique');
+    });
+
+    it('should merge with existing needs when partial update', async () => {
+      const existingNeeds = {
+        id: 'needs-1',
+        user_id: 'user-1',
+        needs_json: {
+          objectives: ['academic-writing'],
+          domain: 'informatique',
+          level: 'master-1',
+          graduationYear: '2026',
+        },
+        needs_updated: false,
+        created_at: new Date(),
+        updated_at: new Date(),
+      };
+      mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.user_needs.findUnique.mockResolvedValue(existingNeeds);
+      mockPrismaService.user_needs.upsert.mockResolvedValue({
+        ...existingNeeds,
+        needs_json: {
+          objectives: ['career-guidance'],
+          domain: 'informatique',
+          level: 'master-1',
+          graduationYear: '2026',
+        },
+        needs_updated: true,
+      });
+
+      const result = await service.updateNeeds('user-1', {
+        objectives: ['career-guidance'],
+      });
+
+      expect(result.objectives).toEqual(['career-guidance']);
+      expect(result.domain).toBe('informatique');
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue(null);
+
+      await expect(
+        service.updateNeeds('invalid-id', { objectives: ['test'] }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should always set needs_updated flag to true for recommendation recalculation', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.user_needs.findUnique.mockResolvedValue(null);
+      mockPrismaService.user_needs.upsert.mockResolvedValue({
+        id: 'needs-1',
+        user_id: 'user-1',
+        needs_json: { objectives: ['test'], domain: null, level: null, graduationYear: null },
+        needs_updated: true,
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
+
+      await service.updateNeeds('user-1', { objectives: ['test'] });
+
+      const upsertCall = mockPrismaService.user_needs.upsert.mock.calls[0][0];
+      expect(upsertCall.create.needs_updated).toBe(true);
+      expect(upsertCall.update.needs_updated).toBe(true);
+    });
+  });
+
+  describe('getConsent', () => {
+    it('should return active consent when record exists and not withdrawn', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.consents.findFirst.mockResolvedValue({
+        id: 'consent-1',
+        user_id: 'user-1',
+        consent_version: '1.0',
+        consented_at: new Date('2024-01-01'),
+        withdrawn_at: null,
+      });
+
+      const result = await service.getConsent('user-1');
+
+      expect(result.hasActiveConsent).toBe(true);
+      expect(result.consentVersion).toBe('1.0');
+      expect(result.withdrawnAt).toBeNull();
+    });
+
+    it('should return inactive consent when withdrawn', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.consents.findFirst.mockResolvedValue({
+        id: 'consent-1',
+        user_id: 'user-1',
+        consent_version: '1.0',
+        consented_at: new Date('2024-01-01'),
+        withdrawn_at: new Date('2024-06-01'),
+      });
+
+      const result = await service.getConsent('user-1');
+
+      expect(result.hasActiveConsent).toBe(false);
+      expect(result.withdrawnAt).toEqual(new Date('2024-06-01'));
+    });
+
+    it('should return no consent when no record exists', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.consents.findFirst.mockResolvedValue(null);
+
+      const result = await service.getConsent('user-1');
+
+      expect(result.hasActiveConsent).toBe(false);
+      expect(result.consentVersion).toBeNull();
+    });
+
+    it('should throw NotFoundException if user not found', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue(null);
+
+      await expect(service.getConsent('invalid-id')).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('withdrawConsent', () => {
+    it('should withdraw active consent and return impact message', async () => {
+      const activeConsent = {
+        id: 'consent-1',
+        user_id: 'user-1',
+        consent_version: '1.0',
+        consented_at: new Date('2024-01-01'),
+        withdrawn_at: null,
+      };
+      mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.consents.findFirst.mockResolvedValue(activeConsent);
+      mockPrismaService.consents.update.mockResolvedValue({
+        ...activeConsent,
+        withdrawn_at: new Date(),
+      });
+
+      const result = await service.withdrawConsent('user-1');
+
+      expect(result.hasActiveConsent).toBe(false);
+      expect(result.withdrawnAt).toBeDefined();
+      expect(result.impactMessage).toBeTruthy();
+      expect(mockPrismaService.consents.update).toHaveBeenCalledWith({
+        where: { id: 'consent-1' },
+        data: { withdrawn_at: expect.any(Date) },
+      });
+    });
+
+    it('should throw NotFoundException if no active consent exists', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
+      mockPrismaService.consents.findFirst.mockResolvedValue(null);
+
+      await expect(service.withdrawConsent('user-1')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw NotFoundException if consent already withdrawn', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
+      // findFirst with withdrawn_at: null filter returns null for already-withdrawn consent
+      mockPrismaService.consents.findFirst.mockResolvedValue(null);
+
+      await expect(service.withdrawConsent('user-1')).rejects.toThrow(NotFoundException);
     });
   });
 });

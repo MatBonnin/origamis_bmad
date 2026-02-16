@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsString,
+  IsBoolean,
   MinLength,
   MaxLength,
   Matches,
@@ -8,6 +9,7 @@ import {
   IsOptional,
   IsArray,
   ValidateNested,
+  Equals,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -64,6 +66,11 @@ export class RegisterDto {
   @ApiProperty({ example: 'etudiant', enum: ['etudiant', 'mentor'] })
   @IsIn(['etudiant', 'mentor'], { message: 'Le rôle doit être etudiant ou mentor' })
   role: 'etudiant' | 'mentor';
+
+  @ApiProperty({ example: true, description: 'Consentement RGPD obligatoire' })
+  @IsBoolean({ message: 'Le consentement RGPD est requis' })
+  @Equals(true, { message: 'Vous devez accepter les conditions d\'utilisation' })
+  consentGiven: boolean;
 
   @ApiPropertyOptional({ type: OnboardingDataDto })
   @IsOptional()

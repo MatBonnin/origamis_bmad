@@ -48,6 +48,7 @@ export function PublicOnboardingWizard() {
   const { status } = useSession();
   const [data, setData] = useState<OnboardingData>(initialData);
   const [password, setPassword] = useState('');
+  const [consentGiven, setConsentGiven] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -132,6 +133,7 @@ export function PublicOnboardingWizard() {
           email: data.email,
           password,
           role: data.profileType,
+          consentGiven: true,
           onboardingData,
         }),
       });
@@ -267,10 +269,12 @@ export function PublicOnboardingWizard() {
             lastName={data.lastName}
             email={data.email}
             password={password}
+            consentGiven={consentGiven}
             onChangeFirstName={(v) => updateData({ firstName: v })}
             onChangeLastName={(v) => updateData({ lastName: v })}
             onChangeEmail={(v) => updateData({ email: v })}
             onChangePassword={setPassword}
+            onChangeConsent={setConsentGiven}
             onBack={() => {
               if (data.profileType === 'mentor') {
                 setData((prev) => ({ ...prev, step: 1 }));
