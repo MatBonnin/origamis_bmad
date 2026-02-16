@@ -1,6 +1,6 @@
 # Story 3.1: Messagerie étudiant → mentor
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -16,12 +16,12 @@ so that échanger avant un rendez-vous.
 
 ## Tasks / Subtasks
 
-- [ ] Créer module messaging (Prisma `messages`, `conversations`, `read_status`) (AC: #1)
-- [ ] Implémenter endpoint REST `POST /messages`, `GET /conversations/:id/messages` (AC: #1)
-- [ ] Ajouter WebSocket `message.send`, `message.received`, `message.read` (AC: #1)
-- [ ] UI chat: conversation list, composer, message bubbles + loading skeletons (AC: #1)
-- [ ] Ajouter pagination, historique, choix canal push (AC: #1)
-- [ ] Tests API + WebSocket + UI (auth, validations, error handling) (AC: #1)
+- [x] Créer module messaging (Prisma `messages`, `conversations`, `read_status`) (AC: #1)
+- [x] Implémenter endpoint REST `POST /messages`, `GET /conversations/:id/messages` (AC: #1)
+- [x] Ajouter WebSocket `message.send`, `message.received`, `message.read` (AC: #1)
+- [x] UI chat: conversation list, composer, message bubbles + loading skeletons (AC: #1)
+- [x] Ajouter pagination, historique, choix canal push (AC: #1)
+- [x] Tests API + WebSocket + UI (auth, validations, error handling) (AC: #1)
 
 ## Dev Notes
 
@@ -97,6 +97,79 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
+- `npm run prisma:generate --workspace=apps/api` (PASS)
+- `npm test --workspace=apps/api -- messaging.service.spec.ts messaging.controller.spec.ts messaging.gateway.spec.ts send-message.dto.spec.ts` (PASS)
+- `npm test --workspace=apps/web -- MessagingPanel.test.tsx` (PASS)
+- `npm test --workspace=apps/web` (PASS, 11 fichiers)
+- `npm test --workspace=apps/api` (PASS, 30 suites)
+
 ### Completion Notes List
 
+- Nouveau module API `messaging` implemente avec persistance Prisma:
+  - modeles `conversations`, `messages`, `read_status` + relations `users`
+  - migration SQL `202602162100_add_messaging`
+  - endpoints REST:
+    - `GET /conversations`
+    - `GET /conversations/:id/messages` (pagination curseur)
+    - `POST /messages`
+- WebSocket NestJS ajoute pour temps reel:
+  - events entrants: `message.send`, `message.read`, `message.typing`
+  - events emis: `message.received`, `message.new`, `message.read`
+  - controle d acces conversation et marquage lu via `read_status`
+- Regles metier messaging ajoutees:
+  - pairage RBAC etudiant/mentor (conversation autorisee uniquement)
+  - deduplication anti double-envoi avec `clientMessageId`
+  - tri chronologique ASC sur fil de messages
+  - integration notification via `NotificationsService.emitNotification`
+- UI messagerie ajoutee:
+  - page app `/(app)/messages`
+  - composant `MessagingPanel` (liste conversations, fil, composer, canal push/in-app)
+  - chargement historique via bouton "Charger l historique"
+  - accessibilite: `aria-live`, `aria-busy`, skeletons
+- Couverture de tests ajoutee pour API/WebSocket/UI:
+  - service/controller/gateway messaging
+  - DTO validations `SendMessageDto`
+  - tests UI `MessagingPanel`
+- Stabilisation regression web hors feature:
+  - test onboarding accepte redirection vers `/dashboard` ou `/profile-suggestion`
+  - correction escape apostrophe dans `OnboardingWizard`
+
+### Implementation Plan
+
+- Creer un module backend messaging dedie avec schema Prisma, endpoints REST et gateway WebSocket.
+- Imposer les contraintes d acces etudiant/mentor et la deduplication pour garantir la coherence des conversations.
+- Construire une UI chat minimalement complete (liste + fil + composer + historique + canal push) avec bonnes pratiques accessibilite.
+- Verifier avec tests unitaires/integration cibles puis regression complete API/Web.
+
 ### File List
+
+- apps/api/prisma/schema.prisma (modified)
+- apps/api/prisma/migrations/202602162100_add_messaging/migration.sql (new)
+- apps/api/src/app.module.ts (modified)
+- apps/api/src/modules/messaging/messaging.module.ts (new)
+- apps/api/src/modules/messaging/messaging.controller.ts (new)
+- apps/api/src/modules/messaging/messaging.gateway.ts (new)
+- apps/api/src/modules/messaging/messaging.service.ts (new)
+- apps/api/src/modules/messaging/index.ts (new)
+- apps/api/src/modules/messaging/dto/send-message.dto.ts (new)
+- apps/api/src/modules/messaging/dto/get-conversation-messages-query.dto.ts (new)
+- apps/api/src/modules/messaging/dto/index.ts (new)
+- apps/api/src/modules/messaging/messaging.service.spec.ts (new)
+- apps/api/src/modules/messaging/messaging.controller.spec.ts (new)
+- apps/api/src/modules/messaging/messaging.gateway.spec.ts (new)
+- apps/api/src/modules/messaging/dto/send-message.dto.spec.ts (new)
+- apps/api/package.json (modified)
+- package-lock.json (modified)
+- apps/web/src/features/messaging/MessagingPanel.tsx (new)
+- apps/web/src/features/messaging/MessagingPanel.module.css (new)
+- apps/web/src/features/messaging/index.ts (new)
+- apps/web/src/features/messaging/__tests__/MessagingPanel.test.tsx (new)
+- apps/web/src/app/(app)/messages/page.tsx (new)
+- apps/web/src/features/onboarding/__tests__/OnboardingWizard.test.tsx (modified)
+- apps/web/src/features/onboarding/OnboardingWizard.tsx (modified)
+- _bmad-output/implementation-artifacts/3-1-messagerie-tudiant-mentor.md (modified)
+- _bmad-output/implementation-artifacts/sprint-status.yaml (modified)
+
+## Change Log
+
+- 2026-02-16: Story 3.1 implementee (module messaging Prisma/NestJS + WebSocket + UI chat + tests API/Web et regression complete).

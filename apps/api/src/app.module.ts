@@ -12,6 +12,7 @@ import { OnboardingModule } from './modules/onboarding';
 import { ProfileSuggestionModule } from './modules/profile-suggestion';
 import { MentorsModule } from './modules/mentors';
 import { MatchingModule } from './modules/matching';
+import { MessagingModule } from './modules/messaging';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { MatchingModule } from './modules/matching';
     ProfileSuggestionModule,
     MatchingModule,
     MentorsModule,
+    MessagingModule,
   ],
   providers: [
     {

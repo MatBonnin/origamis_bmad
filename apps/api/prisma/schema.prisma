@@ -41,6 +41,11 @@ model users {
   mentor_interactions_as_student mentor_interactions[] @relation("mentor_interactions_student")
   recommendation_cache recommendation_cache[]
   user_intents user_intents?
+  conversations_as_student conversations[] @relation("conversations_student")
+  conversations_as_mentor conversations[] @relation("conversations_mentor")
+  sent_messages messages[] @relation("messages_sender")
+  received_messages messages[] @relation("messages_receiver")
+  read_statuses read_status[]
 
   @@map("users")
 }
@@ -243,4 +248,61 @@ model recommendation_cache {
   @@unique([user_id, cache_key])
   @@index([expires_at])
   @@map("recommendation_cache")
+}
+
+model conversations {
+  id              String   @id @default(uuid())
+  mentor_id       String
+  student_id      String
+  last_message_at DateTime @default(now())
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  mentor    users @relation("conversations_mentor", fields: [mentor_id], references: [id], onDelete: Cascade)
+  student   users @relation("conversations_student", fields: [student_id], references: [id], onDelete: Cascade)
+  messages  messages[]
+  read_statuses read_status[]
+
+  @@unique([mentor_id, student_id])
+  @@index([student_id])
+  @@index([mentor_id])
+  @@index([last_message_at])
+  @@map("conversations")
+}
+
+model messages {
+  id                String   @id @default(uuid())
+  conversation_id   String
+  sender_id         String
+  receiver_id       String
+  body              String
+  metadata          Json     @default("{}")
+  client_message_id String?
+  created_at        DateTime @default(now())
+
+  conversation conversations @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  sender       users         @relation("messages_sender", fields: [sender_id], references: [id], onDelete: Cascade)
+  receiver     users         @relation("messages_receiver", fields: [receiver_id], references: [id], onDelete: Cascade)
+  read_statuses read_status[] @relation("read_status_last_message")
+
+  @@unique([conversation_id, sender_id, client_message_id])
+  @@index([conversation_id, created_at])
+  @@index([receiver_id])
+  @@map("messages")
+}
+
+model read_status {
+  id                   String   @id @default(uuid())
+  conversation_id      String
+  user_id              String
+  last_read_message_id String?
+  updated_at           DateTime @updatedAt
+
+  conversation conversations @relation(fields: [conversation_id], references: [id], onDelete: Cascade)
+  user         users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  last_read_message messages? @relation("read_status_last_message", fields: [last_read_message_id], references: [id], onDelete: SetNull)
+
+  @@unique([conversation_id, user_id])
+  @@index([user_id])
+  @@map("read_status")
 }

@@ -62,7 +62,7 @@ development_status:
   epic-2-retrospective: optional
 
   epic-3: in-progress
-  3-1-messagerie-tudiant-mentor: ready-for-dev
+  3-1-messagerie-tudiant-mentor: review
   3-2-messagerie-mentor-tudiant: ready-for-dev
   3-3-notifications-messages-et-rdv: ready-for-dev
   3-4-disponibilit-s-mentor: ready-for-dev

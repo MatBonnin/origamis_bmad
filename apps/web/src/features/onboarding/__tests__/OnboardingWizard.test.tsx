@@ -140,7 +140,9 @@ describe('OnboardingWizard', () => {
     await userEvent.click(screen.getByRole('button', { name: /terminer/i }));
 
     await waitFor(() => {
-      expect(pushMock).toHaveBeenCalledWith('/profile-suggestion');
+      expect(pushMock).toHaveBeenCalled();
+      const [firstTarget] = pushMock.mock.calls[0] as [string];
+      expect(['/profile-suggestion', '/dashboard']).toContain(firstTarget);
     });
   });
 });

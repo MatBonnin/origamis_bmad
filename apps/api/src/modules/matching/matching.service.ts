@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma';
 
 interface RecommendationFilters {
@@ -137,7 +138,7 @@ export class MatchingService {
         return a.mentorId.localeCompare(b.mentorId);
       });
 
-    const payload: CachedRecommendations = {
+    const payload: Prisma.InputJsonValue = {
       mentors: scored,
       generatedAt: new Date().toISOString(),
     };
