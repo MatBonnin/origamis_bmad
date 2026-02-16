@@ -20,7 +20,7 @@ export class UpdateUserNeedsDto {
   objectives?: string[];
 
   @ApiPropertyOptional({
-    description: 'Domaine d\'etude',
+    description: "Domaine d'etude",
     example: 'informatique',
   })
   @IsOptional()
@@ -51,7 +51,7 @@ export class UserNeedsResponseDto {
   @ApiProperty({ description: 'Liste des objectifs' })
   objectives: string[];
 
-  @ApiProperty({ description: 'Domaine d\'etude' })
+  @ApiProperty({ description: "Domaine d'etude" })
   domain: string | null;
 
   @ApiProperty({ description: 'Niveau academique' })

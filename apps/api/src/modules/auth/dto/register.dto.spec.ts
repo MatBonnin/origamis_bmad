@@ -99,7 +99,9 @@ describe('RegisterDto', () => {
     it('should pass with consentGiven true', async () => {
       const dto = createDto({ consentGiven: true });
       const errors = await validate(dto);
-      expect(errors.filter((e) => e.property === 'consentGiven')).toHaveLength(0);
+      expect(errors.filter((e) => e.property === 'consentGiven')).toHaveLength(
+        0,
+      );
     });
 
     it('should fail with consentGiven false', async () => {

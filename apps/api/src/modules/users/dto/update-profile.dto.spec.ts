@@ -94,7 +94,9 @@ describe('UpdateProfileDto', () => {
     });
 
     it('should fail when objectives is not an array', async () => {
-      const dto = createDto({ objectives: 'not an array' as unknown as string[] });
+      const dto = createDto({
+        objectives: 'not an array' as unknown as string[],
+      });
       const errors = await validate(dto);
       expect(errors.length).toBeGreaterThan(0);
     });
@@ -128,7 +130,9 @@ describe('UpdateProfileDto', () => {
     });
 
     it('should fail with avatarUrl exceeding 500 chars', async () => {
-      const dto = createDto({ avatarUrl: 'https://example.com/' + 'a'.repeat(500) });
+      const dto = createDto({
+        avatarUrl: 'https://example.com/' + 'a'.repeat(500),
+      });
       const errors = await validate(dto);
       expect(errors.length).toBeGreaterThan(0);
     });

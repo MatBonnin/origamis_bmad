@@ -255,7 +255,9 @@ describe('UsersService', () => {
 
       const result = await service.getNotificationPreferences('user-1');
 
-      expect(mockPrismaService.notification_preferences.createMany).toHaveBeenCalled();
+      expect(
+        mockPrismaService.notification_preferences.createMany,
+      ).toHaveBeenCalled();
       expect(result.preferences).toEqual([
         { channel: 'email', category: 'messages', enabled: true },
         { channel: 'push', category: 'rdv', enabled: false },
@@ -266,18 +268,20 @@ describe('UsersService', () => {
       mockPrismaService.users.findUnique.mockResolvedValue({ id: 'user-1' });
       mockPrismaService.notification_preferences.findMany
         .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([
-          { channel: 'email', category: 'messages' },
-        ])
+        .mockResolvedValueOnce([{ channel: 'email', category: 'messages' }])
         .mockResolvedValueOnce([
           { channel: 'email', category: 'messages', enabled: false },
         ]);
 
       const result = await service.updateNotificationPreferences('user-1', {
-        preferences: [{ channel: 'email', category: 'messages', enabled: false }],
+        preferences: [
+          { channel: 'email', category: 'messages', enabled: false },
+        ],
       });
 
-      expect(mockPrismaService.notification_preferences.upsert).toHaveBeenCalledWith({
+      expect(
+        mockPrismaService.notification_preferences.upsert,
+      ).toHaveBeenCalledWith({
         where: {
           user_id_channel_category: {
             user_id: 'user-1',
@@ -300,7 +304,9 @@ describe('UsersService', () => {
 
     it('should return true by default when preference does not exist', async () => {
       mockPrismaService.notification_preferences.findMany.mockResolvedValue([]);
-      mockPrismaService.notification_preferences.findUnique.mockResolvedValue(null);
+      mockPrismaService.notification_preferences.findUnique.mockResolvedValue(
+        null,
+      );
 
       const enabled = await service.isNotificationEnabled(
         'user-1',
@@ -413,7 +419,9 @@ describe('UsersService', () => {
       });
       expect(result.objectives).toEqual(['academic-writing']);
       expect(result.domain).toBe('informatique');
-      expect(mockMatchingService.invalidateUserRecommendations).toHaveBeenCalledWith('user-1');
+      expect(
+        mockMatchingService.invalidateUserRecommendations,
+      ).toHaveBeenCalledWith('user-1');
     });
 
     it('should merge with existing needs when partial update', async () => {
@@ -465,7 +473,12 @@ describe('UsersService', () => {
       mockPrismaService.user_needs.upsert.mockResolvedValue({
         id: 'needs-1',
         user_id: 'user-1',
-        needs_json: { objectives: ['test'], domain: null, level: null, graduationYear: null },
+        needs_json: {
+          objectives: ['test'],
+          domain: null,
+          level: null,
+          graduationYear: null,
+        },
         needs_updated: true,
         created_at: new Date(),
         updated_at: new Date(),
@@ -476,7 +489,9 @@ describe('UsersService', () => {
       const upsertCall = mockPrismaService.user_needs.upsert.mock.calls[0][0];
       expect(upsertCall.create.needs_updated).toBe(true);
       expect(upsertCall.update.needs_updated).toBe(true);
-      expect(mockMatchingService.invalidateUserRecommendations).toHaveBeenCalledWith('user-1');
+      expect(
+        mockMatchingService.invalidateUserRecommendations,
+      ).toHaveBeenCalledWith('user-1');
     });
   });
 
@@ -527,7 +542,9 @@ describe('UsersService', () => {
     it('should throw NotFoundException if user not found', async () => {
       mockPrismaService.users.findUnique.mockResolvedValue(null);
 
-      await expect(service.getConsent('invalid-id')).rejects.toThrow(NotFoundException);
+      await expect(service.getConsent('invalid-id')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -562,7 +579,9 @@ describe('UsersService', () => {
       mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
       mockPrismaService.consents.findFirst.mockResolvedValue(null);
 
-      await expect(service.withdrawConsent('user-1')).rejects.toThrow(NotFoundException);
+      await expect(service.withdrawConsent('user-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw NotFoundException if consent already withdrawn', async () => {
@@ -570,7 +589,9 @@ describe('UsersService', () => {
       // findFirst with withdrawn_at: null filter returns null for already-withdrawn consent
       mockPrismaService.consents.findFirst.mockResolvedValue(null);
 
-      await expect(service.withdrawConsent('user-1')).rejects.toThrow(NotFoundException);
+      await expect(service.withdrawConsent('user-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

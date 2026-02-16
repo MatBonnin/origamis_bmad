@@ -24,20 +24,24 @@ describe('RolesGuard', () => {
     reflector.getAllAndOverride = jest.fn().mockReturnValue(undefined);
     const guard = new RolesGuard(reflector);
 
-    expect(guard.canActivate(createContext({ roles: ['etudiant'] }))).toBe(true);
+    expect(guard.canActivate(createContext({ roles: ['etudiant'] }))).toBe(
+      true,
+    );
   });
 
   it('should throw FORBIDDEN when user has no required role', () => {
     reflector.getAllAndOverride = jest.fn().mockReturnValue(['admin']);
     const guard = new RolesGuard(reflector);
 
-    expect(() => guard.canActivate(createContext({ roles: ['mentor'] }))).toThrow(
-      ForbiddenException,
-    );
+    expect(() =>
+      guard.canActivate(createContext({ roles: ['mentor'] })),
+    ).toThrow(ForbiddenException);
   });
 
   it('should allow when user has one of required roles', () => {
-    reflector.getAllAndOverride = jest.fn().mockReturnValue(['admin', 'support']);
+    reflector.getAllAndOverride = jest
+      .fn()
+      .mockReturnValue(['admin', 'support']);
     const guard = new RolesGuard(reflector);
 
     expect(guard.canActivate(createContext({ roles: ['support'] }))).toBe(true);

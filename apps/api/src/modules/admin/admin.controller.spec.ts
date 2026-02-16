@@ -48,6 +48,8 @@ describe('AdminController', () => {
     });
 
     expect(result).toEqual({ data: { user }, error: null });
-    expect(adminService.updateUserRoles).toHaveBeenCalledWith('admin-1', 'u2', ['support']);
+    expect(adminService.updateUserRoles).toHaveBeenCalledWith('admin-1', 'u2', [
+      'support',
+    ]);
   });
 });

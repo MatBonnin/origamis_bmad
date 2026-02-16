@@ -90,7 +90,9 @@ describe('AuthService', () => {
       mockPrismaService.roles.findUnique.mockResolvedValue(mockRole);
       mockPrismaService.users.create.mockResolvedValue(mockUser);
       mockPrismaService.consents.create.mockResolvedValue({ id: 'consent-1' });
-      mockPrismaService.notification_preferences.createMany.mockResolvedValue({ count: 9 });
+      mockPrismaService.notification_preferences.createMany.mockResolvedValue({
+        count: 9,
+      });
       mockJwtService.sign.mockReturnValue('jwt-token');
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
@@ -117,7 +119,9 @@ describe('AuthService', () => {
       mockPrismaService.roles.create.mockResolvedValue(mockRole);
       mockPrismaService.users.create.mockResolvedValue(mockUser);
       mockPrismaService.consents.create.mockResolvedValue({ id: 'consent-1' });
-      mockPrismaService.notification_preferences.createMany.mockResolvedValue({ count: 9 });
+      mockPrismaService.notification_preferences.createMany.mockResolvedValue({
+        count: 9,
+      });
       mockJwtService.sign.mockReturnValue('jwt-token');
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
@@ -132,7 +136,9 @@ describe('AuthService', () => {
       mockPrismaService.users.findUnique.mockResolvedValue(null);
       mockPrismaService.roles.findUnique.mockResolvedValue(mockRole);
       mockPrismaService.users.create.mockResolvedValue(mockUser);
-      mockPrismaService.notification_preferences.createMany.mockResolvedValue({ count: 9 });
+      mockPrismaService.notification_preferences.createMany.mockResolvedValue({
+        count: 9,
+      });
       mockPrismaService.consents.create.mockResolvedValue({
         id: 'consent-1',
         user_id: 'user-1',
@@ -165,9 +171,9 @@ describe('AuthService', () => {
       const { consentGiven: _, ...dtoWithoutConsent } = registerDto;
       mockPrismaService.users.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.register(dtoWithoutConsent as any),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.register(dtoWithoutConsent as any)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should initialize default notification preferences on registration', async () => {
@@ -175,7 +181,9 @@ describe('AuthService', () => {
       mockPrismaService.roles.findUnique.mockResolvedValue(mockRole);
       mockPrismaService.users.create.mockResolvedValue(mockUser);
       mockPrismaService.consents.create.mockResolvedValue({ id: 'consent-1' });
-      mockPrismaService.notification_preferences.createMany.mockResolvedValue({ count: 9 });
+      mockPrismaService.notification_preferences.createMany.mockResolvedValue({
+        count: 9,
+      });
       mockJwtService.sign.mockReturnValue('jwt-token');
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
@@ -196,7 +204,9 @@ describe('AuthService', () => {
       );
 
       // Verify notification preferences are created separately
-      expect(mockPrismaService.notification_preferences.createMany).toHaveBeenCalledWith({
+      expect(
+        mockPrismaService.notification_preferences.createMany,
+      ).toHaveBeenCalledWith({
         data: expect.arrayContaining([
           expect.objectContaining({
             user_id: 'user-1',
@@ -296,7 +306,11 @@ describe('AuthService', () => {
     });
 
     it('should generate token, update user and send email if email exists', async () => {
-      const mockUser = { id: 'user-1', email: 'test@example.com', first_name: 'John' };
+      const mockUser = {
+        id: 'user-1',
+        email: 'test@example.com',
+        first_name: 'John',
+      };
       mockPrismaService.users.findUnique.mockResolvedValue(mockUser);
       mockPrismaService.users.update.mockResolvedValue(mockUser);
       mockMailService.sendPasswordResetEmail.mockResolvedValue(undefined);

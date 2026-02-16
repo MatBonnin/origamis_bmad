@@ -77,7 +77,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Obtenir le profil de l\'utilisateur connecté' })
+  @ApiOperation({ summary: "Obtenir le profil de l'utilisateur connecté" })
   @ApiResponse({
     status: 200,
     description: 'Profil récupéré',

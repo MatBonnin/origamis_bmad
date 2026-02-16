@@ -55,19 +55,25 @@ export class MatchingService {
   ): Promise<RecommendationResult> {
     await this.assertUserExists(userId);
 
-    const limit = Math.max(1, Math.min(options.limit ?? DEFAULT_LIMIT, MAX_LIMIT));
+    const limit = Math.max(
+      1,
+      Math.min(options.limit ?? DEFAULT_LIMIT, MAX_LIMIT),
+    );
     const filters = options.filters ?? {};
     const offset = this.decodeCursor(options.cursor);
     const cacheKey = this.buildCacheKey(filters);
 
     const cached = await this.getValidCache(userId, cacheKey);
-    const fullRecommendations = cached?.mentors ?? await this.buildAndCacheRecommendations(userId, filters, cacheKey);
+    const fullRecommendations =
+      cached?.mentors ??
+      (await this.buildAndCacheRecommendations(userId, filters, cacheKey));
 
     const page = fullRecommendations.slice(offset, offset + limit);
     const nextOffset = offset + limit;
-    const nextCursor = nextOffset < fullRecommendations.length
-      ? this.encodeCursor(nextOffset)
-      : null;
+    const nextCursor =
+      nextOffset < fullRecommendations.length
+        ? this.encodeCursor(nextOffset)
+        : null;
 
     const scoringSignals = this.collectScoringSignals(page);
 
@@ -295,14 +301,20 @@ export class MatchingService {
       where: { user_id: userId },
     });
 
-    const onboardingAnswers = onboarding?.answers_json as Record<string, unknown> | undefined;
+    const onboardingAnswers = onboarding?.answers_json as
+      | Record<string, unknown>
+      | undefined;
     const needsData = needs?.needs_json as Record<string, unknown> | undefined;
 
     const onboardingObjectives = Array.isArray(onboardingAnswers?.objectives)
-      ? onboardingAnswers.objectives.filter((item): item is string => typeof item === 'string')
+      ? onboardingAnswers.objectives.filter(
+          (item): item is string => typeof item === 'string',
+        )
       : [];
     const needsObjectives = Array.isArray(needsData?.objectives)
-      ? needsData.objectives.filter((item): item is string => typeof item === 'string')
+      ? needsData.objectives.filter(
+          (item): item is string => typeof item === 'string',
+        )
       : [];
     const intentsObjectives = intents?.preferred_objectives ?? [];
 
@@ -315,15 +327,17 @@ export class MatchingService {
       ]),
     );
 
-    const preferredDomain = (needsData?.domain as string | undefined)
-      ?? (onboardingAnswers?.domain as string | undefined)
-      ?? intents?.preferred_domain
-      ?? null;
+    const preferredDomain =
+      (needsData?.domain as string | undefined) ??
+      (onboardingAnswers?.domain as string | undefined) ??
+      intents?.preferred_domain ??
+      null;
 
-    const preferredLevel = (needsData?.level as string | undefined)
-      ?? (onboardingAnswers?.level as string | undefined)
-      ?? user.level
-      ?? null;
+    const preferredLevel =
+      (needsData?.level as string | undefined) ??
+      (onboardingAnswers?.level as string | undefined) ??
+      user.level ??
+      null;
 
     return {
       preferredDomain,
@@ -359,9 +373,7 @@ export class MatchingService {
   }
 
   private collectScoringSignals(mentors: MentorRecommendation[]): string[] {
-    return Array.from(
-      new Set(mentors.flatMap((mentor) => mentor.signals)),
-    );
+    return Array.from(new Set(mentors.flatMap((mentor) => mentor.signals)));
   }
 
   private buildCacheKey(filters: RecommendationFilters): string {

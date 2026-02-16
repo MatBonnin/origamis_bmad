@@ -21,6 +21,6 @@ export class ConsentWithdrawResponseDto {
   @ApiProperty({ description: 'Date du retrait' })
   withdrawnAt: Date;
 
-  @ApiProperty({ description: 'Message d\'impact du retrait' })
+  @ApiProperty({ description: "Message d'impact du retrait" })
   impactMessage: string;
 }

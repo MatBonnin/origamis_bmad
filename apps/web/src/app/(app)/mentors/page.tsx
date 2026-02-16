@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
-import { MentorRecommendations } from '@/features/mentors/recommendations';
+import { MentorSearch } from '@/features/mentors/search';
 
 export default async function MentorsPage() {
   const session = await getServerSession(authOptions);
@@ -10,5 +10,5 @@ export default async function MentorsPage() {
     redirect('/connexion?callbackUrl=/mentors');
   }
 
-  return <MentorRecommendations accessToken={session.accessToken} />;
+  return <MentorSearch accessToken={session.accessToken} />;
 }

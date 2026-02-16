@@ -1,10 +1,15 @@
 import { BadRequestException } from '@nestjs/common';
-import { MentorsController } from './mentors.controller';
 import { MatchingService } from '../matching';
+import { MentorsController } from './mentors.controller';
+import { MentorsSearchService } from './mentors-search.service';
 
 describe('MentorsController', () => {
   const mockMatchingService = {
     getRecommendations: jest.fn(),
+  };
+  const mockMentorsSearchService = {
+    searchMentors: jest.fn(),
+    getFilterFacets: jest.fn(),
   };
 
   let controller: MentorsController;
@@ -12,6 +17,7 @@ describe('MentorsController', () => {
   beforeEach(() => {
     controller = new MentorsController(
       mockMatchingService as unknown as MatchingService,
+      mockMentorsSearchService as unknown as MentorsSearchService,
     );
     jest.clearAllMocks();
   });
@@ -26,10 +32,12 @@ describe('MentorsController', () => {
       },
     });
 
-    const result = await controller.getRecommendations(
+    const responsePromise = controller.getRecommendations(
       { id: 'student-1' } as never,
       { limit: 5, filters: '{"domains":["informatique"]}' },
     );
+    await expect(responsePromise).resolves.toHaveProperty('error', null);
+    await expect(responsePromise).resolves.toHaveProperty('data');
 
     expect(mockMatchingService.getRecommendations).toHaveBeenCalledWith(
       'student-1',
@@ -39,18 +47,67 @@ describe('MentorsController', () => {
         filters: { domains: ['informatique'] },
       },
     );
-    expect(result).toEqual({
-      data: expect.any(Object),
-      error: null,
-    });
   });
 
   it('throws BadRequestException when filters is invalid json', async () => {
     await expect(
-      controller.getRecommendations(
-        { id: 'student-1' } as never,
-        { filters: '{invalid' },
-      ),
+      controller.getRecommendations({ id: 'student-1' } as never, {
+        filters: '{invalid',
+      }),
     ).rejects.toThrow(BadRequestException);
+  });
+
+  it('returns envelope data for mentors search endpoint', async () => {
+    mockMentorsSearchService.searchMentors.mockResolvedValue({
+      mentors: [{ mentorId: 'mentor-1' }],
+      metadata: {
+        total: 1,
+        applied_filters: { domains: ['informatique'] },
+        next_cursor: null,
+      },
+    });
+
+    const responsePromise = controller.searchMentors({
+      q: 'react',
+      limit: 6,
+      sort: 'rating_desc',
+      filters: '{"domains":["informatique"],"maxPrice":60}',
+    });
+    await expect(responsePromise).resolves.toHaveProperty('error', null);
+    await expect(responsePromise).resolves.toHaveProperty('data');
+
+    expect(mockMentorsSearchService.searchMentors).toHaveBeenCalledWith({
+      q: 'react',
+      cursor: undefined,
+      limit: 6,
+      sort: 'rating_desc',
+      filters: {
+        domains: ['informatique'],
+        maxPrice: 60,
+      },
+    });
+  });
+
+  it('throws BadRequestException when search filters is invalid json', async () => {
+    await expect(
+      controller.searchMentors({
+        q: 'react',
+        filters: '{invalid',
+      }),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('returns envelope data for filters facets endpoint', async () => {
+    mockMentorsSearchService.getFilterFacets.mockResolvedValue({
+      domains: ['informatique'],
+      price_ranges: { min: 20, max: 100, presets: [] },
+      availabilities: ['available'],
+      rating_thresholds: [4],
+    });
+
+    const responsePromise = controller.getMentorFilterFacets();
+    await expect(responsePromise).resolves.toHaveProperty('error', null);
+    await expect(responsePromise).resolves.toHaveProperty('data');
+    expect(mockMentorsSearchService.getFilterFacets).toHaveBeenCalledTimes(1);
   });
 });

@@ -4,7 +4,9 @@ import { UpdateUserRolesDto } from './update-user-roles.dto';
 
 describe('UpdateUserRolesDto', () => {
   it('should validate with allowed roles', async () => {
-    const dto = plainToInstance(UpdateUserRolesDto, { roles: ['admin', 'support'] });
+    const dto = plainToInstance(UpdateUserRolesDto, {
+      roles: ['admin', 'support'],
+    });
     const errors = await validate(dto);
     expect(errors).toHaveLength(0);
   });

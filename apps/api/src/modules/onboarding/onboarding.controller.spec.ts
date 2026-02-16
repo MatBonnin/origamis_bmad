@@ -24,7 +24,9 @@ describe('OnboardingController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OnboardingController],
-      providers: [{ provide: OnboardingService, useValue: mockOnboardingService }],
+      providers: [
+        { provide: OnboardingService, useValue: mockOnboardingService },
+      ],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })

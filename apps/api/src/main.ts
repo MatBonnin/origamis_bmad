@@ -9,7 +9,7 @@ async function bootstrap() {
 
   // Enable CORS
   const corsOrigins = process.env.CORS_ORIGIN
-    ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+    ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
     : ['http://localhost:3000', 'http://127.0.0.1:3000'];
 
   app.enableCors({
@@ -19,7 +19,12 @@ async function bootstrap() {
 
       // In development, allow any localhost/local IP
       const isDev = process.env.NODE_ENV !== 'production';
-      if (isDev && (origin.includes('localhost') || origin.includes('127.0.0.1') || /^http:\/\/192\.168\.\d+\.\d+/.test(origin))) {
+      if (
+        isDev &&
+        (origin.includes('localhost') ||
+          origin.includes('127.0.0.1') ||
+          /^http:\/\/192\.168\.\d+\.\d+/.test(origin))
+      ) {
         return callback(null, true);
       }
 
@@ -50,8 +55,8 @@ async function bootstrap() {
 
   // Swagger documentation
   const config = new DocumentBuilder()
-    .setTitle('Orig\'AMI API')
-    .setDescription('API pour la plateforme de mentorat Orig\'AMI')
+    .setTitle("Orig'AMI API")
+    .setDescription("API pour la plateforme de mentorat Orig'AMI")
     .setVersion('1.0')
     .addBearerAuth()
     .build();

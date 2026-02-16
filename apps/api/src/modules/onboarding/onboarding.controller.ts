@@ -1,5 +1,10 @@
 import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators';
 import { JwtAuthGuard } from '../../common/guards';
 import { UserResponseDto } from '../auth/dto';
@@ -14,7 +19,9 @@ export class OnboardingController {
   constructor(private readonly onboardingService: OnboardingService) {}
 
   @Get('me')
-  @ApiOperation({ summary: 'Recuperer l etat onboarding de l utilisateur connecte' })
+  @ApiOperation({
+    summary: 'Recuperer l etat onboarding de l utilisateur connecte',
+  })
   @ApiResponse({ status: 200, description: 'Etat onboarding recupere' })
   async getMyOnboarding(@CurrentUser() user: UserResponseDto) {
     const state = await this.onboardingService.getMyOnboarding(user.id);

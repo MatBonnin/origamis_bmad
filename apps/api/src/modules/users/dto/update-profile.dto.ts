@@ -42,7 +42,10 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsArray({ message: 'Les objectifs doivent être une liste' })
   @IsString({ each: true, message: 'Chaque objectif doit être une chaîne' })
-  @MaxLength(200, { each: true, message: 'Chaque objectif ne peut pas dépasser 200 caractères' })
+  @MaxLength(200, {
+    each: true,
+    message: 'Chaque objectif ne peut pas dépasser 200 caractères',
+  })
   objectives?: string[];
 
   @ApiPropertyOptional({
@@ -60,6 +63,8 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   @IsUrl({}, { message: "L'URL de l'avatar doit être une URL valide" })
-  @MaxLength(500, { message: "L'URL de l'avatar ne peut pas dépasser 500 caractères" })
+  @MaxLength(500, {
+    message: "L'URL de l'avatar ne peut pas dépasser 500 caractères",
+  })
   avatarUrl?: string;
 }

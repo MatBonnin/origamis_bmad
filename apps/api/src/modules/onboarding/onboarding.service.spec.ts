@@ -70,7 +70,9 @@ describe('OnboardingService', () => {
       step: 2,
       answers: { profileType: 'etudiant', domain: 'informatique' },
     });
-    expect(mockMatchingService.invalidateUserRecommendations).toHaveBeenCalledWith('u1');
+    expect(
+      mockMatchingService.invalidateUserRecommendations,
+    ).toHaveBeenCalledWith('u1');
   });
 
   it('complete should set completed flag', async () => {
@@ -85,12 +87,16 @@ describe('OnboardingService', () => {
     const result = await service.complete('u1');
 
     expect(result).toEqual({ completed: true });
-    expect(mockMatchingService.invalidateUserRecommendations).toHaveBeenCalledWith('u1');
+    expect(
+      mockMatchingService.invalidateUserRecommendations,
+    ).toHaveBeenCalledWith('u1');
   });
 
   it('should throw if user does not exist', async () => {
     mockPrismaService.users.findUnique.mockResolvedValue(null);
 
-    await expect(service.getMyOnboarding('unknown')).rejects.toThrow(NotFoundException);
+    await expect(service.getMyOnboarding('unknown')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });

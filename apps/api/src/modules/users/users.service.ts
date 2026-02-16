@@ -209,10 +209,22 @@ export class UsersService {
       : { objectives: [], domain: null, level: null, graduationYear: null };
 
     const mergedNeeds = {
-      objectives: dto.objectives !== undefined ? dto.objectives : (existingNeeds.objectives as string[]) || [],
-      domain: dto.domain !== undefined ? dto.domain : (existingNeeds.domain as string) || null,
-      level: dto.level !== undefined ? dto.level : (existingNeeds.level as string) || null,
-      graduationYear: dto.graduationYear !== undefined ? dto.graduationYear : (existingNeeds.graduationYear as string) || null,
+      objectives:
+        dto.objectives !== undefined
+          ? dto.objectives
+          : (existingNeeds.objectives as string[]) || [],
+      domain:
+        dto.domain !== undefined
+          ? dto.domain
+          : (existingNeeds.domain as string) || null,
+      level:
+        dto.level !== undefined
+          ? dto.level
+          : (existingNeeds.level as string) || null,
+      graduationYear:
+        dto.graduationYear !== undefined
+          ? dto.graduationYear
+          : (existingNeeds.graduationYear as string) || null,
     };
 
     const record = await this.prisma.user_needs.upsert({
@@ -334,7 +346,9 @@ export class UsersService {
     }
   }
 
-  private async ensureDefaultNotificationPreferences(userId: string): Promise<void> {
+  private async ensureDefaultNotificationPreferences(
+    userId: string,
+  ): Promise<void> {
     const existing = await this.prisma.notification_preferences.findMany({
       where: { user_id: userId },
       select: { channel: true, category: true },

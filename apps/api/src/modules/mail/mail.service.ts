@@ -41,11 +41,13 @@ export class MailService {
     resetToken: string,
     userName: string,
   ): Promise<void> {
-    const appUrl = this.configService.get<string>('APP_URL') || 'http://localhost:3000';
+    const appUrl =
+      this.configService.get<string>('APP_URL') || 'http://localhost:3000';
     const resetLink = `${appUrl}/auth/reset-password?token=${resetToken}`;
-    const fromEmail = this.configService.get<string>('MAIL_FROM') || 'noreply@origami.local';
+    const fromEmail =
+      this.configService.get<string>('MAIL_FROM') || 'noreply@origami.local';
 
-    const subject = 'Réinitialisation de votre mot de passe - Orig\'AMI';
+    const subject = "Réinitialisation de votre mot de passe - Orig'AMI";
     const html = this.getPasswordResetTemplate(userName, resetLink);
     const text = this.getPasswordResetTextTemplate(userName, resetLink);
 
@@ -58,9 +60,14 @@ export class MailService {
           text,
           html,
         });
-        this.logger.log(`Password reset email sent to ${to}: ${info.messageId}`);
+        this.logger.log(
+          `Password reset email sent to ${to}: ${info.messageId}`,
+        );
       } catch (error) {
-        this.logger.error(`Failed to send password reset email to ${to}`, error);
+        this.logger.error(
+          `Failed to send password reset email to ${to}`,
+          error,
+        );
         throw error;
       }
     } else {
@@ -73,7 +80,10 @@ export class MailService {
     }
   }
 
-  private getPasswordResetTemplate(userName: string, resetLink: string): string {
+  private getPasswordResetTemplate(
+    userName: string,
+    resetLink: string,
+  ): string {
     return `
 <!DOCTYPE html>
 <html lang="fr">
@@ -123,7 +133,10 @@ export class MailService {
     `.trim();
   }
 
-  private getPasswordResetTextTemplate(userName: string, resetLink: string): string {
+  private getPasswordResetTextTemplate(
+    userName: string,
+    resetLink: string,
+  ): string {
     return `
 Bonjour ${userName},
 

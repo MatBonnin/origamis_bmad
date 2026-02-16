@@ -110,17 +110,13 @@ describe('ProfileSuggestionService', () => {
         level: 'licence-3',
       });
 
-      expect(result.bio).toBe(
-        'Etudiant(e) motive(e) et pret(e) a progresser.',
-      );
+      expect(result.bio).toBe('Etudiant(e) motive(e) et pret(e) a progresser.');
     });
 
     it('should use default bio when no domain', () => {
       const result = service.generateSuggestion({ level: 'licence-3' });
 
-      expect(result.bio).toBe(
-        'Etudiant(e) motive(e) et pret(e) a progresser.',
-      );
+      expect(result.bio).toBe('Etudiant(e) motive(e) et pret(e) a progresser.');
     });
   });
 
@@ -253,9 +249,7 @@ describe('ProfileSuggestionService', () => {
           bio: 'Test bio',
         },
       });
-      expect(
-        mockPrismaService.profile_suggestions.update,
-      ).toHaveBeenCalledWith(
+      expect(mockPrismaService.profile_suggestions.update).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { user_id: 'u1' },
           data: expect.objectContaining({ accepted_at: expect.any(Date) }),

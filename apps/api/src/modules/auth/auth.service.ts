@@ -68,12 +68,13 @@ export class AuthService {
 
     // Create user with role
     // Handle onboarding data based on role and whether data was provided
-    const hasOnboardingData = dto.onboardingData && (
-      dto.onboardingData.domain ||
-      dto.onboardingData.level ||
-      dto.onboardingData.graduationYear ||
-      (dto.onboardingData.objectives && dto.onboardingData.objectives.length > 0)
-    );
+    const hasOnboardingData =
+      dto.onboardingData &&
+      (dto.onboardingData.domain ||
+        dto.onboardingData.level ||
+        dto.onboardingData.graduationYear ||
+        (dto.onboardingData.objectives &&
+          dto.onboardingData.objectives.length > 0));
 
     const onboardingCreate =
       dto.role === 'etudiant'
@@ -86,7 +87,8 @@ export class AuthService {
                   ? ({
                       domain: dto.onboardingData?.domain || null,
                       level: dto.onboardingData?.level || null,
-                      graduationYear: dto.onboardingData?.graduationYear || null,
+                      graduationYear:
+                        dto.onboardingData?.graduationYear || null,
                       objectives: dto.onboardingData?.objectives || [],
                     } as Prisma.InputJsonValue)
                   : ({} as Prisma.InputJsonValue),
@@ -165,7 +167,10 @@ export class AuthService {
       });
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.password_hash);
+    const isPasswordValid = await bcrypt.compare(
+      dto.password,
+      user.password_hash,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException({
@@ -262,7 +267,10 @@ export class AuthService {
 
   async resetPassword(dto: ResetPasswordDto): Promise<{ ok: true }> {
     // Hash the provided token to compare with stored hash
-    const tokenHash = crypto.createHash('sha256').update(dto.token).digest('hex');
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(dto.token)
+      .digest('hex');
 
     // Find user with matching token hash
     const user = await this.prisma.users.findFirst({
@@ -279,7 +287,10 @@ export class AuthService {
     }
 
     // Check if token is expired
-    if (!user.password_reset_expires_at || user.password_reset_expires_at < new Date()) {
+    if (
+      !user.password_reset_expires_at ||
+      user.password_reset_expires_at < new Date()
+    ) {
       throw new BadRequestException({
         code: 'TOKEN_EXPIRED',
         message: 'Token de réinitialisation invalide ou expiré',

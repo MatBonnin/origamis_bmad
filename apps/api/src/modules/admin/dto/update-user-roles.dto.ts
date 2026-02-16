@@ -7,7 +7,7 @@ export class UpdateUserRolesDto {
   @ApiProperty({
     type: [String],
     example: ['mentor', 'support'],
-    description: 'Liste des roles a affecter a l\'utilisateur',
+    description: "Liste des roles a affecter a l'utilisateur",
   })
   @IsArray({ message: 'roles doit etre un tableau' })
   @ArrayMinSize(1, { message: 'Au moins un role est requis' })

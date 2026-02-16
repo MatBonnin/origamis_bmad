@@ -44,9 +44,7 @@ describe('UsersController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [
-        { provide: UsersService, useValue: mockUsersService },
-      ],
+      providers: [{ provide: UsersService, useValue: mockUsersService }],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })
@@ -91,7 +89,10 @@ describe('UsersController', () => {
         data: updatedProfile,
         error: null,
       });
-      expect(usersService.updateProfile).toHaveBeenCalledWith('user-1', updateDto);
+      expect(usersService.updateProfile).toHaveBeenCalledWith(
+        'user-1',
+        updateDto,
+      );
     });
 
     it('should update level, objectives and other fields', async () => {
@@ -121,7 +122,9 @@ describe('UsersController', () => {
       const preferences = [
         { channel: 'email', category: 'messages', enabled: true },
       ];
-      mockUsersService.getNotificationPreferences.mockResolvedValue({ preferences });
+      mockUsersService.getNotificationPreferences.mockResolvedValue({
+        preferences,
+      });
 
       const result = await controller.getNotificationPreferences(mockUser);
 
@@ -129,17 +132,30 @@ describe('UsersController', () => {
         data: { preferences },
         error: null,
       });
-      expect(usersService.getNotificationPreferences).toHaveBeenCalledWith('user-1');
+      expect(usersService.getNotificationPreferences).toHaveBeenCalledWith(
+        'user-1',
+      );
     });
 
     it('should update notification preferences wrapped in data envelope', async () => {
       const dto = {
-        preferences: [{ channel: 'push' as const, category: 'rdv' as const, enabled: false }],
+        preferences: [
+          {
+            channel: 'push' as const,
+            category: 'rdv' as const,
+            enabled: false,
+          },
+        ],
       };
       const preferences = dto.preferences;
-      mockUsersService.updateNotificationPreferences.mockResolvedValue({ preferences });
+      mockUsersService.updateNotificationPreferences.mockResolvedValue({
+        preferences,
+      });
 
-      const result = await controller.updateNotificationPreferences(mockUser, dto);
+      const result = await controller.updateNotificationPreferences(
+        mockUser,
+        dto,
+      );
 
       expect(result).toEqual({
         data: { preferences },

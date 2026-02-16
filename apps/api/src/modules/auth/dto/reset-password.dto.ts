@@ -12,13 +12,17 @@ export class ResetPasswordDto {
 
   @ApiProperty({
     example: 'NewPassword123!',
-    description: 'Nouveau mot de passe (min 8 caractères, 1 majuscule, 1 chiffre)',
+    description:
+      'Nouveau mot de passe (min 8 caractères, 1 majuscule, 1 chiffre)',
   })
   @IsString({ message: 'Le mot de passe doit être une chaîne de caractères' })
   @IsNotEmpty({ message: 'Le mot de passe est requis' })
-  @MinLength(8, { message: 'Le mot de passe doit contenir au moins 8 caractères' })
+  @MinLength(8, {
+    message: 'Le mot de passe doit contenir au moins 8 caractères',
+  })
   @Matches(/^(?=.*[A-Z])(?=.*\d)/, {
-    message: 'Le mot de passe doit contenir au moins une majuscule et un chiffre',
+    message:
+      'Le mot de passe doit contenir au moins une majuscule et un chiffre',
   })
   password: string;
 }

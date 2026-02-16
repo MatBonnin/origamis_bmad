@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -32,7 +25,9 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
-  @ApiOperation({ summary: 'Obtenir le profil complet de l\'utilisateur connecté' })
+  @ApiOperation({
+    summary: "Obtenir le profil complet de l'utilisateur connecté",
+  })
   @ApiResponse({
     status: 200,
     description: 'Profil récupéré avec succès',
@@ -53,7 +48,9 @@ export class UsersController {
   }
 
   @Patch('me')
-  @ApiOperation({ summary: 'Mettre à jour le profil de l\'utilisateur connecté' })
+  @ApiOperation({
+    summary: "Mettre à jour le profil de l'utilisateur connecté",
+  })
   @ApiResponse({
     status: 200,
     description: 'Profil mis à jour avec succès',
@@ -81,13 +78,18 @@ export class UsersController {
   }
 
   @Get('me/notification-preferences')
-  @ApiOperation({ summary: 'Obtenir les préférences de notifications de l\'utilisateur connecté' })
+  @ApiOperation({
+    summary:
+      "Obtenir les préférences de notifications de l'utilisateur connecté",
+  })
   @ApiResponse({
     status: 200,
     description: 'Préférences récupérées avec succès',
     schema: {
       properties: {
-        data: { $ref: '#/components/schemas/NotificationPreferencesResponseDto' },
+        data: {
+          $ref: '#/components/schemas/NotificationPreferencesResponseDto',
+        },
         error: { nullable: true },
       },
     },
@@ -97,18 +99,25 @@ export class UsersController {
     description: 'Non authentifié',
   })
   async getNotificationPreferences(@CurrentUser() user: UserResponseDto) {
-    const preferences = await this.usersService.getNotificationPreferences(user.id);
+    const preferences = await this.usersService.getNotificationPreferences(
+      user.id,
+    );
     return { data: { preferences: preferences.preferences }, error: null };
   }
 
   @Patch('me/notification-preferences')
-  @ApiOperation({ summary: 'Mettre à jour les préférences de notifications de l\'utilisateur connecté' })
+  @ApiOperation({
+    summary:
+      "Mettre à jour les préférences de notifications de l'utilisateur connecté",
+  })
   @ApiResponse({
     status: 200,
     description: 'Préférences mises à jour avec succès',
     schema: {
       properties: {
-        data: { $ref: '#/components/schemas/NotificationPreferencesResponseDto' },
+        data: {
+          $ref: '#/components/schemas/NotificationPreferencesResponseDto',
+        },
         error: { nullable: true },
       },
     },
@@ -125,12 +134,15 @@ export class UsersController {
     @CurrentUser() user: UserResponseDto,
     @Body() dto: UpdateNotificationPreferencesDto,
   ) {
-    const preferences = await this.usersService.updateNotificationPreferences(user.id, dto);
+    const preferences = await this.usersService.updateNotificationPreferences(
+      user.id,
+      dto,
+    );
     return { data: { preferences: preferences.preferences }, error: null };
   }
 
   @Get('me/needs')
-  @ApiOperation({ summary: 'Obtenir les besoins de l\'utilisateur connecté' })
+  @ApiOperation({ summary: "Obtenir les besoins de l'utilisateur connecté" })
   @ApiResponse({
     status: 200,
     description: 'Besoins récupérés avec succès',
@@ -148,7 +160,9 @@ export class UsersController {
   }
 
   @Patch('me/needs')
-  @ApiOperation({ summary: 'Mettre à jour les besoins de l\'utilisateur connecté' })
+  @ApiOperation({
+    summary: "Mettre à jour les besoins de l'utilisateur connecté",
+  })
   @ApiResponse({
     status: 200,
     description: 'Besoins mis à jour avec succès',

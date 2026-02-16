@@ -33,10 +33,11 @@ describe('AdminService', () => {
     service = module.get<AdminService>(AdminService);
 
     jest.clearAllMocks();
-    mockPrismaService.$transaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) =>
-      fn({
-        user_roles: mockPrismaService.user_roles,
-      }),
+    mockPrismaService.$transaction.mockImplementation(
+      async (fn: (tx: unknown) => Promise<void>) =>
+        fn({
+          user_roles: mockPrismaService.user_roles,
+        }),
     );
   });
 
@@ -67,17 +68,17 @@ describe('AdminService', () => {
   });
 
   it('updateUserRoles should reject self role modification', async () => {
-    await expect(service.updateUserRoles('u1', 'u1', ['admin'])).rejects.toThrow(
-      ForbiddenException,
-    );
+    await expect(
+      service.updateUserRoles('u1', 'u1', ['admin']),
+    ).rejects.toThrow(ForbiddenException);
   });
 
   it('updateUserRoles should throw when target user does not exist', async () => {
     mockPrismaService.users.findUnique.mockResolvedValueOnce(null);
 
-    await expect(service.updateUserRoles('admin-1', 'u2', ['mentor'])).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      service.updateUserRoles('admin-1', 'u2', ['mentor']),
+    ).rejects.toThrow(NotFoundException);
   });
 
   it('updateUserRoles should assign new role set and return updated user', async () => {
@@ -89,7 +90,10 @@ describe('AdminService', () => {
         first_name: 'User',
         last_name: 'Two',
         created_at: new Date('2026-01-02'),
-        user_roles: [{ role: { name: 'support' } }, { role: { name: 'mentor' } }],
+        user_roles: [
+          { role: { name: 'support' } },
+          { role: { name: 'mentor' } },
+        ],
       });
 
     mockPrismaService.roles.findMany.mockResolvedValue([
@@ -97,9 +101,14 @@ describe('AdminService', () => {
       { id: 'r-support', name: 'support' },
     ]);
 
-    const result = await service.updateUserRoles('admin-1', 'u2', ['mentor', 'support']);
+    const result = await service.updateUserRoles('admin-1', 'u2', [
+      'mentor',
+      'support',
+    ]);
 
-    expect(mockPrismaService.user_roles.deleteMany).toHaveBeenCalledWith({ where: { user_id: 'u2' } });
+    expect(mockPrismaService.user_roles.deleteMany).toHaveBeenCalledWith({
+      where: { user_id: 'u2' },
+    });
     expect(mockPrismaService.user_roles.createMany).toHaveBeenCalledWith({
       data: [
         { user_id: 'u2', role_id: 'r-mentor' },

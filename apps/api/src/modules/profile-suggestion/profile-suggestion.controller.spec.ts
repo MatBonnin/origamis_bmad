@@ -23,9 +23,7 @@ describe('ProfileSuggestionController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ProfileSuggestionController],
-      providers: [
-        { provide: ProfileSuggestionService, useValue: mockService },
-      ],
+      providers: [{ provide: ProfileSuggestionService, useValue: mockService }],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })
@@ -81,10 +79,7 @@ describe('ProfileSuggestionController', () => {
     mockService.modifySuggestion.mockResolvedValue(profile);
 
     const dto = { level: 'avance', bio: 'Modified bio' };
-    const result = await controller.modifySuggestion(
-      mockUser as never,
-      dto,
-    );
+    const result = await controller.modifySuggestion(mockUser as never, dto);
 
     expect(result).toEqual({ data: profile, error: null });
     expect(mockService.modifySuggestion).toHaveBeenCalledWith('user-1', dto);

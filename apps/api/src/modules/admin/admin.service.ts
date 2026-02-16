@@ -35,7 +35,11 @@ export class AdminService {
     return users.map((user) => this.mapUser(user));
   }
 
-  async updateUserRoles(actorUserId: string, targetUserId: string, roles: string[]) {
+  async updateUserRoles(
+    actorUserId: string,
+    targetUserId: string,
+    roles: string[],
+  ) {
     if (actorUserId === targetUserId) {
       throw new ForbiddenException({
         code: 'FORBIDDEN',
@@ -62,7 +66,9 @@ export class AdminService {
 
     for (const roleName of roles) {
       if (!existingByName.has(roleName)) {
-        const created = await this.prisma.roles.create({ data: { name: roleName } });
+        const created = await this.prisma.roles.create({
+          data: { name: roleName },
+        });
         existingByName.set(roleName, created);
       }
     }

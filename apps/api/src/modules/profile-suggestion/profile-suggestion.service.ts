@@ -36,8 +36,7 @@ const DOMAIN_BIO_MAP: Record<string, string> = {
     'Etudiant(e) en communication, a l aise avec les medias et la creation de contenu.',
   ingenierie:
     'Etudiant(e) en ingenierie, oriente(e) vers la resolution de problemes techniques.',
-  lettres:
-    'Etudiant(e) en lettres, passionne(e) par la langue et la culture.',
+  lettres: 'Etudiant(e) en lettres, passionne(e) par la langue et la culture.',
   economie:
     'Etudiant(e) en economie, interesse(e) par la gestion et l analyse financiere.',
 };
@@ -137,8 +136,7 @@ export class ProfileSuggestionService {
       });
     }
 
-    const suggestion =
-      existing.suggestion_json as unknown as ProfileSuggestion;
+    const suggestion = existing.suggestion_json as unknown as ProfileSuggestion;
 
     // Update user profile with suggestion
     await this.prisma.users.update({
@@ -197,8 +195,7 @@ export class ProfileSuggestionService {
     await this.prisma.profile_suggestions.update({
       where: { user_id: userId },
       data: {
-        suggestion_json:
-          modifiedProfile as unknown as Prisma.InputJsonValue,
+        suggestion_json: modifiedProfile as unknown as Prisma.InputJsonValue,
         accepted_at: new Date(),
       },
     });

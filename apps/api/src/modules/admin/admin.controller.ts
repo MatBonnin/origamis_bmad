@@ -20,8 +20,13 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Lister les utilisateurs pour administration des roles' })
-  @ApiResponse({ status: 200, description: 'Utilisateurs recuperes avec succes' })
+  @ApiOperation({
+    summary: 'Lister les utilisateurs pour administration des roles',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Utilisateurs recuperes avec succes',
+  })
   @ApiResponse({ status: 403, description: 'Acces refuse' })
   async getUsers() {
     const users = await this.adminService.listUsers();
@@ -38,7 +43,11 @@ export class AdminController {
     @Param('id') id: string,
     @Body() dto: UpdateUserRolesDto,
   ) {
-    const user = await this.adminService.updateUserRoles(currentUser.id, id, dto.roles);
+    const user = await this.adminService.updateUserRoles(
+      currentUser.id,
+      id,
+      dto.roles,
+    );
     return { data: { user }, error: null };
   }
 }

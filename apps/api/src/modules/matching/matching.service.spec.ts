@@ -113,9 +113,27 @@ describe('MatchingService', () => {
     mockPrismaService.recommendation_cache.findUnique.mockResolvedValue({
       payload_json: {
         mentors: [
-          { mentorId: 'mentor-1', signals: [], rating: 4, hourlyRate: 20, domain: 'informatique' },
-          { mentorId: 'mentor-2', signals: [], rating: 4, hourlyRate: 30, domain: 'informatique' },
-          { mentorId: 'mentor-3', signals: [], rating: 4, hourlyRate: 40, domain: 'informatique' },
+          {
+            mentorId: 'mentor-1',
+            signals: [],
+            rating: 4,
+            hourlyRate: 20,
+            domain: 'informatique',
+          },
+          {
+            mentorId: 'mentor-2',
+            signals: [],
+            rating: 4,
+            hourlyRate: 30,
+            domain: 'informatique',
+          },
+          {
+            mentorId: 'mentor-3',
+            signals: [],
+            rating: 4,
+            hourlyRate: 40,
+            domain: 'informatique',
+          },
         ],
       },
       expires_at: new Date(Date.now() + 60_000),
@@ -129,7 +147,9 @@ describe('MatchingService', () => {
 
     expect(result.mentors).toHaveLength(1);
     expect(result.mentors[0].mentorId).toBe('mentor-2');
-    expect(result.metadata.next_cursor).toBe(Buffer.from('2', 'utf-8').toString('base64'));
+    expect(result.metadata.next_cursor).toBe(
+      Buffer.from('2', 'utf-8').toString('base64'),
+    );
   });
 
   it('uses cache when not expired', async () => {
@@ -137,7 +157,13 @@ describe('MatchingService', () => {
     mockPrismaService.recommendation_cache.findUnique.mockResolvedValue({
       payload_json: {
         mentors: [
-          { mentorId: 'mentor-1', signals: ['mentor_rating'], rating: 4.5, hourlyRate: 30, domain: 'informatique' },
+          {
+            mentorId: 'mentor-1',
+            signals: ['mentor_rating'],
+            rating: 4.5,
+            hourlyRate: 30,
+            domain: 'informatique',
+          },
         ],
       },
       expires_at: new Date(Date.now() + 60_000),
@@ -155,7 +181,9 @@ describe('MatchingService', () => {
   it('invalidates user cache entries', async () => {
     await service.invalidateUserRecommendations('student-1');
 
-    expect(mockPrismaService.recommendation_cache.deleteMany).toHaveBeenCalledWith({
+    expect(
+      mockPrismaService.recommendation_cache.deleteMany,
+    ).toHaveBeenCalledWith({
       where: { user_id: 'student-1' },
     });
   });
