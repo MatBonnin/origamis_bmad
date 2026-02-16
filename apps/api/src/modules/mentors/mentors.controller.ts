@@ -40,6 +40,8 @@ interface ParsedFilters {
   minRating?: number;
 }
 
+type ApiEnvelope<T> = { data: T; error: null };
+
 @ApiTags('mentors')
 @Controller('mentors')
 @UseGuards(JwtAuthGuard)
@@ -60,7 +62,7 @@ export class MentorsController {
   async getRecommendations(
     @CurrentUser() user: UserResponseDto,
     @Query() query: GetRecommendationsQueryDto,
-  ) {
+  ): Promise<ApiEnvelope<unknown>> {
     const filters = this.parseFilters(query.filters);
 
     const data = await this.matchingService.getRecommendations(user.id, {
@@ -77,7 +79,9 @@ export class MentorsController {
     summary: 'Rechercher des mentors avec filtres, tri et pagination',
   })
   @ApiResponse({ status: 200, description: 'Resultats de recherche recuperes' })
-  async searchMentors(@Query() query: GetMentorsSearchQueryDto) {
+  async searchMentors(
+    @Query() query: GetMentorsSearchQueryDto,
+  ): Promise<ApiEnvelope<unknown>> {
     const filters = this.parseSearchFilters(query.filters);
     const sort = query.sort ?? 'relevance';
 
@@ -95,7 +99,7 @@ export class MentorsController {
   @Get('filters')
   @ApiOperation({ summary: 'Recuperer les facettes de filtrage mentors' })
   @ApiResponse({ status: 200, description: 'Facettes de filtres recuperees' })
-  async getMentorFilterFacets() {
+  async getMentorFilterFacets(): Promise<ApiEnvelope<unknown>> {
     const data = await this.mentorsSearchService.getFilterFacets();
     return { data, error: null };
   }
@@ -105,7 +109,9 @@ export class MentorsController {
   @Roles('mentor')
   @ApiOperation({ summary: 'Recuperer le profil mentor du compte connecte' })
   @ApiResponse({ status: 200, description: 'Profil mentor recupere' })
-  async getMyMentorProfile(@CurrentUser() user: UserResponseDto) {
+  async getMyMentorProfile(
+    @CurrentUser() user: UserResponseDto,
+  ): Promise<ApiEnvelope<unknown>> {
     const data = await this.mentorsSelfService.getMyProfile(user.id);
     return { data, error: null };
   }
@@ -118,7 +124,7 @@ export class MentorsController {
   async createMyMentorProfile(
     @CurrentUser() user: UserResponseDto,
     @Body() dto: CreateMentorSelfProfileDto,
-  ) {
+  ): Promise<ApiEnvelope<unknown>> {
     const data = await this.mentorsSelfService.createMyProfile(user.id, dto);
     return { data, error: null };
   }
@@ -133,7 +139,7 @@ export class MentorsController {
   async updateMyMentorProfile(
     @CurrentUser() user: UserResponseDto,
     @Body() dto: UpdateMentorSelfProfileDto,
-  ) {
+  ): Promise<ApiEnvelope<unknown>> {
     const data = await this.mentorsSelfService.updateMyProfile(user.id, dto);
     return { data, error: null };
   }
@@ -141,7 +147,9 @@ export class MentorsController {
   @Get(':id')
   @ApiOperation({ summary: 'Recuperer le profil mentor detaille' })
   @ApiResponse({ status: 200, description: 'Profil mentor recupere' })
-  async getMentorProfile(@Param('id') mentorId: string) {
+  async getMentorProfile(
+    @Param('id') mentorId: string,
+  ): Promise<ApiEnvelope<unknown>> {
     const data = await this.mentorsProfileService.getMentorProfile(mentorId);
     return { data, error: null };
   }
@@ -154,7 +162,7 @@ export class MentorsController {
   async getMentorReviews(
     @Param('id') mentorId: string,
     @Query() query: GetMentorReviewsQueryDto,
-  ) {
+  ): Promise<ApiEnvelope<unknown>> {
     const data = await this.mentorsProfileService.getMentorReviews(mentorId, {
       page: query.page,
       limit: query.limit,

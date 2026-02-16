@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma';
 import {
   CreateMentorSelfProfileDto,
@@ -352,16 +353,33 @@ export class MentorsSelfService {
     const row = await this.prisma.user_needs.findUnique({
       where: { user_id: userId },
     });
-    const base = (row?.needs_json ?? {}) as Record<string, unknown>;
+    const baseRaw = row?.needs_json;
+    const base: Prisma.InputJsonObject =
+      baseRaw &&
+      typeof baseRaw === 'object' &&
+      !Array.isArray(baseRaw) &&
+      baseRaw !== null
+        ? ({ ...(baseRaw as Prisma.JsonObject) } as Prisma.InputJsonObject)
+        : {};
 
-    const nextPayload = {
-      ...base,
-      mentorProfile: {
-        languages: metadata.languages,
-        certifications: metadata.certifications,
-        tariffs: metadata.tariffs,
-        availabilitySlots: metadata.availabilitySlots,
+    const mentorProfile: Prisma.InputJsonObject = {
+      languages: metadata.languages,
+      certifications: metadata.certifications,
+      tariffs: {
+        min: metadata.tariffs.min,
+        max: metadata.tariffs.max,
+        currency: metadata.tariffs.currency,
       },
+      availabilitySlots: metadata.availabilitySlots.map((slot) => ({
+        dayOfWeek: slot.dayOfWeek,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+      })),
+    };
+
+    const nextPayload: Prisma.InputJsonObject = {
+      ...base,
+      mentorProfile,
     };
 
     await this.prisma.user_needs.upsert({

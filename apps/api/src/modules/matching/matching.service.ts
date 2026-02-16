@@ -138,7 +138,7 @@ export class MatchingService {
         return a.mentorId.localeCompare(b.mentorId);
       });
 
-    const payload: Prisma.InputJsonValue = {
+    const payload: CachedRecommendations = {
       mentors: scored,
       generatedAt: new Date().toISOString(),
     };
@@ -153,11 +153,11 @@ export class MatchingService {
       create: {
         user_id: userId,
         cache_key: cacheKey,
-        payload_json: payload,
+        payload_json: payload as unknown as Prisma.InputJsonValue,
         expires_at: new Date(Date.now() + RECOMMENDATION_CACHE_TTL_MS),
       },
       update: {
-        payload_json: payload,
+        payload_json: payload as unknown as Prisma.InputJsonValue,
         expires_at: new Date(Date.now() + RECOMMENDATION_CACHE_TTL_MS),
       },
     });
