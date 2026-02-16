@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma';
+import { MatchingService } from '../matching';
 import {
   ConsentResponseDto,
   ConsentWithdrawResponseDto,
@@ -17,7 +18,10 @@ import {
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly matchingService: MatchingService,
+  ) {}
 
   async getNotificationPreferences(
     userId: string,
@@ -223,6 +227,8 @@ export class UsersService {
         needs_updated: true,
       },
     });
+
+    await this.matchingService.invalidateUserRecommendations(userId);
 
     const needs = record.needs_json as Record<string, unknown>;
     return {

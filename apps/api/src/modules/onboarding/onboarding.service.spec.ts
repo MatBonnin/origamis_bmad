@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { OnboardingService } from './onboarding.service';
 import { PrismaService } from '../prisma';
+import { MatchingService } from '../matching';
 
 describe('OnboardingService', () => {
   let service: OnboardingService;
@@ -17,11 +18,16 @@ describe('OnboardingService', () => {
     },
   };
 
+  const mockMatchingService = {
+    invalidateUserRecommendations: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         OnboardingService,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: MatchingService, useValue: mockMatchingService },
       ],
     }).compile();
 
@@ -64,6 +70,7 @@ describe('OnboardingService', () => {
       step: 2,
       answers: { profileType: 'etudiant', domain: 'informatique' },
     });
+    expect(mockMatchingService.invalidateUserRecommendations).toHaveBeenCalledWith('u1');
   });
 
   it('complete should set completed flag', async () => {
@@ -78,6 +85,7 @@ describe('OnboardingService', () => {
     const result = await service.complete('u1');
 
     expect(result).toEqual({ completed: true });
+    expect(mockMatchingService.invalidateUserRecommendations).toHaveBeenCalledWith('u1');
   });
 
   it('should throw if user does not exist', async () => {

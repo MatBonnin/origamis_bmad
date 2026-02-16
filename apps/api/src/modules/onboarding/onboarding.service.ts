@@ -1,11 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma';
+import { MatchingService } from '../matching';
 import { OnboardingStateDto, UpdateOnboardingStepDto } from './dto';
 
 @Injectable()
 export class OnboardingService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly matchingService: MatchingService,
+  ) {}
 
   async getMyOnboarding(userId: string): Promise<OnboardingStateDto> {
     await this.assertUserExists(userId);
@@ -37,6 +41,8 @@ export class OnboardingService {
       },
     });
 
+    await this.matchingService.invalidateUserRecommendations(userId);
+
     return {
       step: onboarding.step,
       answers: onboarding.answers_json as Record<string, unknown>,
@@ -54,6 +60,8 @@ export class OnboardingService {
         completed_at: new Date(),
       },
     });
+
+    await this.matchingService.invalidateUserRecommendations(userId);
 
     return { completed: true };
   }

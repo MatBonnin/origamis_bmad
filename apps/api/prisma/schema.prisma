@@ -37,6 +37,10 @@ model users {
   profile_suggestion profile_suggestions?
   user_needs user_needs?
   consents   consents[]
+  mentor_profile mentor_profiles?
+  mentor_interactions_as_student mentor_interactions[] @relation("mentor_interactions_student")
+  recommendation_cache recommendation_cache[]
+  user_intents user_intents?
 
   @@map("users")
 }
@@ -157,4 +161,86 @@ model profile_suggestions {
 
   @@index([user_id])
   @@map("profile_suggestions")
+}
+
+model mentor_profiles {
+  id              String   @id @default(uuid())
+  user_id         String   @unique
+  domain          String
+  expertise_tags  String[]
+  supported_levels String[]
+  hourly_rate     Int?
+  rating_avg      Float?   @default(0)
+  is_validated    Boolean  @default(false)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  user         users                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  availability mentor_availability?
+  interactions mentor_interactions[] @relation("mentor_interactions_mentor")
+
+  @@index([domain])
+  @@index([is_validated])
+  @@map("mentor_profiles")
+}
+
+model mentor_availability {
+  id                String   @id @default(uuid())
+  mentor_user_id    String   @unique
+  is_available      Boolean  @default(false)
+  next_available_at DateTime?
+  updated_at        DateTime @updatedAt
+
+  mentor mentor_profiles @relation(fields: [mentor_user_id], references: [user_id], onDelete: Cascade)
+
+  @@index([is_available])
+  @@map("mentor_availability")
+}
+
+model user_intents {
+  id                   String   @id @default(uuid())
+  user_id              String   @unique
+  preferred_domain     String?
+  budget_max           Int?
+  preferred_objectives String[]
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("user_intents")
+}
+
+model mentor_interactions {
+  id                 String   @id @default(uuid())
+  student_user_id    String
+  mentor_user_id     String
+  interaction_count  Int      @default(0)
+  last_interaction_at DateTime?
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  student users           @relation("mentor_interactions_student", fields: [student_user_id], references: [id], onDelete: Cascade)
+  mentor  mentor_profiles @relation("mentor_interactions_mentor", fields: [mentor_user_id], references: [user_id], onDelete: Cascade)
+
+  @@unique([student_user_id, mentor_user_id])
+  @@index([student_user_id])
+  @@map("mentor_interactions")
+}
+
+model recommendation_cache {
+  id           String   @id @default(uuid())
+  user_id      String
+  cache_key    String
+  payload_json Json
+  expires_at   DateTime
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, cache_key])
+  @@index([expires_at])
+  @@map("recommendation_cache")
 }

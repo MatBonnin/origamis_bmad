@@ -10,6 +10,8 @@ import { AdminModule } from './modules/admin';
 import { NotificationsModule } from './modules/notifications';
 import { OnboardingModule } from './modules/onboarding';
 import { ProfileSuggestionModule } from './modules/profile-suggestion';
+import { MentorsModule } from './modules/mentors';
+import { MatchingModule } from './modules/matching';
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { ProfileSuggestionModule } from './modules/profile-suggestion';
     NotificationsModule,
     OnboardingModule,
     ProfileSuggestionModule,
+    MatchingModule,
+    MentorsModule,
   ],
   providers: [
     {

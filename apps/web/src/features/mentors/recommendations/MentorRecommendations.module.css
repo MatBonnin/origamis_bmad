@@ -1,0 +1,144 @@
+.container {
+  padding: var(--spacing-6);
+}
+
+.header {
+  margin-bottom: var(--spacing-6);
+}
+
+.title {
+  color: var(--color-primary-900);
+  font-size: var(--font-size-3xl);
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.subtitle {
+  color: var(--color-neutral-700);
+  margin: 0;
+}
+
+.error {
+  background: var(--color-error-light);
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-3);
+  margin-bottom: var(--spacing-4);
+}
+
+.emptyState {
+  background: var(--color-neutral-50);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  color: var(--color-neutral-700);
+}
+
+.grid {
+  display: grid;
+  gap: var(--spacing-4);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+}
+
+.badge {
+  background: var(--color-accent-300);
+  color: var(--color-primary-900);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.domain {
+  margin: 0;
+  color: var(--color-primary-700);
+  font-weight: var(--font-weight-medium);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+}
+
+.tag {
+  background: var(--color-white);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-full);
+  color: var(--color-neutral-700);
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-1) var(--spacing-2);
+}
+
+.meta {
+  display: grid;
+  gap: var(--spacing-2);
+  margin: 0 0 var(--spacing-4) 0;
+}
+
+.meta div {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-neutral-700);
+}
+
+.meta dt {
+  font-weight: var(--font-weight-medium);
+}
+
+.meta dd {
+  margin: 0;
+}
+
+.ctaButton {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-6);
+}
+
+.liveRegion {
+  min-height: var(--spacing-6);
+  margin: 0;
+}
+
+.skeletonCard {
+  height: 260px;
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-100) 0%,
+    var(--color-neutral-50) 50%,
+    var(--color-neutral-100) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .container {
+    padding: var(--spacing-4);
+  }
+}

@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { PrismaService } from '../prisma';
+import { MatchingService } from '../matching';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -28,6 +29,10 @@ describe('UsersService', () => {
     },
   };
 
+  const mockMatchingService = {
+    invalidateUserRecommendations: jest.fn(),
+  };
+
   const mockUser = {
     id: 'user-1',
     email: 'test@example.com',
@@ -47,6 +52,7 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: MatchingService, useValue: mockMatchingService },
       ],
     }).compile();
 
@@ -407,6 +413,7 @@ describe('UsersService', () => {
       });
       expect(result.objectives).toEqual(['academic-writing']);
       expect(result.domain).toBe('informatique');
+      expect(mockMatchingService.invalidateUserRecommendations).toHaveBeenCalledWith('user-1');
     });
 
     it('should merge with existing needs when partial update', async () => {
@@ -469,6 +476,7 @@ describe('UsersService', () => {
       const upsertCall = mockPrismaService.user_needs.upsert.mock.calls[0][0];
       expect(upsertCall.create.needs_updated).toBe(true);
       expect(upsertCall.update.needs_updated).toBe(true);
+      expect(mockMatchingService.invalidateUserRecommendations).toHaveBeenCalledWith('user-1');
     });
   });
 
