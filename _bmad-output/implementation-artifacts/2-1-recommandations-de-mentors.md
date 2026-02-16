@@ -1,6 +1,6 @@
 # Story 2.1: Recommandations de mentors
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -16,12 +16,12 @@ so that identifier rapidement des profils pertinents.
 
 ## Tasks / Subtasks
 
-- [ ] Mettre en place service de recommandation + règles (profil, besoins, disponibilités) (AC: #1)
-- [ ] Exposer endpoint `GET /mentors/recommendations` avec pagination + filtres contextuels (AC: #1)
-- [ ] Intégrer données sources (onboarding, objectifs, historique interactions) dans scoring (AC: #1)
-- [ ] UI recommandations (cartes, badge recommandé, CTA) + skeletons (AC: #1)
-- [ ] Ajouter cache TTL (ex: Redis) pour éviter recalcul, invalider sur mise à jour (AC: #1)
-- [ ] Tests API scoring + UI affichage + accessibilité (AC: #1)
+- [x] Mettre en place service de recommandation + règles (profil, besoins, disponibilités) (AC: #1)
+- [x] Exposer endpoint `GET /mentors/recommendations` avec pagination + filtres contextuels (AC: #1)
+- [x] Intégrer données sources (onboarding, objectifs, historique interactions) dans scoring (AC: #1)
+- [x] UI recommandations (cartes, badge recommandé, CTA) + skeletons (AC: #1)
+- [x] Ajouter cache TTL (ex: Redis) pour éviter recalcul, invalider sur mise à jour (AC: #1)
+- [x] Tests API scoring + UI affichage + accessibilité (AC: #1)
 
 ## Dev Notes
 
@@ -93,6 +93,24 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
+- `npx prisma generate`
+- `npm run test -- matching.service.spec.ts mentors.controller.spec.ts users.service.spec.ts onboarding.service.spec.ts` (apps/api)
+- `npm run test` (apps/api)
+- `npm run test -- MentorRecommendations.test.tsx` (apps/web)
+- `npm run test` (apps/web)
+
 ### Completion Notes List
 
+- Validation complete de la story 2.1: endpoint /mentors/recommendations, scoring, pagination, filtres, cache TTL, invalidation et UI recommandations conformes aux criteres d''acceptation.
+- Verification tests backend/frontend executee avec succes; un correctif de non-regression a ete applique sur la landing page (`next/image` width manquant).
+- Story et sprint status passes en `review`.
+
 ### File List
+
+- _bmad-output/implementation-artifacts/2-1-recommandations-de-mentors.md
+- _bmad-output/implementation-artifacts/sprint-status.yaml
+- apps/web/src/app/page.tsx
+
+## Change Log
+
+- 2026-02-16: Story 2.1 validee (tests verts), checkboxes completees et statut passe en review.

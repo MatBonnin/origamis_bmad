@@ -45,7 +45,7 @@ export default function Home() {
     <div className={styles.page}>
       <header className={styles.header}>
         <div className={styles.logoWrapper}>
-          <Image src={logo} alt="Orig'AMI" height={40} priority />
+          <Image src={logo} alt="Orig'AMI" width={136} height={40} priority />
         </div>
         <nav className={styles.nav}>
           <Link href="/connexion" className={styles.navLink}>
