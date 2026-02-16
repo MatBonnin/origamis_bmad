@@ -57,7 +57,7 @@ development_status:
   epic-2: in-progress
   2-1-recommandations-de-mentors: review
   2-2-recherche-et-filtres: review
-  2-3-consultation-du-profil-mentor: ready-for-dev
+  2-3-consultation-du-profil-mentor: review
   2-4-profil-mentor-expertise-tarifs: ready-for-dev
   epic-2-retrospective: optional
 

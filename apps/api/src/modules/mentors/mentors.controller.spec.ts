@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { MatchingService } from '../matching';
 import { MentorsController } from './mentors.controller';
+import { MentorsProfileService } from './mentors-profile.service';
 import { MentorsSearchService } from './mentors-search.service';
 
 describe('MentorsController', () => {
@@ -11,6 +12,10 @@ describe('MentorsController', () => {
     searchMentors: jest.fn(),
     getFilterFacets: jest.fn(),
   };
+  const mockMentorsProfileService = {
+    getMentorProfile: jest.fn(),
+    getMentorReviews: jest.fn(),
+  };
 
   let controller: MentorsController;
 
@@ -18,6 +23,7 @@ describe('MentorsController', () => {
     controller = new MentorsController(
       mockMatchingService as unknown as MatchingService,
       mockMentorsSearchService as unknown as MentorsSearchService,
+      mockMentorsProfileService as unknown as MentorsProfileService,
     );
     jest.clearAllMocks();
   });
@@ -109,5 +115,49 @@ describe('MentorsController', () => {
     await expect(responsePromise).resolves.toHaveProperty('error', null);
     await expect(responsePromise).resolves.toHaveProperty('data');
     expect(mockMentorsSearchService.getFilterFacets).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns mentor profile details', async () => {
+    mockMentorsProfileService.getMentorProfile.mockResolvedValue({
+      mentor: { mentorId: 'mentor-1' },
+      reviews: [],
+      availability: { isAvailable: true, nextAvailableAt: null },
+      rating: { average: 4.2, reviewCount: 3 },
+    });
+
+    const responsePromise = controller.getMentorProfile('mentor-1');
+    await expect(responsePromise).resolves.toHaveProperty('error', null);
+    await expect(responsePromise).resolves.toHaveProperty('data');
+
+    expect(mockMentorsProfileService.getMentorProfile).toHaveBeenCalledWith(
+      'mentor-1',
+    );
+  });
+
+  it('returns paginated mentor reviews', async () => {
+    mockMentorsProfileService.getMentorReviews.mockResolvedValue({
+      reviews: [],
+      pagination: {
+        page: 1,
+        limit: 5,
+        total: 0,
+        hasNextPage: false,
+      },
+    });
+
+    const responsePromise = controller.getMentorReviews('mentor-1', {
+      page: 1,
+      limit: 5,
+    });
+    await expect(responsePromise).resolves.toHaveProperty('error', null);
+    await expect(responsePromise).resolves.toHaveProperty('data');
+
+    expect(mockMentorsProfileService.getMentorReviews).toHaveBeenCalledWith(
+      'mentor-1',
+      {
+        page: 1,
+        limit: 5,
+      },
+    );
   });
 });

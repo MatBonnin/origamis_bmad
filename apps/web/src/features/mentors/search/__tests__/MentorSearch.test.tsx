@@ -58,6 +58,10 @@ describe('MentorSearch', () => {
 
     expect(await screen.findByText('Alice Martin')).toBeInTheDocument();
     expect(screen.getByText('1 mentor(s) trouve(s)')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Voir profil' })).toHaveAttribute(
+      'href',
+      '/mentors/mentor-1',
+    );
   });
 
   it('updates query and calls search endpoint with q parameter', async () => {

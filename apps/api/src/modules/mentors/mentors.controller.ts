@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Controller,
   Get,
+  Param,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -15,7 +16,12 @@ import { CurrentUser } from '../../common/decorators';
 import { JwtAuthGuard } from '../../common/guards';
 import { UserResponseDto } from '../auth/dto';
 import { MatchingService } from '../matching';
-import { GetMentorsSearchQueryDto, GetRecommendationsQueryDto } from './dto';
+import {
+  GetMentorReviewsQueryDto,
+  GetMentorsSearchQueryDto,
+  GetRecommendationsQueryDto,
+} from './dto';
+import { MentorsProfileService } from './mentors-profile.service';
 import {
   MentorSearchFilters,
   MentorsSearchService,
@@ -35,6 +41,7 @@ export class MentorsController {
   constructor(
     private readonly matchingService: MatchingService,
     private readonly mentorsSearchService: MentorsSearchService,
+    private readonly mentorsProfileService: MentorsProfileService,
   ) {}
 
   @Get('recommendations')
@@ -82,6 +89,30 @@ export class MentorsController {
   @ApiResponse({ status: 200, description: 'Facettes de filtres recuperees' })
   async getMentorFilterFacets() {
     const data = await this.mentorsSearchService.getFilterFacets();
+    return { data, error: null };
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Recuperer le profil mentor detaille' })
+  @ApiResponse({ status: 200, description: 'Profil mentor recupere' })
+  async getMentorProfile(@Param('id') mentorId: string) {
+    const data = await this.mentorsProfileService.getMentorProfile(mentorId);
+    return { data, error: null };
+  }
+
+  @Get(':id/reviews')
+  @ApiOperation({
+    summary: 'Recuperer les avis d un mentor avec pagination',
+  })
+  @ApiResponse({ status: 200, description: 'Avis mentor recuperes' })
+  async getMentorReviews(
+    @Param('id') mentorId: string,
+    @Query() query: GetMentorReviewsQueryDto,
+  ) {
+    const data = await this.mentorsProfileService.getMentorReviews(mentorId, {
+      page: query.page,
+      limit: query.limit,
+    });
     return { data, error: null };
   }
 

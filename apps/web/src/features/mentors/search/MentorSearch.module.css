@@ -150,6 +150,14 @@
   color: var(--color-primary-900);
 }
 
+.cardActions {
+  margin-top: var(--spacing-4);
+}
+
+.profileLink {
+  display: block;
+}
+
 .actions {
   display: flex;
   justify-content: center;

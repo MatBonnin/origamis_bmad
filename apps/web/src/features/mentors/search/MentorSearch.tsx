@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from '@/components/ui';
 import styles from './MentorSearch.module.css';
 
@@ -370,6 +371,16 @@ export function MentorSearch({ accessToken }: Props) {
                       <dd>{mentor.isAvailable ? 'Disponible' : 'Indisponible'}</dd>
                     </div>
                   </dl>
+                  <div className={styles.cardActions}>
+                    <Link
+                      href={`/mentors/${mentor.mentorId}`}
+                      className={styles.profileLink}
+                    >
+                      <Button type="button" variant="secondary" fullWidth>
+                        Voir profil
+                      </Button>
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             ))}
