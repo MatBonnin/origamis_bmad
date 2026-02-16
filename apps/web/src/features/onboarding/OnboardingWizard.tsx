@@ -154,7 +154,7 @@ export function OnboardingWizard({ accessToken }: Props) {
         return;
       }
 
-      router.push('/dashboard');
+      router.push('/profile-suggestion');
       router.refresh();
     } catch {
       setError('Erreur de connexion au serveur');

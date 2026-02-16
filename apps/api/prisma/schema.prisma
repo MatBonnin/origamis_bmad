@@ -34,6 +34,7 @@ model users {
   sessions   sessions[]
   notification_preferences notification_preferences[]
   onboarding onboarding?
+  profile_suggestion profile_suggestions?
 
   @@map("users")
 }
@@ -113,4 +114,18 @@ model sessions {
   @@index([user_id])
   @@index([expires_at])
   @@map("sessions")
+}
+
+model profile_suggestions {
+  id              String    @id @default(uuid())
+  user_id         String    @unique
+  suggestion_json Json
+  accepted_at     DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("profile_suggestions")
 }

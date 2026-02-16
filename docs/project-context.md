@@ -79,3 +79,53 @@ See `.env.example` at root for required variables:
 ## Branding Assets
 
 - Main logo: `apps/web/src/app/assets/logo.png`
+- Maquettes de reference: `doc_origami/maquette/` (dashboard, mentors, onboarding)
+
+## Design System - REGLES OBLIGATOIRES
+
+### Reference visuelle
+
+Le style de reference est la maquette `doc_origami/maquette/Etudiant V2.jpg` (dashboard etudiant). Toute implementation UI DOIT s'en inspirer pour les couleurs, espacements et composants.
+
+### Couleurs - Hierarchie stricte
+
+- **CTA / Bouton primaire** : Orange `--color-accent-500` (#F29F08) - C'est LA couleur d'action
+- **Titres / Structure** : Bleu fonce `--color-primary-900` (#00064F)
+- **Elements secondaires (sidebar, liens actifs)** : Bleu `--color-primary-700` (#36529B)
+- **Fonds de cartes** : Bleu tres clair `--color-neutral-50` (#EBF0F7)
+- **Texte courant** : `--color-neutral-700` (#525252)
+- **Fond principal** : Blanc `--color-white` (#FFFFFF)
+
+### Tokens CSS obligatoires
+
+JAMAIS de couleurs hex codees en dur dans les fichiers CSS modules. Toujours utiliser les variables CSS definies dans `apps/web/src/app/globals.css`. Exemples :
+- `var(--color-accent-500)` au lieu de `#F29F08`
+- `var(--color-primary-900)` au lieu de `#00064F`
+- `var(--spacing-4)` au lieu de `1rem`
+- `var(--radius-lg)` au lieu de `10px`
+
+### Composants reutilisables obligatoires
+
+Tous les composants UI reutilisables sont dans `apps/web/src/components/ui/` :
+- `Button` (variants: primary/secondary/outline/ghost, sizes: sm/md/lg)
+- `Card`, `CardHeader`, `CardTitle`, `CardContent`
+- `Input`
+- `Select`
+- `ProgressBar`
+
+**REGLE** : Toute page ou feature DOIT utiliser ces composants au lieu de recreer ses propres elements HTML avec du CSS maison. Si un composant manque, le creer dans `components/ui/` pour qu'il soit reutilisable.
+
+### Layout app (pages post-connexion)
+
+Les pages authentifiees (dashboard, mentors, projets, etc.) doivent suivre le layout de la maquette Etudiant V2 :
+- Sidebar bleu fonce a gauche (navigation)
+- Header avec logo centre + profil utilisateur en haut a droite
+- Zone de contenu principale au centre
+- Panneau notifications optionnel a droite
+
+### Accessibilite
+
+- WCAG 2.1 AA obligatoire
+- Tous les elements interactifs doivent avoir `min-height: var(--min-touch-target)` (44px)
+- Focus visible avec `outline: 3px solid var(--color-accent-500)`
+- ARIA labels sur les elements non textuels

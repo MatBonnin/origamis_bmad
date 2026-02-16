@@ -153,7 +153,12 @@ export function PublicOnboardingWizard() {
       if (signInResult?.ok) {
         // Clear storage
         sessionStorage.removeItem(STORAGE_KEY);
-        router.push('/dashboard');
+        // Redirect to profile suggestion if student completed onboarding
+        if (data.profileType === 'etudiant') {
+          router.push('/profile-suggestion');
+        } else {
+          router.push('/dashboard');
+        }
         router.refresh();
       } else {
         // If sign in fails, redirect to login

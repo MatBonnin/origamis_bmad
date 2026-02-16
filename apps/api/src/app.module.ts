@@ -9,6 +9,7 @@ import { UsersModule } from './modules/users';
 import { AdminModule } from './modules/admin';
 import { NotificationsModule } from './modules/notifications';
 import { OnboardingModule } from './modules/onboarding';
+import { ProfileSuggestionModule } from './modules/profile-suggestion';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { OnboardingModule } from './modules/onboarding';
     AdminModule,
     NotificationsModule,
     OnboardingModule,
+    ProfileSuggestionModule,
   ],
   providers: [
     {

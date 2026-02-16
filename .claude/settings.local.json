@@ -34,7 +34,9 @@
       "Bash(npm run lint:*)",
       "Bash(taskkill:*)",
       "Bash(curl:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npx jest:*)",
+      "Bash(npx next lint)"
     ]
   }
 }

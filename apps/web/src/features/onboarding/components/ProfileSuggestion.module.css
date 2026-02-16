@@ -1,0 +1,132 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: var(--spacing-8) var(--spacing-4);
+}
+
+.title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-900);
+  margin: 0 0 var(--spacing-3);
+  text-align: center;
+}
+
+.subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-neutral-700);
+  margin: 0 0 var(--spacing-8);
+  text-align: center;
+  max-width: 500px;
+}
+
+.loading {
+  font-size: var(--font-size-lg);
+  color: var(--color-neutral-600);
+  text-align: center;
+  padding: var(--spacing-16) 0;
+}
+
+.error {
+  background-color: var(--color-error-50);
+  color: var(--color-error-700);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-6);
+  width: 100%;
+  text-align: center;
+}
+
+.suggestionCard {
+  width: 100%;
+  margin-bottom: var(--spacing-8);
+}
+
+.details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--spacing-3) var(--spacing-6);
+}
+
+.details dt {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-700);
+}
+
+.details dd {
+  margin: 0;
+  color: var(--color-neutral-900);
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-4);
+  width: 100%;
+  max-width: var(--container-sm);
+}
+
+.actions > * {
+  flex: 1;
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.fieldLabel {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-700);
+  font-size: var(--font-size-sm);
+}
+
+.select {
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  background-color: var(--color-white);
+  color: var(--color-neutral-900);
+}
+
+.select:focus {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+.objectivesSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.objectivesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-3);
+}
+
+@media (max-width: 560px) {
+  .objectivesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .details {
+    grid-template-columns: 1fr;
+  }
+
+  .details dt {
+    margin-top: var(--spacing-2);
+  }
+}
