@@ -1,0 +1,210 @@
+.container {
+  padding: var(--spacing-6);
+  display: grid;
+  gap: var(--spacing-5);
+}
+
+.header {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+}
+
+.title {
+  margin: 0;
+  color: var(--color-primary-900);
+  font-size: var(--font-size-3xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 var(--spacing-1);
+  border-radius: 12px;
+  background: var(--color-accent-500);
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.error {
+  border: 1px solid var(--color-error);
+  background: var(--color-error-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3);
+  color: var(--color-error);
+}
+
+.filters {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.filterButton,
+.filterActive {
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-neutral-200);
+  background: var(--color-white);
+  color: var(--color-neutral-700);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  min-height: var(--min-touch-target);
+  transition: background 0.15s ease;
+}
+
+.filterButton:hover {
+  background: var(--color-neutral-50);
+}
+
+.filterActive {
+  border-color: var(--color-primary-700);
+  background: var(--color-primary-700);
+  color: var(--color-white);
+}
+
+.filterActive:focus-visible,
+.filterButton:focus-visible {
+  outline: 3px solid var(--color-accent-500);
+}
+
+.notificationList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.notificationUnread,
+.notificationRead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+  transition: background 0.15s ease;
+}
+
+.notificationUnread {
+  background: var(--color-neutral-50);
+  border-left: 3px solid var(--color-accent-500);
+}
+
+.notificationRead {
+  background: var(--color-white);
+  opacity: 0.7;
+}
+
+.notificationContent {
+  display: grid;
+  gap: var(--spacing-1);
+  min-width: 0;
+}
+
+.categoryTag {
+  display: inline-block;
+  padding: 2px var(--spacing-2);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  width: fit-content;
+}
+
+.categoryTag[data-category='messages'] {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.categoryTag[data-category='rdv'] {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.categoryTag[data-category='system'] {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.notificationTitle {
+  color: var(--color-primary-900);
+  font-size: var(--font-size-base);
+}
+
+.notificationMessage {
+  margin: 0;
+  color: var(--color-neutral-700);
+  font-size: var(--font-size-sm);
+}
+
+.notificationTime {
+  color: var(--color-neutral-500);
+  font-size: var(--font-size-xs);
+}
+
+.markReadButton {
+  background: none;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-1) var(--spacing-2);
+  color: var(--color-primary-700);
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  min-height: var(--min-touch-target);
+}
+
+.markReadButton:hover {
+  background: var(--color-neutral-50);
+}
+
+.markReadButton:focus-visible {
+  outline: 3px solid var(--color-accent-500);
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-neutral-700);
+}
+
+.skeletonList {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.skeletonItem {
+  height: 72px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-100) 0%,
+    var(--color-neutral-50) 45%,
+    var(--color-neutral-100) 100%
+  );
+}
+
+@media (max-width: 767px) {
+  .container {
+    padding: var(--spacing-4);
+  }
+
+  .headerRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

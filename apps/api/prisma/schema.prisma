@@ -33,6 +33,7 @@ model users {
   user_roles user_roles[]
   sessions   sessions[]
   notification_preferences notification_preferences[]
+  notifications notifications[]
   onboarding onboarding?
   profile_suggestion profile_suggestions?
   user_needs user_needs?
@@ -89,6 +90,34 @@ model notification_preferences {
   @@unique([user_id, channel, category])
   @@index([user_id])
   @@map("notification_preferences")
+}
+
+enum notification_status {
+  pending
+  sent
+  failed
+}
+
+model notifications {
+  id         String                @id @default(uuid())
+  user_id    String
+  category   notification_category
+  channel    notification_channel
+  title      String
+  message    String
+  payload    Json                  @default("{}")
+  status     notification_status   @default(pending)
+  retries    Int                   @default(0)
+  sent_at    DateTime?
+  read_at    DateTime?
+  created_at DateTime              @default(now())
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id, created_at])
+  @@index([user_id, read_at])
+  @@index([status])
+  @@map("notifications")
 }
 
 model roles {

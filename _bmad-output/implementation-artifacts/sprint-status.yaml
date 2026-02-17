@@ -64,7 +64,7 @@ development_status:
   epic-3: in-progress
   3-1-messagerie-tudiant-mentor: review
   3-2-messagerie-mentor-tudiant: review
-  3-3-notifications-messages-et-rdv: ready-for-dev
+  3-3-notifications-messages-et-rdv: review
   3-4-disponibilit-s-mentor: ready-for-dev
   3-5-r-servation-d-un-rendez-vous: ready-for-dev
   3-6-annulation-et-report-de-rendez-vous: ready-for-dev
