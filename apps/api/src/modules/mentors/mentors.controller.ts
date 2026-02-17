@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -27,6 +28,7 @@ import {
   GetRecommendationsQueryDto,
   UpdateMentorSelfProfileDto,
 } from './dto';
+import { MentorsAvailabilityService } from './mentors-availability.service';
 import { MentorsProfileService } from './mentors-profile.service';
 import {
   MentorSearchFilters,
@@ -52,6 +54,7 @@ export class MentorsController {
     private readonly mentorsSearchService: MentorsSearchService,
     private readonly mentorsProfileService: MentorsProfileService,
     private readonly mentorsSelfService: MentorsSelfService,
+    private readonly mentorsAvailabilityService: MentorsAvailabilityService,
   ) {}
 
   @Get('recommendations')
@@ -141,6 +144,83 @@ export class MentorsController {
     @Body() dto: UpdateMentorSelfProfileDto,
   ): Promise<ApiEnvelope<unknown>> {
     const data = await this.mentorsSelfService.updateMyProfile(user.id, dto);
+    return { data, error: null };
+  }
+
+  // ── Availability endpoints ──
+
+  @Get('me/availability')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Recuperer les disponibilites du mentor connecte' })
+  @ApiResponse({ status: 200, description: 'Disponibilites recuperees' })
+  async getMyAvailability(
+    @CurrentUser() user: UserResponseDto,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsAvailabilityService.getMyAvailability(user.id);
+    return { data, error: null };
+  }
+
+  @Post('me/availability')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Ajouter un creneau de disponibilite' })
+  @ApiResponse({ status: 201, description: 'Creneau cree' })
+  async createAvailabilitySlot(
+    @CurrentUser() user: UserResponseDto,
+    @Body() dto: { dayOfWeek: number; startTime: string; endTime: string; isRecurring?: boolean; status?: string },
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsAvailabilityService.createSlot(user.id, dto);
+    return { data, error: null };
+  }
+
+  @Patch('me/availability/general')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Mettre a jour la disponibilite generale' })
+  @ApiResponse({ status: 200, description: 'Disponibilite mise a jour' })
+  async updateGeneralAvailability(
+    @CurrentUser() user: UserResponseDto,
+    @Body() dto: { isAvailable?: boolean; nextAvailableAt?: string; timezone?: string },
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsAvailabilityService.updateGeneralAvailability(user.id, dto);
+    return { data, error: null };
+  }
+
+  @Patch('me/availability/:slotId')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Modifier un creneau de disponibilite' })
+  @ApiResponse({ status: 200, description: 'Creneau modifie' })
+  async updateAvailabilitySlot(
+    @CurrentUser() user: UserResponseDto,
+    @Param('slotId') slotId: string,
+    @Body() dto: { dayOfWeek?: number; startTime?: string; endTime?: string; isRecurring?: boolean; status?: string },
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsAvailabilityService.updateSlot(user.id, slotId, dto);
+    return { data, error: null };
+  }
+
+  @Delete('me/availability/:slotId')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Supprimer un creneau de disponibilite' })
+  @ApiResponse({ status: 200, description: 'Creneau supprime' })
+  async deleteAvailabilitySlot(
+    @CurrentUser() user: UserResponseDto,
+    @Param('slotId') slotId: string,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsAvailabilityService.deleteSlot(user.id, slotId);
+    return { data, error: null };
+  }
+
+  @Get(':id/availability')
+  @ApiOperation({ summary: 'Recuperer les disponibilites d un mentor (etudiant)' })
+  @ApiResponse({ status: 200, description: 'Disponibilites recuperees' })
+  async getMentorAvailability(
+    @Param('id') mentorId: string,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsAvailabilityService.getMentorAvailability(mentorId);
     return { data, error: null };
   }
 

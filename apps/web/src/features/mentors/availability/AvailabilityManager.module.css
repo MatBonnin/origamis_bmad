@@ -1,0 +1,153 @@
+.container {
+  padding: var(--spacing-6);
+  display: grid;
+  gap: var(--spacing-5);
+}
+
+.header { display: grid; gap: var(--spacing-2); }
+
+.title {
+  margin: 0;
+  color: var(--color-primary-900);
+  font-size: var(--font-size-3xl);
+}
+
+.subtitle { margin: 0; color: var(--color-neutral-700); }
+
+.error {
+  border: 1px solid var(--color-error);
+  background: var(--color-error-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3);
+  color: var(--color-error);
+}
+
+.success {
+  border: 1px solid #4caf50;
+  background: #e8f5e9;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3);
+  color: #2e7d32;
+}
+
+.generalRow {
+  display: grid;
+  gap: var(--spacing-4);
+}
+
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  color: var(--color-primary-900);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  min-height: var(--min-touch-target);
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-accent-500);
+}
+
+.timezoneRow { max-width: 320px; }
+
+.addSlotForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: var(--spacing-3);
+  align-items: end;
+}
+
+.slotsGrid {
+  display: grid;
+  gap: var(--spacing-4);
+}
+
+.dayGroup {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.dayTitle {
+  margin: 0;
+  color: var(--color-primary-700);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.slotList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--spacing-1);
+}
+
+.slotItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-neutral-50);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+}
+
+.slotTime {
+  color: var(--color-primary-900);
+  font-weight: var(--font-weight-semibold);
+}
+
+.slotStatus {
+  font-size: var(--font-size-xs);
+  padding: 2px var(--spacing-2);
+  border-radius: var(--radius-lg);
+}
+
+.slotStatus[data-status='published'] {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.slotStatus[data-status='draft'] {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.slotStatus[data-status='blocked'] {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.deleteButton {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--color-neutral-500);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  min-height: var(--min-touch-target);
+  min-width: var(--min-touch-target);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deleteButton:hover { color: var(--color-error); }
+.deleteButton:focus-visible { outline: 3px solid var(--color-accent-500); }
+
+.empty { margin: 0; color: var(--color-neutral-700); }
+
+.skeletonList { display: grid; gap: var(--spacing-2); }
+.skeletonItem {
+  height: 72px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, var(--color-neutral-100) 0%, var(--color-neutral-50) 45%, var(--color-neutral-100) 100%);
+}
+
+@media (max-width: 767px) {
+  .container { padding: var(--spacing-4); }
+  .addSlotForm { grid-template-columns: 1fr; }
+}

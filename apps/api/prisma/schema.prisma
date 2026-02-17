@@ -223,12 +223,31 @@ model mentor_availability {
   mentor_user_id    String   @unique
   is_available      Boolean  @default(false)
   next_available_at DateTime?
+  timezone          String   @default("Europe/Paris")
   updated_at        DateTime @updatedAt
 
-  mentor mentor_profiles @relation(fields: [mentor_user_id], references: [user_id], onDelete: Cascade)
+  mentor mentor_profiles          @relation(fields: [mentor_user_id], references: [user_id], onDelete: Cascade)
+  slots  mentor_availability_slots[]
 
   @@index([is_available])
   @@map("mentor_availability")
+}
+
+model mentor_availability_slots {
+  id             String   @id @default(uuid())
+  availability_id String
+  day_of_week    Int      // 0 = dimanche, 6 = samedi
+  start_time     String   // HH:mm UTC
+  end_time       String   // HH:mm UTC
+  is_recurring   Boolean  @default(true)
+  status         String   @default("published") // published, draft, blocked
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  availability mentor_availability @relation(fields: [availability_id], references: [id], onDelete: Cascade)
+
+  @@index([availability_id])
+  @@map("mentor_availability_slots")
 }
 
 model user_intents {
