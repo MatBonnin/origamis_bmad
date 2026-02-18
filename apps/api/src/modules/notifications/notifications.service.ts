@@ -1,4 +1,5 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma';
 import {
   NotificationCategory,
@@ -60,7 +61,7 @@ export class NotificationsService {
         channel: input.channel,
         title: input.title,
         message: input.message,
-        payload: input.payload ?? {},
+        payload: (input.payload ?? {}) as Prisma.InputJsonValue,
         status: 'sent',
         sent_at: new Date(),
       },

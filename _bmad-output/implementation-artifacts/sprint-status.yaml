@@ -69,7 +69,7 @@ development_status:
   3-5-r-servation-d-un-rendez-vous: review
   3-6-annulation-et-report-de-rendez-vous: review
   3-7-acc-s-session-visio: review
-  3-8-historique-des-sessions: in-progress
+  3-8-historique-des-sessions: review
   epic-3-retrospective: optional
 
   epic-4: in-progress
@@ -96,5 +96,4 @@ development_status:
   7-3-tableaux-de-bord-de-base: ready-for-dev
   7-4-suppression-des-donn-es-personnelles: ready-for-dev
   epic-7-retrospective: optional
-
 

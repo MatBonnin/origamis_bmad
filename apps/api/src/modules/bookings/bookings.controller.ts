@@ -16,11 +16,8 @@ import {
 } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators';
 import { JwtAuthGuard } from '../../common/guards';
-import {
-  BookingsService,
-  CreateBookingDto,
-  RescheduleBookingDto,
-} from './bookings.service';
+import { BookingsService } from './bookings.service';
+import type { CreateBookingDto, RescheduleBookingDto } from './bookings.service';
 
 @ApiTags('Bookings')
 @ApiBearerAuth()

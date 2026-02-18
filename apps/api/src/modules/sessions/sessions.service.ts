@@ -16,7 +16,7 @@ export interface GetSessionHistoryQuery {
   limit?: number;
 }
 
-interface SessionHistoryItem {
+export interface SessionHistoryItem {
   id: string;
   bookingId: string | null;
   userId: string;

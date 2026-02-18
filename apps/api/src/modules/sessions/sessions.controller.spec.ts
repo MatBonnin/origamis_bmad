@@ -74,7 +74,9 @@ describe('SessionsController', () => {
   });
 
   it('returns replay link with envelope', async () => {
-    mockService.getReplayLink.mockResolvedValue({ url: 'https://replay.local/1' });
+    mockService.getReplayLink.mockResolvedValue({
+      url: 'https://replay.local/1',
+    });
 
     const result = await controller.getReplayLink(
       { id: 'user-1' } as { id: string },
@@ -85,7 +87,10 @@ describe('SessionsController', () => {
       data: { url: 'https://replay.local/1' },
       error: null,
     });
-    expect(mockService.getReplayLink).toHaveBeenCalledWith('user-1', 'session-1');
+    expect(mockService.getReplayLink).toHaveBeenCalledWith(
+      'user-1',
+      'session-1',
+    );
   });
 
   it('exports history with envelope', async () => {

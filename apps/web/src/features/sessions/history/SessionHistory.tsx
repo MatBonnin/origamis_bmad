@@ -191,7 +191,9 @@ export function SessionHistory({ accessToken, userId }: Props) {
       )}
 
       {loading ? (
-        <div className={styles.loading} aria-busy="true">Chargement de l'historique...</div>
+        <div className={styles.loading} aria-busy="true">
+          Chargement de l&apos;historique...
+        </div>
       ) : entries.length === 0 ? (
         <Card>
           <CardContent>

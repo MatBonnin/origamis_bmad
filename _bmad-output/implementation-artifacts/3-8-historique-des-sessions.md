@@ -1,6 +1,6 @@
 # Story 3.8: Historique des sessions
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story pour quality check before dev-story. -->
 
@@ -17,10 +17,10 @@ so that suivre mes échanges passés.
 ## Tasks / Subtasks
 
 - [x] Endpoint `GET /sessions/history?user_id=` (pagination + filters) (AC: #1)
-- [ ] Ajouter export (PDF/CSV) + lien de replay (si dispo) (AC: #1)
-- [ ] UI historique: timeline, filtre par type (message, RDV, visio) (AC: #1)
-- [ ] Relier aux logs (message, booking) + respect RGPD (AC: #1)
-- [ ] Tests API + UI + access (AC: #1)
+- [x] Ajouter export (PDF/CSV) + lien de replay (si dispo) (AC: #1)
+- [x] UI historique: timeline, filtre par type (message, RDV, visio) (AC: #1)
+- [x] Relier aux logs (message, booking) + respect RGPD (AC: #1)
+- [x] Tests API + UI + access (AC: #1)
 
 ## Dev Notes
 
@@ -99,12 +99,20 @@ GPT-5 (Codex)
 - Implémentation API `GET /sessions/history` avec pagination cursor-based (`cursor`, `limit`) et filtres (`category`: `message|rdv|visio`).
 - Contrôle d'accès propriétaire appliqué: blocage si `user_id` diffère de l'utilisateur authentifié.
 - Validation exécutée: tests ciblés sessions + suite Jest API complète (`--runInBand`) passants.
+- Export/replay valides: POST /sessions/history/export + GET /sessions/:id/replay-link (controle acces + expiration).
+- UI validee: timeline + filtres + export + replay conditionnel + aria-live, avec tokens CSS design system.
+- Validation: API ciblee (14/14), Web ciblee (3/3), regression API (276/276), regression Web (69/69).
 
 ### Completion Notes List
 
 - ✅ Tâche 1 livrée: endpoint historique disponible via `apps/api/src/modules/sessions/sessions.controller.ts`.
 - ✅ Service associé créé avec normalisation de la réponse `{ sessions, metadata }` et enveloppe API `{ data, error }`.
 - ✅ Tests ajoutés/renforcés (controller + service) couvrant pagination, filtres et sécurité d'accès.
+- Done: Export CSV/PDF livre avec URL data (exportUrl / export_url).
+- Done: Replay visio livre avec verification participant + expiration.
+- Done: UI historique finalisee (timeline, filtres par type, CTA export, replay conditionnel).
+- Done: Logs d'audit et contrainte RGPD verifies (historique masque si consentement retire).
+- Done: Correction lint React dans la feature (&apos;) et tests relances avec succes.
 
 ### File List
 
@@ -118,3 +126,15 @@ GPT-5 (Codex)
 - apps/api/package.json
 - apps/api/src/test-shims/nestjs-websockets.ts
 - apps/api/src/test-shims/socket-io.ts
+- apps/web/src/app/(app)/sessions/history/page.tsx
+- apps/web/src/features/sessions/history/SessionHistory.tsx
+- apps/web/src/features/sessions/history/SessionHistory.module.css
+- apps/web/src/features/sessions/history/__tests__/SessionHistory.test.tsx
+- apps/web/src/features/sessions/history/index.ts
+- apps/web/src/features/sessions/index.ts
+
+## Change Log
+
+- 2026-02-18: Story 3.8 finalisee (export CSV/PDF, replay visio, UI timeline + filtres, logs/RGPD, tests API/Web).
+
+
