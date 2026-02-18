@@ -41,7 +41,9 @@
       "Bash(npx vitest:*)",
       "Bash(netstat:*)",
       "Bash(node -e:*)",
-      "Bash(npx ts-node:*)"
+      "Bash(npx ts-node:*)",
+      "Bash(npm run prisma:seed:*)",
+      "Bash(cat:*)"
     ]
   }
 }

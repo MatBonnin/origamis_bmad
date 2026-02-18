@@ -20,7 +20,7 @@ import { GetConversationMessagesQueryDto, SendMessageDto } from './dto';
 import { MessagingService } from './messaging.service';
 
 @ApiTags('messaging')
-@Controller()
+@Controller('messaging')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class MessagingController {
