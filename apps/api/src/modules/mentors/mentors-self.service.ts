@@ -26,6 +26,9 @@ interface MentorSelfProfileResponse {
     mentorId: string;
     fullName: string;
     bio: string | null;
+    bannerUrl: string | null;
+    about: string | null;
+    professionalLinks: string[];
     domain: string;
     expertiseTags: string[];
     supportedLevels: string[];
@@ -43,6 +46,7 @@ interface MentorSelfProfileResponse {
 }
 
 const DEFAULT_CURRENCY = 'EUR';
+const ALLOWED_PROFESSIONAL_LINK_DOMAINS = ['linkedin.com'];
 
 @Injectable()
 export class MentorsSelfService {
@@ -77,6 +81,7 @@ export class MentorsSelfService {
     dto: CreateMentorSelfProfileDto,
   ): Promise<MentorSelfProfileResponse> {
     await this.assertMentorRole(userId);
+    this.assertProfessionalLinks(dto.professionalLinks);
     this.assertTariffs(dto.tariffs);
     this.assertAvailability(
       dto.availability.nextAvailableAt,
@@ -103,6 +108,9 @@ export class MentorsSelfService {
     await this.prisma.mentor_profiles.create({
       data: {
         user_id: userId,
+        banner_url: dto.bannerUrl,
+        about: dto.about,
+        professional_links: this.cleanTags(dto.professionalLinks ?? []),
         domain: dto.domain,
         expertise_tags: this.cleanTags(dto.expertiseTags),
         supported_levels: this.cleanTags(dto.supportedLevels ?? []),
@@ -169,6 +177,9 @@ export class MentorsSelfService {
     if (dto.tariffs) {
       this.assertTariffs(dto.tariffs);
     }
+    if (dto.professionalLinks) {
+      this.assertProfessionalLinks(dto.professionalLinks);
+    }
 
     const nextSlots = dto.availability?.slots ?? currentMeta.availabilitySlots;
     const nextNextAvailableAt =
@@ -177,6 +188,9 @@ export class MentorsSelfService {
     this.assertAvailability(nextNextAvailableAt, nextSlots);
 
     const profileData: {
+      banner_url?: string | null;
+      about?: string | null;
+      professional_links?: string[];
       domain?: string;
       expertise_tags?: string[];
       supported_levels?: string[];
@@ -186,6 +200,15 @@ export class MentorsSelfService {
 
     if (dto.domain !== undefined) {
       profileData.domain = dto.domain;
+    }
+    if (dto.bannerUrl !== undefined) {
+      profileData.banner_url = dto.bannerUrl || null;
+    }
+    if (dto.about !== undefined) {
+      profileData.about = dto.about || null;
+    }
+    if (dto.professionalLinks !== undefined) {
+      profileData.professional_links = this.cleanTags(dto.professionalLinks);
     }
     if (dto.expertiseTags !== undefined) {
       profileData.expertise_tags = this.cleanTags(dto.expertiseTags);
@@ -281,6 +304,37 @@ export class MentorsSelfService {
         code: 'INVALID_TARIFF_RANGE',
         message: 'Le tarif minimum doit etre strictement inferieur au maximum',
       });
+    }
+  }
+
+  private assertProfessionalLinks(links?: string[]): void {
+    if (!links || links.length === 0) {
+      return;
+    }
+
+    for (const link of links) {
+      let hostname = '';
+      try {
+        const url = new URL(link);
+        hostname = url.hostname.toLowerCase();
+      } catch {
+        throw new BadRequestException({
+          code: 'INVALID_PROFESSIONAL_LINK',
+          message: `Lien professionnel invalide: ${link}`,
+        });
+      }
+
+      const authorized = ALLOWED_PROFESSIONAL_LINK_DOMAINS.some(
+        (domain) => hostname === domain || hostname.endsWith(`.${domain}`),
+      );
+
+      if (!authorized) {
+        throw new BadRequestException({
+          code: 'INVALID_PROFESSIONAL_LINK_DOMAIN',
+          message:
+            'Seuls les liens professionnels LinkedIn sont autorises pour le moment',
+        });
+      }
     }
   }
 
@@ -399,6 +453,9 @@ export class MentorsSelfService {
   private mapMentorToResponse(
     mentor: {
       user_id: string;
+      banner_url: string | null;
+      about: string | null;
+      professional_links: string[];
       domain: string;
       expertise_tags: string[];
       supported_levels: string[];
@@ -418,6 +475,9 @@ export class MentorsSelfService {
         mentorId: mentor.user_id,
         fullName: `${mentor.user.first_name} ${mentor.user.last_name}`,
         bio: mentor.user.bio,
+        bannerUrl: mentor.banner_url ?? null,
+        about: mentor.about ?? null,
+        professionalLinks: mentor.professional_links ?? [],
         domain: mentor.domain,
         expertiseTags: mentor.expertise_tags,
         supportedLevels: mentor.supported_levels,

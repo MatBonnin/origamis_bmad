@@ -21,6 +21,9 @@ interface MentorProfileResponse {
     fullName: string;
     bio: string | null;
     avatarUrl: string | null;
+    bannerUrl: string | null;
+    about: string | null;
+    professionalLinks: string[];
     domain: string;
     expertiseTags: string[];
     supportedLevels: string[];
@@ -153,7 +156,18 @@ export function MentorProfile({ accessToken, mentorId }: Props) {
           <CardTitle as="h2">Informations clés</CardTitle>
         </CardHeader>
         <CardContent>
+          {data.mentor.bannerUrl && (
+            <p className={styles.reviewMeta}>Banniere: {data.mentor.bannerUrl}</p>
+          )}
           <p className={styles.bio}>{data.mentor.bio || 'Bio non renseignee.'}</p>
+          {data.mentor.about && <p className={styles.bio}>{data.mentor.about}</p>}
+          {data.mentor.professionalLinks.length > 0 && (
+            <p className={styles.reviewMeta}>
+              <a href={data.mentor.professionalLinks[0]} target="_blank" rel="noreferrer">
+                LinkedIn
+              </a>
+            </p>
+          )}
           <dl className={styles.meta}>
             <div>
               <dt>Note moyenne</dt>

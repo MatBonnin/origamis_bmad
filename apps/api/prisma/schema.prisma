@@ -215,6 +215,9 @@ model mentor_profiles {
   id              String   @id @default(uuid())
   user_id         String   @unique
   domain          String
+  banner_url      String?
+  about           String?
+  professional_links String[] @default([])
   expertise_tags  String[]
   supported_levels String[]
   hourly_rate     Int?

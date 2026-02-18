@@ -10,6 +10,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUrl,
   Length,
   Matches,
   Max,
@@ -130,6 +131,30 @@ export class CreateMentorSelfProfileDto {
   @MaxLength(500)
   bio?: string;
 
+  @ApiPropertyOptional({ description: 'URL de la banniere mentor' })
+  @IsOptional()
+  @IsString()
+  @IsUrl({ require_protocol: true, protocols: ['https'] })
+  @MaxLength(500)
+  bannerUrl?: string;
+
+  @ApiPropertyOptional({ description: 'A propos du mentor', maxLength: 1200 })
+  @IsOptional()
+  @IsString()
+  @MaxLength(1200)
+  about?: string;
+
+  @ApiPropertyOptional({
+    description: 'Liens professionnels du mentor',
+    type: [String],
+    example: ['https://www.linkedin.com/in/alice-martin'],
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(5)
+  @IsUrl({ require_protocol: true, protocols: ['https'] }, { each: true })
+  professionalLinks?: string[];
+
   @ApiProperty({ type: MentorTariffsDto })
   @ValidateNested()
   @Type(() => MentorTariffsDto)
@@ -196,6 +221,30 @@ export class UpdateMentorSelfProfileDto {
   @IsString()
   @MaxLength(500)
   bio?: string;
+
+  @ApiPropertyOptional({ description: 'URL de la banniere mentor' })
+  @IsOptional()
+  @IsString()
+  @IsUrl({ require_protocol: true, protocols: ['https'] })
+  @MaxLength(500)
+  bannerUrl?: string;
+
+  @ApiPropertyOptional({ description: 'A propos du mentor', maxLength: 1200 })
+  @IsOptional()
+  @IsString()
+  @MaxLength(1200)
+  about?: string;
+
+  @ApiPropertyOptional({
+    description: 'Liens professionnels du mentor',
+    type: [String],
+    example: ['https://www.linkedin.com/in/alice-martin'],
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(5)
+  @IsUrl({ require_protocol: true, protocols: ['https'] }, { each: true })
+  professionalLinks?: string[];
 
   @ApiPropertyOptional({ type: MentorTariffsDto })
   @IsOptional()

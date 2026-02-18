@@ -1,0 +1,4 @@
+ALTER TABLE "mentor_profiles"
+ADD COLUMN IF NOT EXISTS "banner_url" TEXT,
+ADD COLUMN IF NOT EXISTS "about" TEXT,
+ADD COLUMN IF NOT EXISTS "professional_links" TEXT[] DEFAULT ARRAY[]::TEXT[];

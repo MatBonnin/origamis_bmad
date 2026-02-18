@@ -143,7 +143,12 @@ describe('MentorsProfileService', () => {
       rating_avg: 4,
       supported_levels: [],
       is_validated: true,
-      user: { first_name: 'Alice', last_name: 'Martin', bio: '', avatar_url: null },
+      user: {
+        first_name: 'Alice',
+        last_name: 'Martin',
+        bio: '',
+        avatar_url: null,
+      },
       availability: null,
     });
     mockPrismaService.bookings.findFirst.mockResolvedValue({ id: 'b-1' });

@@ -21,6 +21,9 @@ describe('MentorSettings', () => {
               mentorId: 'mentor-1',
               fullName: 'Alice Martin',
               bio: 'Mentor frontend',
+              bannerUrl: 'https://cdn.origami.app/banner.png',
+              about: 'Mentor frontend orientee projets',
+              professionalLinks: ['https://www.linkedin.com/in/alice-martin'],
               domain: 'informatique',
               expertiseTags: ['react'],
               supportedLevels: ['intermediaire'],
@@ -54,6 +57,9 @@ describe('MentorSettings', () => {
               mentorId: 'mentor-1',
               fullName: 'Alice Martin',
               bio: 'Mentor frontend',
+              bannerUrl: 'https://cdn.origami.app/banner.png',
+              about: 'Mentor frontend orientee projets',
+              professionalLinks: ['https://www.linkedin.com/in/alice-martin'],
               domain: 'informatique',
               expertiseTags: ['react'],
               supportedLevels: ['intermediaire'],
@@ -76,6 +82,12 @@ describe('MentorSettings', () => {
     render(<MentorSettings accessToken="token-1" />);
 
     expect(await screen.findByRole('heading', { name: 'Mon profil mentor' })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Banniere (URL)' })).toHaveValue(
+      'https://cdn.origami.app/banner.png',
+    );
+    expect(screen.getByRole('textbox', { name: 'Liens professionnels' })).toHaveValue(
+      'https://www.linkedin.com/in/alice-martin',
+    );
     await userEvent.click(screen.getByRole('button', { name: 'Mettre a jour mon profil mentor' }));
 
     await waitFor(() => {
@@ -115,6 +127,9 @@ describe('MentorSettings', () => {
               mentorId: 'mentor-1',
               fullName: 'Alice Martin',
               bio: null,
+              bannerUrl: null,
+              about: null,
+              professionalLinks: [],
               domain: 'informatique',
               expertiseTags: ['react'],
               supportedLevels: [],

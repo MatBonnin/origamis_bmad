@@ -209,6 +209,7 @@ describe('MentorsSelfService', () => {
       id: 'mentor-1',
       user_roles: [{ role: { name: 'mentor' } }],
     });
+    mockPrismaService.mentor_profiles.findUnique.mockResolvedValueOnce(null);
 
     await expect(
       service.createMyProfile('mentor-1', {

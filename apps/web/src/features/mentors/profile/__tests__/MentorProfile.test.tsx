@@ -21,6 +21,9 @@ describe('MentorProfile', () => {
             fullName: 'Alice Martin',
             bio: 'Mentor frontend',
             avatarUrl: null,
+            bannerUrl: 'https://cdn.origami.app/banner.png',
+            about: 'Mentor frontend orientee projets',
+            professionalLinks: ['https://www.linkedin.com/in/alice-martin'],
             domain: 'informatique',
             expertiseTags: ['react', 'typescript'],
             supportedLevels: ['intermediaire'],
@@ -52,6 +55,11 @@ describe('MentorProfile', () => {
     render(<MentorProfile accessToken="token-1" mentorId="mentor-1" />);
 
     expect(await screen.findByRole('heading', { name: 'Alice Martin' })).toBeInTheDocument();
+    expect(screen.getByText('Mentor frontend orientee projets')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'LinkedIn' })).toHaveAttribute(
+      'href',
+      'https://www.linkedin.com/in/alice-martin',
+    );
     expect(screen.getByText('Mentor frontend')).toBeInTheDocument();
     expect(screen.getByText('Nina Dupont')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Contacter' })).toBeInTheDocument();
@@ -68,6 +76,9 @@ describe('MentorProfile', () => {
             fullName: 'Alice Martin',
             bio: 'Mentor frontend',
             avatarUrl: null,
+            bannerUrl: null,
+            about: null,
+            professionalLinks: [],
             domain: 'informatique',
             expertiseTags: [],
             supportedLevels: [],
@@ -113,12 +124,15 @@ describe('MentorProfile', () => {
         ok: true,
         json: async () => ({
           data: {
-            mentor: {
-              mentorId: 'mentor-1',
-              fullName: 'Alice Martin',
-              bio: 'Mentor frontend',
-              avatarUrl: null,
-              domain: 'informatique',
+          mentor: {
+            mentorId: 'mentor-1',
+            fullName: 'Alice Martin',
+            bio: 'Mentor frontend',
+            avatarUrl: null,
+            bannerUrl: null,
+            about: null,
+            professionalLinks: [],
+            domain: 'informatique',
               expertiseTags: ['react'],
               supportedLevels: ['intermediaire'],
               hourlyRate: 45,
@@ -146,6 +160,9 @@ describe('MentorProfile', () => {
               fullName: 'Alice Martin',
               bio: 'Mentor frontend',
               avatarUrl: null,
+              bannerUrl: null,
+              about: null,
+              professionalLinks: [],
               domain: 'informatique',
               expertiseTags: ['react'],
               supportedLevels: ['intermediaire'],

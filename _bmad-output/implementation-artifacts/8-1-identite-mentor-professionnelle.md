@@ -1,6 +1,6 @@
 # Story 8.1: Identite mentor professionnelle
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,22 +17,22 @@ so that renforcer la confiance et mon image professionnelle.
 
 ## Tasks / Subtasks
 
-- [ ] Schema & migration (AC: #1, #2)
-  - [ ] Ajouter `banner_url` et `about` a `mentor_profiles`
-  - [ ] Ajouter `professional_links` (JSON/array) avec contraintes de taille
-- [ ] API mentor self-service (AC: #1, #3, #4)
-  - [ ] Etendre DTO `Create/UpdateMentorSelfProfileDto`
-  - [ ] Ajouter validation URL + allowlist provider (linkedin en v1 obligatoire recommande)
-  - [ ] Mettre a jour `MentorsSelfService` mapping et persistance
-- [ ] API profil public (AC: #2)
-  - [ ] Exposer les nouveaux champs dans `MentorsProfileService`
-- [ ] UI web mentor/public (AC: #1, #2, #3)
-  - [ ] Ajouter section "Identite professionnelle" dans `MentorSettings`
-  - [ ] Afficher ces informations dans `MentorProfile`
-- [ ] Tests (AC: #1, #2, #3, #4)
-  - [ ] Unit tests DTO + validations
-  - [ ] Integration tests API (happy-path + erreurs)
-  - [ ] UI tests formulaire + rendu public
+- [x] Schema & migration (AC: #1, #2)
+  - [x] Ajouter `banner_url` et `about` a `mentor_profiles`
+  - [x] Ajouter `professional_links` (JSON/array) avec contraintes de taille
+- [x] API mentor self-service (AC: #1, #3, #4)
+  - [x] Etendre DTO `Create/UpdateMentorSelfProfileDto`
+  - [x] Ajouter validation URL + allowlist provider (linkedin en v1 obligatoire recommande)
+  - [x] Mettre a jour `MentorsSelfService` mapping et persistance
+- [x] API profil public (AC: #2)
+  - [x] Exposer les nouveaux champs dans `MentorsProfileService`
+- [x] UI web mentor/public (AC: #1, #2, #3)
+  - [x] Ajouter section "Identite professionnelle" dans `MentorSettings`
+  - [x] Afficher ces informations dans `MentorProfile`
+- [x] Tests (AC: #1, #2, #3, #4)
+  - [x] Unit tests DTO + validations
+  - [x] Integration tests API (happy-path + erreurs)
+  - [x] UI tests formulaire + rendu public
 
 ## Dev Notes
 
@@ -50,7 +50,7 @@ so that renforcer la confiance et mon image professionnelle.
 
 - `mentor_profiles.banner_url: String?`
 - `mentor_profiles.about: String?` (max 1200)
-- `mentor_profiles.professional_links: Json` (max 5 liens)
+- `mentor_profiles.professional_links: String[]` (max 5 liens)
 
 ### Validation Rules
 
@@ -91,6 +91,28 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
+- API tests: `npm test --workspace=apps/api -- mentors-self.service.spec.ts mentors-profile.service.spec.ts mentor-self-profile.dto.spec.ts`
+- Web tests: `npm test --workspace=apps/web -- MentorSettings.test.tsx MentorProfile.test.tsx`
+
 ### Completion Notes List
 
+- Ajout des champs d'identite mentor (`bannerUrl`, `about`, `professionalLinks`) dans le schema Prisma et migration SQL.
+- Extension des DTO self-service mentor avec validations URL HTTPS et limite de taille.
+- Application d'une allowlist domaine pour les liens professionnels (LinkedIn v1).
+- Exposition des nouveaux champs dans les endpoints `GET/PATCH /mentors/me` et `GET /mentors/:id`.
+- Mise a jour de l'UI mentor settings et profil public pour edition/affichage des nouveaux champs.
+- Tests API et web cibles executes au vert.
+
 ### File List
+
+- `apps/api/prisma/schema.prisma`
+- `apps/api/prisma/migrations/202602181530_epic8_mentor_identity_fields/migration.sql`
+- `apps/api/src/modules/mentors/dto/mentor-self-profile.dto.ts`
+- `apps/api/src/modules/mentors/mentors-self.service.ts`
+- `apps/api/src/modules/mentors/mentors-self.service.spec.ts`
+- `apps/api/src/modules/mentors/mentors-profile.service.ts`
+- `apps/api/src/modules/mentors/mentors-profile.service.spec.ts`
+- `apps/web/src/features/mentors/settings/MentorSettings.tsx`
+- `apps/web/src/features/mentors/settings/__tests__/MentorSettings.test.tsx`
+- `apps/web/src/features/mentors/profile/MentorProfile.tsx`
+- `apps/web/src/features/mentors/profile/__tests__/MentorProfile.test.tsx`

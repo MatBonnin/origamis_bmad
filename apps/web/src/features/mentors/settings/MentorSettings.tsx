@@ -26,6 +26,9 @@ interface MentorSettingsPayload {
     mentorId: string;
     fullName: string;
     bio: string | null;
+    bannerUrl: string | null;
+    about: string | null;
+    professionalLinks: string[];
     domain: string;
     expertiseTags: string[];
     supportedLevels: string[];
@@ -107,6 +110,9 @@ export function MentorSettings({ accessToken }: Props) {
 
   const [domain, setDomain] = useState('');
   const [bio, setBio] = useState('');
+  const [bannerUrl, setBannerUrl] = useState('');
+  const [about, setAbout] = useState('');
+  const [professionalLinksInput, setProfessionalLinksInput] = useState('');
   const [expertiseInput, setExpertiseInput] = useState('');
   const [languagesInput, setLanguagesInput] = useState('');
   const [certificationsInput, setCertificationsInput] = useState('');
@@ -143,6 +149,9 @@ export function MentorSettings({ accessToken }: Props) {
       setHasExistingProfile(true);
       setDomain(data.profile.domain);
       setBio(data.profile.bio ?? '');
+      setBannerUrl(data.profile.bannerUrl ?? '');
+      setAbout(data.profile.about ?? '');
+      setProfessionalLinksInput(data.profile.professionalLinks.join(', '));
       setExpertiseInput(data.profile.expertiseTags.join(', '));
       setLanguagesInput(data.profile.languages.join(', '));
       setCertificationsInput(data.profile.certifications.join(', '));
@@ -175,8 +184,9 @@ export function MentorSettings({ accessToken }: Props) {
       expertise: toList(expertiseInput),
       languages: toList(languagesInput),
       certifications: toList(certificationsInput),
+      professionalLinks: toList(professionalLinksInput),
     };
-  }, [certificationsInput, expertiseInput, languagesInput]);
+  }, [certificationsInput, expertiseInput, languagesInput, professionalLinksInput]);
 
   const validateClient = () => {
     if (!domain.trim()) {
@@ -185,6 +195,23 @@ export function MentorSettings({ accessToken }: Props) {
     }
     if (normalizedSummary.expertise.length === 0) {
       setError('Au moins une competence est requise');
+      return false;
+    }
+    if (about.length > 1200) {
+      setError('La section A propos ne peut pas depasser 1200 caracteres');
+      return false;
+    }
+    const invalidLink = normalizedSummary.professionalLinks.find((value) => {
+      try {
+        const url = new URL(value);
+        const host = url.hostname.toLowerCase();
+        return !(host === 'linkedin.com' || host.endsWith('.linkedin.com'));
+      } catch {
+        return true;
+      }
+    });
+    if (invalidLink) {
+      setError('Les liens professionnels doivent etre des URLs LinkedIn valides');
       return false;
     }
 
@@ -221,6 +248,9 @@ export function MentorSettings({ accessToken }: Props) {
     const payload = {
       domain: domain.trim(),
       bio: bio.trim() || undefined,
+      bannerUrl: bannerUrl.trim() || undefined,
+      about: about.trim() || undefined,
+      professionalLinks: normalizedSummary.professionalLinks,
       expertiseTags: normalizedSummary.expertise,
       supportedLevels,
       languages: normalizedSummary.languages,
@@ -367,6 +397,30 @@ export function MentorSettings({ accessToken }: Props) {
             value={bio}
             onChange={(event) => setBio(event.target.value)}
             placeholder="Presentez votre approche mentor"
+          />
+
+          <Input
+            name="bannerUrl"
+            label="Banniere (URL)"
+            value={bannerUrl}
+            onChange={(event) => setBannerUrl(event.target.value)}
+            placeholder="https://cdn.example.com/mentor-banner.png"
+          />
+
+          <Input
+            name="about"
+            label="A propos"
+            value={about}
+            onChange={(event) => setAbout(event.target.value)}
+            placeholder="Votre approche, votre posture, vos domaines de specialisation"
+          />
+
+          <Input
+            name="professionalLinks"
+            label="Liens professionnels"
+            value={professionalLinksInput}
+            onChange={(event) => setProfessionalLinksInput(event.target.value)}
+            placeholder="https://www.linkedin.com/in/..., https://www.linkedin.com/in/..."
           />
         </CardContent>
       </Card>
@@ -515,8 +569,16 @@ export function MentorSettings({ accessToken }: Props) {
               <dd>{domain || 'Non renseigne'}</dd>
             </div>
             <div>
+              <dt>Banniere</dt>
+              <dd>{bannerUrl || 'Non renseigne'}</dd>
+            </div>
+            <div>
               <dt>Competences</dt>
               <dd>{normalizedSummary.expertise.join(', ') || 'Non renseigne'}</dd>
+            </div>
+            <div>
+              <dt>Liens professionnels</dt>
+              <dd>{normalizedSummary.professionalLinks.join(', ') || 'Non renseigne'}</dd>
             </div>
             <div>
               <dt>Langues</dt>

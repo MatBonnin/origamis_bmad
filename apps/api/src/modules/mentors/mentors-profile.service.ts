@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma';
 
 interface MentorReview {
@@ -28,6 +32,9 @@ interface MentorProfileResult {
     fullName: string;
     bio: string | null;
     avatarUrl: string | null;
+    bannerUrl: string | null;
+    about: string | null;
+    professionalLinks: string[];
     domain: string;
     expertiseTags: string[];
     supportedLevels: string[];
@@ -65,6 +72,9 @@ export class MentorsProfileService {
         fullName: `${mentor.user.first_name} ${mentor.user.last_name}`,
         bio: mentor.user.bio,
         avatarUrl: mentor.user.avatar_url,
+        bannerUrl: mentor.banner_url ?? null,
+        about: mentor.about ?? null,
+        professionalLinks: mentor.professional_links ?? [],
         domain: mentor.domain,
         expertiseTags: mentor.expertise_tags,
         supportedLevels: mentor.supported_levels,
@@ -223,7 +233,11 @@ export class MentorsProfileService {
     };
   }
 
-  async deleteMentorReview(mentorId: string, reviewId: string, studentId: string) {
+  async deleteMentorReview(
+    mentorId: string,
+    reviewId: string,
+    studentId: string,
+  ) {
     return this.updateMentorReview(mentorId, reviewId, {
       studentId,
       status: 'removed',
