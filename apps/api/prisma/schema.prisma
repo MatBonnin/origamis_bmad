@@ -47,6 +47,8 @@ model users {
   sent_messages messages[] @relation("messages_sender")
   received_messages messages[] @relation("messages_receiver")
   read_statuses read_status[]
+  bookings_as_student bookings[] @relation("bookings_student")
+  bookings_as_mentor bookings[] @relation("bookings_mentor")
 
   @@map("users")
 }
@@ -245,9 +247,43 @@ model mentor_availability_slots {
   updated_at     DateTime @updatedAt
 
   availability mentor_availability @relation(fields: [availability_id], references: [id], onDelete: Cascade)
+  bookings     bookings[]
 
   @@index([availability_id])
   @@map("mentor_availability_slots")
+}
+
+enum booking_status {
+  pending
+  confirmed
+  cancelled
+  completed
+}
+
+model bookings {
+  id              String         @id @default(uuid())
+  student_id      String
+  mentor_id       String
+  slot_id         String
+  booking_date    DateTime       // The specific date of the booking
+  start_time      String         // HH:mm
+  end_time        String         // HH:mm
+  status          booking_status @default(pending)
+  notes           String?
+  cancelled_by    String?
+  cancellation_reason String?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  student users @relation("bookings_student", fields: [student_id], references: [id], onDelete: Cascade)
+  mentor  users @relation("bookings_mentor", fields: [mentor_id], references: [id], onDelete: Cascade)
+  slot    mentor_availability_slots @relation(fields: [slot_id], references: [id], onDelete: Cascade)
+
+  @@index([student_id])
+  @@index([mentor_id])
+  @@index([slot_id, booking_date])
+  @@index([status])
+  @@map("bookings")
 }
 
 model user_intents {

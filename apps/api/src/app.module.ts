@@ -13,6 +13,7 @@ import { ProfileSuggestionModule } from './modules/profile-suggestion';
 import { MentorsModule } from './modules/mentors';
 import { MatchingModule } from './modules/matching';
 import { MessagingModule } from './modules/messaging';
+import { BookingsModule } from './modules/bookings';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { MessagingModule } from './modules/messaging';
     MatchingModule,
     MentorsModule,
     MessagingModule,
+    BookingsModule,
   ],
   providers: [
     {

@@ -1,0 +1,104 @@
+.container {
+  padding: var(--spacing-6);
+  display: grid;
+  gap: var(--spacing-5);
+}
+
+.header { display: grid; gap: var(--spacing-2); }
+
+.title {
+  margin: 0;
+  color: var(--color-primary-900);
+  font-size: var(--font-size-3xl);
+}
+
+.subtitle { margin: 0; color: var(--color-neutral-700); }
+
+.error {
+  border: 1px solid var(--color-error);
+  background: var(--color-error-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3);
+  color: var(--color-error);
+}
+
+.success {
+  border: 1px solid #4caf50;
+  background: #e8f5e9;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3);
+  color: #2e7d32;
+}
+
+.bookingsList {
+  display: grid;
+  gap: var(--spacing-4);
+}
+
+.bookingDetails {
+  display: grid;
+  gap: var(--spacing-3);
+}
+
+.bookingInfo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.time {
+  color: var(--color-primary-900);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-lg);
+}
+
+.participant {
+  color: var(--color-neutral-700);
+}
+
+.status {
+  font-size: var(--font-size-xs);
+  padding: 2px var(--spacing-2);
+  border-radius: var(--radius-lg);
+}
+
+.status[data-status='confirmed'] {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status[data-status='pending'] {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.status[data-status='cancelled'] {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status[data-status='completed'] {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.notes {
+  margin: 0;
+  color: var(--color-neutral-700);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+}
+
+.empty { margin: 0; color: var(--color-neutral-700); }
+
+.skeletonList { display: grid; gap: var(--spacing-2); }
+.skeletonItem {
+  height: 120px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, var(--color-neutral-100) 0%, var(--color-neutral-50) 45%, var(--color-neutral-100) 100%);
+}
+
+@media (max-width: 767px) {
+  .container { padding: var(--spacing-4); }
+}
