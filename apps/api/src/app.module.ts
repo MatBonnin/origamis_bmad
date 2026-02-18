@@ -15,6 +15,7 @@ import { MatchingModule } from './modules/matching';
 import { MessagingModule } from './modules/messaging';
 import { BookingsModule } from './modules/bookings';
 import { SessionsModule } from './modules/sessions';
+import { MilestonesModule } from './modules/milestones';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { SessionsModule } from './modules/sessions';
     MessagingModule,
     BookingsModule,
     SessionsModule,
+    MilestonesModule,
   ],
   providers: [
     {

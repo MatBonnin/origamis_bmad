@@ -73,9 +73,9 @@ development_status:
   epic-3-retrospective: optional
 
   epic-4: in-progress
-  4-1-parcours-de-suivi-avec-jalons: ready-for-dev
-  4-2-marquer-un-jalon-comme-termin: ready-for-dev
-  4-3-suivi-de-l-avancement-par-le-mentor: ready-for-dev
+  4-1-parcours-de-suivi-avec-jalons: review
+  4-2-marquer-un-jalon-comme-termin: review
+  4-3-suivi-de-l-avancement-par-le-mentor: review
   epic-4-retrospective: optional
 
   epic-5: in-progress
@@ -96,4 +96,6 @@ development_status:
   7-3-tableaux-de-bord-de-base: ready-for-dev
   7-4-suppression-des-donn-es-personnelles: ready-for-dev
   epic-7-retrospective: optional
+
+
 

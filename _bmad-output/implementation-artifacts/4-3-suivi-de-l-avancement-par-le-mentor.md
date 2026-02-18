@@ -1,6 +1,6 @@
 # Story 4.3: Suivi de l‚Äôavancement par le mentor
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -16,11 +16,11 @@ so that adapter mon accompagnement.
 
 ## Tasks / Subtasks
 
-- [ ] Endpoint `GET /students/:id/progression` (AC: #1)
-- [ ] Ajouter section ‚ÄúInsights‚Äù (avancement, risques, notes) (AC: #1)
-- [ ] UI mentor: timeline, filtres par jalon, alertes (AC: #1)
-- [ ] Ajouter workflow notifications mentor (reminder, escalation) (AC: #1)
-- [ ] Tests API + UI + notifications (AC: #1)
+- [x] Endpoint GET /students/:id/progression (AC: #1)
+- [x] Ajouter section ìInsightsî (avancement, risques, notes) (AC: #1)
+- [x] UI mentor: timeline, filtres par jalon, alertes (AC: #1)
+- [x] Ajouter workflow notifications mentor (reminder, escalation) (AC: #1)
+- [x] Tests API + UI + notifications (AC: #1)
 
 ## Dev Notes
 
@@ -95,6 +95,37 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
+- Endpoints mentor implÈmentÈs: GET /students/:id/progression et GET /students/:id/milestone-insights.
+- ContrÙle RBAC appliquÈ: accËs mentor uniquement sur Ètudiants liÈs (ou admin/support).
+- UI mentor crÈÈe (/mentor/progression) avec timeline, insights risque/retards et actions de review.
+- Workflow notifications branchÈ pour validation/refus de jalon avec message ‡ l Ètudiant.
+- Tests passants: API ciblÈ (13/13), Web ciblÈ (5/5), API complet (289/289).
+
 ### Completion Notes List
 
+- Story 4.3 terminÈe: vue mentor de suivi, insights, workflow notifications et tests livrÈs.
+
 ### File List
+
+- apps/api/src/modules/milestones/milestones.service.ts
+- apps/api/src/modules/milestones/milestones.controller.ts
+- apps/api/src/modules/milestones/milestones.module.ts
+- apps/api/src/modules/milestones/index.ts
+- apps/api/src/modules/milestones/milestones.service.spec.ts
+- apps/api/src/modules/milestones/milestones.controller.spec.ts
+- apps/api/src/app.module.ts
+- apps/web/src/app/(app)/projets/page.tsx
+- apps/web/src/app/(app)/mentor/progression/page.tsx
+- apps/web/src/features/milestones/index.ts
+- apps/web/src/features/milestones/progress/index.ts
+- apps/web/src/features/milestones/progress/StudentProgression.tsx
+- apps/web/src/features/milestones/progress/StudentProgression.module.css
+- apps/web/src/features/milestones/progress/__tests__/StudentProgression.test.tsx
+- apps/web/src/features/mentors/progression/index.ts
+- apps/web/src/features/mentors/progression/MentorProgression.tsx
+- apps/web/src/features/mentors/progression/MentorProgression.module.css
+- apps/web/src/features/mentors/progression/__tests__/MentorProgression.test.tsx
+
+## Change Log
+
+- 2026-02-18: Story 4.3 completee (GET progression mentor, insights, UI mentor, workflow review/notifications, tests).

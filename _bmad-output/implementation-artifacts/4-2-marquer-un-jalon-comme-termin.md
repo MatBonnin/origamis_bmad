@@ -1,6 +1,6 @@
 # Story 4.2: Marquer un jalon comme termin√©
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -16,11 +16,11 @@ so that suivre mon avancement.
 
 ## Tasks / Subtasks
 
-- [ ] Endpoint `PATCH /milestones/:id/status` (AC: #1)
-- [ ] Ajouter workflow validation (review/mentor validation) (AC: #1)
-- [ ] UI action ‚ÄúMarquer termin√©‚Äù + confirmation + toast (AC: #1)
-- [ ] Recalcul progression student/mentor + trigger notifications (AC: #1)
-- [ ] Tests API + UI + notifications (AC: #1)
+- [x] Endpoint PATCH /milestones/:id/status (AC: #1)
+- [x] Ajouter workflow validation (review/mentor validation) (AC: #1)
+- [x] UI action ìMarquer terminÈî + confirmation + toast (AC: #1)
+- [x] Recalcul progression student/mentor + trigger notifications (AC: #1)
+- [x] Tests API + UI + notifications (AC: #1)
 
 ## Dev Notes
 
@@ -95,6 +95,37 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
+- PATCH /milestones/:id/status implÈmentÈ avec rËgle de validation mentor avant passage en done.
+- Workflow de review mentor implÈmentÈ via POST /milestones/:id/review.
+- UI Ètudiant: action Marquer terminÈ avec confirmation et feedback ria-live.
+- Recalcul progression renvoyÈ dans la rÈponse et notifications mentor/Ètudiant dÈclenchÈes.
+- Tests passants: API ciblÈ (13/13), Web ciblÈ (5/5), API complet (289/289).
+
 ### Completion Notes List
 
+- Story 4.2 terminÈe: transitions de statut, validation mentor, UI confirmation, notifications et tests livrÈs.
+
 ### File List
+
+- apps/api/src/modules/milestones/milestones.service.ts
+- apps/api/src/modules/milestones/milestones.controller.ts
+- apps/api/src/modules/milestones/milestones.module.ts
+- apps/api/src/modules/milestones/index.ts
+- apps/api/src/modules/milestones/milestones.service.spec.ts
+- apps/api/src/modules/milestones/milestones.controller.spec.ts
+- apps/api/src/app.module.ts
+- apps/web/src/app/(app)/projets/page.tsx
+- apps/web/src/app/(app)/mentor/progression/page.tsx
+- apps/web/src/features/milestones/index.ts
+- apps/web/src/features/milestones/progress/index.ts
+- apps/web/src/features/milestones/progress/StudentProgression.tsx
+- apps/web/src/features/milestones/progress/StudentProgression.module.css
+- apps/web/src/features/milestones/progress/__tests__/StudentProgression.test.tsx
+- apps/web/src/features/mentors/progression/index.ts
+- apps/web/src/features/mentors/progression/MentorProgression.tsx
+- apps/web/src/features/mentors/progression/MentorProgression.module.css
+- apps/web/src/features/mentors/progression/__tests__/MentorProgression.test.tsx
+
+## Change Log
+
+- 2026-02-18: Story 4.2 completee (PATCH status, workflow review mentor, UI confirmation, recalcul progression, notifications, tests).

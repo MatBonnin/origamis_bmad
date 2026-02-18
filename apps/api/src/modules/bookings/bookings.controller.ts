@@ -17,7 +17,10 @@ import {
 import { CurrentUser } from '../../common/decorators';
 import { JwtAuthGuard } from '../../common/guards';
 import { BookingsService } from './bookings.service';
-import type { CreateBookingDto, RescheduleBookingDto } from './bookings.service';
+import type {
+  CreateBookingDto,
+  RescheduleBookingDto,
+} from './bookings.service';
 
 @ApiTags('Bookings')
 @ApiBearerAuth()
