@@ -72,6 +72,9 @@ export function MyBookings({ accessToken, userId }: Props) {
   const [newSlotId, setNewSlotId] = useState('');
   const [newDate, setNewDate] = useState('');
 
+  // Session link state
+  const [sessionLoading, setSessionLoading] = useState<string | null>(null);
+
   const headers = { Authorization: `Bearer ${accessToken}` };
 
   const loadBookings = useCallback(async () => {
@@ -197,6 +200,31 @@ export function MyBookings({ accessToken, userId }: Props) {
     }
   };
 
+  // Join session flow
+  const joinSession = async (bookingId: string) => {
+    setSessionLoading(bookingId);
+    setError('');
+    try {
+      const res = await fetch(
+        `${API_URL}/bookings/${bookingId}/session-link`,
+        { headers, cache: 'no-store' },
+      );
+      const result = await res.json();
+      if (!res.ok || result.error) {
+        setError(
+          result.error?.message || 'Impossible de recuperer le lien de session',
+        );
+        return;
+      }
+      const data = result.data as { sessionUrl: string; expiresAt: string };
+      window.open(data.sessionUrl, '_blank', 'noopener,noreferrer');
+    } catch {
+      setError('Erreur de connexion');
+    } finally {
+      setSessionLoading(null);
+    }
+  };
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr + 'T00:00:00');
     return date.toLocaleDateString('fr-FR', {
@@ -285,6 +313,19 @@ export function MyBookings({ accessToken, userId }: Props) {
                   )}
                   {isActive(booking.status) && (
                     <div className={styles.actions}>
+                      {booking.status === 'confirmed' && (
+                        <Button
+                          size="sm"
+                          type="button"
+                          onClick={() => void joinSession(booking.bookingId)}
+                          disabled={sessionLoading === booking.bookingId}
+                          aria-label={`Rejoindre la visio du ${formatDate(booking.bookingDate)}`}
+                        >
+                          {sessionLoading === booking.bookingId
+                            ? 'Chargement...'
+                            : 'Rejoindre visio'}
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         size="sm"

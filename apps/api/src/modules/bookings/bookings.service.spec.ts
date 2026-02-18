@@ -21,6 +21,10 @@ describe('BookingsService', () => {
       create: jest.fn(),
       update: jest.fn(),
     },
+    booking_sessions: {
+      create: jest.fn(),
+      update: jest.fn(),
+    },
   };
 
   const mockNotifications = {
@@ -392,6 +396,113 @@ describe('BookingsService', () => {
       await expect(
         service.getBooking('other-user', 'booking-1'),
       ).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  describe('getSessionLink', () => {
+    const makeConfirmedBooking = (overrides: Record<string, unknown> = {}) => {
+      const futureDate = getFutureBookingDate();
+      return {
+        id: 'booking-1',
+        student_id: 'student-1',
+        mentor_id: 'mentor-1',
+        slot_id: 'slot-1',
+        booking_date: futureDate,
+        start_time: '14:00',
+        end_time: '16:00',
+        status: 'confirmed',
+        notes: null,
+        cancelled_by: null,
+        cancellation_reason: null,
+        created_at: new Date(),
+        updated_at: new Date(),
+        session: null,
+        ...overrides,
+      };
+    };
+
+    it('generates a new session link for confirmed booking', async () => {
+      mockPrisma.bookings.findUnique.mockResolvedValue(makeConfirmedBooking());
+      mockPrisma.booking_sessions.create.mockResolvedValue({});
+
+      const result = await service.getSessionLink('student-1', 'booking-1');
+
+      expect(result.sessionUrl).toMatch(/^\/session\/.+/);
+      expect(result.token).toBeDefined();
+      expect(result.expiresAt).toBeDefined();
+      expect(mockPrisma.booking_sessions.create).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns existing valid session link', async () => {
+      const futureExpiry = new Date();
+      futureExpiry.setHours(futureExpiry.getHours() + 24);
+
+      mockPrisma.bookings.findUnique.mockResolvedValue(
+        makeConfirmedBooking({
+          session: {
+            id: 'session-1',
+            session_token: 'existing-token',
+            session_url: '/session/existing-token',
+            expires_at: futureExpiry,
+          },
+        }),
+      );
+
+      const result = await service.getSessionLink('student-1', 'booking-1');
+
+      expect(result.sessionUrl).toBe('/session/existing-token');
+      expect(result.token).toBe('existing-token');
+      expect(mockPrisma.booking_sessions.create).not.toHaveBeenCalled();
+    });
+
+    it('regenerates expired session link', async () => {
+      const pastExpiry = new Date();
+      pastExpiry.setHours(pastExpiry.getHours() - 1);
+
+      mockPrisma.bookings.findUnique.mockResolvedValue(
+        makeConfirmedBooking({
+          session: {
+            id: 'session-1',
+            session_token: 'old-token',
+            session_url: '/session/old-token',
+            expires_at: pastExpiry,
+          },
+        }),
+      );
+      mockPrisma.booking_sessions.update.mockResolvedValue({});
+
+      const result = await service.getSessionLink('student-1', 'booking-1');
+
+      expect(result.token).not.toBe('old-token');
+      expect(mockPrisma.booking_sessions.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('rejects non-participant', async () => {
+      mockPrisma.bookings.findUnique.mockResolvedValue(makeConfirmedBooking());
+
+      await expect(
+        service.getSessionLink('other-user', 'booking-1'),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('rejects non-confirmed booking', async () => {
+      mockPrisma.bookings.findUnique.mockResolvedValue(
+        makeConfirmedBooking({ status: 'pending' }),
+      );
+
+      await expect(
+        service.getSessionLink('student-1', 'booking-1'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('rejects cancelled booking', async () => {
+      mockPrisma.bookings.findUnique.mockResolvedValue(
+        makeConfirmedBooking({ status: 'cancelled' }),
+      );
+
+      await expect(
+        service.getSessionLink('student-1', 'booking-1'),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 });

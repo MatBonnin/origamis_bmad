@@ -174,6 +174,96 @@ describe('MyBookings', () => {
     expect(await screen.findByText('Rendez-vous reporte')).toBeInTheDocument();
   });
 
+  it('shows Rejoindre visio button for confirmed bookings', async () => {
+    fetchMock.mockResolvedValueOnce(mockBookings([confirmedBooking]));
+
+    render(<MyBookings accessToken="token-1" userId="student-1" />);
+
+    await screen.findByText('Confirme');
+
+    expect(
+      screen.getByRole('button', { name: /Rejoindre/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('does not show Rejoindre visio button for pending bookings', async () => {
+    fetchMock.mockResolvedValueOnce(
+      mockBookings([{ ...confirmedBooking, status: 'pending' }]),
+    );
+
+    render(<MyBookings accessToken="token-1" userId="student-1" />);
+
+    await screen.findByText('En attente');
+
+    expect(
+      screen.queryByRole('button', { name: /Rejoindre/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('fetches session link when clicking Rejoindre visio', async () => {
+    const windowOpenSpy = vi.fn();
+    vi.stubGlobal('open', windowOpenSpy);
+
+    fetchMock
+      .mockResolvedValueOnce(mockBookings([confirmedBooking]))
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: {
+            sessionUrl: '/session/test-token',
+            token: 'test-token',
+            expiresAt: '2026-03-04T16:30:00.000Z',
+          },
+          error: null,
+        }),
+      } as Response);
+
+    render(<MyBookings accessToken="token-1" userId="student-1" />);
+
+    await screen.findByText('Confirme');
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /Rejoindre/i }),
+    );
+
+    await waitFor(() => {
+      const sessionCall = fetchMock.mock.calls.find((call) =>
+        String(call[0]).includes('/bookings/b-1/session-link'),
+      );
+      expect(sessionCall).toBeDefined();
+    });
+
+    expect(windowOpenSpy).toHaveBeenCalledWith(
+      '/session/test-token',
+      '_blank',
+      'noopener,noreferrer',
+    );
+  });
+
+  it('shows error when session link fails', async () => {
+    fetchMock
+      .mockResolvedValueOnce(mockBookings([confirmedBooking]))
+      .mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({
+          data: null,
+          error: { code: 'BOOKING_NOT_CONFIRMED', message: 'Le rendez-vous doit etre confirme' },
+        }),
+      } as Response);
+
+    render(<MyBookings accessToken="token-1" userId="student-1" />);
+
+    await screen.findByText('Confirme');
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /Rejoindre/i }),
+    );
+
+    expect(
+      await screen.findByText('Le rendez-vous doit etre confirme'),
+    ).toBeInTheDocument();
+  });
+
   it('shows empty state', async () => {
     fetchMock.mockResolvedValueOnce(mockBookings([]));
 

@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma';
 import {
   NotificationsService,
@@ -400,6 +401,76 @@ export class BookingsService {
     );
 
     return { booking: this.mapBooking(updated) };
+  }
+
+  async getSessionLink(userId: string, bookingId: string) {
+    const booking = await this.prisma.bookings.findUnique({
+      where: { id: bookingId },
+      include: { session: true },
+    });
+
+    if (!booking) {
+      throw new NotFoundException({
+        code: 'BOOKING_NOT_FOUND',
+        message: 'Rendez-vous introuvable',
+      });
+    }
+
+    if (booking.student_id !== userId && booking.mentor_id !== userId) {
+      throw new ForbiddenException({
+        code: 'NOT_BOOKING_PARTICIPANT',
+        message: "Vous n'etes pas participant de ce rendez-vous",
+      });
+    }
+
+    if (booking.status !== 'confirmed') {
+      throw new BadRequestException({
+        code: 'BOOKING_NOT_CONFIRMED',
+        message: 'Le rendez-vous doit etre confirme pour acceder a la session',
+      });
+    }
+
+    // Check if session already exists and is still valid
+    if (booking.session && booking.session.expires_at > new Date()) {
+      return {
+        sessionUrl: booking.session.session_url,
+        token: booking.session.session_token,
+        expiresAt: booking.session.expires_at.toISOString(),
+      };
+    }
+
+    // Generate new session link
+    const token = randomUUID();
+    const sessionUrl = `/session/${token}`;
+
+    // Expires 30 min after booking end time on booking date
+    const [endH, endM] = booking.end_time.split(':').map(Number);
+    const expiresAt = new Date(booking.booking_date);
+    expiresAt.setHours(endH, endM + 30, 0, 0);
+
+    if (booking.session) {
+      // Update expired session
+      await this.prisma.booking_sessions.update({
+        where: { id: booking.session.id },
+        data: { session_token: token, session_url: sessionUrl, expires_at: expiresAt },
+      });
+    } else {
+      // Create new session
+      await this.prisma.booking_sessions.create({
+        data: {
+          booking_id: bookingId,
+          session_token: token,
+          session_url: sessionUrl,
+          expires_at: expiresAt,
+        },
+      });
+    }
+
+    return {
+      sessionUrl,
+      token,
+      expiresAt: expiresAt.toISOString(),
+    };
   }
 
   private checkNoticePolicy(bookingDate: Date, startTime: string) {

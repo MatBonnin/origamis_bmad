@@ -66,6 +66,17 @@ export class BookingsController {
     return { data, error: null };
   }
 
+  @Get(':id/session-link')
+  @ApiOperation({ summary: 'Obtenir le lien de session visio' })
+  @ApiResponse({ status: 200, description: 'Lien de session' })
+  async getSessionLink(
+    @CurrentUser() user: { id: string },
+    @Param('id') bookingId: string,
+  ) {
+    const data = await this.bookingsService.getSessionLink(user.id, bookingId);
+    return { data, error: null };
+  }
+
   @Patch(':id/cancel')
   @ApiOperation({ summary: 'Annuler une reservation' })
   @ApiResponse({ status: 200, description: 'Reservation annulee' })
