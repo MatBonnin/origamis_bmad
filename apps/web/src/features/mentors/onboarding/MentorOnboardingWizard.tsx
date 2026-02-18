@@ -2,7 +2,18 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from '@/components/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  Select,
+  SearchableSelect,
+  MultiSearchSelect,
+  LanguageSelect,
+} from '@/components/ui';
 import styles from './MentorOnboardingWizard.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -128,24 +139,29 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Step 0 — Identite
   const [domain, setDomain] = useState('');
+  const [domainLabel, setDomainLabel] = useState('');
   const [bio, setBio] = useState('');
   const [about, setAbout] = useState('');
   const [educationLevel, setEducationLevel] = useState('');
-  const [expertiseInput, setExpertiseInput] = useState('');
+  const [expertiseTags, setExpertiseTags] = useState<string[]>([]);
   const [supportedLevels, setSupportedLevels] = useState<string[]>([]);
 
+  // Step 1 — Offre
   const [supportTypes, setSupportTypes] = useState<string[]>([]);
   const [tariffMin, setTariffMin] = useState('30');
   const [tariffMax, setTariffMax] = useState('45');
   const [currency, setCurrency] = useState('EUR');
-  const [languagesInput, setLanguagesInput] = useState('');
+  const [languages, setLanguages] = useState<string[]>([]);
   const [certificationsInput, setCertificationsInput] = useState('');
 
+  // Step 2 — Disponibilités
   const [isAvailable, setIsAvailable] = useState(true);
   const [nextAvailableAt, setNextAvailableAt] = useState('');
   const [slots, setSlots] = useState<AvailabilitySlot[]>([EMPTY_SLOT]);
 
+  // Step 3 — Finalisation
   const [professionalLinksInput, setProfessionalLinksInput] = useState('');
   const [degreesInput, setDegreesInput] = useState('');
   const [keywordsInput, setKeywordsInput] = useState('');
@@ -157,7 +173,7 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
   const profileCompletion = useMemo(() => {
     const checks = [
       Boolean(domain.trim()),
-      toArray(expertiseInput).length > 0,
+      expertiseTags.length > 0,
       Boolean(about.trim()),
       supportTypes.length > 0,
       Number(tariffMin) > 0 && Number(tariffMax) > Number(tariffMin),
@@ -167,7 +183,7 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
 
     const done = checks.filter(Boolean).length;
     return Math.round((done / checks.length) * 100);
-  }, [about, documents.length, domain, expertiseInput, professionalLinksInput, supportTypes.length, tariffMax, tariffMin]);
+  }, [about, documents.length, domain, expertiseTags.length, professionalLinksInput, supportTypes.length, tariffMax, tariffMin]);
 
   const loadProfile = useCallback(async () => {
     setLoading(true);
@@ -200,13 +216,13 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
         setBio(data.profile.bio ?? '');
         setAbout(data.profile.about ?? '');
         setEducationLevel(data.profile.educationLevel ?? '');
-        setExpertiseInput(data.profile.expertiseTags.join(', '));
+        setExpertiseTags(data.profile.expertiseTags ?? []);
         setSupportedLevels(data.profile.supportedLevels ?? []);
         setSupportTypes(data.profile.supportTypes ?? []);
         setTariffMin(String(data.profile.tariffs.min));
         setTariffMax(String(data.profile.tariffs.max));
         setCurrency(data.profile.tariffs.currency || 'EUR');
-        setLanguagesInput((data.profile.languages ?? []).join(', '));
+        setLanguages(data.profile.languages ?? []);
         setCertificationsInput((data.profile.certifications ?? []).join(', '));
         setIsAvailable(data.profile.availability.isAvailable);
         setNextAvailableAt(toLocalDateTime(data.profile.availability.nextAvailableAt));
@@ -240,8 +256,8 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
 
   const validateCurrentStep = () => {
     if (step === 0) {
-      if (!domain.trim()) return 'Le domaine est requis';
-      if (toArray(expertiseInput).length === 0) return 'Ajoutez au moins une competence';
+      if (!domain.trim()) return 'Le domaine principal est requis';
+      if (expertiseTags.length === 0) return 'Ajoutez au moins une competence';
       if (!about.trim()) return 'La section A propos est requise';
     }
 
@@ -288,10 +304,10 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
       degrees: toArray(degreesInput),
       keywords: toArray(keywordsInput),
       professionalLinks: toArray(professionalLinksInput),
-      expertiseTags: toArray(expertiseInput),
+      expertiseTags,
       supportedLevels,
       supportTypes,
-      languages: toArray(languagesInput),
+      languages,
       certifications: toArray(certificationsInput),
       tariffs: {
         min: Number(tariffMin),
@@ -402,7 +418,7 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
       <div className={styles.hero}>
         <h1 id="mentor-onboarding-title" className={styles.title}>Construisons votre profil mentor</h1>
         <p className={styles.subtitle}>
-          Etape {step + 1}/{STEPS.length} - {STEPS[step]}
+          Etape {step + 1}/{STEPS.length} — {STEPS[step]}
         </p>
         <div className={styles.progressTrack} aria-hidden="true">
           <div className={styles.progressFill} style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
@@ -430,15 +446,25 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
           {error && <div className={styles.feedbackError}>{error}</div>}
           {success && <div className={styles.feedbackSuccess}>{success}</div>}
 
+          {/* ── Étape 0 : Identité ─────────────────────────────────── */}
           {step === 0 && (
             <div className={styles.grid}>
-              <Input name="domain" label="Domaine principal" value={domain} onChange={(event) => setDomain(event.target.value)} />
-              <Input
-                name="expertise"
-                label="Competences (separees par des virgules)"
-                value={expertiseInput}
-                onChange={(event) => setExpertiseInput(event.target.value)}
-                placeholder="react, ux, management"
+              <SearchableSelect
+                label="Domaine principal"
+                placeholder="Rechercher un domaine…"
+                fetchUrl="/references/domains"
+                value={domain}
+                valueLabel={domainLabel}
+                onChange={(val, lbl) => { setDomain(val); setDomainLabel(lbl); }}
+              />
+              <MultiSearchSelect
+                label="Compétences (sélectionnez dans la liste)"
+                placeholder="Rechercher une compétence…"
+                fetchUrl="/references/skills"
+                domainFilter={domain || undefined}
+                values={expertiseTags}
+                onChange={setExpertiseTags}
+                maxItems={12}
               />
               <Input
                 name="bio"
@@ -488,6 +514,7 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
             </div>
           )}
 
+          {/* ── Étape 1 : Offre ──────────────────────────────────────── */}
           {step === 1 && (
             <div className={styles.grid}>
               <div>
@@ -537,12 +564,10 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
                 onChange={(event) => setCurrency(event.target.value.toUpperCase())}
                 maxLength={3}
               />
-              <Input
-                name="languages"
-                label="Langues"
-                value={languagesInput}
-                onChange={(event) => setLanguagesInput(event.target.value)}
-                placeholder="fr, en"
+              <LanguageSelect
+                label="Langues parlées"
+                values={languages}
+                onChange={setLanguages}
               />
               <Input
                 name="certifications"
@@ -554,6 +579,7 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
             </div>
           )}
 
+          {/* ── Étape 2 : Disponibilités ────────────────────────────── */}
           {step === 2 && (
             <div className={styles.grid}>
               <label className={styles.checkLine}>
@@ -627,6 +653,7 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
             </div>
           )}
 
+          {/* ── Étape 3 : Finalisation ──────────────────────────────── */}
           {step === 3 && (
             <div className={styles.grid}>
               <Input

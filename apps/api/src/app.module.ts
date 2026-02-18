@@ -21,6 +21,7 @@ import { ContentReportsModule } from './modules/content-reports';
 import { ModerationModule } from './modules/moderation';
 import { SupportModule } from './modules/support';
 import { AnalyticsModule } from './modules/analytics';
+import { ReferencesModule } from './modules/references';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { AnalyticsModule } from './modules/analytics';
     ModerationModule,
     SupportModule,
     AnalyticsModule,
+    ReferencesModule,
   ],
   providers: [
     {

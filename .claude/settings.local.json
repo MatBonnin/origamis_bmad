@@ -39,7 +39,9 @@
       "Bash(npx next lint)",
       "Bash(npx next build)",
       "Bash(npx vitest:*)",
-      "Bash(netstat:*)"
+      "Bash(netstat:*)",
+      "Bash(node -e:*)",
+      "Bash(npx ts-node:*)"
     ]
   }
 }

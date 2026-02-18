@@ -5,6 +5,26 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model domain_refs {
+  id       String @id @default(uuid())
+  slug     String @unique
+  label    String
+  category String
+
+  @@index([category])
+  @@map("domain_refs")
+}
+
+model skill_refs {
+  id          String  @id @default(uuid())
+  slug        String  @unique
+  label       String
+  domain_slug String?
+
+  @@index([domain_slug])
+  @@map("skill_refs")
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
