@@ -12,11 +12,48 @@
   margin: 0 auto;
 }
 
+.containerWide {
+  max-width: 1200px;
+}
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1.5rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.tabButton {
+  border: 1px solid #c7d2fe;
+  background: #eef2ff;
+  color: #1e3a8a;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.tabButton:hover,
+.tabButton:focus {
+  background: #dbeafe;
+  outline: none;
+}
+
+.tabButtonActive {
+  border-color: #36529b;
+  background: #36529b;
+  color: #ffffff;
+}
+
+.mentorPanel {
+  margin-top: 0.5rem;
 }
 
 .title {
