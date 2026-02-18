@@ -13,6 +13,7 @@ import {
   SearchableSelect,
   MultiSearchSelect,
   LanguageSelect,
+  FileUpload,
 } from '@/components/ui';
 import styles from './MentorSettings.module.css';
 
@@ -131,6 +132,20 @@ function toLocalDateTime(value: string | null): string {
   )}:${pad(date.getMinutes())}`;
 }
 
+const REQUIREMENT_LABELS: Record<string, string> = {
+  about: 'Description "A propos"',
+  banner_or_avatar: 'Photo de profil ou banniere',
+  domain: 'Domaine d\'expertise',
+  expertise_tags: 'Au moins une competence',
+  support_types: 'Au moins un type d\'accompagnement',
+  tariff: 'Tarif horaire',
+  profile: 'Profil mentor',
+};
+
+function translateRequirement(key: string): string {
+  return REQUIREMENT_LABELS[key] || key;
+}
+
 export function MentorSettings({ accessToken }: Props) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -207,6 +222,18 @@ export function MentorSettings({ accessToken }: Props) {
       setIsAvailable(data.profile.availability.isAvailable);
       setNextAvailableAt(toLocalDateTime(data.profile.availability.nextAvailableAt));
       setSlots(data.profile.availability.slots.length > 0 ? data.profile.availability.slots : [EMPTY_SLOT]);
+
+      // Charger le statut de publication
+      const readinessResponse = await fetch(`${API_URL}/mentors/me/publish-readiness`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        cache: 'no-store',
+      });
+      if (readinessResponse.ok) {
+        const readinessResult = await readinessResponse.json();
+        if (readinessResult.data) {
+          setMissingRequirements(readinessResult.data.missingRequirements ?? []);
+        }
+      }
 
     } catch {
       setError('Erreur de connexion au serveur');
@@ -435,6 +462,35 @@ export function MentorSettings({ accessToken }: Props) {
 
       <Card>
         <CardHeader>
+          <CardTitle>Statut de publication</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!hasExistingProfile ? (
+            <div className={styles.publishStatus}>
+              <span className={styles.statusBadgeWarning}>Non cree</span>
+              <p>Remplissez le formulaire pour creer votre profil mentor.</p>
+            </div>
+          ) : missingRequirements.length === 0 ? (
+            <div className={styles.publishStatus}>
+              <span className={styles.statusBadgeSuccess}>Profil visible</span>
+              <p>Votre profil est publie et visible dans la recherche des etudiants.</p>
+            </div>
+          ) : (
+            <div className={styles.publishStatus}>
+              <span className={styles.statusBadgeWarning}>Profil incomplet</span>
+              <p>Completez les elements suivants pour apparaitre dans la recherche :</p>
+              <ul className={styles.missingList}>
+                {missingRequirements.map((item) => (
+                  <li key={item}>{translateRequirement(item)}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Resume mentor</CardTitle>
         </CardHeader>
         <CardContent>
@@ -508,12 +564,13 @@ export function MentorSettings({ accessToken }: Props) {
             placeholder="Presentez votre approche mentor"
           />
 
-          <Input
-            name="bannerUrl"
-            label="Banniere (URL)"
-            value={bannerUrl}
-            onChange={(event) => setBannerUrl(event.target.value)}
-            placeholder="https://cdn.example.com/mentor-banner.png"
+          <FileUpload
+            label="Banniere"
+            accept="image"
+            accessToken={accessToken}
+            value={bannerUrl || undefined}
+            onChange={(url) => setBannerUrl(url || '')}
+            placeholder="Glissez votre photo de banniere"
           />
 
           <Input
@@ -721,36 +778,53 @@ export function MentorSettings({ accessToken }: Props) {
           <CardTitle>Legitimite & documents</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className={styles.gridThree}>
-            <Select
-              name="docType"
-              label="Type"
-              value={docType}
-              options={[
-                { value: 'diploma', label: 'Diplome' },
-                { value: 'certificate', label: 'Certification' },
-              ]}
-              onChange={(event) => setDocType(event.target.value as 'diploma' | 'certificate')}
-            />
-            <Input
-              name="docUrl"
-              label="URL document"
-              value={docUrl}
-              onChange={(event) => setDocUrl(event.target.value)}
-              placeholder="https://..."
-            />
-            <Button type="button" variant="outline" onClick={() => void uploadDocument()}>
-              Ajouter
-            </Button>
+          <div className={styles.documentsSection}>
+            <div className={styles.documentUploadRow}>
+              <Select
+                name="docType"
+                label="Type de document"
+                value={docType}
+                options={[
+                  { value: 'diploma', label: 'Diplome' },
+                  { value: 'certificate', label: 'Certification' },
+                ]}
+                onChange={(event) => setDocType(event.target.value as 'diploma' | 'certificate')}
+              />
+              <FileUpload
+                label="Document (PDF, image)"
+                accept="document"
+                accessToken={accessToken}
+                value={docUrl || undefined}
+                onChange={(url) => setDocUrl(url || '')}
+                placeholder="Glissez un diplome ou certificat"
+              />
+            </div>
+            {docUrl && (
+              <Button type="button" variant="outline" onClick={() => void uploadDocument()}>
+                Enregistrer ce document
+              </Button>
+            )}
           </div>
-          <ul>
-            {documents.map((doc) => (
-              <li key={doc.documentId}>
-                {doc.type} - {doc.verificationStatus}
-              </li>
-            ))}
-            {documents.length === 0 && <li>Aucun document</li>}
-          </ul>
+
+          {documents.length > 0 && (
+            <div className={styles.documentsList}>
+              <p className={styles.groupTitle}>Documents enregistres</p>
+              <ul className={styles.documentsGrid}>
+                {documents.map((doc) => (
+                  <li key={doc.documentId} className={styles.documentItem}>
+                    <span className={styles.documentType}>
+                      {doc.type === 'diploma' ? 'Diplome' : 'Certification'}
+                    </span>
+                    <span className={styles.documentStatus} data-status={doc.verificationStatus}>
+                      {doc.verificationStatus === 'pending' && 'En attente'}
+                      {doc.verificationStatus === 'verified' && 'Verifie'}
+                      {doc.verificationStatus === 'rejected' && 'Rejete'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -771,23 +845,6 @@ export function MentorSettings({ accessToken }: Props) {
               </Button>
             )}
           </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Readiness publication</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {missingRequirements.length === 0 ? (
-            <p>Profil publiable</p>
-          ) : (
-            <ul>
-              {missingRequirements.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          )}
         </CardContent>
       </Card>
 

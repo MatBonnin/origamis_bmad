@@ -22,6 +22,7 @@ import { ModerationModule } from './modules/moderation';
 import { SupportModule } from './modules/support';
 import { AnalyticsModule } from './modules/analytics';
 import { ReferencesModule } from './modules/references';
+import { UploadModule } from './modules/upload';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { ReferencesModule } from './modules/references';
     SupportModule,
     AnalyticsModule,
     ReferencesModule,
+    UploadModule,
   ],
   providers: [
     {

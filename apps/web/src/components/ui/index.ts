@@ -28,3 +28,7 @@ export type { MultiSelectOption } from './MultiSearchSelect';
 
 // LanguageSelect
 export { LanguageSelect, LANGUAGES } from './LanguageSelect';
+
+// FileUpload
+export { FileUpload } from './FileUpload';
+export type { FileUploadProps } from './FileUpload';

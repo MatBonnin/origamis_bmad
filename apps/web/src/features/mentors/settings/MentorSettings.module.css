@@ -167,3 +167,115 @@
     flex-direction: column;
   }
 }
+
+.publishStatus {
+  display: grid;
+  gap: var(--spacing-3);
+}
+
+.publishStatus p {
+  margin: 0;
+  color: var(--color-neutral-700);
+}
+
+.statusBadgeBase {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  width: fit-content;
+}
+
+.statusBadgeSuccess {
+  composes: statusBadgeBase;
+  background: var(--color-success-light, #dcfce7);
+  color: var(--color-success, #16a34a);
+}
+
+.statusBadgeWarning {
+  composes: statusBadgeBase;
+  background: var(--color-warning-light, #fef3c7);
+  color: var(--color-warning, #d97706);
+}
+
+.missingList {
+  margin: 0;
+  padding-left: var(--spacing-5);
+  display: grid;
+  gap: var(--spacing-2);
+  color: var(--color-neutral-700);
+}
+
+.missingList li {
+  line-height: 1.5;
+}
+
+.documentsSection {
+  display: grid;
+  gap: var(--spacing-4);
+}
+
+.documentUploadRow {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: var(--spacing-4);
+  align-items: start;
+}
+
+.documentsList {
+  margin-top: var(--spacing-4);
+  display: grid;
+  gap: var(--spacing-3);
+}
+
+.documentsGrid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.documentItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3);
+  background-color: var(--color-neutral-50);
+  border-radius: var(--radius-md);
+}
+
+.documentType {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-900);
+}
+
+.documentStatus {
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.documentStatus[data-status="pending"] {
+  background-color: var(--color-warning-light, #fef3c7);
+  color: var(--color-warning, #d97706);
+}
+
+.documentStatus[data-status="verified"] {
+  background-color: var(--color-success-light, #dcfce7);
+  color: var(--color-success, #16a34a);
+}
+
+.documentStatus[data-status="rejected"] {
+  background-color: var(--color-error-light, #fee2e2);
+  color: var(--color-error, #dc2626);
+}
+
+@media (max-width: 767px) {
+  .documentUploadRow {
+    grid-template-columns: 1fr;
+  }
+}
