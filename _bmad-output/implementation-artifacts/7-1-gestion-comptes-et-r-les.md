@@ -1,25 +1,25 @@
-# Story 7.1: Gestion comptes et rôles
+﻿# Story 7.1: Gestion comptes et rÃ´les
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
 ## Story
 
 As a admin,
-I want gérer les comptes et rôles utilisateurs,
+I want gÃ©rer les comptes et rÃ´les utilisateurs,
 so that administrer la plateforme.
 
 ## Acceptance Criteria
 
-1. Given un admin authentifié When il modifie un compte ou un rôle Then les changements sont enregistrés
+1. Given un admin authentifiÃ© When il modifie un compte ou un rÃ´le Then les changements sont enregistrÃ©s
 
 ## Tasks / Subtasks
 
-- [ ] Endpoint admin `GET /users`, `PATCH /users/:id`, `PATCH /users/:id/roles` (AC: #1)
-- [ ] Ajouter tableau de bord comptes + filtres (status, rôle, sync RGPD) (AC: #1)
-- [ ] Historiser changements (audit trail) (AC: #1)
-- [ ] Tests API + audit + UI (AC: #1)
+- [x] Endpoint admin `GET /users`, `PATCH /users/:id`, `PATCH /users/:id/roles` (AC: #1)
+- [x] Ajouter tableau de bord comptes + filtres (status, rÃ´le, sync RGPD) (AC: #1)
+- [x] Historiser changements (audit trail) (AC: #1)
+- [x] Tests API + audit + UI (AC: #1)
 
 ## Dev Notes
 
@@ -50,7 +50,7 @@ so that administrer la plateforme.
 - `user_roles`: many-to-many linking.
 - Conventions `snake_case`.
 
-### UX & accessibilité
+### UX & accessibilitÃ©
 
 - Table des comptes avec recherche, filtres, pagination.
 - Accessible modals pour role/status change.
@@ -69,11 +69,11 @@ so that administrer la plateforme.
 - UI: filters, modals, audit display.
 - Compliance: audit entries created for each action.
 
-### Do / Don’t
+### Do / Donâ€™t
 
 - Do: enforce RBAC (admin vs support).
 - Do: allow rollback via audit log.
-- Don’t: expose passwords or tokens.
+- Donâ€™t: expose passwords or tokens.
 
 - Web: `apps/web/src/features/admin/users`.
 - API: `apps/api/src/modules/users`.
@@ -99,6 +99,28 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
+- npm test -- --runInBand modules/admin modules/users modules/support modules/analytics (apps/api)
+- npm test -- src/features/admin/users/__tests__/AdminUsersManager.test.tsx src/features/support/incidents/__tests__/SupportIncidentsBoard.test.tsx src/features/analytics/dashboard/__tests__/AnalyticsDashboard.test.tsx src/features/rgpd/deletion/__tests__/RgpdDeletionManager.test.tsx (apps/web)
+
 ### Completion Notes List
 
+- Ajout des endpoints comptes admin sur `/users` : listage filtre, edition profil, roles, status, suppression logique.
+- Extension de la couche admin avec statuts comptes (`active|suspended|deleted`), metadonnees RGPD et journal d audit.
+- Mise a jour du front `AdminUsersManager` : filtres role/status, actions statut, affichage audit.
+- Validation RBAC admin/support sur les operations de gestion de comptes.
+
 ### File List
+
+- apps/api/src/modules/admin/admin.service.ts
+- apps/api/src/modules/admin/admin.controller.ts
+- apps/api/src/modules/admin/admin.service.spec.ts
+- apps/api/src/modules/admin/admin.controller.spec.ts
+- apps/api/src/modules/users/users.controller.ts
+- apps/api/src/modules/users/users.module.ts
+- apps/web/src/features/admin/users/AdminUsersManager.tsx
+- apps/web/src/features/admin/users/AdminUsersManager.module.css
+- apps/web/src/features/admin/users/__tests__/AdminUsersManager.test.tsx
+
+### Change Log
+
+- 2026-02-18: Livraison story 7.1 (gestion comptes/roles + audit + UI admin).

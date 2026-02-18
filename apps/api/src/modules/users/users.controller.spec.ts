@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { AdminService } from '../admin';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -16,6 +17,17 @@ describe('UsersController', () => {
     updateNeeds: jest.fn(),
     getConsent: jest.fn(),
     withdrawConsent: jest.fn(),
+    requestDeletion: jest.fn(),
+    updateDeletionStatus: jest.fn(),
+    deleteUserData: jest.fn(),
+  };
+
+  const mockAdminService = {
+    listUsers: jest.fn(),
+    updateUserAccount: jest.fn(),
+    updateUserRoles: jest.fn(),
+    updateUserStatus: jest.fn(),
+    suppressUser: jest.fn(),
   };
 
   const mockUser = {
@@ -44,7 +56,10 @@ describe('UsersController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [{ provide: UsersService, useValue: mockUsersService }],
+      providers: [
+        { provide: UsersService, useValue: mockUsersService },
+        { provide: AdminService, useValue: mockAdminService },
+      ],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })
@@ -235,6 +250,31 @@ describe('UsersController', () => {
 
       expect(result).toEqual({ data: mockResult, error: null });
       expect(usersService.withdrawConsent).toHaveBeenCalledWith('user-1');
+    });
+  });
+
+  describe('admin users endpoints', () => {
+    it('should list users for admin/support', async () => {
+      mockAdminService.listUsers.mockResolvedValue({
+        users: [],
+        metadata: { total: 0, nextCursor: null },
+      });
+
+      const result = await controller.getUsersForAdmin();
+      expect(result.error).toBeNull();
+      expect(mockAdminService.listUsers).toHaveBeenCalled();
+    });
+  });
+
+  describe('rgpd deletion endpoints', () => {
+    it('should create deletion request', async () => {
+      mockUsersService.requestDeletion.mockResolvedValue({ status: 'requested' });
+      const result = await controller.requestDeletion(
+        mockUser as never,
+        'user-1',
+        { reason: 'test' },
+      );
+      expect(result.error).toBeNull();
     });
   });
 });

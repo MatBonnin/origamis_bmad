@@ -1,0 +1,1 @@
+﻿export { SupportIncidentsBoard } from './SupportIncidentsBoard';

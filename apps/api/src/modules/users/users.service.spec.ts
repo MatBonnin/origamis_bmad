@@ -27,6 +27,25 @@ describe('UsersService', () => {
       create: jest.fn(),
       update: jest.fn(),
     },
+    notifications: {
+      deleteMany: jest.fn(),
+    },
+    messages: {
+      deleteMany: jest.fn(),
+    },
+    read_status: {
+      deleteMany: jest.fn(),
+    },
+    bookings: {
+      deleteMany: jest.fn(),
+    },
+    sessions: {
+      deleteMany: jest.fn(),
+    },
+    user_roles: {
+      deleteMany: jest.fn(),
+    },
+    $transaction: jest.fn(),
   };
 
   const mockMatchingService = {
@@ -59,6 +78,10 @@ describe('UsersService', () => {
     service = module.get<UsersService>(UsersService);
 
     jest.clearAllMocks();
+    mockPrismaService.$transaction.mockImplementation(
+      async (fn: (tx: typeof mockPrismaService) => Promise<void>) =>
+        fn(mockPrismaService as never),
+    );
   });
 
   describe('getProfile', () => {
@@ -592,6 +615,18 @@ describe('UsersService', () => {
       await expect(service.withdrawConsent('user-1')).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('rgpd deletion flow', () => {
+    it('creates deletion request for current user', async () => {
+      mockPrismaService.users.findUnique.mockResolvedValue({ id: 'user-1' });
+      const request = await service.requestDeletion(
+        { id: 'user-1', roles: ['etudiant'] },
+        'user-1',
+        { reason: 'RGPD' },
+      );
+      expect(request.status).toBe('requested');
     });
   });
 });

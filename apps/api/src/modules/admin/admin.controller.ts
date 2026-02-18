@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -28,9 +36,35 @@ export class AdminController {
     description: 'Utilisateurs recuperes avec succes',
   })
   @ApiResponse({ status: 403, description: 'Acces refuse' })
-  async getUsers() {
-    const users = await this.adminService.listUsers();
-    return { data: { users }, error: null };
+  async getUsers(
+    @Query('role') role?: string,
+    @Query('status') status?: 'active' | 'suspended' | 'deleted' | 'all',
+    @Query('cursor') cursor?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const parsedLimit = Number(limit);
+    const data = await this.adminService.listUsers({
+      role,
+      status,
+      cursor,
+      limit: Number.isFinite(parsedLimit) ? parsedLimit : undefined,
+    });
+    return { data, error: null };
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Mettre a jour un compte utilisateur' })
+  async updateUser(
+    @CurrentUser() currentUser: UserResponseDto,
+    @Param('id') id: string,
+    @Body() dto: { firstName?: string; lastName?: string; status?: 'active' | 'suspended' | 'deleted' },
+  ) {
+    const user = await this.adminService.updateUserAccount(
+      currentUser.id,
+      id,
+      dto,
+    );
+    return { data: { user }, error: null };
   }
 
   @Patch(':id/roles')
@@ -47,6 +81,21 @@ export class AdminController {
       currentUser.id,
       id,
       dto.roles,
+    );
+    return { data: { user }, error: null };
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Modifier le statut d un utilisateur' })
+  async updateUserStatus(
+    @CurrentUser() currentUser: UserResponseDto,
+    @Param('id') id: string,
+    @Body() dto: { status: 'active' | 'suspended' | 'deleted' },
+  ) {
+    const user = await this.adminService.updateUserStatus(
+      currentUser.id,
+      id,
+      dto.status,
     );
     return { data: { user }, error: null };
   }

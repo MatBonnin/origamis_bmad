@@ -9,7 +9,9 @@ describe('AdminController', () => {
 
   const mockAdminService = {
     listUsers: jest.fn(),
+    updateUserAccount: jest.fn(),
     updateUserRoles: jest.fn(),
+    updateUserStatus: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -29,12 +31,12 @@ describe('AdminController', () => {
   });
 
   it('getUsers should return data envelope', async () => {
-    const users = [{ id: 'u1', roles: ['mentor'] }];
-    mockAdminService.listUsers.mockResolvedValue(users);
+    const data = { users: [{ id: 'u1', roles: ['mentor'] }], metadata: { total: 1, nextCursor: null } };
+    mockAdminService.listUsers.mockResolvedValue(data);
 
     const result = await controller.getUsers();
 
-    expect(result).toEqual({ data: { users }, error: null });
+    expect(result).toEqual({ data, error: null });
     expect(adminService.listUsers).toHaveBeenCalledTimes(1);
   });
 

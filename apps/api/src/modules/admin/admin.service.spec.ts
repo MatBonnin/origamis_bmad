@@ -55,15 +55,14 @@ describe('AdminService', () => {
 
     const result = await service.listUsers();
 
-    expect(result).toEqual([
-      {
+    expect(result.users).toEqual([
+      expect.objectContaining({
         id: 'u1',
         email: 'user@example.com',
         firstName: 'User',
         lastName: 'One',
         roles: ['mentor'],
-        createdAt: new Date('2026-01-01'),
-      },
+      }),
     ]);
   });
 

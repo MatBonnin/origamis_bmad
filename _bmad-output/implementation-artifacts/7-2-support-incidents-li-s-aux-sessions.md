@@ -1,24 +1,24 @@
-# Story 7.2: Support incidents liés aux sessions
+﻿# Story 7.2: Support incidents liÃ©s aux sessions
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
 ## Story
 
 As a support,
-I want consulter les incidents liés aux sessions,
-so that aider à la résolution.
+I want consulter les incidents liÃ©s aux sessions,
+so that aider Ã  la rÃ©solution.
 
 ## Acceptance Criteria
 
-1. Given un incident déclaré When le support consulte le dossier Then les détails de session sont visibles
+1. Given un incident dÃ©clarÃ© When le support consulte le dossier Then les dÃ©tails de session sont visibles
 
-- [ ] Endpoint `GET /sessions/:id/incidents`, `POST /incidents` + `PATCH /incidents/:id/status` (AC: #1)
-- [ ] UI support avec timeline incident (sessions, messages, notifications) (AC: #1)
-- [ ] Intégrer logs + attachments (logs, visio replays, messages) (AC: #1)
-- [ ] Notifications automatiques (support, mentor, student) (AC: #1)
-- [ ] Tests API + UI + alert workflow (AC: #1)
+- [x] Endpoint `GET /sessions/:id/incidents`, `POST /incidents` + `PATCH /incidents/:id/status` (AC: #1)
+- [x] UI support avec timeline incident (sessions, messages, notifications) (AC: #1)
+- [x] IntÃ©grer logs + attachments (logs, visio replays, messages) (AC: #1)
+- [x] Notifications automatiques (support, mentor, student) (AC: #1)
+- [x] Tests API + UI + alert workflow (AC: #1)
 
 ## Dev Notes
 
@@ -48,7 +48,7 @@ so that aider à la résolution.
 - `incident_attachments`: `incident_id`, `type`, `url`.
 - Conventions `snake_case`.
 
-### UX & accessibilité
+### UX & accessibilitÃ©
 
 - Timeline view (session events, incidents, notes).
 - Accessible controls for support, modals with `aria-live`.
@@ -66,11 +66,11 @@ so that aider à la résolution.
 - UI: timeline, attachments, filters.
 - Integration: notification triggers.
 
-### Do / Don’t
+### Do / Donâ€™t
 
 - Do: log each action (audit).
 - Do: capture context (session id, user).
-- Don’t: hide incidents without resolution.
+- Donâ€™t: hide incidents without resolution.
 
 - Web: `apps/web/src/features/support/incidents`.
 - API: `apps/api/src/modules/support`.
@@ -96,6 +96,30 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
+- npm test -- --runInBand modules/admin modules/users modules/support modules/analytics (apps/api)
+- npm test -- src/features/support/incidents/__tests__/SupportIncidentsBoard.test.tsx (apps/web)
+
 ### Completion Notes List
 
+- Creation du module API `support` avec endpoints : `GET /sessions/:id/incidents`, `POST /incidents`, `PATCH /incidents/:id/status`, `GET /incidents`.
+- Ajout des structures incident/timeline/attachments et transitions de statut (open, in_review, resolved, escalated).
+- Ajout de l UI support `SupportIncidentsBoard` avec filtre status et actions de resolution.
+- Ajout de la page protegee `/admin/incidents` accessible admin/support.
+
 ### File List
+
+- apps/api/src/modules/support/support.module.ts
+- apps/api/src/modules/support/support.controller.ts
+- apps/api/src/modules/support/support.service.ts
+- apps/api/src/modules/support/support.controller.spec.ts
+- apps/api/src/modules/support/support.service.spec.ts
+- apps/api/src/modules/support/index.ts
+- apps/web/src/features/support/incidents/SupportIncidentsBoard.tsx
+- apps/web/src/features/support/incidents/SupportIncidentsBoard.module.css
+- apps/web/src/features/support/incidents/index.ts
+- apps/web/src/features/support/incidents/__tests__/SupportIncidentsBoard.test.tsx
+- apps/web/src/app/(app)/admin/incidents/page.tsx
+
+### Change Log
+
+- 2026-02-18: Livraison story 7.2 (module support incidents API + UI + tests).

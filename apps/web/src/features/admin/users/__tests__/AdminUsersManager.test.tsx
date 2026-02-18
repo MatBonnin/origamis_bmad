@@ -30,6 +30,9 @@ describe('AdminUsersManager', () => {
                 firstName: 'Alice',
                 lastName: 'Mentor',
                 roles: ['etudiant'],
+                status: 'active',
+                rgpdSync: true,
+                auditCount: 0,
               },
             ],
           },
@@ -46,6 +49,9 @@ describe('AdminUsersManager', () => {
               firstName: 'Alice',
               lastName: 'Mentor',
               roles: ['etudiant', 'mentor'],
+              status: 'active',
+              rgpdSync: true,
+              auditCount: 1,
             },
           },
           error: null,
@@ -58,14 +64,14 @@ describe('AdminUsersManager', () => {
 
     const mentorCheckbox = screen.getByRole('checkbox', { name: 'mentor' });
     await userEvent.click(mentorCheckbox);
-    await userEvent.click(screen.getByRole('button', { name: 'Enregistrer' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Enregistrer roles' }));
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledTimes(2);
     });
 
     const secondCall = fetchMock.mock.calls[1];
-    expect(secondCall[0]).toContain('/admin/users/user-2/roles');
+    expect(secondCall[0]).toContain('/users/user-2/roles');
     expect(secondCall[1]).toMatchObject({ method: 'PATCH' });
     expect(String((secondCall[1] as RequestInit).body)).toContain('mentor');
 

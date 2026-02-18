@@ -58,6 +58,9 @@
 
 .preferencesActions {
   margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .preferencesLink {

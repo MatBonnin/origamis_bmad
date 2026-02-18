@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Patch, Body, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -14,15 +24,21 @@ import {
   UserProfileResponseDto,
 } from './dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
 import { UserResponseDto } from '../auth/dto';
+import { AdminService } from '../admin';
 
 @ApiTags('users')
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly adminService: AdminService,
+  ) {}
 
   @Get('me')
   @ApiOperation({
@@ -200,5 +216,129 @@ export class UsersController {
   async withdrawConsent(@CurrentUser() user: UserResponseDto) {
     const result = await this.usersService.withdrawConsent(user.id);
     return { data: result, error: null };
+  }
+
+  @Get()
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'support')
+  @ApiOperation({ summary: 'Lister les comptes utilisateurs' })
+  async getUsersForAdmin(
+    @Query('role') role?: string,
+    @Query('status') status?: 'active' | 'suspended' | 'deleted' | 'all',
+    @Query('cursor') cursor?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const parsedLimit = Number(limit);
+    const data = await this.adminService.listUsers({
+      role,
+      status,
+      cursor,
+      limit: Number.isFinite(parsedLimit) ? parsedLimit : undefined,
+    });
+    return { data, error: null };
+  }
+
+  @Patch(':id')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Modifier un compte utilisateur (admin)' })
+  async updateUserForAdmin(
+    @CurrentUser() user: UserResponseDto,
+    @Param('id') targetUserId: string,
+    @Body()
+    dto: { firstName?: string; lastName?: string; status?: 'active' | 'suspended' | 'deleted' },
+  ) {
+    const updated = await this.adminService.updateUserAccount(
+      user.id,
+      targetUserId,
+      dto,
+    );
+    return { data: { user: updated }, error: null };
+  }
+
+  @Patch(':id/roles')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Modifier les roles utilisateur (admin)' })
+  async updateUserRolesForAdmin(
+    @CurrentUser() user: UserResponseDto,
+    @Param('id') targetUserId: string,
+    @Body() dto: { roles: string[] },
+  ) {
+    const updated = await this.adminService.updateUserRoles(
+      user.id,
+      targetUserId,
+      dto.roles,
+    );
+    return { data: { user: updated }, error: null };
+  }
+
+  @Patch(':id/status')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Modifier le statut utilisateur (admin)' })
+  async updateUserStatusForAdmin(
+    @CurrentUser() user: UserResponseDto,
+    @Param('id') targetUserId: string,
+    @Body() dto: { status: 'active' | 'suspended' | 'deleted' },
+  ) {
+    const updated = await this.adminService.updateUserStatus(
+      user.id,
+      targetUserId,
+      dto.status,
+    );
+    return { data: { user: updated }, error: null };
+  }
+
+  @Post(':id/suppress')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Archiver/supprimer logiquement un utilisateur (admin)' })
+  async suppressUserForAdmin(
+    @CurrentUser() user: UserResponseDto,
+    @Param('id') targetUserId: string,
+  ) {
+    const result = await this.adminService.suppressUser(user.id, targetUserId);
+    return { data: result, error: null };
+  }
+
+  @Post(':id/request-deletion')
+  @ApiOperation({ summary: 'Demander la suppression de ses donnees (RGPD)' })
+  async requestDeletion(
+    @CurrentUser() user: UserResponseDto,
+    @Param('id') targetUserId: string,
+    @Body() dto: { reason?: string; requestExport?: boolean },
+  ) {
+    const request = await this.usersService.requestDeletion(user, targetUserId, dto);
+    return { data: { request }, error: null };
+  }
+
+  @Patch(':id/deletion-status')
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'support')
+  @ApiOperation({ summary: 'Mettre a jour le statut d une demande RGPD' })
+  async updateDeletionStatus(
+    @CurrentUser() user: UserResponseDto,
+    @Param('id') targetUserId: string,
+    @Body() dto: { status: 'requested' | 'reviewed' | 'approved' | 'rejected' | 'deleted'; notes?: string },
+  ) {
+    const status = await this.usersService.updateDeletionStatus(
+      user,
+      targetUserId,
+      dto,
+    );
+    return { data: { status }, error: null };
+  }
+
+  @Delete(':id/data')
+  @UseGuards(RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Executer la suppression des donnees utilisateur' })
+  async deleteUserData(
+    @CurrentUser() user: UserResponseDto,
+    @Param('id') targetUserId: string,
+  ) {
+    const data = await this.usersService.deleteUserData(user, targetUserId);
+    return { data, error: null };
   }
 }

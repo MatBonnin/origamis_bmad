@@ -36,19 +36,32 @@ export default async function DashboardPage() {
             <Link href="/preferences-notifications" className={styles.preferencesLink}>
               Gerer mes preferences de notifications
             </Link>
+            <Link href="/rgpd/suppression" className={styles.preferencesLink}>
+              Gerer ma demande RGPD
+            </Link>
           </div>
 
-          {session.user.roles.includes('admin') && (
+          {(session.user.roles.includes('admin') || session.user.roles.includes('support')) && (
             <div className={styles.adminActions}>
-              <Link href="/admin/utilisateurs" className={styles.adminLink}>
-                Gerer les roles utilisateurs
+              <Link href="/admin/incidents" className={styles.adminLink}>
+                Support incidents
               </Link>
-              <Link href="/admin/mentors/validation" className={styles.adminLink}>
-                Valider les mentors
+              <Link href="/admin/analytics" className={styles.adminLink}>
+                Dashboard analytics
               </Link>
-              <Link href="/admin/mentors/visibilite" className={styles.adminLink}>
-                Gerer la visibilite mentors
-              </Link>
+              {session.user.roles.includes('admin') && (
+                <>
+                  <Link href="/admin/utilisateurs" className={styles.adminLink}>
+                    Gerer les roles utilisateurs
+                  </Link>
+                  <Link href="/admin/mentors/validation" className={styles.adminLink}>
+                    Valider les mentors
+                  </Link>
+                  <Link href="/admin/mentors/visibilite" className={styles.adminLink}>
+                    Gerer la visibilite mentors
+                  </Link>
+                </>
+              )}
             </div>
           )}
         </div>

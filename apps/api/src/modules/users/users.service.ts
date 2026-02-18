@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma';
 import { MatchingService } from '../matching';
 import {
@@ -18,6 +22,21 @@ import {
 
 @Injectable()
 export class UsersService {
+  private readonly deletionRequests = new Map<
+    string,
+    {
+      id: string;
+      userId: string;
+      reason: string;
+      requestExport: boolean;
+      status: 'requested' | 'reviewed' | 'approved' | 'rejected' | 'deleted';
+      reviewedBy: string | null;
+      requestedAt: string;
+      updatedAt: string;
+      notes: string;
+    }
+  >();
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly matchingService: MatchingService,
@@ -305,6 +324,163 @@ export class UsersService {
         'En retirant votre consentement, les fonctionnalites suivantes seront desactivees : ' +
         'matching de mentors, messagerie, prise de rendez-vous et notifications. ' +
         'Vous pourrez toujours consulter votre compte, telecharger vos donnees et demander leur suppression.',
+    };
+  }
+
+  async requestDeletion(
+    actor: { id: string; roles?: string[] },
+    targetUserId: string,
+    input: { reason?: string; requestExport?: boolean },
+  ) {
+    if (actor.id !== targetUserId && !actor.roles?.includes('admin')) {
+      throw new ForbiddenException({
+        code: 'RGPD_FORBIDDEN',
+        message: 'Vous ne pouvez demander que la suppression de vos donnees',
+      });
+    }
+
+    await this.assertUserExists(targetUserId);
+
+    const now = new Date().toISOString();
+    const existing = this.deletionRequests.get(targetUserId);
+    const request = {
+      id:
+        existing?.id ??
+        `deletion-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      userId: targetUserId,
+      reason: input.reason?.trim() || 'Demande utilisateur',
+      requestExport: Boolean(input.requestExport),
+      status: 'requested' as const,
+      reviewedBy: null,
+      requestedAt: existing?.requestedAt ?? now,
+      updatedAt: now,
+      notes: '',
+    };
+
+    this.deletionRequests.set(targetUserId, request);
+    return request;
+  }
+
+  async updateDeletionStatus(
+    actor: { id: string; roles?: string[] },
+    targetUserId: string,
+    input: {
+      status: 'requested' | 'reviewed' | 'approved' | 'rejected' | 'deleted';
+      notes?: string;
+    },
+  ) {
+    if (!actor.roles?.includes('admin') && !actor.roles?.includes('support')) {
+      throw new ForbiddenException({
+        code: 'RGPD_STATUS_FORBIDDEN',
+        message: 'Acces reserve au support/admin',
+      });
+    }
+
+    await this.assertUserExists(targetUserId);
+
+    const existing = this.deletionRequests.get(targetUserId);
+    if (!existing) {
+      throw new NotFoundException({
+        code: 'RGPD_REQUEST_NOT_FOUND',
+        message: 'Aucune demande de suppression trouvee',
+      });
+    }
+
+    const updated = {
+      ...existing,
+      status: input.status,
+      reviewedBy: actor.id,
+      notes: input.notes?.trim() ?? existing.notes,
+      updatedAt: new Date().toISOString(),
+    };
+    this.deletionRequests.set(targetUserId, updated);
+
+    return {
+      userId: targetUserId,
+      status: updated.status,
+      reviewedBy: updated.reviewedBy,
+      updatedAt: updated.updatedAt,
+      notes: updated.notes,
+    };
+  }
+
+  async deleteUserData(
+    actor: { id: string; roles?: string[] },
+    targetUserId: string,
+  ) {
+    if (!actor.roles?.includes('admin')) {
+      throw new ForbiddenException({
+        code: 'RGPD_DELETE_FORBIDDEN',
+        message: 'Seul un admin peut executer la suppression finale',
+      });
+    }
+
+    await this.assertUserExists(targetUserId);
+
+    const request = this.deletionRequests.get(targetUserId);
+    if (!request || (request.status !== 'approved' && request.status !== 'deleted')) {
+      throw new ForbiddenException({
+        code: 'RGPD_NOT_APPROVED',
+        message: 'La suppression finale requiert une approbation prealable',
+      });
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.notifications.deleteMany({ where: { user_id: targetUserId } });
+      await tx.notification_preferences.deleteMany({
+        where: { user_id: targetUserId },
+      });
+      await tx.messages.deleteMany({
+        where: {
+          OR: [{ sender_id: targetUserId }, { receiver_id: targetUserId }],
+        },
+      });
+      await tx.read_status.deleteMany({ where: { user_id: targetUserId } });
+      await tx.bookings.deleteMany({
+        where: {
+          OR: [{ student_id: targetUserId }, { mentor_id: targetUserId }],
+        },
+      });
+      await tx.user_needs.deleteMany({ where: { user_id: targetUserId } });
+      await tx.sessions.deleteMany({ where: { user_id: targetUserId } });
+      await tx.consents.deleteMany({ where: { user_id: targetUserId } });
+      await tx.user_roles.deleteMany({ where: { user_id: targetUserId } });
+      await tx.users.update({
+        where: { id: targetUserId },
+        data: {
+          first_name: 'Supprime',
+          last_name: 'Utilisateur',
+          email: `deleted+${targetUserId}@example.invalid`,
+          bio: null,
+          avatar_url: null,
+          objectives: [],
+        },
+      });
+    });
+
+    this.deletionRequests.set(targetUserId, {
+      ...request,
+      status: 'deleted',
+      reviewedBy: actor.id,
+      updatedAt: new Date().toISOString(),
+      notes: request.notes || 'Suppression executee',
+    });
+
+    return {
+      success: true,
+      userId: targetUserId,
+      deletedArtifacts: [
+        'notifications',
+        'notification_preferences',
+        'messages',
+        'read_status',
+        'bookings',
+        'user_needs',
+        'sessions',
+        'consents',
+        'user_roles',
+        'users(anonymized)',
+      ],
     };
   }
 

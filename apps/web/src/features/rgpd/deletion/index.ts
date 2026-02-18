@@ -1,0 +1,1 @@
+﻿export { RgpdDeletionManager } from './RgpdDeletionManager';

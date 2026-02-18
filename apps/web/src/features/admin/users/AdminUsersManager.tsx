@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -7,12 +7,17 @@ import styles from './AdminUsersManager.module.css';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 const ROLE_OPTIONS = ['etudiant', 'mentor', 'admin', 'support'] as const;
 
+type UserStatus = 'active' | 'suspended' | 'deleted';
+
 interface AdminUser {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
   roles: string[];
+  status: UserStatus;
+  rgpdSync: boolean;
+  auditCount: number;
 }
 
 interface ApiResponse<T> {
@@ -35,34 +40,44 @@ export function AdminUsersManager({ accessToken, currentUserId }: AdminUsersMana
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [savingUserId, setSavingUserId] = useState<string | null>(null);
+  const [roleFilter, setRoleFilter] = useState<'all' | (typeof ROLE_OPTIONS)[number]>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | UserStatus>('all');
+
+  const loadUsers = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const query = new URLSearchParams();
+      if (roleFilter !== 'all') query.set('role', roleFilter);
+      if (statusFilter !== 'all') query.set('status', statusFilter);
+
+      const response = await fetch(`${API_URL}/users?${query.toString()}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        cache: 'no-store',
+      });
+
+      const result: ApiResponse<{ users: AdminUser[] }> = await response.json();
+
+      if (!response.ok || result.error) {
+        setError(result.error?.message || 'Erreur lors du chargement des utilisateurs');
+        return;
+      }
+
+      setUsers(result.data?.users || []);
+    } catch {
+      setError('Erreur de connexion au serveur');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function loadUsers() {
-      try {
-        const response = await fetch(`${API_URL}/admin/users`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          cache: 'no-store',
-        });
-
-        const result: ApiResponse<{ users: AdminUser[] }> = await response.json();
-
-        if (!response.ok || result.error) {
-          setError(result.error?.message || 'Erreur lors du chargement des utilisateurs');
-          return;
-        }
-
-        setUsers(result.data?.users || []);
-      } catch {
-        setError('Erreur de connexion au serveur');
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadUsers();
-  }, [accessToken]);
+    void loadUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accessToken, roleFilter, statusFilter]);
 
   const sortedUsers = useMemo(
     () => [...users].sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)),
@@ -98,7 +113,7 @@ export function AdminUsersManager({ accessToken, currentUserId }: AdminUsersMana
     setSavingUserId(user.id);
 
     try {
-      const response = await fetch(`${API_URL}/admin/users/${user.id}/roles`, {
+      const response = await fetch(`${API_URL}/users/${user.id}/roles`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -127,6 +142,41 @@ export function AdminUsersManager({ accessToken, currentUserId }: AdminUsersMana
     }
   };
 
+  const updateStatus = async (user: AdminUser, status: UserStatus) => {
+    setError('');
+    setSuccess('');
+    setSavingUserId(user.id);
+
+    try {
+      const response = await fetch(`${API_URL}/users/${user.id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      const result: ApiResponse<{ user: AdminUser }> = await response.json();
+
+      if (!response.ok || result.error) {
+        setError(result.error?.message || 'Erreur lors de la mise a jour du statut');
+        return;
+      }
+
+      setUsers((previousUsers) =>
+        previousUsers.map((existing) =>
+          existing.id === user.id ? result.data!.user : existing,
+        ),
+      );
+      setSuccess(`Statut de ${user.firstName} ${user.lastName} mis a jour`);
+    } catch {
+      setError('Erreur de connexion au serveur');
+    } finally {
+      setSavingUserId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className={styles.main}>
@@ -139,13 +189,34 @@ export function AdminUsersManager({ accessToken, currentUserId }: AdminUsersMana
     <div className={styles.main}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Administration des roles</h1>
+          <h1 className={styles.title}>Administration des comptes</h1>
           <Link href="/dashboard" className={styles.backLink}>
             Retour au dashboard
           </Link>
         </div>
 
-        <p className={styles.subtitle}>Attribuez les roles etudiant, mentor, admin, support.</p>
+        <p className={styles.subtitle}>Attribuez les roles et gelez/reactivez des comptes avec audit.</p>
+
+        <div className={styles.filters}>
+          <label>
+            Role
+            <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value as 'all' | (typeof ROLE_OPTIONS)[number])}>
+              <option value="all">all</option>
+              {ROLE_OPTIONS.map((role) => (
+                <option key={role} value={role}>{role}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Status
+            <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as 'all' | UserStatus)}>
+              <option value="all">all</option>
+              <option value="active">active</option>
+              <option value="suspended">suspended</option>
+              <option value="deleted">deleted</option>
+            </select>
+          </label>
+        </div>
 
         {error && <div className={styles.error} role="alert">{error}</div>}
         {success && <div className={styles.success} role="status">{success}</div>}
@@ -159,6 +230,7 @@ export function AdminUsersManager({ accessToken, currentUserId }: AdminUsersMana
                 <div className={styles.userInfo}>
                   <p className={styles.userName}>{user.firstName} {user.lastName}</p>
                   <p className={styles.userEmail}>{user.email}</p>
+                  <p className={styles.userMeta}>status: {user.status} | rgpdSync: {String(user.rgpdSync)} | audits: {user.auditCount}</p>
                 </div>
 
                 <div className={styles.roles}>
@@ -175,14 +247,22 @@ export function AdminUsersManager({ accessToken, currentUserId }: AdminUsersMana
                   ))}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => saveRoles(user)}
-                  className={styles.saveButton}
-                  disabled={isCurrentAdmin || savingUserId === user.id}
-                >
-                  {savingUserId === user.id ? 'Enregistrement...' : 'Enregistrer'}
-                </button>
+                <div className={styles.actions}>
+                  <button
+                    type="button"
+                    onClick={() => saveRoles(user)}
+                    className={styles.saveButton}
+                    disabled={isCurrentAdmin || savingUserId === user.id}
+                  >
+                    {savingUserId === user.id ? 'Enregistrement...' : 'Enregistrer roles'}
+                  </button>
+                  <button type="button" className={styles.secondaryButton} onClick={() => void updateStatus(user, 'active')}>
+                    Activer
+                  </button>
+                  <button type="button" className={styles.secondaryButton} onClick={() => void updateStatus(user, 'suspended')}>
+                    Suspendre
+                  </button>
+                </div>
               </section>
             );
           })}

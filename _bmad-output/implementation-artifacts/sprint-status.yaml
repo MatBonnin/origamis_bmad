@@ -91,11 +91,12 @@ development_status:
   epic-6-retrospective: optional
 
   epic-7: in-progress
-  7-1-gestion-comptes-et-r-les: ready-for-dev
-  7-2-support-incidents-li-s-aux-sessions: ready-for-dev
-  7-3-tableaux-de-bord-de-base: ready-for-dev
-  7-4-suppression-des-donn-es-personnelles: ready-for-dev
+  7-1-gestion-comptes-et-r-les: review
+  7-2-support-incidents-li-s-aux-sessions: review
+  7-3-tableaux-de-bord-de-base: review
+  7-4-suppression-des-donn-es-personnelles: review
   epic-7-retrospective: optional
+
 
 
 

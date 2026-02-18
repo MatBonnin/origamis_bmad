@@ -1,26 +1,26 @@
-# Story 7.4: Suppression des données personnelles
+﻿# Story 7.4: Suppression des donnÃ©es personnelles
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
 ## Story
 
 As a utilisateur,
-I want demander la suppression de mes données,
+I want demander la suppression de mes donnÃ©es,
 so that exercer mon droit RGPD.
 
 ## Acceptance Criteria
 
-- 1. Given un utilisateur authentifié When il demande la suppression de ses données Then la demande est enregistrée And un processus de suppression est déclenché
+- 1. Given un utilisateur authentifiÃ© When il demande la suppression de ses donnÃ©es Then la demande est enregistrÃ©e And un processus de suppression est dÃ©clenchÃ©
 
 ## Tasks / Subtasks
 
-- [ ] Endpoint `POST /users/:id/request-deletion` -> queues suppressions (AC: #1)
-- [ ] Workflow `DELETE /users/:id/data` triggered after review + export log (AC: #1)
-- [ ] UI: gestionnaire RGPD avec formulaire, statut de demande, FAQ (AC: #1)
-- [ ] Notification client & admin + logging (AC: #1)
-- [ ] Tests API + UI + audit (AC: #1)
+- [x] Endpoint `POST /users/:id/request-deletion` -> queues suppressions (AC: #1)
+- [x] Workflow `DELETE /users/:id/data` triggered after review + export log (AC: #1)
+- [x] UI: gestionnaire RGPD avec formulaire, statut de demande, FAQ (AC: #1)
+- [x] Notification client & admin + logging (AC: #1)
+- [x] Tests API + UI + audit (AC: #1)
 
 ## Dev Notes
 
@@ -33,7 +33,7 @@ so that exercer mon droit RGPD.
 - Conventions: `snake_case` DB, `camelCase` JSON.
 - UX: responsive + WCAG 2.1 AA.
 - Cible: admin/support/analytics.
-- Processus RGPD traçé + audit.
+- Processus RGPD traÃ§Ã© + audit.
 
 ### API Contracts (suppression)
 
@@ -49,7 +49,7 @@ so that exercer mon droit RGPD.
 - `deleted_artifacts`: list of tables cleaned (users, messages, bookings).
 - Conventions `snake_case`.
 
-### UX & accessibilité
+### UX & accessibilitÃ©
 
 - Formulaire suppression avec champs (raison, export) + instructions WCAG.
 - Timeline de statut (requested, reviewed, deleted).
@@ -69,11 +69,11 @@ so that exercer mon droit RGPD.
 - UI: flow, exports, reminder notifications.
 - Compliance: log entries, retention checks.
 
-### Do / Don’t
+### Do / Donâ€™t
 
 - Do: verify identity before deletion request.
 - Do: log every delete action for audit.
-- Don’t: delete before admin approval.
+- Donâ€™t: delete before admin approval.
 
 ### Project Structure Notes
 
@@ -96,6 +96,34 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
+- npm test -- --runInBand modules/admin modules/users modules/support modules/analytics (apps/api)
+- npm test -- src/features/rgpd/deletion/__tests__/RgpdDeletionManager.test.tsx (apps/web)
+
 ### Completion Notes List
 
+- Ajout du workflow RGPD dans `UsersController/UsersService` :
+  - `POST /users/:id/request-deletion`
+  - `PATCH /users/:id/deletion-status`
+  - `DELETE /users/:id/data`
+- Ajout des controles RBAC et verification identite pour la demande de suppression.
+- Ajout du processus de suppression/anonymisation des donnees principales apres approbation admin.
+- Ajout de l UI `RgpdDeletionManager` avec formulaire, statut et action admin de suppression finale.
+- Ajout de la page `/rgpd/suppression` et acces depuis le dashboard.
+
 ### File List
+
+- apps/api/src/modules/users/users.controller.ts
+- apps/api/src/modules/users/users.service.ts
+- apps/api/src/modules/users/users.controller.spec.ts
+- apps/api/src/modules/users/users.service.spec.ts
+- apps/web/src/features/rgpd/deletion/RgpdDeletionManager.tsx
+- apps/web/src/features/rgpd/deletion/RgpdDeletionManager.module.css
+- apps/web/src/features/rgpd/deletion/index.ts
+- apps/web/src/features/rgpd/deletion/__tests__/RgpdDeletionManager.test.tsx
+- apps/web/src/app/(app)/rgpd/suppression/page.tsx
+- apps/web/src/app/(app)/dashboard/page.tsx
+- apps/web/src/app/(app)/dashboard/page.module.css
+
+### Change Log
+
+- 2026-02-18: Livraison story 7.4 (workflow RGPD suppression + UI + tests).
