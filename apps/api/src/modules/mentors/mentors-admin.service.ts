@@ -2,30 +2,14 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { PrismaService } from '../prisma';
 
 export type MentorValidationStatus = 'pending_review' | 'validated' | 'rejected';
-export type MentorVisibilityStatus = 'visible' | 'hidden' | 'priority' | 'experimental';
-
-interface ValidationRecord {
-  mentorId: string;
-  status: MentorValidationStatus;
-  checkedBy: string;
-  notes: string;
-  updatedAt: string;
-}
-
-interface VisibilityRule {
-  mentorId: string;
-  status: MentorVisibilityStatus;
-  effectiveFrom: string;
-  notes: string;
-  updatedBy: string;
-  updatedAt: string;
-}
+export type MentorVisibilityStatus =
+  | 'visible'
+  | 'hidden'
+  | 'priority'
+  | 'experimental';
 
 @Injectable()
 export class MentorsAdminService {
-  private readonly validationRecords = new Map<string, ValidationRecord>();
-  private readonly visibilityRules = new Map<string, VisibilityRule>();
-
   constructor(private readonly prisma: PrismaService) {}
 
   async getPendingMentors(user: { roles: string[] }) {
@@ -36,28 +20,34 @@ export class MentorsAdminService {
         user: {
           select: { first_name: true, last_name: true, email: true },
         },
+        validation_checks: {
+          orderBy: { created_at: 'desc' },
+          take: 1,
+        },
       },
       orderBy: { updated_at: 'desc' },
       take: 100,
     });
 
     const pending = mentors.filter((mentor) => {
-      const record = this.validationRecords.get(mentor.user_id);
-      const status = record?.status ?? (mentor.is_validated ? 'validated' : 'pending_review');
+      const status =
+        mentor.validation_checks[0]?.status ??
+        (mentor.is_validated ? 'validated' : 'pending_review');
       return status === 'pending_review';
     });
 
     return {
       mentors: pending.map((mentor) => {
-        const record = this.validationRecords.get(mentor.user_id);
+        const latest = mentor.validation_checks[0];
+        const status = latest?.status ?? (mentor.is_validated ? 'validated' : 'pending_review');
         return {
           mentorId: mentor.user_id,
           fullName: `${mentor.user.first_name} ${mentor.user.last_name}`,
           email: mentor.user.email,
           domain: mentor.domain,
-          status: record?.status ?? (mentor.is_validated ? 'validated' : 'pending_review'),
-          notes: record?.notes ?? '',
-          updatedAt: record?.updatedAt ?? mentor.updated_at.toISOString(),
+          status,
+          notes: latest?.notes ?? '',
+          updatedAt: latest?.updated_at.toISOString() ?? mentor.updated_at.toISOString(),
         };
       }),
     };
@@ -68,29 +58,7 @@ export class MentorsAdminService {
     mentorId: string,
     notes?: string,
   ) {
-    this.assertAdmin(user.roles);
-    await this.assertMentorExists(mentorId);
-
-    const now = new Date().toISOString();
-    const record: ValidationRecord = {
-      mentorId,
-      status: 'validated',
-      checkedBy: user.id,
-      notes: notes?.trim() || 'Profil valide',
-      updatedAt: now,
-    };
-
-    this.validationRecords.set(mentorId, record);
-
-    return {
-      mentor: {
-        mentorId,
-        status: record.status,
-        notes: record.notes,
-        checkedBy: record.checkedBy,
-        updatedAt: record.updatedAt,
-      },
-    };
+    return this.updateMentorStatus(user, mentorId, 'validated', notes);
   }
 
   async updateMentorStatus(
@@ -102,25 +70,29 @@ export class MentorsAdminService {
     this.assertAdmin(user.roles);
     await this.assertMentorExists(mentorId);
 
-    const now = new Date().toISOString();
+    const check = await this.prisma.mentor_validation_checks.create({
+      data: {
+        mentor_id: mentorId,
+        status,
+        checked_by: user.id,
+        notes: notes?.trim() || '',
+      },
+    });
 
-    const record: ValidationRecord = {
-      mentorId,
-      status,
-      checkedBy: user.id,
-      notes: notes?.trim() || '',
-      updatedAt: now,
-    };
-
-    this.validationRecords.set(mentorId, record);
+    await this.prisma.mentor_profiles.update({
+      where: { user_id: mentorId },
+      data: {
+        is_validated: status === 'validated',
+      },
+    });
 
     return {
       mentor: {
         mentorId,
         status,
-        notes: record.notes,
+        notes: check.notes,
         checkedBy: user.id,
-        updatedAt: now,
+        updatedAt: check.updated_at.toISOString(),
       },
     };
   }
@@ -133,7 +105,7 @@ export class MentorsAdminService {
     this.assertAdmin(user.roles);
     await this.assertMentorExists(mentorId);
 
-    const validation = this.getMentorValidationStatus(mentorId);
+    const validation = await this.getMentorValidationStatus(mentorId);
     if (validation !== 'validated' && input.status !== 'hidden') {
       throw new ForbiddenException({
         code: 'MENTOR_VISIBILITY_FORBIDDEN',
@@ -141,23 +113,43 @@ export class MentorsAdminService {
       });
     }
 
-    const rule: VisibilityRule = {
-      mentorId,
-      status: input.status,
-      effectiveFrom: input.effectiveFrom || new Date().toISOString(),
-      notes: input.notes?.trim() || '',
-      updatedBy: user.id,
-      updatedAt: new Date().toISOString(),
-    };
+    const effectiveFrom = input.effectiveFrom
+      ? new Date(input.effectiveFrom)
+      : new Date();
 
-    this.visibilityRules.set(mentorId, rule);
+    await this.prisma.mentor_visibility.upsert({
+      where: { mentor_id: mentorId },
+      create: {
+        mentor_id: mentorId,
+        status: input.status,
+        effective_from: effectiveFrom,
+        notes: input.notes?.trim() || '',
+        updated_by: user.id,
+      },
+      update: {
+        status: input.status,
+        effective_from: effectiveFrom,
+        notes: input.notes?.trim() || '',
+        updated_by: user.id,
+      },
+    });
+
+    await this.prisma.mentor_visibility_history.create({
+      data: {
+        mentor_id: mentorId,
+        status: input.status,
+        effective_from: effectiveFrom,
+        notes: input.notes?.trim() || '',
+        updated_by: user.id,
+      },
+    });
 
     return {
       mentor: {
         mentorId,
-        visibility: rule.status,
-        effectiveFrom: rule.effectiveFrom,
-        notes: rule.notes,
+        visibility: input.status,
+        effectiveFrom: effectiveFrom.toISOString(),
+        notes: input.notes?.trim() || '',
       },
     };
   }
@@ -169,34 +161,43 @@ export class MentorsAdminService {
       select: {
         user_id: true,
         domain: true,
+        visibility: {
+          select: {
+            status: true,
+            effective_from: true,
+            notes: true,
+          },
+        },
       },
       take: 200,
     });
 
     return {
-      visibilityRules: mentors.map((mentor) => {
-        const rule = this.visibilityRules.get(mentor.user_id);
-        return {
-          mentorId: mentor.user_id,
-          domain: mentor.domain,
-          status: rule?.status ?? 'visible',
-          effectiveFrom: rule?.effectiveFrom ?? null,
-          notes: rule?.notes ?? '',
-        };
-      }),
+      visibilityRules: mentors.map((mentor) => ({
+        mentorId: mentor.user_id,
+        domain: mentor.domain,
+        status: mentor.visibility?.status ?? 'visible',
+        effectiveFrom: mentor.visibility?.effective_from?.toISOString() ?? null,
+        notes: mentor.visibility?.notes ?? '',
+      })),
     };
   }
 
-  getMentorVisibilityStatus(mentorId: string): MentorVisibilityStatus {
-    return this.visibilityRules.get(mentorId)?.status ?? 'visible';
+  async getMentorVisibilityStatus(mentorId: string): Promise<MentorVisibilityStatus> {
+    const row = await this.prisma.mentor_visibility.findUnique({
+      where: { mentor_id: mentorId },
+      select: { status: true },
+    });
+    return row?.status ?? 'visible';
   }
 
-  getMentorValidationStatus(mentorId: string): MentorValidationStatus {
-    return this.validationRecords.get(mentorId)?.status ?? 'pending_review';
-  }
-
-  getMentorValidationOverride(mentorId: string): MentorValidationStatus | null {
-    return this.validationRecords.get(mentorId)?.status ?? null;
+  async getMentorValidationStatus(mentorId: string): Promise<MentorValidationStatus> {
+    const row = await this.prisma.mentor_validation_checks.findFirst({
+      where: { mentor_id: mentorId },
+      orderBy: { created_at: 'desc' },
+      select: { status: true },
+    });
+    return row?.status ?? 'pending_review';
   }
 
   private async assertMentorExists(mentorId: string) {

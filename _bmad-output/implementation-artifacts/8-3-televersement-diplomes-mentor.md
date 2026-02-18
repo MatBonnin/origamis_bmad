@@ -1,6 +1,6 @@
 # Story 8.3: Televersement diplomes mentor
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,22 +17,22 @@ so that permettre leur verification admin.
 
 ## Tasks / Subtasks
 
-- [ ] Schema & migration (AC: #1, #2, #3)
-  - [ ] Etendre `mentor_documents` avec `document_type`, `verification_status`, `verified_by`, `verified_at`
-- [ ] Endpoints mentor (AC: #1, #2, #4)
-  - [ ] `POST /mentors/me/documents`
-  - [ ] `GET /mentors/me/documents`
-  - [ ] `DELETE /mentors/me/documents/:docId`
-- [ ] Endpoints admin (AC: #3, #4)
-  - [ ] `GET /mentors/:id/documents`
-  - [ ] `PATCH /mentors/:id/documents/:docId/status`
-- [ ] UI mentor/admin (AC: #1, #2, #3)
-  - [ ] bloc upload/list/suppression dans `MentorSettings`
-  - [ ] previsualisation + statut dans board admin validation
-- [ ] Tests (AC: #1, #2, #3, #4)
-  - [ ] RBAC
-  - [ ] validation extension/type/taille
-  - [ ] audit trail verification
+- [x] Schema & migration (AC: #1, #2, #3)
+  - [x] Etendre `mentor_documents` avec `document_type`, `verification_status`, `verified_by`, `verified_at`
+- [x] Endpoints mentor (AC: #1, #2, #4)
+  - [x] `POST /mentors/me/documents`
+  - [x] `GET /mentors/me/documents`
+  - [x] `DELETE /mentors/me/documents/:docId`
+- [x] Endpoints admin (AC: #3, #4)
+  - [x] `GET /mentors/:id/documents`
+  - [x] `PATCH /mentors/:id/documents/:docId/status`
+- [x] UI mentor/admin (AC: #1, #2, #3)
+  - [x] bloc upload/list/suppression dans `MentorSettings`
+  - [x] previsualisation + statut dans board admin validation
+- [x] Tests (AC: #1, #2, #3, #4)
+  - [x] RBAC
+  - [x] validation extension/type/taille
+  - [x] audit trail verification
 
 ## Dev Notes
 
@@ -77,4 +77,9 @@ GPT-5 (Codex)
 
 ### Completion Notes List
 
+- Story implementee (API/Web/tests selon perimetre).
+
 ### File List
+
+- Voir les fichiers modifies dans le diff Git.
+

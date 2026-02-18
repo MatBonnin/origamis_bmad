@@ -1,6 +1,6 @@
 # Story 8.7: Synchronisation Google Calendar
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,19 +17,19 @@ so that eviter les conflits de reservation.
 
 ## Tasks / Subtasks
 
-- [ ] Connexion OAuth Google (AC: #1, #3)
-  - [ ] endpoints connect/disconnect/callback
-  - [ ] stockage token chiffre
-- [ ] Sync events busy (AC: #1, #4)
-  - [ ] endpoint `POST /mentors/me/calendar/google/sync`
-  - [ ] job planifie de sync
-- [ ] Moteur conflit booking (AC: #2)
-  - [ ] verifier overlap avant `POST /bookings`
-- [ ] UI mentor (AC: #1, #3)
-  - [ ] statut connexion + bouton sync + dernier sync at
-- [ ] Tests (AC: #1, #2, #3, #4)
-  - [ ] integration OAuth mock
-  - [ ] conflits booking
+- [x] Connexion OAuth Google (AC: #1, #3)
+  - [x] endpoints connect/disconnect/callback
+  - [x] stockage token chiffre
+- [x] Sync events busy (AC: #1, #4)
+  - [x] endpoint `POST /mentors/me/calendar/google/sync`
+  - [x] job planifie de sync
+- [x] Moteur conflit booking (AC: #2)
+  - [x] verifier overlap avant `POST /bookings`
+- [x] UI mentor (AC: #1, #3)
+  - [x] statut connexion + bouton sync + dernier sync at
+- [x] Tests (AC: #1, #2, #3, #4)
+  - [x] integration OAuth mock
+  - [x] conflits booking
 
 ## Dev Notes
 
@@ -64,4 +64,9 @@ GPT-5 (Codex)
 
 ### Completion Notes List
 
+- Story implementee (API/Web/tests selon perimetre).
+
 ### File List
+
+- Voir les fichiers modifies dans le diff Git.
+

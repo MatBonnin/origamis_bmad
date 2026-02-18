@@ -1,6 +1,6 @@
 # Story 8.5: Gating strict publication mentor
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,20 +17,20 @@ so that publier seulement un profil conforme.
 
 ## Tasks / Subtasks
 
-- [ ] Regles metier readiness (AC: #1, #2)
-  - [ ] definir checklist obligatoire
-  - [ ] produire `missingRequirements[]`
-- [ ] Persistance et endpoints (AC: #1, #2)
-  - [ ] ajouter `is_publish_ready` sur `mentor_profiles`
-  - [ ] ajouter `GET /mentors/me/publish-readiness`
-- [ ] Recherche/reco (AC: #3, #4)
-  - [ ] filtrer par `is_publish_ready`
-  - [ ] respecter validations/visibilite admin
-- [ ] UI mentor (AC: #1, #2)
-  - [ ] ecran checklist + CTA corriger
-- [ ] Tests (AC: #1, #2, #3, #4)
-  - [ ] integration API gating
-  - [ ] non-regression search/reco
+- [x] Regles metier readiness (AC: #1, #2)
+  - [x] definir checklist obligatoire
+  - [x] produire `missingRequirements[]`
+- [x] Persistance et endpoints (AC: #1, #2)
+  - [x] ajouter `is_publish_ready` sur `mentor_profiles`
+  - [x] ajouter `GET /mentors/me/publish-readiness`
+- [x] Recherche/reco (AC: #3, #4)
+  - [x] filtrer par `is_publish_ready`
+  - [x] respecter validations/visibilite admin
+- [x] UI mentor (AC: #1, #2)
+  - [x] ecran checklist + CTA corriger
+- [x] Tests (AC: #1, #2, #3, #4)
+  - [x] integration API gating
+  - [x] non-regression search/reco
 
 ## Dev Notes
 
@@ -61,4 +61,9 @@ GPT-5 (Codex)
 
 ### Completion Notes List
 
+- Story implementee (API/Web/tests selon perimetre).
+
 ### File List
+
+- Voir les fichiers modifies dans le diff Git.
+

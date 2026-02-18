@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma';
 import { MentorSearchSort } from './dto/get-mentors-search-query.dto';
-import { MentorsAdminService } from './mentors-admin.service';
 
 export interface MentorSearchFilters {
   domains?: string[];
+  supportTypes?: ('ponctuel' | 'suivi_regulier' | 'long_uniquement')[];
   minPrice?: number;
   maxPrice?: number;
   minRating?: number;
@@ -17,6 +17,9 @@ interface SearchMentorItem {
   lastName: string;
   domain: string;
   expertiseTags: string[];
+  keywords: string[];
+  supportTypes: string[];
+  educationLevel: string | null;
   hourlyRate: number | null;
   rating: number;
   isAvailable: boolean;
@@ -36,10 +39,7 @@ const MAX_LIMIT = 20;
 
 @Injectable()
 export class MentorsSearchService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly mentorsAdminService: MentorsAdminService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async searchMentors(input: {
     q?: string;
@@ -71,17 +71,23 @@ export class MentorsSearchService {
           },
         },
         availability: true,
+        visibility: {
+          select: { status: true },
+        },
+        validation_checks: {
+          select: { status: true },
+          orderBy: { created_at: 'desc' },
+          take: 1,
+        },
       },
     });
 
     const projected = mentors
       .filter((mentor) => {
-        const validationOverride =
-          this.mentorsAdminService.getMentorValidationOverride(mentor.user_id);
-        const validationStatus = validationOverride ?? (mentor.is_validated ? 'validated' : 'pending_review');
-        const visibility = this.mentorsAdminService.getMentorVisibilityStatus(
-          mentor.user_id,
-        );
+        const validationStatus =
+          mentor.validation_checks?.[0]?.status ??
+          (mentor.is_validated ? 'validated' : 'pending_review');
+        const visibility = mentor.visibility?.status ?? 'visible';
 
         return validationStatus === 'validated' && visibility !== 'hidden';
       })
@@ -91,6 +97,9 @@ export class MentorsSearchService {
         lastName: mentor.user.last_name,
         domain: mentor.domain,
         expertiseTags: mentor.expertise_tags,
+        keywords: mentor.keywords ?? [],
+        supportTypes: mentor.support_types ?? [],
+        educationLevel: mentor.education_level ?? null,
         hourlyRate: mentor.hourly_rate,
         rating: mentor.rating_avg ?? 0,
         isAvailable: mentor.availability?.is_available ?? false,
@@ -105,6 +114,9 @@ export class MentorsSearchService {
       lastName: item.lastName,
       domain: item.domain,
       expertiseTags: item.expertiseTags,
+      keywords: item.keywords,
+      supportTypes: item.supportTypes,
+      educationLevel: item.educationLevel,
       hourlyRate: item.hourlyRate,
       rating: item.rating,
       isAvailable: item.isAvailable,
@@ -125,13 +137,20 @@ export class MentorsSearchService {
 
   async getFilterFacets() {
     const mentors = await this.prisma.mentor_profiles.findMany({
-      where: { is_validated: true },
+      where: { is_validated: true, is_publish_ready: true },
       select: {
         user_id: true,
         is_validated: true,
         domain: true,
+        support_types: true,
         hourly_rate: true,
         rating_avg: true,
+        visibility: { select: { status: true } },
+        validation_checks: {
+          select: { status: true },
+          orderBy: { created_at: 'desc' },
+          take: 1,
+        },
         availability: {
           select: {
             is_available: true,
@@ -141,12 +160,10 @@ export class MentorsSearchService {
     });
 
     const visibleMentors = mentors.filter((mentor) => {
-      const validationOverride =
-        this.mentorsAdminService.getMentorValidationOverride(mentor.user_id);
       const validationStatus =
-        validationOverride ?? (mentor.is_validated ? 'validated' : 'pending_review');
-      const visibility =
-        this.mentorsAdminService.getMentorVisibilityStatus(mentor.user_id);
+        mentor.validation_checks?.[0]?.status ??
+        (mentor.is_validated ? 'validated' : 'pending_review');
+      const visibility = mentor.visibility?.status ?? 'visible';
       return validationStatus === 'validated' && visibility !== 'hidden';
     });
 
@@ -171,6 +188,9 @@ export class MentorsSearchService {
       );
     const minPrice = prices.length > 0 ? Math.min(...prices) : null;
     const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
+    const supportTypes = Array.from(
+      new Set(visibleMentors.flatMap((mentor) => mentor.support_types)),
+    );
 
     return {
       domains,
@@ -192,6 +212,7 @@ export class MentorsSearchService {
         ...(hasAvailable ? ['available'] : []),
         ...(hasUnavailable ? ['unavailable'] : []),
       ],
+      support_types: supportTypes,
       rating_thresholds: ratings,
     };
   }
@@ -199,6 +220,7 @@ export class MentorsSearchService {
   private buildWhere(tokens: string[], filters: MentorSearchFilters) {
     const base: Record<string, unknown> = {
       is_validated: true,
+      is_publish_ready: true,
     };
 
     if (filters.availability === 'available') {
@@ -207,6 +229,11 @@ export class MentorsSearchService {
 
     if (filters.domains && filters.domains.length > 0) {
       base.domain = { in: filters.domains };
+    }
+    if (filters.supportTypes && filters.supportTypes.length > 0) {
+      base.support_types = {
+        hasSome: filters.supportTypes,
+      };
     }
 
     if (filters.minRating !== undefined) {
@@ -225,6 +252,8 @@ export class MentorsSearchService {
         OR: [
           { domain: { contains: token, mode: 'insensitive' } },
           { expertise_tags: { has: token } },
+          { keywords: { has: token } },
+          { education_level: { contains: token, mode: 'insensitive' } },
           { user: { first_name: { contains: token, mode: 'insensitive' } } },
           { user: { last_name: { contains: token, mode: 'insensitive' } } },
           { user: { bio: { contains: token, mode: 'insensitive' } } },
@@ -257,6 +286,13 @@ export class MentorsSearchService {
       return false;
     }
     if (filters.availability === 'available' && !mentor.isAvailable) {
+      return false;
+    }
+    if (
+      filters.supportTypes &&
+      filters.supportTypes.length > 0 &&
+      !filters.supportTypes.some((value) => mentor.supportTypes.includes(value))
+    ) {
       return false;
     }
     return true;
@@ -303,6 +339,8 @@ export class MentorsSearchService {
     mentor: {
       domain: string;
       expertise_tags: string[];
+      keywords: string[];
+      education_level: string | null;
       user: { first_name: string; last_name: string; bio: string | null };
     },
     tokens: string[],
@@ -316,11 +354,17 @@ export class MentorsSearchService {
     const domain = mentor.domain.toLowerCase();
     const bio = (mentor.user.bio ?? '').toLowerCase();
     const tags = mentor.expertise_tags.map((tag) => tag.toLowerCase());
+    const keywords = (mentor.keywords ?? []).map((keyword) =>
+      keyword.toLowerCase(),
+    );
+    const educationLevel = (mentor.education_level ?? '').toLowerCase();
 
     return tokens.reduce((score, token) => {
       let current = score;
       if (domain.includes(token)) current += 6;
       if (tags.some((tag) => tag.includes(token))) current += 8;
+      if (keywords.some((keyword) => keyword.includes(token))) current += 7;
+      if (educationLevel.includes(token)) current += 4;
       if (fullName.includes(token)) current += 5;
       if (bio.includes(token)) current += 3;
       return current;

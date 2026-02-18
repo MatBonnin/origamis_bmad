@@ -35,6 +35,7 @@ import {
   MentorsAdminService,
 } from './mentors-admin.service';
 import { MentorsProfileService } from './mentors-profile.service';
+import { MentorsEpic8Service } from './mentors-epic8.service';
 import {
   MentorSearchFilters,
   MentorsSearchService,
@@ -43,6 +44,7 @@ import { MentorsSelfService } from './mentors-self.service';
 
 interface ParsedFilters {
   domains?: string[];
+  supportTypes?: ('ponctuel' | 'suivi_regulier' | 'long_uniquement')[];
   maxPrice?: number;
   minRating?: number;
 }
@@ -61,6 +63,7 @@ export class MentorsController {
     private readonly mentorsSelfService: MentorsSelfService,
     private readonly mentorsAvailabilityService: MentorsAvailabilityService,
     private readonly mentorsAdminService: MentorsAdminService,
+    private readonly mentorsEpic8Service: MentorsEpic8Service,
   ) {}
 
   @Get('recommendations')
@@ -80,27 +83,10 @@ export class MentorsController {
       filters,
     });
 
-    const mentors = (rawData as { mentors?: Array<{ mentorId: string }> })
-      .mentors;
-    const filteredMentors = Array.isArray(mentors)
-      ? mentors.filter((mentor) => {
-        const visibility = this.mentorsAdminService.getMentorVisibilityStatus(
-          mentor.mentorId,
-        );
-        const validation =
-            this.mentorsAdminService.getMentorValidationOverride(
-              mentor.mentorId,
-            ) ?? 'validated';
-        return visibility !== 'hidden' && validation === 'validated';
-      })
-      : [];
-
-    const data = {
-      ...(rawData as unknown as Record<string, unknown>),
-      mentors: filteredMentors,
+    return {
+      data: rawData,
+      error: null,
     };
-
-    return { data, error: null };
   }
 
   @Get('search')
@@ -170,6 +156,105 @@ export class MentorsController {
     @Body() dto: UpdateMentorSelfProfileDto,
   ): Promise<ApiEnvelope<unknown>> {
     const data = await this.mentorsSelfService.updateMyProfile(user.id, dto);
+    return { data, error: null };
+  }
+
+  @Get('me/publish-readiness')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Etat de readiness de publication mentor' })
+  async getMyPublishReadiness(
+    @CurrentUser() user: UserResponseDto,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsSelfService.getPublishReadiness(user.id);
+    return { data, error: null };
+  }
+
+  @Get('me/documents')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Lister les documents du mentor connecte' })
+  async getMyDocuments(
+    @CurrentUser() user: UserResponseDto,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsEpic8Service.listMyDocuments(user.id);
+    return { data, error: null };
+  }
+
+  @Post('me/documents')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Uploader un document mentor' })
+  async uploadMyDocument(
+    @CurrentUser() user: UserResponseDto,
+    @Body() body: { type: 'diploma' | 'certificate'; fileUrl: string },
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsEpic8Service.uploadMyDocument(user.id, body);
+    return { data, error: null };
+  }
+
+  @Delete('me/documents/:docId')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Supprimer un document mentor' })
+  async deleteMyDocument(
+    @CurrentUser() user: UserResponseDto,
+    @Param('docId') docId: string,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsEpic8Service.deleteMyDocument(
+      user.id,
+      docId,
+    );
+    return { data, error: null };
+  }
+
+  @Post('me/calendar/google/connect')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Connecter Google Calendar' })
+  async connectGoogleCalendar(
+    @CurrentUser() user: UserResponseDto,
+    @Body() body: { authCode?: string },
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsEpic8Service.connectGoogleCalendar(
+      user.id,
+      body.authCode,
+    );
+    return { data, error: null };
+  }
+
+  @Delete('me/calendar/google/disconnect')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Deconnecter Google Calendar' })
+  async disconnectGoogleCalendar(
+    @CurrentUser() user: UserResponseDto,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsEpic8Service.disconnectGoogleCalendar(
+      user.id,
+    );
+    return { data, error: null };
+  }
+
+  @Post('me/calendar/google/sync')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Synchroniser Google Calendar' })
+  async syncGoogleCalendar(
+    @CurrentUser() user: UserResponseDto,
+    @Body()
+    body: {
+      busySlots?: Array<{
+        startAt: string;
+        endAt: string;
+        providerEventId?: string;
+      }>;
+    },
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsEpic8Service.syncGoogleCalendar(
+      user.id,
+      body,
+    );
     return { data, error: null };
   }
 
@@ -300,6 +385,37 @@ export class MentorsController {
     @CurrentUser() user: UserResponseDto,
   ): Promise<ApiEnvelope<unknown>> {
     const data = await this.mentorsAdminService.getVisibility(user);
+    return { data, error: null };
+  }
+
+  @Get(':id/documents')
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'support')
+  @ApiOperation({ summary: 'Lister les documents d un mentor (admin)' })
+  async getMentorDocuments(
+    @Param('id') mentorId: string,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data =
+      await this.mentorsEpic8Service.getMentorDocumentsForAdmin(mentorId);
+    return { data, error: null };
+  }
+
+  @Patch(':id/documents/:docId/status')
+  @UseGuards(RolesGuard)
+  @Roles('admin', 'support')
+  @ApiOperation({ summary: 'Mettre a jour le statut d un document mentor' })
+  async patchMentorDocumentStatus(
+    @CurrentUser() user: UserResponseDto,
+    @Param('id') mentorId: string,
+    @Param('docId') docId: string,
+    @Body() body: { status: 'pending' | 'verified' | 'rejected' },
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsEpic8Service.updateMentorDocumentStatus(
+      user.id,
+      mentorId,
+      docId,
+      body.status,
+    );
     return { data, error: null };
   }
 
@@ -449,6 +565,15 @@ export class MentorsController {
       if (Array.isArray(parsed.domains)) {
         next.domains = parsed.domains.filter(
           (item): item is string => typeof item === 'string',
+        );
+      }
+
+      if (Array.isArray(parsed.supportTypes)) {
+        next.supportTypes = parsed.supportTypes.filter(
+          (item): item is 'ponctuel' | 'suivi_regulier' | 'long_uniquement' =>
+            item === 'ponctuel' ||
+            item === 'suivi_regulier' ||
+            item === 'long_uniquement',
         );
       }
 

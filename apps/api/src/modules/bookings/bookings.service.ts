@@ -115,6 +115,13 @@ export class BookingsService {
       });
     }
 
+    await this.assertExternalCalendarAvailability(
+      dto.mentorId,
+      bookingDate,
+      slot.start_time,
+      slot.end_time,
+    );
+
     // 8. Create booking
     const booking = await this.prisma.bookings.create({
       data: {
@@ -378,6 +385,13 @@ export class BookingsService {
       });
     }
 
+    await this.assertExternalCalendarAvailability(
+      booking.mentor_id,
+      newBookingDate,
+      newSlot.start_time,
+      newSlot.end_time,
+    );
+
     // Update booking with new slot and date
     const updated = await this.prisma.bookings.update({
       where: { id: bookingId },
@@ -556,5 +570,40 @@ export class BookingsService {
       createdAt: booking.created_at.toISOString(),
       updatedAt: booking.updated_at.toISOString(),
     };
+  }
+
+  private async assertExternalCalendarAvailability(
+    mentorId: string,
+    bookingDate: Date,
+    startTime: string,
+    endTime: string,
+  ) {
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+
+    const startAt = new Date(bookingDate);
+    startAt.setHours(startHour, startMinute, 0, 0);
+    const endAt = new Date(bookingDate);
+    endAt.setHours(endHour, endMinute, 0, 0);
+
+    if (!this.prisma.mentor_calendar_busy_slots?.findFirst) {
+      return;
+    }
+    const conflict = await this.prisma.mentor_calendar_busy_slots.findFirst({
+      where: {
+        mentor_id: mentorId,
+        start_at: { lt: endAt },
+        end_at: { gt: startAt },
+      },
+      select: { id: true },
+    });
+
+    if (conflict) {
+      throw new ConflictException({
+        code: 'EXTERNAL_CALENDAR_CONFLICT',
+        message:
+          'Ce creneau est deja occupe dans le calendrier externe du mentor',
+      });
+    }
   }
 }

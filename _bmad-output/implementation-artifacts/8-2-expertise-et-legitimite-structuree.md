@@ -1,6 +1,6 @@
 # Story 8.2: Expertise et legitimite structuree
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,22 +17,22 @@ so that ameliorer le matching et la credibilite.
 
 ## Tasks / Subtasks
 
-- [ ] Schema & migration (AC: #1, #3)
-  - [ ] Ajouter `education_level`, `degrees`, `keywords` sur profil mentor
-- [ ] DTO + validations (AC: #1, #4)
-  - [ ] Enum `educationLevel` (bac, bac+2, bac+3, bac+5, doctorat, autre)
-  - [ ] `degrees[]` max 10, `keywords[]` max 20, unicite case-insensitive
-- [ ] Services API (AC: #1, #2, #3)
-  - [ ] Persister dans self-service
-  - [ ] Exposer dans profil public/recherche
-  - [ ] Brancher matching/reco sur `keywords`
-- [ ] UI (AC: #1, #3, #4)
-  - [ ] Ajouter section "Expertise et legitimite" dans `MentorSettings`
-  - [ ] Afficher section dans `MentorProfile`
-- [ ] Tests (AC: #1, #2, #3, #4)
-  - [ ] Unit DTO
-  - [ ] Integration API
-  - [ ] UI formulaire + affichage
+- [x] Schema & migration (AC: #1, #3)
+  - [x] Ajouter `education_level`, `degrees`, `keywords` sur profil mentor
+- [x] DTO + validations (AC: #1, #4)
+  - [x] Enum `educationLevel` (bac, bac+2, bac+3, bac+5, doctorat, autre)
+  - [x] `degrees[]` max 10, `keywords[]` max 20, unicite case-insensitive
+- [x] Services API (AC: #1, #2, #3)
+  - [x] Persister dans self-service
+  - [x] Exposer dans profil public/recherche
+  - [x] Brancher matching/reco sur `keywords`
+- [x] UI (AC: #1, #3, #4)
+  - [x] Ajouter section "Expertise et legitimite" dans `MentorSettings`
+  - [x] Afficher section dans `MentorProfile`
+- [x] Tests (AC: #1, #2, #3, #4)
+  - [x] Unit DTO
+  - [x] Integration API
+  - [x] UI formulaire + affichage
 
 ## Dev Notes
 
@@ -83,4 +83,9 @@ GPT-5 (Codex)
 
 ### Completion Notes List
 
+- Story implementee (API/Web/tests selon perimetre).
+
 ### File List
+
+- Voir les fichiers modifies dans le diff Git.
+

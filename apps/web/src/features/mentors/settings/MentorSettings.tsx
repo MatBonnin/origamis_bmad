@@ -29,9 +29,13 @@ interface MentorSettingsPayload {
     bannerUrl: string | null;
     about: string | null;
     professionalLinks: string[];
+    educationLevel: string | null;
+    degrees: string[];
+    keywords: string[];
     domain: string;
     expertiseTags: string[];
     supportedLevels: string[];
+    supportTypes: Array<'ponctuel' | 'suivi_regulier' | 'long_uniquement'>;
     languages: string[];
     certifications: string[];
     tariffs: {
@@ -53,6 +57,13 @@ interface Props {
   accessToken: string;
 }
 
+interface MentorDocument {
+  documentId: string;
+  type: 'diploma' | 'certificate';
+  url: string;
+  verificationStatus: 'pending' | 'verified' | 'rejected';
+}
+
 const DAY_OPTIONS = [
   { value: '1', label: 'Lundi' },
   { value: '2', label: 'Mardi' },
@@ -67,6 +78,22 @@ const LEVEL_OPTIONS = [
   { value: 'debutant', label: 'Debutant' },
   { value: 'intermediaire', label: 'Intermediaire' },
   { value: 'avance', label: 'Avance' },
+];
+
+const SUPPORT_TYPE_OPTIONS = [
+  { value: 'ponctuel', label: 'Ponctuel' },
+  { value: 'suivi_regulier', label: 'Suivi regulier' },
+  { value: 'long_uniquement', label: 'Long uniquement' },
+] as const;
+
+const EDUCATION_OPTIONS = [
+  { value: '', label: 'Non renseigne' },
+  { value: 'bac', label: 'Bac' },
+  { value: 'bac+2', label: 'Bac+2' },
+  { value: 'bac+3', label: 'Bac+3' },
+  { value: 'bac+5', label: 'Bac+5' },
+  { value: 'doctorat', label: 'Doctorat' },
+  { value: 'autre', label: 'Autre' },
 ];
 
 const EMPTY_SLOT: AvailabilitySlot = {
@@ -112,17 +139,26 @@ export function MentorSettings({ accessToken }: Props) {
   const [bio, setBio] = useState('');
   const [bannerUrl, setBannerUrl] = useState('');
   const [about, setAbout] = useState('');
+  const [educationLevel, setEducationLevel] = useState('');
+  const [degreesInput, setDegreesInput] = useState('');
+  const [keywordsInput, setKeywordsInput] = useState('');
   const [professionalLinksInput, setProfessionalLinksInput] = useState('');
   const [expertiseInput, setExpertiseInput] = useState('');
   const [languagesInput, setLanguagesInput] = useState('');
   const [certificationsInput, setCertificationsInput] = useState('');
   const [supportedLevels, setSupportedLevels] = useState<string[]>([]);
+  const [supportTypes, setSupportTypes] = useState<string[]>([]);
   const [tariffMin, setTariffMin] = useState('30');
   const [tariffMax, setTariffMax] = useState('45');
   const [currency, setCurrency] = useState('EUR');
   const [isAvailable, setIsAvailable] = useState(true);
   const [nextAvailableAt, setNextAvailableAt] = useState('');
   const [slots, setSlots] = useState<AvailabilitySlot[]>([EMPTY_SLOT]);
+  const [documents, setDocuments] = useState<MentorDocument[]>([]);
+  const [docType, setDocType] = useState<'diploma' | 'certificate'>('diploma');
+  const [docUrl, setDocUrl] = useState('');
+  const [calendarConnected, setCalendarConnected] = useState(false);
+  const [missingRequirements, setMissingRequirements] = useState<string[]>([]);
 
   const loadProfile = useCallback(async () => {
     setLoading(true);
@@ -151,17 +187,22 @@ export function MentorSettings({ accessToken }: Props) {
       setBio(data.profile.bio ?? '');
       setBannerUrl(data.profile.bannerUrl ?? '');
       setAbout(data.profile.about ?? '');
-      setProfessionalLinksInput(data.profile.professionalLinks.join(', '));
+      setEducationLevel(data.profile.educationLevel ?? '');
+      setDegreesInput((data.profile.degrees ?? []).join(', '));
+      setKeywordsInput((data.profile.keywords ?? []).join(', '));
+      setProfessionalLinksInput((data.profile.professionalLinks ?? []).join(', '));
       setExpertiseInput(data.profile.expertiseTags.join(', '));
       setLanguagesInput(data.profile.languages.join(', '));
       setCertificationsInput(data.profile.certifications.join(', '));
       setSupportedLevels(data.profile.supportedLevels);
+      setSupportTypes(data.profile.supportTypes ?? []);
       setTariffMin(String(data.profile.tariffs.min));
       setTariffMax(String(data.profile.tariffs.max));
       setCurrency(data.profile.tariffs.currency);
       setIsAvailable(data.profile.availability.isAvailable);
       setNextAvailableAt(toLocalDateTime(data.profile.availability.nextAvailableAt));
       setSlots(data.profile.availability.slots.length > 0 ? data.profile.availability.slots : [EMPTY_SLOT]);
+
     } catch {
       setError('Erreur de connexion au serveur');
     } finally {
@@ -182,11 +223,13 @@ export function MentorSettings({ accessToken }: Props) {
 
     return {
       expertise: toList(expertiseInput),
+      degrees: toList(degreesInput),
+      keywords: toList(keywordsInput),
       languages: toList(languagesInput),
       certifications: toList(certificationsInput),
       professionalLinks: toList(professionalLinksInput),
     };
-  }, [certificationsInput, expertiseInput, languagesInput, professionalLinksInput]);
+  }, [certificationsInput, degreesInput, expertiseInput, keywordsInput, languagesInput, professionalLinksInput]);
 
   const validateClient = () => {
     if (!domain.trim()) {
@@ -250,9 +293,13 @@ export function MentorSettings({ accessToken }: Props) {
       bio: bio.trim() || undefined,
       bannerUrl: bannerUrl.trim() || undefined,
       about: about.trim() || undefined,
+      educationLevel: educationLevel || undefined,
+      degrees: normalizedSummary.degrees,
+      keywords: normalizedSummary.keywords,
       professionalLinks: normalizedSummary.professionalLinks,
       expertiseTags: normalizedSummary.expertise,
       supportedLevels,
+      supportTypes,
       languages: normalizedSummary.languages,
       certifications: normalizedSummary.certifications,
       tariffs: {
@@ -297,6 +344,59 @@ export function MentorSettings({ accessToken }: Props) {
     } finally {
       setSaving(false);
     }
+  };
+
+  const uploadDocument = async () => {
+    if (!docUrl.trim()) {
+      setError('URL document requise');
+      return;
+    }
+    setError('');
+    const response = await fetch(`${API_URL}/mentors/me/documents`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ type: docType, fileUrl: docUrl.trim() }),
+    });
+    const result = await response.json();
+    if (!response.ok || result.error) {
+      setError(result.error?.message || 'Upload document impossible');
+      return;
+    }
+    setDocUrl('');
+    await loadProfile();
+  };
+
+  const connectGoogleCalendar = async () => {
+    const response = await fetch(`${API_URL}/mentors/me/calendar/google/connect`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({}),
+    });
+    const result = await response.json();
+    if (!response.ok || result.error) {
+      setError(result.error?.message || 'Connexion Google impossible');
+      return;
+    }
+    setCalendarConnected(true);
+  };
+
+  const disconnectGoogleCalendar = async () => {
+    const response = await fetch(`${API_URL}/mentors/me/calendar/google/disconnect`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    const result = await response.json();
+    if (!response.ok || result.error) {
+      setError(result.error?.message || 'Deconnexion Google impossible');
+      return;
+    }
+    setCalendarConnected(false);
   };
 
   if (loading) {
@@ -415,6 +515,30 @@ export function MentorSettings({ accessToken }: Props) {
             placeholder="Votre approche, votre posture, vos domaines de specialisation"
           />
 
+          <Select
+            name="educationLevel"
+            label="Niveau d etudes"
+            value={educationLevel}
+            options={EDUCATION_OPTIONS}
+            onChange={(event) => setEducationLevel(event.target.value)}
+          />
+
+          <Input
+            name="degrees"
+            label="Diplomes"
+            value={degreesInput}
+            onChange={(event) => setDegreesInput(event.target.value)}
+            placeholder="Master informatique, MBA..."
+          />
+
+          <Input
+            name="keywords"
+            label="Mots-cles"
+            value={keywordsInput}
+            onChange={(event) => setKeywordsInput(event.target.value)}
+            placeholder="gestion de projet, memoire, digital..."
+          />
+
           <Input
             name="professionalLinks"
             label="Liens professionnels"
@@ -422,6 +546,31 @@ export function MentorSettings({ accessToken }: Props) {
             onChange={(event) => setProfessionalLinksInput(event.target.value)}
             placeholder="https://www.linkedin.com/in/..., https://www.linkedin.com/in/..."
           />
+
+          <div className={styles.levels}>
+            <p className={styles.groupTitle}>Types d accompagnement</p>
+            <div className={styles.levelsGrid}>
+              {SUPPORT_TYPE_OPTIONS.map((option) => {
+                const checked = supportTypes.includes(option.value);
+                return (
+                  <label key={option.value} className={styles.checkboxLine}>
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(event) => {
+                        setSupportTypes((previous) =>
+                          event.target.checked
+                            ? [...new Set([...previous, option.value])]
+                            : previous.filter((item) => item !== option.value),
+                        );
+                      }}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -560,6 +709,81 @@ export function MentorSettings({ accessToken }: Props) {
 
       <Card>
         <CardHeader>
+          <CardTitle>Legitimite & documents</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className={styles.gridThree}>
+            <Select
+              name="docType"
+              label="Type"
+              value={docType}
+              options={[
+                { value: 'diploma', label: 'Diplome' },
+                { value: 'certificate', label: 'Certification' },
+              ]}
+              onChange={(event) => setDocType(event.target.value as 'diploma' | 'certificate')}
+            />
+            <Input
+              name="docUrl"
+              label="URL document"
+              value={docUrl}
+              onChange={(event) => setDocUrl(event.target.value)}
+              placeholder="https://..."
+            />
+            <Button type="button" variant="outline" onClick={() => void uploadDocument()}>
+              Ajouter
+            </Button>
+          </div>
+          <ul>
+            {documents.map((doc) => (
+              <li key={doc.documentId}>
+                {doc.type} - {doc.verificationStatus}
+              </li>
+            ))}
+            {documents.length === 0 && <li>Aucun document</li>}
+          </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Agenda Google</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>{calendarConnected ? 'Connecte' : 'Non connecte'}</p>
+          <div className={styles.actions}>
+            {!calendarConnected ? (
+              <Button type="button" variant="outline" onClick={() => void connectGoogleCalendar()}>
+                Connecter Google
+              </Button>
+            ) : (
+              <Button type="button" variant="ghost" onClick={() => void disconnectGoogleCalendar()}>
+                Deconnecter Google
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Readiness publication</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {missingRequirements.length === 0 ? (
+            <p>Profil publiable</p>
+          ) : (
+            <ul>
+              {missingRequirements.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Apercu public</CardTitle>
         </CardHeader>
         <CardContent>
@@ -577,8 +801,24 @@ export function MentorSettings({ accessToken }: Props) {
               <dd>{normalizedSummary.expertise.join(', ') || 'Non renseigne'}</dd>
             </div>
             <div>
+              <dt>Niveau d etudes</dt>
+              <dd>{educationLevel || 'Non renseigne'}</dd>
+            </div>
+            <div>
+              <dt>Diplomes</dt>
+              <dd>{normalizedSummary.degrees.join(', ') || 'Non renseigne'}</dd>
+            </div>
+            <div>
+              <dt>Mots-cles</dt>
+              <dd>{normalizedSummary.keywords.join(', ') || 'Non renseigne'}</dd>
+            </div>
+            <div>
               <dt>Liens professionnels</dt>
               <dd>{normalizedSummary.professionalLinks.join(', ') || 'Non renseigne'}</dd>
+            </div>
+            <div>
+              <dt>Accompagnement</dt>
+              <dd>{supportTypes.join(', ') || 'Non renseigne'}</dd>
             </div>
             <div>
               <dt>Langues</dt>

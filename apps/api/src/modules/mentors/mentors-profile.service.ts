@@ -14,18 +14,6 @@ interface MentorReview {
   createdAt: string;
 }
 
-interface StoredMentorReview {
-  reviewId: string;
-  mentorId: string;
-  studentId: string;
-  bookingId: string | null;
-  rating: number;
-  comment: string;
-  status: 'pending' | 'published' | 'removed';
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface MentorProfileResult {
   mentor: {
     mentorId: string;
@@ -35,9 +23,13 @@ interface MentorProfileResult {
     bannerUrl: string | null;
     about: string | null;
     professionalLinks: string[];
+    educationLevel: string | null;
+    degrees: string[];
+    keywords: string[];
     domain: string;
     expertiseTags: string[];
     supportedLevels: string[];
+    supportTypes: string[];
     hourlyRate: number | null;
   };
   reviews: MentorReview[];
@@ -57,8 +49,6 @@ const MAX_REVIEW_LIMIT = 20;
 
 @Injectable()
 export class MentorsProfileService {
-  private readonly storedReviews = new Map<string, StoredMentorReview>();
-
   constructor(private readonly prisma: PrismaService) {}
 
   async getMentorProfile(mentorId: string): Promise<MentorProfileResult> {
@@ -75,9 +65,13 @@ export class MentorsProfileService {
         bannerUrl: mentor.banner_url ?? null,
         about: mentor.about ?? null,
         professionalLinks: mentor.professional_links ?? [],
+        educationLevel: mentor.education_level ?? null,
+        degrees: mentor.degrees ?? [],
+        keywords: mentor.keywords ?? [],
         domain: mentor.domain,
         expertiseTags: mentor.expertise_tags,
         supportedLevels: mentor.supported_levels,
+        supportTypes: mentor.support_types ?? [],
         hourlyRate: mentor.hourly_rate,
       },
       reviews: reviews.slice(0, DEFAULT_REVIEW_LIMIT),
@@ -155,37 +149,33 @@ export class MentorsProfileService {
       });
     }
 
-    const duplicate = [...this.storedReviews.values()].find(
-      (review) =>
-        review.mentorId === mentorId &&
-        review.studentId === input.studentId &&
-        review.bookingId === resolvedBookingId &&
-        review.status !== 'removed',
-    );
+    const duplicate = await this.prisma.mentor_reviews.findFirst({
+      where: {
+        mentor_id: mentorId,
+        student_id: input.studentId,
+        booking_id: resolvedBookingId,
+        status: { not: 'removed' },
+      },
+    });
 
     if (duplicate) {
       return {
-        review: this.mapStoredReview(duplicate),
+        review: this.mapDbReview(duplicate),
       };
     }
-
-    const now = new Date().toISOString();
-    const review: StoredMentorReview = {
-      reviewId: `manual-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-      mentorId,
-      studentId: input.studentId,
-      bookingId: resolvedBookingId,
-      rating: Math.max(1, Math.min(5, Number(input.rating.toFixed(1)))),
-      comment: input.body.trim(),
-      status: 'published',
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    this.storedReviews.set(review.reviewId, review);
+    const review = await this.prisma.mentor_reviews.create({
+      data: {
+        mentor_id: mentorId,
+        student_id: input.studentId,
+        booking_id: resolvedBookingId,
+        rating: Math.max(1, Math.min(5, Number(input.rating.toFixed(1)))),
+        body: input.body.trim(),
+        status: 'published',
+      },
+    });
 
     return {
-      review: this.mapStoredReview(review),
+      review: this.mapDbReview(review),
     };
   }
 
@@ -200,36 +190,37 @@ export class MentorsProfileService {
     },
   ) {
     await this.findMentorOrThrow(mentorId);
-    const review = this.storedReviews.get(reviewId);
+    const review = await this.prisma.mentor_reviews.findUnique({
+      where: { id: reviewId },
+    });
 
-    if (!review || review.mentorId !== mentorId) {
+    if (!review || review.mentor_id !== mentorId) {
       throw new NotFoundException({
         code: 'REVIEW_NOT_FOUND',
         message: 'Avis introuvable',
       });
     }
 
-    if (review.studentId !== input.studentId) {
+    if (review.student_id !== input.studentId) {
       throw new NotFoundException({
         code: 'REVIEW_NOT_FOUND',
         message: 'Avis introuvable',
       });
     }
 
-    const updated: StoredMentorReview = {
-      ...review,
-      rating:
-        input.rating !== undefined
-          ? Math.max(1, Math.min(5, Number(input.rating.toFixed(1))))
-          : review.rating,
-      comment: input.body?.trim() || review.comment,
-      status: input.status ?? review.status,
-      updatedAt: new Date().toISOString(),
-    };
-
-    this.storedReviews.set(reviewId, updated);
+    const updated = await this.prisma.mentor_reviews.update({
+      where: { id: reviewId },
+      data: {
+        rating:
+          input.rating !== undefined
+            ? Math.max(1, Math.min(5, Number(input.rating.toFixed(1))))
+            : undefined,
+        body: input.body?.trim() || undefined,
+        status: input.status,
+      },
+    });
     return {
-      review: this.mapStoredReview(updated),
+      review: this.mapDbReview(updated),
     };
   }
 
@@ -257,10 +248,18 @@ export class MentorsProfileService {
           },
         },
         availability: true,
+        visibility: {
+          select: { status: true },
+        },
       },
     });
 
-    if (!mentor || !mentor.is_validated) {
+    if (
+      !mentor ||
+      !mentor.is_validated ||
+      (mentor.is_publish_ready !== undefined && !mentor.is_publish_ready) ||
+      mentor.visibility?.status === 'hidden'
+    ) {
       throw new NotFoundException({
         code: 'MENTOR_NOT_FOUND',
         message: 'Profil mentor introuvable',
@@ -271,15 +270,13 @@ export class MentorsProfileService {
   }
 
   private async buildReviews(mentorId: string): Promise<MentorReview[]> {
-    const interactions = await this.prisma.mentor_interactions.findMany({
+    const reviews = await this.prisma.mentor_reviews.findMany({
       where: {
-        mentor_user_id: mentorId,
-        interaction_count: {
-          gt: 0,
-        },
+        mentor_id: mentorId,
+        status: 'published',
       },
       orderBy: {
-        last_interaction_at: 'desc',
+        created_at: 'desc',
       },
       include: {
         student: {
@@ -291,45 +288,33 @@ export class MentorsProfileService {
       },
     });
 
-    const autoReviews = interactions.map((interaction) => {
-      const rating = Math.min(5, 3 + interaction.interaction_count * 0.4);
-      const timestamp =
-        interaction.last_interaction_at ?? interaction.created_at;
-      const authorName = interaction.student
-        ? `${interaction.student.first_name} ${interaction.student.last_name}`
-        : 'Etudiant OrigAMI';
-
-      return {
-        reviewId: `${interaction.student_user_id}-${interaction.mentor_user_id}`,
-        rating: Number(rating.toFixed(1)),
-        comment: 'Session de mentorat validee par retour de session.',
-        author: authorName,
-        source: 'session' as const,
-        createdAt: timestamp.toISOString(),
-      };
-    });
-
-    const manualReviews = [...this.storedReviews.values()]
-      .filter(
-        (review) =>
-          review.mentorId === mentorId && review.status === 'published',
-      )
-      .map((review): MentorReview => this.mapStoredReview(review));
-
-    return [...manualReviews, ...autoReviews].sort(
+    return reviews
+      .map((review) => this.mapDbReview(review))
+      .sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
   }
 
-  private mapStoredReview(review: StoredMentorReview): MentorReview {
+  private mapDbReview(review: {
+    id: string;
+    rating: number;
+    body: string;
+    student_id?: string;
+    student?: { first_name: string; last_name: string } | null;
+    created_at: Date;
+  }): MentorReview {
+    const authorName = review.student
+      ? `${review.student.first_name} ${review.student.last_name}`
+      : (review.student_id ?? 'Etudiant');
+
     return {
-      reviewId: review.reviewId,
+      reviewId: review.id,
       rating: review.rating,
-      comment: review.comment,
-      author: review.studentId,
+      comment: review.body,
+      author: authorName,
       source: 'feedback',
-      createdAt: review.createdAt,
+      createdAt: review.created_at.toISOString(),
     };
   }
 

@@ -16,7 +16,11 @@ describe('MentorSelfProfileDto', () => {
       bio: 'Mentor frontend',
       bannerUrl: 'https://cdn.origami.app/banner.png',
       about: 'Mentor specialise front-end avec 7 ans d experience.',
+      educationLevel: 'bac+5',
+      degrees: ['Master Informatique'],
+      keywords: ['gestion de projet', 'memoire'],
       professionalLinks: ['https://www.linkedin.com/in/alice-martin'],
+      supportTypes: ['ponctuel', 'suivi_regulier'],
       tariffs: { min: 30, max: 50, currency: 'EUR' },
       availability: {
         isAvailable: true,
@@ -82,6 +86,19 @@ describe('MentorSelfProfileDto', () => {
       domain: 'informatique',
       expertiseTags: ['react'],
       professionalLinks: ['linkedin.com/in/no-protocol'],
+      tariffs: { min: 30, max: 50, currency: 'EUR' },
+      availability: { isAvailable: true },
+    });
+
+    const errors = await validate(dto);
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it('rejects invalid support type', async () => {
+    const dto = plainToInstance(CreateMentorSelfProfileDto, {
+      domain: 'informatique',
+      expertiseTags: ['react'],
+      supportTypes: ['invalid'],
       tariffs: { min: 30, max: 50, currency: 'EUR' },
       availability: { isAvailable: true },
     });

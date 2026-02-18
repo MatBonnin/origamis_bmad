@@ -14,6 +14,7 @@ interface MentorSearchItem {
   lastName: string;
   domain: string;
   expertiseTags: string[];
+  supportTypes?: string[];
   hourlyRate: number | null;
   rating: number;
   isAvailable: boolean;
@@ -36,11 +37,13 @@ interface SearchFacets {
     presets: Array<{ key: string; min: number; max: number | null; label: string }>;
   };
   availabilities: string[];
+  support_types?: string[];
   rating_thresholds: number[];
 }
 
 interface SearchFilters {
   domains?: string[];
+  supportTypes?: string[];
   maxPrice?: number;
   minRating?: number;
   availability?: 'available' | 'all';
@@ -180,6 +183,7 @@ export function MentorSearch({ accessToken }: Props) {
   }, [loading, total]);
 
   const domainValue = filters.domains?.[0] ?? '';
+  const supportTypeValue = filters.supportTypes?.[0] ?? '';
   const maxPriceValue = filters.maxPrice !== undefined ? String(filters.maxPrice) : '';
   const minRatingValue = filters.minRating !== undefined ? String(filters.minRating) : '';
   const onlyAvailable = filters.availability === 'available';
@@ -193,10 +197,15 @@ export function MentorSearch({ accessToken }: Props) {
     value: String(preset.max ?? 9999),
     label: preset.label,
   }));
+  const supportTypeOptions = (facets?.support_types ?? []).map((value) => ({
+    value,
+    label: value,
+  }));
 
   const activeFilters = [
     domainValue ? `Domaine: ${domainValue}` : '',
     maxPriceValue ? `Prix max: ${maxPriceValue} EUR/h` : '',
+    supportTypeValue ? `Accompagnement: ${supportTypeValue}` : '',
     minRatingValue ? `Note min: ${minRatingValue}` : '',
     onlyAvailable ? 'Disponible maintenant' : '',
   ].filter(Boolean);
@@ -214,6 +223,21 @@ export function MentorSearch({ accessToken }: Props) {
           setFilters((previous) => ({
             ...previous,
             domains: nextValue ? [nextValue] : undefined,
+          }));
+        }}
+      />
+
+      <Select
+        label="Accompagnement"
+        name="supportType"
+        value={supportTypeValue}
+        options={supportTypeOptions}
+        placeholder="Tous les types"
+        onChange={(event) => {
+          const nextValue = event.target.value;
+          setFilters((previous) => ({
+            ...previous,
+            supportTypes: nextValue ? [nextValue] : undefined,
           }));
         }}
       />
@@ -370,6 +394,12 @@ export function MentorSearch({ accessToken }: Props) {
                       <dt>Disponibilite</dt>
                       <dd>{mentor.isAvailable ? 'Disponible' : 'Indisponible'}</dd>
                     </div>
+                    {mentor.supportTypes && mentor.supportTypes.length > 0 && (
+                      <div>
+                        <dt>Accompagnement</dt>
+                        <dd>{mentor.supportTypes.join(', ')}</dd>
+                      </div>
+                    )}
                   </dl>
                   <div className={styles.cardActions}>
                     <Link

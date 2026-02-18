@@ -1,6 +1,6 @@
 # Story 8.4: Parametrage d'offre mentor
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,18 +17,18 @@ so that controler mon positionnement et mon modele.
 
 ## Tasks / Subtasks
 
-- [ ] Schema & migration (AC: #1, #3)
-  - [ ] Ajouter `support_types` sur `mentor_profiles`
-- [ ] API self-service/public/recherche (AC: #1, #2, #3, #4)
-  - [ ] Etendre DTO
-  - [ ] Exposer champ dans profil public
-  - [ ] Ajouter filtre dans `GET /mentors/search` et facettes
-- [ ] UI mentor/etudiant (AC: #1, #2, #3)
-  - [ ] Checkbox group dans `MentorSettings`
-  - [ ] filtre cote recherche mentors
-- [ ] Tests (AC: #1, #2, #3, #4)
-  - [ ] unit/integration API
-  - [ ] UI filtre + rendu profil
+- [x] Schema & migration (AC: #1, #3)
+  - [x] Ajouter `support_types` sur `mentor_profiles`
+- [x] API self-service/public/recherche (AC: #1, #2, #3, #4)
+  - [x] Etendre DTO
+  - [x] Exposer champ dans profil public
+  - [x] Ajouter filtre dans `GET /mentors/search` et facettes
+- [x] UI mentor/etudiant (AC: #1, #2, #3)
+  - [x] Checkbox group dans `MentorSettings`
+  - [x] filtre cote recherche mentors
+- [x] Tests (AC: #1, #2, #3, #4)
+  - [x] unit/integration API
+  - [x] UI filtre + rendu profil
 
 ## Dev Notes
 
@@ -63,4 +63,9 @@ GPT-5 (Codex)
 
 ### Completion Notes List
 
+- Story implementee (API/Web/tests selon perimetre).
+
 ### File List
+
+- Voir les fichiers modifies dans le diff Git.
+

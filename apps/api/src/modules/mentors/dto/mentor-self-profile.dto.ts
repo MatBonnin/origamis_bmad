@@ -20,6 +20,15 @@ import {
 } from 'class-validator';
 
 const WEEK_DAYS = [0, 1, 2, 3, 4, 5, 6] as const;
+const EDUCATION_LEVELS = [
+  'bac',
+  'bac+2',
+  'bac+3',
+  'bac+5',
+  'doctorat',
+  'autre',
+] as const;
+const SUPPORT_TYPES = ['ponctuel', 'suivi_regulier', 'long_uniquement'] as const;
 
 export class MentorTariffsDto {
   @ApiProperty({ description: 'Tarif minimum horaire', example: 30 })
@@ -145,6 +154,37 @@ export class CreateMentorSelfProfileDto {
   about?: string;
 
   @ApiPropertyOptional({
+    description: "Niveau d'etudes",
+    enum: EDUCATION_LEVELS,
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(EDUCATION_LEVELS)
+  educationLevel?: string;
+
+  @ApiPropertyOptional({
+    description: 'Diplomes du mentor',
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(10)
+  @IsString({ each: true })
+  @MaxLength(120, { each: true })
+  degrees?: string[];
+
+  @ApiPropertyOptional({
+    description: 'Mots-cles de matching',
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(20)
+  @IsString({ each: true })
+  @MaxLength(50, { each: true })
+  keywords?: string[];
+
+  @ApiPropertyOptional({
     description: 'Liens professionnels du mentor',
     type: [String],
     example: ['https://www.linkedin.com/in/alice-martin'],
@@ -154,6 +194,19 @@ export class CreateMentorSelfProfileDto {
   @ArrayMaxSize(5)
   @IsUrl({ require_protocol: true, protocols: ['https'] }, { each: true })
   professionalLinks?: string[];
+
+  @ApiPropertyOptional({
+    description: "Types d'accompagnement proposes",
+    type: [String],
+    enum: SUPPORT_TYPES,
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(3)
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  @IsIn(SUPPORT_TYPES, { each: true })
+  supportTypes?: string[];
 
   @ApiProperty({ type: MentorTariffsDto })
   @ValidateNested()
@@ -236,6 +289,37 @@ export class UpdateMentorSelfProfileDto {
   about?: string;
 
   @ApiPropertyOptional({
+    description: "Niveau d'etudes",
+    enum: EDUCATION_LEVELS,
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(EDUCATION_LEVELS)
+  educationLevel?: string;
+
+  @ApiPropertyOptional({
+    description: 'Diplomes du mentor',
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(10)
+  @IsString({ each: true })
+  @MaxLength(120, { each: true })
+  degrees?: string[];
+
+  @ApiPropertyOptional({
+    description: 'Mots-cles de matching',
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(20)
+  @IsString({ each: true })
+  @MaxLength(50, { each: true })
+  keywords?: string[];
+
+  @ApiPropertyOptional({
     description: 'Liens professionnels du mentor',
     type: [String],
     example: ['https://www.linkedin.com/in/alice-martin'],
@@ -245,6 +329,19 @@ export class UpdateMentorSelfProfileDto {
   @ArrayMaxSize(5)
   @IsUrl({ require_protocol: true, protocols: ['https'] }, { each: true })
   professionalLinks?: string[];
+
+  @ApiPropertyOptional({
+    description: "Types d'accompagnement proposes",
+    type: [String],
+    enum: SUPPORT_TYPES,
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(3)
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  @IsIn(SUPPORT_TYPES, { each: true })
+  supportTypes?: string[];
 
   @ApiPropertyOptional({ type: MentorTariffsDto })
   @IsOptional()

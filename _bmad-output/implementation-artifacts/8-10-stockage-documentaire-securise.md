@@ -1,6 +1,6 @@
 # Story 8.10: Stockage documentaire securise d'accompagnement
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,17 +17,17 @@ so that professionnaliser le suivi.
 
 ## Tasks / Subtasks
 
-- [ ] Schema & migration (AC: #1, #2, #3, #4)
-  - [ ] `program_documents` + ACL simple mentor/student
-- [ ] API documents programme (AC: #1, #2, #3, #4)
-  - [ ] upload/list/delete
-  - [ ] liens temporaires securises
-- [ ] UI mentor/etudiant (AC: #1, #3, #4)
-  - [ ] onglet documents dans suivi programme
-- [ ] Security hardening (AC: #2)
-  - [ ] verification ownership programme
-  - [ ] scan mime/type
-- [ ] Tests (AC: #1, #2, #3, #4)
+- [x] Schema & migration (AC: #1, #2, #3, #4)
+  - [x] `program_documents` + ACL simple mentor/student
+- [x] API documents programme (AC: #1, #2, #3, #4)
+  - [x] upload/list/delete
+  - [x] liens temporaires securises
+- [x] UI mentor/etudiant (AC: #1, #3, #4)
+  - [x] onglet documents dans suivi programme
+- [x] Security hardening (AC: #2)
+  - [x] verification ownership programme
+  - [x] scan mime/type
+- [x] Tests (AC: #1, #2, #3, #4)
 
 ## Dev Notes
 
@@ -56,4 +56,9 @@ GPT-5 (Codex)
 
 ### Completion Notes List
 
+- Story implementee (API/Web/tests selon perimetre).
+
 ### File List
+
+- Voir les fichiers modifies dans le diff Git.
+

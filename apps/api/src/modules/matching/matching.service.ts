@@ -102,7 +102,7 @@ export class MatchingService {
     const userContext = await this.getUserContext(userId);
 
     const mentors = await this.prisma.mentor_profiles.findMany({
-      where: { is_validated: true },
+      where: { is_validated: true, is_publish_ready: true },
       include: {
         user: {
           select: {
@@ -111,6 +111,14 @@ export class MatchingService {
           },
         },
         availability: true,
+        visibility: {
+          select: { status: true },
+        },
+        validation_checks: {
+          select: { status: true },
+          orderBy: { created_at: 'desc' },
+          take: 1,
+        },
       },
     });
 
@@ -126,7 +134,17 @@ export class MatchingService {
     );
 
     const scored = mentors
-      .filter((mentor) => mentor.availability?.is_available)
+      .filter((mentor) => {
+        const validationStatus =
+          mentor.validation_checks[0]?.status ??
+          (mentor.is_validated ? 'validated' : 'pending_review');
+        const visibility = mentor.visibility?.status ?? 'visible';
+        return (
+          mentor.availability?.is_available &&
+          validationStatus === 'validated' &&
+          visibility !== 'hidden'
+        );
+      })
       .map((mentor) => {
         const interactionCount = interactionMap.get(mentor.user_id) ?? 0;
         return this.scoreMentor(mentor, userContext, interactionCount);

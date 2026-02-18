@@ -10,6 +10,13 @@ describe('MentorsProfileService', () => {
     mentor_profiles: {
       findUnique: jest.fn(),
     },
+    mentor_reviews: {
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
     mentor_interactions: {
       findMany: jest.fn(),
     },
@@ -41,6 +48,7 @@ describe('MentorsProfileService', () => {
       hourly_rate: 45,
       rating_avg: 4.2,
       supported_levels: ['intermediaire'],
+      is_publish_ready: true,
       is_validated: true,
       user: {
         first_name: 'Alice',
@@ -53,12 +61,13 @@ describe('MentorsProfileService', () => {
         next_available_at: new Date('2026-02-17T10:00:00.000Z'),
       },
     });
-    mockPrismaService.mentor_interactions.findMany.mockResolvedValue([
+    mockPrismaService.mentor_reviews.findMany.mockResolvedValue([
       {
-        student_user_id: 'student-1',
-        interaction_count: 3,
-        last_interaction_at: new Date('2026-02-10T10:00:00.000Z'),
-        created_at: new Date('2026-01-01T10:00:00.000Z'),
+        id: 'review-1',
+        rating: 4.2,
+        body: 'Session tres utile',
+        student_id: 'student-1',
+        created_at: new Date('2026-02-10T10:00:00.000Z'),
         student: { first_name: 'Nina', last_name: 'Dupont' },
       },
     ]);
@@ -86,6 +95,7 @@ describe('MentorsProfileService', () => {
       hourly_rate: 45,
       rating_avg: 4,
       supported_levels: [],
+      is_publish_ready: true,
       is_validated: true,
       user: {
         first_name: 'Alice',
@@ -98,19 +108,21 @@ describe('MentorsProfileService', () => {
         next_available_at: null,
       },
     });
-    mockPrismaService.mentor_interactions.findMany.mockResolvedValue([
+    mockPrismaService.mentor_reviews.findMany.mockResolvedValue([
       {
-        student_user_id: 'student-2',
-        interaction_count: 1,
-        last_interaction_at: new Date('2026-02-15T10:00:00.000Z'),
-        created_at: new Date('2026-02-14T10:00:00.000Z'),
+        id: 'review-2',
+        rating: 4.5,
+        body: 'Top',
+        student_id: 'student-2',
+        created_at: new Date('2026-02-15T10:00:00.000Z'),
         student: { first_name: 'Bob', last_name: 'Durand' },
       },
       {
-        student_user_id: 'student-1',
-        interaction_count: 2,
-        last_interaction_at: new Date('2026-02-10T10:00:00.000Z'),
-        created_at: new Date('2026-02-01T10:00:00.000Z'),
+        id: 'review-1',
+        rating: 4.1,
+        body: 'Bien',
+        student_id: 'student-1',
+        created_at: new Date('2026-02-10T10:00:00.000Z'),
         student: { first_name: 'Nina', last_name: 'Dupont' },
       },
     ]);
@@ -142,6 +154,7 @@ describe('MentorsProfileService', () => {
       hourly_rate: 45,
       rating_avg: 4,
       supported_levels: [],
+      is_publish_ready: true,
       is_validated: true,
       user: {
         first_name: 'Alice',
@@ -152,6 +165,15 @@ describe('MentorsProfileService', () => {
       availability: null,
     });
     mockPrismaService.bookings.findFirst.mockResolvedValue({ id: 'b-1' });
+    mockPrismaService.mentor_reviews.findFirst.mockResolvedValue(null);
+    mockPrismaService.mentor_reviews.create.mockResolvedValue({
+      id: 'review-created',
+      rating: 5,
+      body: 'Tres bonne session',
+      student_id: 'student-1',
+      created_at: new Date('2026-02-18T10:00:00.000Z'),
+      student: null,
+    });
 
     const result = await service.createMentorReview('mentor-1', {
       studentId: 'student-1',
@@ -159,6 +181,7 @@ describe('MentorsProfileService', () => {
       body: 'Tres bonne session',
     });
 
-    expect(result.review.reviewId).toContain('manual-');
+    expect(result.review.reviewId).toBe('review-created');
   });
 });
+

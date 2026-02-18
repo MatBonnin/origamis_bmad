@@ -1,6 +1,6 @@
 # Story 8.9: Parcours mentor configurables
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,18 +17,18 @@ so that structurer l'accompagnement.
 
 ## Tasks / Subtasks
 
-- [ ] Schema & migration (AC: #1, #2, #3)
-  - [ ] `program_templates`, `program_template_milestones`, `student_programs`, `student_program_milestones`
-- [ ] API templates/programs (AC: #1, #2, #3, #4)
-  - [ ] `POST/GET/PATCH /mentor/program-templates`
-  - [ ] `POST /students/:id/programs`
-  - [ ] endpoints lecture progression programmes
-- [ ] Integration milestones (AC: #2, #3)
-  - [ ] aligner avec module `milestones`
-- [ ] UI mentor/etudiant (AC: #1, #2, #3)
-  - [ ] create/edit template
-  - [ ] assignation et suivi
-- [ ] Tests (AC: #1, #2, #3, #4)
+- [x] Schema & migration (AC: #1, #2, #3)
+  - [x] `program_templates`, `program_template_milestones`, `student_programs`, `student_program_milestones`
+- [x] API templates/programs (AC: #1, #2, #3, #4)
+  - [x] `POST/GET/PATCH /mentor/program-templates`
+  - [x] `POST /students/:id/programs`
+  - [x] endpoints lecture progression programmes
+- [x] Integration milestones (AC: #2, #3)
+  - [x] aligner avec module `milestones`
+- [x] UI mentor/etudiant (AC: #1, #2, #3)
+  - [x] create/edit template
+  - [x] assignation et suivi
+- [x] Tests (AC: #1, #2, #3, #4)
 
 ## Dev Notes
 
@@ -57,4 +57,9 @@ GPT-5 (Codex)
 
 ### Completion Notes List
 
+- Story implementee (API/Web/tests selon perimetre).
+
 ### File List
+
+- Voir les fichiers modifies dans le diff Git.
+

@@ -1,6 +1,6 @@
 # Story 8.8: Controle mentor des demandes
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,18 +17,18 @@ so that preserver mon autonomie.
 
 ## Tasks / Subtasks
 
-- [ ] Schema & migration (AC: #1, #2, #3)
-  - [ ] creer `mentor_requests`
-- [ ] Endpoints (AC: #1, #2, #3, #4)
-  - [ ] `POST /mentors/:id/requests`
-  - [ ] `PATCH /mentor/requests/:id`
-  - [ ] `GET /mentor/requests` (inbox mentor)
-- [ ] Notifications (AC: #2, #3)
-  - [ ] push/in_app/email selon preferences
-- [ ] UI mentor/etudiant (AC: #1, #2, #3)
-  - [ ] formulaire demande cote etudiant
-  - [ ] inbox decision cote mentor
-- [ ] Tests (AC: #1, #2, #3, #4)
+- [x] Schema & migration (AC: #1, #2, #3)
+  - [x] creer `mentor_requests`
+- [x] Endpoints (AC: #1, #2, #3, #4)
+  - [x] `POST /mentors/:id/requests`
+  - [x] `PATCH /mentor/requests/:id`
+  - [x] `GET /mentor/requests` (inbox mentor)
+- [x] Notifications (AC: #2, #3)
+  - [x] push/in_app/email selon preferences
+- [x] UI mentor/etudiant (AC: #1, #2, #3)
+  - [x] formulaire demande cote etudiant
+  - [x] inbox decision cote mentor
+- [x] Tests (AC: #1, #2, #3, #4)
 
 ## Dev Notes
 
@@ -51,4 +51,9 @@ GPT-5 (Codex)
 
 ### Completion Notes List
 
+- Story implementee (API/Web/tests selon perimetre).
+
 ### File List
+
+- Voir les fichiers modifies dans le diff Git.
+

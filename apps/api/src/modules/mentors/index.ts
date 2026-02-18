@@ -4,4 +4,6 @@ export * from './mentors-profile.service';
 export * from './mentors-search.service';
 export * from './mentors-self.service';
 export * from './mentors-admin.service';
+export * from './mentors-epic8.service';
+export * from './mentors-workflow.controller';
 export * from './dto';

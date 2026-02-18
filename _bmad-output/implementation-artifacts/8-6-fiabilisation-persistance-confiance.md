@@ -1,6 +1,6 @@
 # Story 8.6: Fiabilisation persistance confiance
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -17,17 +17,17 @@ so that garantir stabilite et auditabilite apres redemarrage.
 
 ## Tasks / Subtasks
 
-- [ ] Retirer etat memoire admin (AC: #1, #2)
-  - [ ] remplacer Maps de `MentorsAdminService` par requetes Prisma
-- [ ] Persister flux avis (AC: #3)
-  - [ ] utiliser `mentor_reviews`, `mentor_ratings` comme source de verite
-- [ ] Aligner services dependants (AC: #2, #3)
-  - [ ] recherche/profil/boards admin lisent DB uniquement
-- [ ] Audit/log (AC: #4)
-  - [ ] tracer validation, rejet, visibilite, moderation avis
-- [ ] Tests (AC: #1, #2, #3, #4)
-  - [ ] tests redemarrage (state reload)
-  - [ ] tests integration bout-en-bout
+- [x] Retirer etat memoire admin (AC: #1, #2)
+  - [x] remplacer Maps de `MentorsAdminService` par requetes Prisma
+- [x] Persister flux avis (AC: #3)
+  - [x] utiliser `mentor_reviews`, `mentor_ratings` comme source de verite
+- [x] Aligner services dependants (AC: #2, #3)
+  - [x] recherche/profil/boards admin lisent DB uniquement
+- [x] Audit/log (AC: #4)
+  - [x] tracer validation, rejet, visibilite, moderation avis
+- [x] Tests (AC: #1, #2, #3, #4)
+  - [x] tests redemarrage (state reload)
+  - [x] tests integration bout-en-bout
 
 ## Dev Notes
 
@@ -57,4 +57,9 @@ GPT-5 (Codex)
 
 ### Completion Notes List
 
+- Story implementee (API/Web/tests selon perimetre).
+
 ### File List
+
+- Voir les fichiers modifies dans le diff Git.
+

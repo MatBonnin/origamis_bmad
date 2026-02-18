@@ -54,6 +54,13 @@ model users {
   mentor_validation_checks mentor_validation_checks[] @relation("mentor_validation_checks_checker")
   mentor_visibility_updates mentor_visibility[] @relation("mentor_visibility_updated_by")
   mentor_visibility_history_updates mentor_visibility_history[] @relation("mentor_visibility_history_updated_by")
+  verified_mentor_documents mentor_documents[] @relation("mentor_documents_verified_by")
+  mentor_calendar_connections mentor_calendar_connections[]
+  mentor_requests_as_student mentor_requests[] @relation("mentor_requests_student")
+  program_templates program_templates[]
+  student_programs_as_student student_programs[] @relation("student_programs_student")
+  student_programs_as_mentor student_programs[] @relation("student_programs_mentor")
+  program_documents program_documents[]
   user_audit_logs_as_target user_audit_logs[] @relation("user_audit_logs_user")
   user_audit_logs_as_actor user_audit_logs[] @relation("user_audit_logs_admin")
   incidents_reported incidents[] @relation("incidents_reported_by")
@@ -217,11 +224,16 @@ model mentor_profiles {
   domain          String
   banner_url      String?
   about           String?
+  education_level String?
+  degrees         String[] @default([])
+  keywords        String[] @default([])
   professional_links String[] @default([])
   expertise_tags  String[]
   supported_levels String[]
+  support_types   mentor_support_type[] @default([])
   hourly_rate     Int?
   rating_avg      Float?   @default(0)
+  is_publish_ready Boolean @default(false)
   is_validated    Boolean  @default(false)
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
@@ -233,11 +245,14 @@ model mentor_profiles {
   rating mentor_ratings?
   validation_checks mentor_validation_checks[]
   documents mentor_documents[]
+  calendar_busy_slots mentor_calendar_busy_slots[]
+  requests mentor_requests[] @relation("mentor_requests_mentor")
   visibility mentor_visibility?
   visibility_history mentor_visibility_history[]
 
   @@index([domain])
   @@index([is_validated])
+  @@index([is_publish_ready])
   @@map("mentor_profiles")
 }
 
@@ -447,6 +462,49 @@ enum mentor_status {
   rejected
 }
 
+enum mentor_support_type {
+  ponctuel
+  suivi_regulier
+  long_uniquement
+}
+
+enum mentor_document_type {
+  diploma
+  certificate
+}
+
+enum verification_status {
+  pending
+  verified
+  rejected
+}
+
+enum calendar_provider {
+  google
+}
+
+enum mentor_request_status {
+  pending
+  accepted
+  rejected
+  cancelled
+}
+
+enum program_milestone_status {
+  planned
+  in_progress
+  review
+  done
+  blocked
+}
+
+enum program_document_type {
+  memory
+  brief
+  annex
+  other
+}
+
 enum mentor_visibility_status {
   visible
   hidden
@@ -523,14 +581,163 @@ model mentor_validation_checks {
 model mentor_documents {
   id          String   @id @default(uuid())
   mentor_id   String
-  type        String
+  document_type mentor_document_type
   url         String
+  verification_status verification_status @default(pending)
+  verified_by String?
+  verified_at DateTime?
+  deleted_at  DateTime?
   uploaded_at DateTime @default(now())
 
   mentor mentor_profiles @relation(fields: [mentor_id], references: [user_id], onDelete: Cascade)
+  verifier users? @relation("mentor_documents_verified_by", fields: [verified_by], references: [id], onDelete: SetNull)
 
   @@index([mentor_id])
+  @@index([verification_status])
   @@map("mentor_documents")
+}
+
+model mentor_calendar_connections {
+  id                String            @id @default(uuid())
+  mentor_id         String
+  provider          calendar_provider
+  access_token_enc  String
+  refresh_token_enc String?
+  expires_at        DateTime?
+  connected_at      DateTime          @default(now())
+  disconnected_at   DateTime?
+  last_sync_at      DateTime?
+
+  mentor users @relation(fields: [mentor_id], references: [id], onDelete: Cascade)
+
+  @@unique([mentor_id, provider])
+  @@index([provider, disconnected_at])
+  @@map("mentor_calendar_connections")
+}
+
+model mentor_calendar_busy_slots {
+  id                String   @id @default(uuid())
+  mentor_id         String
+  provider          calendar_provider
+  provider_event_id String
+  start_at          DateTime
+  end_at            DateTime
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  mentor mentor_profiles @relation(fields: [mentor_id], references: [user_id], onDelete: Cascade)
+
+  @@unique([mentor_id, provider, provider_event_id])
+  @@index([mentor_id, start_at, end_at])
+  @@map("mentor_calendar_busy_slots")
+}
+
+model mentor_requests {
+  id          String               @id @default(uuid())
+  mentor_id   String
+  student_id  String
+  status      mentor_request_status @default(pending)
+  message     String?
+  decision_reason String?
+  created_at  DateTime             @default(now())
+  updated_at  DateTime             @updatedAt
+
+  mentor  mentor_profiles @relation("mentor_requests_mentor", fields: [mentor_id], references: [user_id], onDelete: Cascade)
+  student users           @relation("mentor_requests_student", fields: [student_id], references: [id], onDelete: Cascade)
+
+  @@index([mentor_id, status])
+  @@index([student_id, status])
+  @@map("mentor_requests")
+}
+
+model program_templates {
+  id          String   @id @default(uuid())
+  mentor_id   String
+  title       String
+  description String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  mentor users @relation(fields: [mentor_id], references: [id], onDelete: Cascade)
+  milestones program_template_milestones[]
+  programs student_programs[]
+
+  @@index([mentor_id, updated_at])
+  @@map("program_templates")
+}
+
+model program_template_milestones {
+  id           String   @id @default(uuid())
+  template_id  String
+  title        String
+  description  String?
+  milestone_order Int
+  due_days_from_start Int
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  template program_templates @relation(fields: [template_id], references: [id], onDelete: Cascade)
+
+  @@unique([template_id, milestone_order])
+  @@index([template_id])
+  @@map("program_template_milestones")
+}
+
+model student_programs {
+  id          String   @id @default(uuid())
+  template_id String?
+  mentor_id   String
+  student_id  String
+  title       String
+  status      String   @default("active")
+  start_at    DateTime @default(now())
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  template program_templates? @relation(fields: [template_id], references: [id], onDelete: SetNull)
+  mentor users @relation("student_programs_mentor", fields: [mentor_id], references: [id], onDelete: Cascade)
+  student users @relation("student_programs_student", fields: [student_id], references: [id], onDelete: Cascade)
+  milestones student_program_milestones[]
+  documents program_documents[]
+
+  @@index([mentor_id, updated_at])
+  @@index([student_id, updated_at])
+  @@map("student_programs")
+}
+
+model student_program_milestones {
+  id          String   @id @default(uuid())
+  program_id  String
+  title       String
+  description String?
+  milestone_order Int
+  deadline_at DateTime
+  status      program_milestone_status @default(planned)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  program student_programs @relation(fields: [program_id], references: [id], onDelete: Cascade)
+
+  @@index([program_id, milestone_order])
+  @@map("student_program_milestones")
+}
+
+model program_documents {
+  id          String   @id @default(uuid())
+  program_id  String
+  uploaded_by String
+  document_type program_document_type @default(other)
+  file_name   String?
+  url         String
+  created_at  DateTime @default(now())
+  deleted_at  DateTime?
+
+  program student_programs @relation(fields: [program_id], references: [id], onDelete: Cascade)
+  uploader users @relation(fields: [uploaded_by], references: [id], onDelete: Cascade)
+
+  @@index([program_id, created_at])
+  @@index([uploaded_by, created_at])
+  @@map("program_documents")
 }
 
 model mentor_visibility {

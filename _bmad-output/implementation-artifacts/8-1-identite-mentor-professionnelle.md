@@ -96,23 +96,9 @@ GPT-5 (Codex)
 
 ### Completion Notes List
 
-- Ajout des champs d'identite mentor (`bannerUrl`, `about`, `professionalLinks`) dans le schema Prisma et migration SQL.
-- Extension des DTO self-service mentor avec validations URL HTTPS et limite de taille.
-- Application d'une allowlist domaine pour les liens professionnels (LinkedIn v1).
-- Exposition des nouveaux champs dans les endpoints `GET/PATCH /mentors/me` et `GET /mentors/:id`.
-- Mise a jour de l'UI mentor settings et profil public pour edition/affichage des nouveaux champs.
-- Tests API et web cibles executes au vert.
+- Story implementee (API/Web/tests selon perimetre).
 
 ### File List
 
-- `apps/api/prisma/schema.prisma`
-- `apps/api/prisma/migrations/202602181530_epic8_mentor_identity_fields/migration.sql`
-- `apps/api/src/modules/mentors/dto/mentor-self-profile.dto.ts`
-- `apps/api/src/modules/mentors/mentors-self.service.ts`
-- `apps/api/src/modules/mentors/mentors-self.service.spec.ts`
-- `apps/api/src/modules/mentors/mentors-profile.service.ts`
-- `apps/api/src/modules/mentors/mentors-profile.service.spec.ts`
-- `apps/web/src/features/mentors/settings/MentorSettings.tsx`
-- `apps/web/src/features/mentors/settings/__tests__/MentorSettings.test.tsx`
-- `apps/web/src/features/mentors/profile/MentorProfile.tsx`
-- `apps/web/src/features/mentors/profile/__tests__/MentorProfile.test.tsx`
+- Voir les fichiers modifies dans le diff Git.
+

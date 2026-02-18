@@ -24,9 +24,13 @@ interface MentorProfileResponse {
     bannerUrl: string | null;
     about: string | null;
     professionalLinks: string[];
+    educationLevel: string | null;
+    degrees: string[];
+    keywords: string[];
     domain: string;
     expertiseTags: string[];
     supportedLevels: string[];
+    supportTypes: string[];
     hourlyRate: number | null;
   };
   reviews: MentorReview[];
@@ -170,6 +174,18 @@ export function MentorProfile({ accessToken, mentorId }: Props) {
           )}
           <dl className={styles.meta}>
             <div>
+              <dt>Niveau d etudes</dt>
+              <dd>{data.mentor.educationLevel || 'Non renseigne'}</dd>
+            </div>
+            <div>
+              <dt>Diplomes</dt>
+              <dd>{(data.mentor.degrees ?? []).join(', ') || 'Non renseigne'}</dd>
+            </div>
+            <div>
+              <dt>Accompagnement</dt>
+              <dd>{(data.mentor.supportTypes ?? []).join(', ') || 'Non renseigne'}</dd>
+            </div>
+            <div>
               <dt>Note moyenne</dt>
               <dd>{data.rating.average.toFixed(1)}/5 ({data.rating.reviewCount} avis)</dd>
             </div>
@@ -202,6 +218,7 @@ export function MentorProfile({ accessToken, mentorId }: Props) {
                 ))
                 : <span className={styles.fallback}>Aucune competence renseignee.</span>}
             </div>
+            <p className={styles.meta}>Mots-cles: {(data.mentor.keywords ?? []).join(', ') || 'Non renseignes'}</p>
           </CardContent>
         </Card>
 
