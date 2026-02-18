@@ -68,10 +68,10 @@ describe('MessagingController', () => {
     });
 
     await expect(
-      controller.sendMessage(
-        { id: 'student-1' } as never,
-        { receiverId: 'mentor-1', body: 'Salut mentor' },
-      ),
+      controller.sendMessage({ id: 'student-1' } as never, {
+        receiverId: 'mentor-1',
+        body: 'Salut mentor',
+      }),
     ).resolves.toEqual({
       data: {
         conversationId: 'conv-1',

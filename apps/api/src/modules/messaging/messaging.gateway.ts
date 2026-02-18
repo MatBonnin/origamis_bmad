@@ -49,8 +49,12 @@ export class MessagingGateway implements OnGatewayConnection {
 
     const result = await this.messagingService.sendMessage(userId, payload);
 
-    this.server.to(`user:${result.message.receiverId}`).emit('message.received', result);
-    this.server.to(`user:${result.message.senderId}`).emit('message.new', result);
+    this.server
+      .to(`user:${result.message.receiverId}`)
+      .emit('message.received', result);
+    this.server
+      .to(`user:${result.message.senderId}`)
+      .emit('message.new', result);
 
     return result;
   }
@@ -58,7 +62,8 @@ export class MessagingGateway implements OnGatewayConnection {
   @SubscribeMessage('message.read')
   async handleMessageRead(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() payload: { conversationId: string; lastReadMessageId?: string },
+    @MessageBody()
+    payload: { conversationId: string; lastReadMessageId?: string },
   ) {
     const userId = client.data.userId;
     if (!userId) {

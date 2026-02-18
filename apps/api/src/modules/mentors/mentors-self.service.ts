@@ -359,7 +359,7 @@ export class MentorsSelfService {
       typeof baseRaw === 'object' &&
       !Array.isArray(baseRaw) &&
       baseRaw !== null
-        ? ({ ...(baseRaw as Prisma.JsonObject) } as Prisma.InputJsonObject)
+        ? ({ ...baseRaw } as Prisma.InputJsonObject)
         : {};
 
     const mentorProfile: Prisma.InputJsonObject = {

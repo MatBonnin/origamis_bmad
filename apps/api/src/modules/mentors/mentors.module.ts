@@ -10,6 +10,11 @@ import { MentorsSelfService } from './mentors-self.service';
 @Module({
   imports: [MatchingModule, PrismaModule],
   controllers: [MentorsController],
-  providers: [MentorsSearchService, MentorsProfileService, MentorsSelfService, MentorsAvailabilityService],
+  providers: [
+    MentorsSearchService,
+    MentorsProfileService,
+    MentorsSelfService,
+    MentorsAvailabilityService,
+  ],
 })
 export class MentorsModule {}

@@ -1,7 +1,4 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsService } from '../notifications';
 import { PrismaService } from '../prisma';
@@ -167,7 +164,9 @@ describe('MessagingService – mentor flows', () => {
       },
     ]);
 
-    const result = await service.getConversationMessages('mentor-1', 'conv-1', { limit: 20 });
+    const result = await service.getConversationMessages('mentor-1', 'conv-1', {
+      limit: 20,
+    });
 
     expect(result.messages).toHaveLength(1);
     expect(result.messages[0].senderId).toBe('student-1');

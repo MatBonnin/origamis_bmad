@@ -75,7 +75,12 @@ export class MentorsAvailabilityService {
 
     const availability = await this.findOrCreateAvailability(userId);
 
-    await this.checkOverlap(availability.id, dto.dayOfWeek, dto.startTime, dto.endTime);
+    await this.checkOverlap(
+      availability.id,
+      dto.dayOfWeek,
+      dto.startTime,
+      dto.endTime,
+    );
 
     const slot = await this.prisma.mentor_availability_slots.create({
       data: {
@@ -100,7 +105,13 @@ export class MentorsAvailabilityService {
     const endTime = dto.endTime ?? existing.end_time;
 
     this.validateSlotTimes(startTime, endTime);
-    await this.checkOverlap(availability.id, dayOfWeek, startTime, endTime, slotId);
+    await this.checkOverlap(
+      availability.id,
+      dayOfWeek,
+      startTime,
+      endTime,
+      slotId,
+    );
 
     const slot = await this.prisma.mentor_availability_slots.update({
       where: { id: slotId },
@@ -129,7 +140,11 @@ export class MentorsAvailabilityService {
 
   async updateGeneralAvailability(
     userId: string,
-    data: { isAvailable?: boolean; nextAvailableAt?: string; timezone?: string },
+    data: {
+      isAvailable?: boolean;
+      nextAvailableAt?: string;
+      timezone?: string;
+    },
   ) {
     const availability = await this.findOrCreateAvailability(userId);
 

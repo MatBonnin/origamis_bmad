@@ -14,6 +14,7 @@ import { MentorsModule } from './modules/mentors';
 import { MatchingModule } from './modules/matching';
 import { MessagingModule } from './modules/messaging';
 import { BookingsModule } from './modules/bookings';
+import { SessionsModule } from './modules/sessions';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { BookingsModule } from './modules/bookings';
     MentorsModule,
     MessagingModule,
     BookingsModule,
+    SessionsModule,
   ],
   providers: [
     {

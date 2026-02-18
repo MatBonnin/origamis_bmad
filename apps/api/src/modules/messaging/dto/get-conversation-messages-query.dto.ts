@@ -7,7 +7,12 @@ export class GetConversationMessagesQueryDto {
   @IsString()
   cursor?: string;
 
-  @ApiPropertyOptional({ description: 'Taille de page', default: 20, minimum: 1, maximum: 50 })
+  @ApiPropertyOptional({
+    description: 'Taille de page',
+    default: 20,
+    minimum: 1,
+    maximum: 50,
+  })
   @IsOptional()
   @IsInt()
   @Min(1)

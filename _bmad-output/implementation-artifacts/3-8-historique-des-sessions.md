@@ -16,7 +16,7 @@ so that suivre mes échanges passés.
 
 ## Tasks / Subtasks
 
-- [ ] Endpoint `GET /sessions/history?user_id=` (pagination + filters) (AC: #1)
+- [x] Endpoint `GET /sessions/history?user_id=` (pagination + filters) (AC: #1)
 - [ ] Ajouter export (PDF/CSV) + lien de replay (si dispo) (AC: #1)
 - [ ] UI historique: timeline, filtre par type (message, RDV, visio) (AC: #1)
 - [ ] Relier aux logs (message, booking) + respect RGPD (AC: #1)
@@ -96,6 +96,25 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
+- Implémentation API `GET /sessions/history` avec pagination cursor-based (`cursor`, `limit`) et filtres (`category`: `message|rdv|visio`).
+- Contrôle d'accès propriétaire appliqué: blocage si `user_id` diffère de l'utilisateur authentifié.
+- Validation exécutée: tests ciblés sessions + suite Jest API complète (`--runInBand`) passants.
+
 ### Completion Notes List
 
+- ✅ Tâche 1 livrée: endpoint historique disponible via `apps/api/src/modules/sessions/sessions.controller.ts`.
+- ✅ Service associé créé avec normalisation de la réponse `{ sessions, metadata }` et enveloppe API `{ data, error }`.
+- ✅ Tests ajoutés/renforcés (controller + service) couvrant pagination, filtres et sécurité d'accès.
+
 ### File List
+
+- apps/api/src/modules/sessions/sessions.controller.ts
+- apps/api/src/modules/sessions/sessions.service.ts
+- apps/api/src/modules/sessions/sessions.module.ts
+- apps/api/src/modules/sessions/index.ts
+- apps/api/src/modules/sessions/sessions.controller.spec.ts
+- apps/api/src/modules/sessions/sessions.service.spec.ts
+- apps/api/src/app.module.ts
+- apps/api/package.json
+- apps/api/src/test-shims/nestjs-websockets.ts
+- apps/api/src/test-shims/socket-io.ts

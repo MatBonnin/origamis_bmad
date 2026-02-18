@@ -24,13 +24,15 @@ import { NotificationCategory } from '../users/dto/notification-preferences.dto'
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class NotificationsController {
-  constructor(
-    private readonly notificationsService: NotificationsService,
-  ) {}
+  constructor(private readonly notificationsService: NotificationsService) {}
 
   @Get()
   @ApiOperation({ summary: 'Lister les notifications de l utilisateur' })
-  @ApiQuery({ name: 'category', required: false, enum: ['messages', 'rdv', 'system'] })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    enum: ['messages', 'rdv', 'system'],
+  })
   @ApiQuery({ name: 'unreadOnly', required: false, type: Boolean })
   @ApiResponse({ status: 200, description: 'Notifications recuperees' })
   async getNotifications(
@@ -69,7 +71,10 @@ export class NotificationsController {
 
   @Patch('read-all')
   @ApiOperation({ summary: 'Marquer toutes les notifications comme lues' })
-  @ApiResponse({ status: 200, description: 'Notifications marquees comme lues' })
+  @ApiResponse({
+    status: 200,
+    description: 'Notifications marquees comme lues',
+  })
   async markAllAsRead(@CurrentUser() user: UserResponseDto) {
     const data = await this.notificationsService.markAllAsRead(user.id);
     return { data, error: null };

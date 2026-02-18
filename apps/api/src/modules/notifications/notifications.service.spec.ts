@@ -115,10 +115,13 @@ describe('NotificationsService', () => {
         message: 'System update',
       });
 
-      expect(mockEmitter).toHaveBeenCalledWith('user-1', expect.objectContaining({
-        notificationId: 'notif-2',
-        title: 'Update',
-      }));
+      expect(mockEmitter).toHaveBeenCalledWith(
+        'user-1',
+        expect.objectContaining({
+          notificationId: 'notif-2',
+          title: 'Update',
+        }),
+      );
     });
   });
 
@@ -192,9 +195,9 @@ describe('NotificationsService', () => {
     it('should throw if notification not found', async () => {
       mockPrisma.notifications.findUnique.mockResolvedValue(null);
 
-      await expect(service.markAsRead('user-1', 'notif-unknown')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.markAsRead('user-1', 'notif-unknown'),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw if notification belongs to another user', async () => {

@@ -99,7 +99,9 @@ describe('BookingsService', () => {
   describe('createBooking', () => {
     it('creates a confirmed booking', async () => {
       const bookingDate = getNextWednesday();
-      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(validSlot);
+      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(
+        validSlot,
+      );
       mockPrisma.bookings.findFirst.mockResolvedValue(null);
       mockPrisma.bookings.create.mockResolvedValue({
         id: 'booking-1',
@@ -156,7 +158,9 @@ describe('BookingsService', () => {
     });
 
     it('rejects self-booking', async () => {
-      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(validSlot);
+      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(
+        validSlot,
+      );
 
       await expect(
         service.createBooking('mentor-1', {
@@ -168,7 +172,9 @@ describe('BookingsService', () => {
     });
 
     it('rejects when day of week does not match slot', async () => {
-      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(validSlot);
+      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(
+        validSlot,
+      );
 
       const d = new Date();
       d.setDate(d.getDate() + ((4 + 7 - d.getDay()) % 7 || 7));
@@ -185,7 +191,9 @@ describe('BookingsService', () => {
 
     it('rejects when slot already booked for date', async () => {
       const bookingDate = getNextWednesday();
-      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(validSlot);
+      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(
+        validSlot,
+      );
       mockPrisma.bookings.findFirst.mockResolvedValue({
         id: 'existing-booking',
         status: 'confirmed',
@@ -223,9 +231,7 @@ describe('BookingsService', () => {
     });
 
     it('rejects cancellation by non-participant', async () => {
-      mockPrisma.bookings.findUnique.mockResolvedValue(
-        makeFutureBooking(),
-      );
+      mockPrisma.bookings.findUnique.mockResolvedValue(makeFutureBooking());
 
       await expect(
         service.cancelBooking('other-user', 'booking-1'),
@@ -289,7 +295,9 @@ describe('BookingsService', () => {
     it('reschedules a booking to a new slot and date', async () => {
       const newDate = getNextThursday();
       mockPrisma.bookings.findUnique.mockResolvedValue(makeFutureBooking());
-      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(newSlot);
+      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(
+        newSlot,
+      );
       mockPrisma.bookings.findFirst.mockResolvedValue(null);
       mockPrisma.bookings.update.mockResolvedValue({
         ...makeFutureBooking(),
@@ -337,7 +345,9 @@ describe('BookingsService', () => {
     it('rejects reschedule when new slot already booked', async () => {
       const newDate = getNextThursday();
       mockPrisma.bookings.findUnique.mockResolvedValue(makeFutureBooking());
-      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(newSlot);
+      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(
+        newSlot,
+      );
       mockPrisma.bookings.findFirst.mockResolvedValue({
         id: 'other-booking',
         status: 'confirmed',
@@ -369,7 +379,11 @@ describe('BookingsService', () => {
           cancellation_reason: null,
           created_at: new Date(),
           updated_at: new Date(),
-          student: { id: 'student-1', first_name: 'Alice', last_name: 'Dupont' },
+          student: {
+            id: 'student-1',
+            first_name: 'Alice',
+            last_name: 'Dupont',
+          },
           mentor: { id: 'mentor-1', first_name: 'Marc', last_name: 'Martin' },
         },
       ]);

@@ -31,25 +31,22 @@ export class NotificationsService {
   constructor(private readonly prisma: PrismaService) {}
 
   /** Called by the gateway to register the WebSocket emitter */
-  registerWsEmitter(
-    emitter: (userId: string, notification: unknown) => void,
-  ) {
+  registerWsEmitter(emitter: (userId: string, notification: unknown) => void) {
     this.wsEmitter = emitter;
   }
 
   async emitNotification(
     input: EmitNotificationInput,
   ): Promise<EmitNotificationResult> {
-    const preference =
-      await this.prisma.notification_preferences.findUnique({
-        where: {
-          user_id_channel_category: {
-            user_id: input.userId,
-            channel: input.channel,
-            category: input.category,
-          },
+    const preference = await this.prisma.notification_preferences.findUnique({
+      where: {
+        user_id_channel_category: {
+          user_id: input.userId,
+          channel: input.channel,
+          category: input.category,
         },
-      });
+      },
+    });
 
     if (preference && !preference.enabled) {
       return { sent: false, reason: 'DISABLED_BY_PREFERENCE' };
@@ -176,7 +173,9 @@ export class NotificationsService {
         data: { retries: n.retries + 1, status: 'sent', sent_at: new Date() },
       });
       retried++;
-      this.logger.log(`Retried notification ${n.id} (attempt ${n.retries + 1})`);
+      this.logger.log(
+        `Retried notification ${n.id} (attempt ${n.retries + 1})`,
+      );
     }
 
     return { retried };

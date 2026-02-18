@@ -83,9 +83,15 @@ export class MessagingService {
     conversationId: string,
     input: { cursor?: string; limit?: number },
   ) {
-    const conversation = await this.assertConversationAccess(userId, conversationId);
+    const conversation = await this.assertConversationAccess(
+      userId,
+      conversationId,
+    );
 
-    const limit = Math.max(1, Math.min(input.limit ?? DEFAULT_LIMIT, MAX_LIMIT));
+    const limit = Math.max(
+      1,
+      Math.min(input.limit ?? DEFAULT_LIMIT, MAX_LIMIT),
+    );
     const cursor = this.decodeCursor(input.cursor);
 
     const messages = await this.prisma.messages.findMany({
@@ -299,7 +305,10 @@ export class MessagingService {
     };
   }
 
-  private async assertConversationAccess(userId: string, conversationId: string) {
+  private async assertConversationAccess(
+    userId: string,
+    conversationId: string,
+  ) {
     const conversation = await this.prisma.conversations.findUnique({
       where: { id: conversationId },
     });
@@ -311,7 +320,10 @@ export class MessagingService {
       });
     }
 
-    if (conversation.student_id !== userId && conversation.mentor_id !== userId) {
+    if (
+      conversation.student_id !== userId &&
+      conversation.mentor_id !== userId
+    ) {
       throw new ForbiddenException({
         code: 'CONVERSATION_FORBIDDEN',
         message: 'Acces refuse a cette conversation',

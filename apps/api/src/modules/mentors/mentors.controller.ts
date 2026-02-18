@@ -157,7 +157,9 @@ export class MentorsController {
   async getMyAvailability(
     @CurrentUser() user: UserResponseDto,
   ): Promise<ApiEnvelope<unknown>> {
-    const data = await this.mentorsAvailabilityService.getMyAvailability(user.id);
+    const data = await this.mentorsAvailabilityService.getMyAvailability(
+      user.id,
+    );
     return { data, error: null };
   }
 
@@ -168,7 +170,14 @@ export class MentorsController {
   @ApiResponse({ status: 201, description: 'Creneau cree' })
   async createAvailabilitySlot(
     @CurrentUser() user: UserResponseDto,
-    @Body() dto: { dayOfWeek: number; startTime: string; endTime: string; isRecurring?: boolean; status?: string },
+    @Body()
+    dto: {
+      dayOfWeek: number;
+      startTime: string;
+      endTime: string;
+      isRecurring?: boolean;
+      status?: string;
+    },
   ): Promise<ApiEnvelope<unknown>> {
     const data = await this.mentorsAvailabilityService.createSlot(user.id, dto);
     return { data, error: null };
@@ -181,9 +190,14 @@ export class MentorsController {
   @ApiResponse({ status: 200, description: 'Disponibilite mise a jour' })
   async updateGeneralAvailability(
     @CurrentUser() user: UserResponseDto,
-    @Body() dto: { isAvailable?: boolean; nextAvailableAt?: string; timezone?: string },
+    @Body()
+    dto: { isAvailable?: boolean; nextAvailableAt?: string; timezone?: string },
   ): Promise<ApiEnvelope<unknown>> {
-    const data = await this.mentorsAvailabilityService.updateGeneralAvailability(user.id, dto);
+    const data =
+      await this.mentorsAvailabilityService.updateGeneralAvailability(
+        user.id,
+        dto,
+      );
     return { data, error: null };
   }
 
@@ -195,9 +209,20 @@ export class MentorsController {
   async updateAvailabilitySlot(
     @CurrentUser() user: UserResponseDto,
     @Param('slotId') slotId: string,
-    @Body() dto: { dayOfWeek?: number; startTime?: string; endTime?: string; isRecurring?: boolean; status?: string },
+    @Body()
+    dto: {
+      dayOfWeek?: number;
+      startTime?: string;
+      endTime?: string;
+      isRecurring?: boolean;
+      status?: string;
+    },
   ): Promise<ApiEnvelope<unknown>> {
-    const data = await this.mentorsAvailabilityService.updateSlot(user.id, slotId, dto);
+    const data = await this.mentorsAvailabilityService.updateSlot(
+      user.id,
+      slotId,
+      dto,
+    );
     return { data, error: null };
   }
 
@@ -210,17 +235,23 @@ export class MentorsController {
     @CurrentUser() user: UserResponseDto,
     @Param('slotId') slotId: string,
   ): Promise<ApiEnvelope<unknown>> {
-    const data = await this.mentorsAvailabilityService.deleteSlot(user.id, slotId);
+    const data = await this.mentorsAvailabilityService.deleteSlot(
+      user.id,
+      slotId,
+    );
     return { data, error: null };
   }
 
   @Get(':id/availability')
-  @ApiOperation({ summary: 'Recuperer les disponibilites d un mentor (etudiant)' })
+  @ApiOperation({
+    summary: 'Recuperer les disponibilites d un mentor (etudiant)',
+  })
   @ApiResponse({ status: 200, description: 'Disponibilites recuperees' })
   async getMentorAvailability(
     @Param('id') mentorId: string,
   ): Promise<ApiEnvelope<unknown>> {
-    const data = await this.mentorsAvailabilityService.getMentorAvailability(mentorId);
+    const data =
+      await this.mentorsAvailabilityService.getMentorAvailability(mentorId);
     return { data, error: null };
   }
 

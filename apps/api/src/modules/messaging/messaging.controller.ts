@@ -16,10 +16,7 @@ import {
 import { CurrentUser } from '../../common/decorators';
 import { JwtAuthGuard } from '../../common/guards';
 import { UserResponseDto } from '../auth/dto';
-import {
-  GetConversationMessagesQueryDto,
-  SendMessageDto,
-} from './dto';
+import { GetConversationMessagesQueryDto, SendMessageDto } from './dto';
 import { MessagingService } from './messaging.service';
 
 @ApiTags('messaging')
@@ -30,7 +27,9 @@ export class MessagingController {
   constructor(private readonly messagingService: MessagingService) {}
 
   @Get('conversations')
-  @ApiOperation({ summary: 'Lister les conversations de l utilisateur connecte' })
+  @ApiOperation({
+    summary: 'Lister les conversations de l utilisateur connecte',
+  })
   @ApiResponse({ status: 200, description: 'Conversations recuperees' })
   async getConversations(@CurrentUser() user: UserResponseDto) {
     const data = await this.messagingService.listConversations(user.id);
@@ -38,7 +37,9 @@ export class MessagingController {
   }
 
   @Get('conversations/:id/messages')
-  @ApiOperation({ summary: 'Lister les messages d une conversation (pagination cursor)' })
+  @ApiOperation({
+    summary: 'Lister les messages d une conversation (pagination cursor)',
+  })
   @ApiResponse({ status: 200, description: 'Messages recuperes' })
   async getConversationMessages(
     @CurrentUser() user: UserResponseDto,
@@ -60,7 +61,10 @@ export class MessagingController {
   @Post('messages')
   @ApiOperation({ summary: 'Envoyer un message a un mentor ou un etudiant' })
   @ApiResponse({ status: 201, description: 'Message envoye' })
-  async sendMessage(@CurrentUser() user: UserResponseDto, @Body() dto: SendMessageDto) {
+  async sendMessage(
+    @CurrentUser() user: UserResponseDto,
+    @Body() dto: SendMessageDto,
+  ) {
     const data = await this.messagingService.sendMessage(user.id, dto);
     return { data, error: null };
   }

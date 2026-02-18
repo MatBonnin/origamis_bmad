@@ -89,6 +89,10 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "moduleNameMapper": {
+      "^@nestjs/websockets$": "<rootDir>/test-shims/nestjs-websockets.ts",
+      "^socket\\.io$": "<rootDir>/test-shims/socket-io.ts"
+    },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],

@@ -34,12 +34,16 @@ describe('MentorsAvailabilityService', () => {
       ],
     }).compile();
 
-    service = module.get<MentorsAvailabilityService>(MentorsAvailabilityService);
+    service = module.get<MentorsAvailabilityService>(
+      MentorsAvailabilityService,
+    );
     jest.clearAllMocks();
   });
 
   const setupMentorProfile = () => {
-    mockPrisma.mentor_profiles.findUnique.mockResolvedValue({ user_id: 'mentor-1' });
+    mockPrisma.mentor_profiles.findUnique.mockResolvedValue({
+      user_id: 'mentor-1',
+    });
     mockPrisma.mentor_availability.findUnique.mockResolvedValue({
       id: 'avail-1',
       mentor_user_id: 'mentor-1',

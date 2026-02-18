@@ -107,9 +107,13 @@ describe('MessagingService', () => {
       },
     ]);
 
-    const result = await service.getConversationMessages('student-1', 'conv-1', {
-      limit: 20,
-    });
+    const result = await service.getConversationMessages(
+      'student-1',
+      'conv-1',
+      {
+        limit: 20,
+      },
+    );
 
     expect(result.messages[0].messageId).toBe('msg-1');
     expect(result.messages[1].messageId).toBe('msg-2');

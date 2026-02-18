@@ -316,7 +316,8 @@ export class BookingsService {
     if (booking.status !== 'confirmed' && booking.status !== 'pending') {
       throw new BadRequestException({
         code: 'CANNOT_RESCHEDULE',
-        message: 'Seuls les rendez-vous confirmes ou en attente peuvent etre reportes',
+        message:
+          'Seuls les rendez-vous confirmes ou en attente peuvent etre reportes',
       });
     }
 
@@ -452,7 +453,11 @@ export class BookingsService {
       // Update expired session
       await this.prisma.booking_sessions.update({
         where: { id: booking.session.id },
-        data: { session_token: token, session_url: sessionUrl, expires_at: expiresAt },
+        data: {
+          session_token: token,
+          session_url: sessionUrl,
+          expires_at: expiresAt,
+        },
       });
     } else {
       // Create new session
