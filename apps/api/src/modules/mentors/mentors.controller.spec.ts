@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { MatchingService } from '../matching';
+import { MentorsAdminService } from './mentors-admin.service';
 import { MentorsController } from './mentors.controller';
 import { MentorsProfileService } from './mentors-profile.service';
 import { MentorsSearchService } from './mentors-search.service';
@@ -16,11 +17,23 @@ describe('MentorsController', () => {
   const mockMentorsProfileService = {
     getMentorProfile: jest.fn(),
     getMentorReviews: jest.fn(),
+    createMentorReview: jest.fn(),
+    updateMentorReview: jest.fn(),
+    deleteMentorReview: jest.fn(),
   };
   const mockMentorsSelfService = {
     getMyProfile: jest.fn(),
     createMyProfile: jest.fn(),
     updateMyProfile: jest.fn(),
+  };
+  const mockMentorsAdminService = {
+    getPendingMentors: jest.fn(),
+    validateMentor: jest.fn(),
+    updateMentorStatus: jest.fn(),
+    updateVisibility: jest.fn(),
+    getVisibility: jest.fn(),
+    getMentorVisibilityStatus: jest.fn(),
+    getMentorValidationOverride: jest.fn(),
   };
 
   let controller: MentorsController;
@@ -31,8 +44,12 @@ describe('MentorsController', () => {
       mockMentorsSearchService as unknown as MentorsSearchService,
       mockMentorsProfileService as unknown as MentorsProfileService,
       mockMentorsSelfService as unknown as MentorsSelfService,
+      {} as never,
+      mockMentorsAdminService as unknown as MentorsAdminService,
     );
     jest.clearAllMocks();
+    mockMentorsAdminService.getMentorVisibilityStatus.mockReturnValue('visible');
+    mockMentorsAdminService.getMentorValidationOverride.mockReturnValue(null);
   });
 
   it('returns envelope data for recommendations endpoint', async () => {
@@ -144,7 +161,7 @@ describe('MentorsController', () => {
   it('returns paginated mentor reviews', async () => {
     mockMentorsProfileService.getMentorReviews.mockResolvedValue({
       reviews: [],
-      pagination: {
+      metadata: {
         page: 1,
         limit: 5,
         total: 0,
@@ -229,5 +246,41 @@ describe('MentorsController', () => {
       'mentor-1',
       payload,
     );
+  });
+
+  it('creates mentor review', async () => {
+    mockMentorsProfileService.createMentorReview.mockResolvedValue({
+      review: { reviewId: 'r-1' },
+    });
+
+    const responsePromise = controller.createMentorReview(
+      { id: 'student-1' } as never,
+      'mentor-1',
+      { rating: 4.5, body: 'Excellent mentor' },
+    );
+    await expect(responsePromise).resolves.toHaveProperty('error', null);
+    expect(mockMentorsProfileService.createMentorReview).toHaveBeenCalledWith(
+      'mentor-1',
+      {
+        studentId: 'student-1',
+        bookingId: undefined,
+        rating: 4.5,
+        body: 'Excellent mentor',
+      },
+    );
+  });
+
+  it('updates mentor visibility (admin)', async () => {
+    mockMentorsAdminService.updateVisibility.mockResolvedValue({
+      mentor: { mentorId: 'mentor-1', visibility: 'priority' },
+    });
+
+    const responsePromise = controller.patchMentorVisibility(
+      { id: 'admin-1', roles: ['admin'] } as never,
+      'mentor-1',
+      { status: 'priority' },
+    );
+
+    await expect(responsePromise).resolves.toHaveProperty('error', null);
   });
 });

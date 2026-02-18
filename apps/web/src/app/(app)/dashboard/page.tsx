@@ -43,6 +43,12 @@ export default async function DashboardPage() {
               <Link href="/admin/utilisateurs" className={styles.adminLink}>
                 Gerer les roles utilisateurs
               </Link>
+              <Link href="/admin/mentors/validation" className={styles.adminLink}>
+                Valider les mentors
+              </Link>
+              <Link href="/admin/mentors/visibilite" className={styles.adminLink}>
+                Gerer la visibilite mentors
+              </Link>
             </div>
           )}
         </div>

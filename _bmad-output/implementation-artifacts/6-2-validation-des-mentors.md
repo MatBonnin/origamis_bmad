@@ -1,26 +1,26 @@
-# Story 6.2: Validation des mentors
+﻿# Story 6.2: Validation des mentors
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
 ## Story
 
 As a admin,
-I want vérifier/valider un profil mentor,
-so that garantir la qualité des mentors.
+I want vÃ©rifier/valider un profil mentor,
+so that garantir la qualitÃ© des mentors.
 
 ## Acceptance Criteria
 
-- 1. Given un mentor en attente de validation When l’admin valide le profil Then le mentor devient visible et actif
+- 1. Given un mentor en attente de validation When lâ€™admin valide le profil Then le mentor devient visible et actif
 
 ## Tasks / Subtasks
 
-- [ ] Créer workflow validation (awaited mentors en `pending_review`) (AC: #1)
-- [ ] Endpoint admin `POST /mentors/:id/validate`, `PATCH /mentors/:id/status` (AC: #1)
-- [ ] UI admin (liste mentors en attente, preview profil, actions) (AC: #1)
-- [ ] Vérifier critères (documents, avis, compliance) + notifications (AC: #1)
-- [ ] Tests API + UI + alerts (AC: #1)
+- [x] CrÃ©er workflow validation (awaited mentors en `pending_review`) (AC: #1)
+- [x] Endpoint admin `POST /mentors/:id/validate`, `PATCH /mentors/:id/status` (AC: #1)
+- [x] UI admin (liste mentors en attente, preview profil, actions) (AC: #1)
+- [x] VÃ©rifier critÃ¨res (documents, avis, compliance) + notifications (AC: #1)
+- [x] Tests API + UI + alerts (AC: #1)
 
 ## Dev Notes
 
@@ -33,7 +33,7 @@ so that garantir la qualité des mentors.
 - Conventions: `snake_case` DB, `camelCase` JSON.
 - UX: responsive + WCAG 2.1 AA.
 - Cible: reviews + admin.
-- Mentors en `pending_review` jusqu’à validation.
+- Mentors en `pending_review` jusquâ€™Ã  validation.
 
 ### API Contracts (validation)
 
@@ -52,13 +52,13 @@ so that garantir la qualité des mentors.
 ### UX & compliance
 
 - Vue admin liste mentors, preview, statuts (pending, rejected).
-- Accessibilité: focus sur actions, confirmations modales.
+- AccessibilitÃ©: focus sur actions, confirmations modales.
 - Document checklist visible.
 - Notifications (email/push) sur validation/rejet.
 
 ### Workflow & notifications
 
-- Générer événements pour notifications + audits.
+- GÃ©nÃ©rer Ã©vÃ©nements pour notifications + audits.
 - Rejeter mentors (messages instructifs).
 - Stocker logs (actions).
 
@@ -68,11 +68,11 @@ so that garantir la qualité des mentors.
 - UI: actions modales, preview documents.
 - Integration: notifications triggered.
 
-### Do / Don’t
+### Do / Donâ€™t
 
 - Do: document raisons en cas de rejet.
 - Do: conserver logs pour audits RGPD.
-- Don’t: exposer mentors non validés à la recherche.
+- Donâ€™t: exposer mentors non validÃ©s Ã  la recherche.
 
 ### Project Structure Notes
 
@@ -95,6 +95,31 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
+- npm test -- modules/mentors (apps/api)
+- npm test -- src/features/admin/mentor-validation/__tests__/MentorValidationBoard.test.tsx (apps/web)
+
 ### Completion Notes List
 
+- Ajout du workflow admin de validation mentor (GET /mentors/pending, POST /mentors/:id/validate, PATCH /mentors/:id/status).
+- Ajout des gardes RBAC admin/support et du suivi des statuts (pending_review, validated, rejected).
+- Ajout de l interface admin de validation avec liste pending, previsualisation et actions valider/rejeter.
+- Ajout des modeles Prisma et migration pour mentor_validation_checks et mentor_documents.
+
 ### File List
+
+- apps/api/prisma/schema.prisma
+- apps/api/prisma/migrations/202602181200_epic6_mentors_reviews_validation_visibility/migration.sql
+- apps/api/src/modules/mentors/mentors-admin.service.ts
+- apps/api/src/modules/mentors/mentors-admin.service.spec.ts
+- apps/api/src/modules/mentors/mentors.controller.ts
+- apps/api/src/modules/mentors/mentors.module.ts
+- apps/api/src/modules/mentors/index.ts
+- apps/web/src/features/admin/mentor-validation/MentorValidationBoard.tsx
+- apps/web/src/features/admin/mentor-validation/MentorValidationBoard.module.css
+- apps/web/src/features/admin/mentor-validation/index.ts
+- apps/web/src/features/admin/mentor-validation/__tests__/MentorValidationBoard.test.tsx
+- apps/web/src/app/(app)/admin/mentors/validation/page.tsx
+
+### Change Log
+
+- 2026-02-18: Implementation complete de la validation des mentors (API + UI + tests + modeles Prisma).

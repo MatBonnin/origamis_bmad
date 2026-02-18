@@ -46,6 +46,9 @@ export function MentorProfile({ accessToken, mentorId }: Props) {
   const [data, setData] = useState<MentorProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [newRating, setNewRating] = useState('5');
+  const [newComment, setNewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   const fetchProfile = useCallback(async () => {
     setLoading(true);
@@ -83,6 +86,36 @@ export function MentorProfile({ accessToken, mentorId }: Props) {
     if (!data.availability.nextAvailableAt) return 'Disponibilite non communiquee';
     return `Prochaine disponibilite: ${new Date(data.availability.nextAvailableAt).toLocaleString('fr-FR')}`;
   }, [data]);
+
+  const submitReview = async () => {
+    setError('');
+    setSubmittingReview(true);
+    try {
+      const response = await fetch(`${API_URL}/mentors/${mentorId}/reviews`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rating: Number(newRating),
+          body: newComment,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok || result.error) {
+        setError(result.error?.message || 'Impossible d envoyer l avis');
+        return;
+      }
+      setNewComment('');
+      setNewRating('5');
+      await fetchProfile();
+    } catch {
+      setError('Erreur de connexion au serveur');
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -177,6 +210,39 @@ export function MentorProfile({ accessToken, mentorId }: Props) {
                 </p>
               </article>
             ))}
+
+            <div className={styles.reviewForm}>
+              <h3 className={styles.reviewFormTitle}>Laisser un avis</h3>
+              <label className={styles.reviewFormLabel}>
+                Note
+                <input
+                  className={styles.reviewInput}
+                  type="number"
+                  min={1}
+                  max={5}
+                  step={0.5}
+                  value={newRating}
+                  onChange={(event) => setNewRating(event.target.value)}
+                />
+              </label>
+              <label className={styles.reviewFormLabel}>
+                Commentaire
+                <textarea
+                  className={styles.reviewTextarea}
+                  value={newComment}
+                  onChange={(event) => setNewComment(event.target.value)}
+                  aria-label="Rediger un avis"
+                />
+              </label>
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => void submitReview()}
+                disabled={submittingReview || !newComment.trim()}
+              >
+                {submittingReview ? 'Envoi...' : 'Publier mon avis'}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

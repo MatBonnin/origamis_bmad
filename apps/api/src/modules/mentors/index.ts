@@ -3,4 +3,5 @@ export * from './mentors.controller';
 export * from './mentors-profile.service';
 export * from './mentors-search.service';
 export * from './mentors-self.service';
+export * from './mentors-admin.service';
 export * from './dto';

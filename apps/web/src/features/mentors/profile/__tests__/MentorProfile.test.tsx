@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MentorProfile } from '../MentorProfile';
 
@@ -104,5 +105,80 @@ describe('MentorProfile', () => {
     render(<MentorProfile accessToken="token-1" mentorId="missing" />);
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Profil introuvable');
+  });
+
+  it('submits a new review and refreshes profile', async () => {
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: {
+            mentor: {
+              mentorId: 'mentor-1',
+              fullName: 'Alice Martin',
+              bio: 'Mentor frontend',
+              avatarUrl: null,
+              domain: 'informatique',
+              expertiseTags: ['react'],
+              supportedLevels: ['intermediaire'],
+              hourlyRate: 45,
+            },
+            reviews: [],
+            availability: { isAvailable: true, nextAvailableAt: null },
+            rating: { average: 4.2, reviewCount: 0 },
+          },
+          error: null,
+        }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: { review: { reviewId: 'review-1' } },
+          error: null,
+        }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: {
+            mentor: {
+              mentorId: 'mentor-1',
+              fullName: 'Alice Martin',
+              bio: 'Mentor frontend',
+              avatarUrl: null,
+              domain: 'informatique',
+              expertiseTags: ['react'],
+              supportedLevels: ['intermediaire'],
+              hourlyRate: 45,
+            },
+            reviews: [
+              {
+                reviewId: 'review-1',
+                rating: 5,
+                comment: 'Excellent mentor',
+                author: 'student-1',
+                source: 'feedback',
+                createdAt: '2026-02-12T10:00:00.000Z',
+              },
+            ],
+            availability: { isAvailable: true, nextAvailableAt: null },
+            rating: { average: 4.8, reviewCount: 1 },
+          },
+          error: null,
+        }),
+      } as Response);
+
+    render(<MentorProfile accessToken="token-1" mentorId="mentor-1" />);
+
+    expect(await screen.findByRole('heading', { name: 'Alice Martin' })).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText('Rediger un avis'), 'Excellent mentor');
+    await userEvent.click(screen.getByRole('button', { name: 'Publier mon avis' }));
+
+    await waitFor(() => {
+      const reviewCall = fetchMock.mock.calls.find((call) =>
+        String(call[0]).includes('/mentors/mentor-1/reviews'),
+      );
+      expect(reviewCall).toBeDefined();
+    });
   });
 });

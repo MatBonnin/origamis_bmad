@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma';
 
 interface MentorReview {
@@ -8,6 +8,18 @@ interface MentorReview {
   author: string;
   source: 'session' | 'feedback';
   createdAt: string;
+}
+
+interface StoredMentorReview {
+  reviewId: string;
+  mentorId: string;
+  studentId: string;
+  bookingId: string | null;
+  rating: number;
+  comment: string;
+  status: 'pending' | 'published' | 'removed';
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface MentorProfileResult {
@@ -38,6 +50,8 @@ const MAX_REVIEW_LIMIT = 20;
 
 @Injectable()
 export class MentorsProfileService {
+  private readonly storedReviews = new Map<string, StoredMentorReview>();
+
   constructor(private readonly prisma: PrismaService) {}
 
   async getMentorProfile(mentorId: string): Promise<MentorProfileResult> {
@@ -86,13 +100,134 @@ export class MentorsProfileService {
 
     return {
       reviews: pageItems,
-      pagination: {
+      metadata: {
         page,
         limit,
         total: reviews.length,
         hasNextPage: offset + limit < reviews.length,
       },
     };
+  }
+
+  async createMentorReview(
+    mentorId: string,
+    input: {
+      studentId: string;
+      bookingId?: string;
+      rating: number;
+      body: string;
+    },
+  ) {
+    await this.findMentorOrThrow(mentorId);
+
+    const hasBooking = await this.prisma.bookings.findFirst({
+      where: {
+        mentor_id: mentorId,
+        student_id: input.studentId,
+        status: { in: ['confirmed', 'completed'] },
+      },
+      select: { id: true },
+    });
+
+    if (!hasBooking) {
+      throw new NotFoundException({
+        code: 'REVIEW_BOOKING_REQUIRED',
+        message: 'Une session mentor est requise avant de laisser un avis',
+      });
+    }
+
+    const resolvedBookingId = input.bookingId ?? hasBooking.id;
+
+    if (!input.body.trim()) {
+      throw new BadRequestException({
+        code: 'REVIEW_BODY_REQUIRED',
+        message: 'Le commentaire de l avis est requis',
+      });
+    }
+
+    const duplicate = [...this.storedReviews.values()].find(
+      (review) =>
+        review.mentorId === mentorId &&
+        review.studentId === input.studentId &&
+        review.bookingId === resolvedBookingId &&
+        review.status !== 'removed',
+    );
+
+    if (duplicate) {
+      return {
+        review: this.mapStoredReview(duplicate),
+      };
+    }
+
+    const now = new Date().toISOString();
+    const review: StoredMentorReview = {
+      reviewId: `manual-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      mentorId,
+      studentId: input.studentId,
+      bookingId: resolvedBookingId,
+      rating: Math.max(1, Math.min(5, Number(input.rating.toFixed(1)))),
+      comment: input.body.trim(),
+      status: 'published',
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    this.storedReviews.set(review.reviewId, review);
+
+    return {
+      review: this.mapStoredReview(review),
+    };
+  }
+
+  async updateMentorReview(
+    mentorId: string,
+    reviewId: string,
+    input: {
+      studentId: string;
+      rating?: number;
+      body?: string;
+      status?: 'pending' | 'published' | 'removed';
+    },
+  ) {
+    await this.findMentorOrThrow(mentorId);
+    const review = this.storedReviews.get(reviewId);
+
+    if (!review || review.mentorId !== mentorId) {
+      throw new NotFoundException({
+        code: 'REVIEW_NOT_FOUND',
+        message: 'Avis introuvable',
+      });
+    }
+
+    if (review.studentId !== input.studentId) {
+      throw new NotFoundException({
+        code: 'REVIEW_NOT_FOUND',
+        message: 'Avis introuvable',
+      });
+    }
+
+    const updated: StoredMentorReview = {
+      ...review,
+      rating:
+        input.rating !== undefined
+          ? Math.max(1, Math.min(5, Number(input.rating.toFixed(1))))
+          : review.rating,
+      comment: input.body?.trim() || review.comment,
+      status: input.status ?? review.status,
+      updatedAt: new Date().toISOString(),
+    };
+
+    this.storedReviews.set(reviewId, updated);
+    return {
+      review: this.mapStoredReview(updated),
+    };
+  }
+
+  async deleteMentorReview(mentorId: string, reviewId: string, studentId: string) {
+    return this.updateMentorReview(mentorId, reviewId, {
+      studentId,
+      status: 'removed',
+    });
   }
 
   private async findMentorOrThrow(mentorId: string) {
@@ -142,7 +277,7 @@ export class MentorsProfileService {
       },
     });
 
-    return interactions.map((interaction) => {
+    const autoReviews = interactions.map((interaction) => {
       const rating = Math.min(5, 3 + interaction.interaction_count * 0.4);
       const timestamp =
         interaction.last_interaction_at ?? interaction.created_at;
@@ -159,6 +294,29 @@ export class MentorsProfileService {
         createdAt: timestamp.toISOString(),
       };
     });
+
+    const manualReviews = [...this.storedReviews.values()]
+      .filter(
+        (review) =>
+          review.mentorId === mentorId && review.status === 'published',
+      )
+      .map((review): MentorReview => this.mapStoredReview(review));
+
+    return [...manualReviews, ...autoReviews].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  }
+
+  private mapStoredReview(review: StoredMentorReview): MentorReview {
+    return {
+      reviewId: review.reviewId,
+      rating: review.rating,
+      comment: review.comment,
+      author: review.studentId,
+      source: 'feedback',
+      createdAt: review.createdAt,
+    };
   }
 
   private computeWeightedRating(

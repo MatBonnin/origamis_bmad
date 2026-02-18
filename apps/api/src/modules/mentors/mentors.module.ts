@@ -3,6 +3,7 @@ import { MentorsController } from './mentors.controller';
 import { MatchingModule } from '../matching';
 import { PrismaModule } from '../prisma';
 import { MentorsAvailabilityService } from './mentors-availability.service';
+import { MentorsAdminService } from './mentors-admin.service';
 import { MentorsProfileService } from './mentors-profile.service';
 import { MentorsSearchService } from './mentors-search.service';
 import { MentorsSelfService } from './mentors-self.service';
@@ -15,6 +16,7 @@ import { MentorsSelfService } from './mentors-self.service';
     MentorsProfileService,
     MentorsSelfService,
     MentorsAvailabilityService,
+    MentorsAdminService,
   ],
 })
 export class MentorsModule {}

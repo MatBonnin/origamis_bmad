@@ -1,26 +1,26 @@
-# Story 6.1: Avis sur mentor
+﻿# Story 6.1: Avis sur mentor
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
 ## Story
 
-As a étudiant,
+As a Ã©tudiant,
 I want laisser un avis sur un mentor,
-so that partager mon expérience.
+so that partager mon expÃ©rience.
 
 ## Acceptance Criteria
 
-1. Given un étudiant ayant eu une session When il laisse un avis Then l’avis est enregistré et visible sur le profil mentor
+1. Given un Ã©tudiant ayant eu une session When il laisse un avis Then lâ€™avis est enregistrÃ© et visible sur le profil mentor
 
 ## Tasks / Subtasks
 
-- [ ] Créer tables `mentor_reviews`, `mentor_ratings`, `mentor_review_flags` (AC: #1)
-- [ ] Endpoint `POST /mentors/:id/reviews`, `GET /mentors/:id/reviews` (AC: #1)
-- [ ] UI: affichage avis, call-to-action pour rédiger, visualiser notes (AC: #1)
-- [ ] Gestion du fil d’avis (pagination, édition, suppression) + webhooks (AC: #1)
-- [ ] Tests API + mixité UI + validation (AC: #1)
+- [x] CrÃ©er tables `mentor_reviews`, `mentor_ratings`, `mentor_review_flags` (AC: #1)
+- [x] Endpoint `POST /mentors/:id/reviews`, `GET /mentors/:id/reviews` (AC: #1)
+- [x] UI: affichage avis, call-to-action pour rÃ©diger, visualiser notes (AC: #1)
+- [x] Gestion du fil dâ€™avis (pagination, Ã©dition, suppression) + webhooks (AC: #1)
+- [x] Tests API + mixitÃ© UI + validation (AC: #1)
 
 ## Dev Notes
 
@@ -47,11 +47,11 @@ so that partager mon expérience.
 - `mentor_review_flags`: `review_id`, `reporter_id`, `reason`, `status`.
 - Conventions `snake_case`.
 
-### UX & accessibilité
+### UX & accessibilitÃ©
 
-- Liste d’avis avec note moyenne, avatars, filtres (récents, notes).
+- Liste dâ€™avis avec note moyenne, avatars, filtres (rÃ©cents, notes).
 - Formulaire accessible (aria-live), validations (min/max length).
-- Indicateur de progression (moyenne) + CTA “Laisser un avis”.
+- Indicateur de progression (moyenne) + CTA â€œLaisser un avisâ€.
 - Reader mode (contraste, taille).
 
 ### Testing Requirements
@@ -60,11 +60,11 @@ so that partager mon expérience.
 - UI: form, review list, accessible badges.
 - Real-time: updates propagate via WebSocket/notifications if needed.
 
-### Do / Don’t
+### Do / Donâ€™t
 
-- Do: valider qu’un étudiant a une session (booking) avant avis.
+- Do: valider quâ€™un Ã©tudiant a une session (booking) avant avis.
 - Do: bloquer simple duplication (unique per booking).
-- Don’t: afficher avis non validés (status `pending`).
+- Donâ€™t: afficher avis non validÃ©s (status `pending`).
 
 ### Project Structure Notes
 
@@ -87,18 +87,28 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
-### Completion Notes List
-
-### File List
-
-## Dev Agent Record
-
-### Agent Model Used
-
-GPT-5 (Codex)
-
-### Debug Log References
+- npm test -- modules/mentors (apps/api)
+- npm test -- src/features/mentors/profile/__tests__/MentorProfile.test.tsx src/features/admin/mentor-validation/__tests__/MentorValidationBoard.test.tsx src/features/admin/visibility/__tests__/MentorVisibilityBoard.test.tsx (apps/web)
 
 ### Completion Notes List
 
+- Implementation du flux d avis mentor (POST/GET/PATCH/DELETE) avec controle booking, anti-duplication par booking et pagination metadata.
+- Ajout du formulaire de soumission d avis dans le profil mentor avec rafraichissement de la liste.
+- Ajout des modeles Prisma et migration pour mentor_reviews, mentor_ratings, mentor_review_flags.
+- Ajout et mise a jour des tests API/Web pour les flux reviews.
+
 ### File List
+
+- apps/api/prisma/schema.prisma
+- apps/api/prisma/migrations/202602181200_epic6_mentors_reviews_validation_visibility/migration.sql
+- apps/api/src/modules/mentors/mentors-profile.service.ts
+- apps/api/src/modules/mentors/mentors.controller.ts
+- apps/api/src/modules/mentors/mentors-profile.service.spec.ts
+- apps/api/src/modules/mentors/mentors.controller.spec.ts
+- apps/web/src/features/mentors/profile/MentorProfile.tsx
+- apps/web/src/features/mentors/profile/MentorProfile.module.css
+- apps/web/src/features/mentors/profile/__tests__/MentorProfile.test.tsx
+
+### Change Log
+
+- 2026-02-18: Implementation complete du flux d avis mentor (API + UI + tests) et ajout des tables Prisma associees.

@@ -1,24 +1,24 @@
-# Story 6.3: Gestion de la visibilité des mentors
+﻿# Story 6.3: Gestion de la visibilitÃ© des mentors
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
 ## Story
 
 As a admin,
-I want gérer la visibilité des mentors,
-so that ajuster l’affichage selon la qualité.
+I want gÃ©rer la visibilitÃ© des mentors,
+so that ajuster lâ€™affichage selon la qualitÃ©.
 
 ## Acceptance Criteria
 
-1. Given un admin authentifié When il modifie la visibilité d’un mentor Then la visibilité est appliquée dans la recherche
+1. Given un admin authentifiÃ© When il modifie la visibilitÃ© dâ€™un mentor Then la visibilitÃ© est appliquÃ©e dans la recherche
 
-- [ ] Endpoint `PATCH /mentors/:id/visibility` + `GET /mentors/visibility` (AC: #1)
-- [ ] Ajouter règles de visibilité (pinned, hidden, experimental) (AC: #1)
-- [ ] UI admin pour gérer, prévisualiser, planifier mise à jour (AC: #1)
-- [ ] Synchro avec recherche (story 2-2) et recommandations (story 2-1) (AC: #1)
-- [ ] Tests API + UI + propagation (AC: #1)
+- [x] Endpoint `PATCH /mentors/:id/visibility` + `GET /mentors/visibility` (AC: #1)
+- [x] Ajouter rÃ¨gles de visibilitÃ© (pinned, hidden, experimental) (AC: #1)
+- [x] UI admin pour gÃ©rer, prÃ©visualiser, planifier mise Ã  jour (AC: #1)
+- [x] Synchro avec recherche (story 2-2) et recommandations (story 2-1) (AC: #1)
+- [x] Tests API + UI + propagation (AC: #1)
 
 ## Dev Notes
 
@@ -31,7 +31,7 @@ so that ajuster l’affichage selon la qualité.
 - Conventions: `snake_case` DB, `camelCase` JSON.
 - UX: responsive + WCAG 2.1 AA.
 - Cible: reviews + admin.
-- Visibilité influence search/recommendations.
+- VisibilitÃ© influence search/recommendations.
 
 - `PATCH /mentors/:id/visibility` -> `{ data: { mentor }, error: null }`
 - `GET /mentors/visibility` -> `{ data: { visibility_rules }, error: null }`
@@ -44,7 +44,7 @@ so that ajuster l’affichage selon la qualité.
 - Logs `mentor_visibility_history`.
 - Conventions `snake_case`.
 
-### UX & accessibilité
+### UX & accessibilitÃ©
 
 - Admin table with toggles, preview, scheduling (activate future status).
 - ARIA accessible toggle + confirmation.
@@ -62,11 +62,11 @@ so that ajuster l’affichage selon la qualité.
 - UI: toggles, previsualisation, confirmation modals.
 - Integration: search/recommendation contexts.
 
-### Do / Don’t
+### Do / Donâ€™t
 
-- Do: log qui change la visibilité.
+- Do: log qui change la visibilitÃ©.
 - Do: permettre rollback (undo).
-- Don’t: enlever visibilité sans notif.
+- Donâ€™t: enlever visibilitÃ© sans notif.
 
 ### Project Structure Notes
 
@@ -94,6 +94,33 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
+- npm test -- modules/mentors (apps/api)
+- npm test -- src/features/admin/visibility/__tests__/MentorVisibilityBoard.test.tsx (apps/web)
+
 ### Completion Notes List
 
+- Ajout des endpoints admin de visibilite (PATCH /mentors/:id/visibility, GET /mentors/visibility).
+- Ajout des regles visible|hidden|priority|experimental avec controle de validation mentor et RBAC.
+- Synchronisation de la recherche mentors pour exclure les mentors hidden/non validates via service admin.
+- Ajout de l UI admin de gestion de visibilite (edition du statut, date effective, notes).
+- Ajout des modeles Prisma et migration pour mentor_visibility et mentor_visibility_history.
+
 ### File List
+
+- apps/api/prisma/schema.prisma
+- apps/api/prisma/migrations/202602181200_epic6_mentors_reviews_validation_visibility/migration.sql
+- apps/api/src/modules/mentors/mentors-admin.service.ts
+- apps/api/src/modules/mentors/mentors-search.service.ts
+- apps/api/src/modules/mentors/mentors-search.service.spec.ts
+- apps/api/src/modules/mentors/mentors.controller.ts
+- apps/web/src/features/admin/visibility/MentorVisibilityBoard.tsx
+- apps/web/src/features/admin/visibility/MentorVisibilityBoard.module.css
+- apps/web/src/features/admin/visibility/index.ts
+- apps/web/src/features/admin/visibility/__tests__/MentorVisibilityBoard.test.tsx
+- apps/web/src/app/(app)/admin/mentors/visibilite/page.tsx
+- apps/web/src/app/(app)/dashboard/page.tsx
+- apps/web/src/app/(app)/dashboard/page.module.css
+
+### Change Log
+
+- 2026-02-18: Implementation complete de la gestion de visibilite mentors (API + recherche + UI + tests).

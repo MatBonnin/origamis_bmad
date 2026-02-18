@@ -49,6 +49,11 @@ model users {
   read_statuses read_status[]
   bookings_as_student bookings[] @relation("bookings_student")
   bookings_as_mentor bookings[] @relation("bookings_mentor")
+  mentor_reviews mentor_reviews[] @relation("mentor_reviews_student")
+  mentor_review_flags mentor_review_flags[] @relation("mentor_review_flags_reporter")
+  mentor_validation_checks mentor_validation_checks[] @relation("mentor_validation_checks_checker")
+  mentor_visibility_updates mentor_visibility[] @relation("mentor_visibility_updated_by")
+  mentor_visibility_history_updates mentor_visibility_history[] @relation("mentor_visibility_history_updated_by")
 
   @@map("users")
 }
@@ -214,6 +219,12 @@ model mentor_profiles {
   user         users                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
   availability mentor_availability?
   interactions mentor_interactions[] @relation("mentor_interactions_mentor")
+  reviews mentor_reviews[] @relation("mentor_reviews_mentor")
+  rating mentor_ratings?
+  validation_checks mentor_validation_checks[]
+  documents mentor_documents[]
+  visibility mentor_visibility?
+  visibility_history mentor_visibility_history[]
 
   @@index([domain])
   @@index([is_validated])
@@ -279,6 +290,7 @@ model bookings {
   mentor  users @relation("bookings_mentor", fields: [mentor_id], references: [id], onDelete: Cascade)
   slot    mentor_availability_slots @relation(fields: [slot_id], references: [id], onDelete: Cascade)
   session booking_sessions?
+  mentor_review mentor_reviews?
 
   @@index([student_id])
   @@index([mentor_id])
@@ -404,4 +416,140 @@ model read_status {
   @@unique([conversation_id, user_id])
   @@index([user_id])
   @@map("read_status")
+}
+
+enum mentor_review_status {
+  pending
+  published
+  removed
+}
+
+enum mentor_review_flag_status {
+  open
+  reviewed
+  dismissed
+}
+
+enum mentor_status {
+  pending_review
+  validated
+  rejected
+}
+
+enum mentor_visibility_status {
+  visible
+  hidden
+  priority
+  experimental
+}
+
+model mentor_reviews {
+  id         String             @id @default(uuid())
+  mentor_id  String
+  student_id String
+  booking_id String?            @unique
+  rating     Float
+  body       String
+  status     mentor_review_status @default(published)
+  created_at DateTime           @default(now())
+  updated_at DateTime           @updatedAt
+
+  mentor  mentor_profiles @relation("mentor_reviews_mentor", fields: [mentor_id], references: [user_id], onDelete: Cascade)
+  student users           @relation("mentor_reviews_student", fields: [student_id], references: [id], onDelete: Cascade)
+  booking bookings?       @relation(fields: [booking_id], references: [id], onDelete: SetNull)
+  flags   mentor_review_flags[]
+
+  @@index([mentor_id, status])
+  @@index([student_id])
+  @@map("mentor_reviews")
+}
+
+model mentor_ratings {
+  mentor_id       String   @id
+  average_rating  Float    @default(0)
+  review_count    Int      @default(0)
+  updated_at      DateTime @updatedAt
+
+  mentor mentor_profiles @relation(fields: [mentor_id], references: [user_id], onDelete: Cascade)
+
+  @@map("mentor_ratings")
+}
+
+model mentor_review_flags {
+  id          String                   @id @default(uuid())
+  review_id   String
+  reporter_id String
+  reason      String
+  status      mentor_review_flag_status @default(open)
+  created_at  DateTime                 @default(now())
+  updated_at  DateTime                 @updatedAt
+
+  review   mentor_reviews @relation(fields: [review_id], references: [id], onDelete: Cascade)
+  reporter users          @relation("mentor_review_flags_reporter", fields: [reporter_id], references: [id], onDelete: Cascade)
+
+  @@index([review_id])
+  @@index([reporter_id])
+  @@map("mentor_review_flags")
+}
+
+model mentor_validation_checks {
+  id         String       @id @default(uuid())
+  mentor_id  String
+  status     mentor_status
+  checked_by String
+  notes      String?
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+
+  mentor  mentor_profiles @relation(fields: [mentor_id], references: [user_id], onDelete: Cascade)
+  checker users           @relation("mentor_validation_checks_checker", fields: [checked_by], references: [id], onDelete: Cascade)
+
+  @@index([mentor_id, status])
+  @@index([checked_by])
+  @@map("mentor_validation_checks")
+}
+
+model mentor_documents {
+  id          String   @id @default(uuid())
+  mentor_id   String
+  type        String
+  url         String
+  uploaded_at DateTime @default(now())
+
+  mentor mentor_profiles @relation(fields: [mentor_id], references: [user_id], onDelete: Cascade)
+
+  @@index([mentor_id])
+  @@map("mentor_documents")
+}
+
+model mentor_visibility {
+  id             String                 @id @default(uuid())
+  mentor_id      String                 @unique
+  status         mentor_visibility_status @default(visible)
+  effective_from DateTime?
+  notes          String?
+  updated_by     String
+  updated_at     DateTime               @updatedAt
+
+  mentor  mentor_profiles @relation(fields: [mentor_id], references: [user_id], onDelete: Cascade)
+  updater users           @relation("mentor_visibility_updated_by", fields: [updated_by], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@map("mentor_visibility")
+}
+
+model mentor_visibility_history {
+  id             String                 @id @default(uuid())
+  mentor_id      String
+  status         mentor_visibility_status
+  effective_from DateTime?
+  notes          String?
+  updated_by     String
+  updated_at     DateTime               @default(now())
+
+  mentor  mentor_profiles @relation(fields: [mentor_id], references: [user_id], onDelete: Cascade)
+  updater users           @relation("mentor_visibility_history_updated_by", fields: [updated_by], references: [id], onDelete: Cascade)
+
+  @@index([mentor_id, updated_at])
+  @@map("mentor_visibility_history")
 }

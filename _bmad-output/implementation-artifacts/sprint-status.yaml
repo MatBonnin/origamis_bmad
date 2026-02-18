@@ -1,4 +1,4 @@
-# generated: 2026-01-16T14:36:59.987933
+﻿# generated: 2026-01-16T14:36:59.987933
 # project: site
 # project_key: site
 # tracking_system: file-system
@@ -12,8 +12,8 @@
 #   - done: All stories in epic completed
 #
 # Epic Status Transitions:
-#   - backlog → in-progress: Automatically when first story is created (via create-story)
-#   - in-progress → done: Manually when all stories reach 'done' status
+#   - backlog â†’ in-progress: Automatically when first story is created (via create-story)
+#   - in-progress â†’ done: Manually when all stories reach 'done' status
 #
 # Story Status:
 #   - backlog: Story only exists in epic file
@@ -85,9 +85,9 @@ development_status:
   epic-5-retrospective: optional
 
   epic-6: in-progress
-  6-1-avis-sur-mentor: ready-for-dev
-  6-2-validation-des-mentors: ready-for-dev
-  6-3-gestion-de-la-visibilit-des-mentors: ready-for-dev
+  6-1-avis-sur-mentor: review
+  6-2-validation-des-mentors: review
+  6-3-gestion-de-la-visibilit-des-mentors: review
   epic-6-retrospective: optional
 
   epic-7: in-progress
@@ -96,6 +96,7 @@ development_status:
   7-3-tableaux-de-bord-de-base: ready-for-dev
   7-4-suppression-des-donn-es-personnelles: ready-for-dev
   epic-7-retrospective: optional
+
 
 
 

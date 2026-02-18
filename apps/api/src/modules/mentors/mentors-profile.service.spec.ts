@@ -13,6 +13,9 @@ describe('MentorsProfileService', () => {
     mentor_interactions: {
       findMany: jest.fn(),
     },
+    bookings: {
+      findFirst: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -111,8 +114,8 @@ describe('MentorsProfileService', () => {
 
     expect(result.reviews).toHaveLength(1);
     expect(result.reviews[0].author).toBe('Bob Durand');
-    expect(result.pagination.total).toBe(2);
-    expect(result.pagination.hasNextPage).toBe(true);
+    expect(result.metadata.total).toBe(2);
+    expect(result.metadata.hasNextPage).toBe(true);
   });
 
   it('throws NotFoundException when mentor does not exist', async () => {
@@ -121,5 +124,28 @@ describe('MentorsProfileService', () => {
     await expect(service.getMentorProfile('missing')).rejects.toThrow(
       NotFoundException,
     );
+  });
+
+  it('creates review when student has booking', async () => {
+    mockPrismaService.mentor_profiles.findUnique.mockResolvedValue({
+      user_id: 'mentor-1',
+      domain: 'informatique',
+      expertise_tags: [],
+      hourly_rate: 45,
+      rating_avg: 4,
+      supported_levels: [],
+      is_validated: true,
+      user: { first_name: 'Alice', last_name: 'Martin', bio: '', avatar_url: null },
+      availability: null,
+    });
+    mockPrismaService.bookings.findFirst.mockResolvedValue({ id: 'b-1' });
+
+    const result = await service.createMentorReview('mentor-1', {
+      studentId: 'student-1',
+      rating: 5,
+      body: 'Tres bonne session',
+    });
+
+    expect(result.review.reviewId).toContain('manual-');
   });
 });

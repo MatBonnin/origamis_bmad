@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma';
 import { MentorSearchSort } from './dto/get-mentors-search-query.dto';
+import { MentorsAdminService } from './mentors-admin.service';
 
 export interface MentorSearchFilters {
   domains?: string[];
@@ -35,7 +36,10 @@ const MAX_LIMIT = 20;
 
 @Injectable()
 export class MentorsSearchService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly mentorsAdminService: MentorsAdminService,
+  ) {}
 
   async searchMentors(input: {
     q?: string;
@@ -71,6 +75,16 @@ export class MentorsSearchService {
     });
 
     const projected = mentors
+      .filter((mentor) => {
+        const validationOverride =
+          this.mentorsAdminService.getMentorValidationOverride(mentor.user_id);
+        const validationStatus = validationOverride ?? (mentor.is_validated ? 'validated' : 'pending_review');
+        const visibility = this.mentorsAdminService.getMentorVisibilityStatus(
+          mentor.user_id,
+        );
+
+        return validationStatus === 'validated' && visibility !== 'hidden';
+      })
       .map((mentor) => ({
         mentorId: mentor.user_id,
         firstName: mentor.user.first_name,
@@ -113,6 +127,8 @@ export class MentorsSearchService {
     const mentors = await this.prisma.mentor_profiles.findMany({
       where: { is_validated: true },
       select: {
+        user_id: true,
+        is_validated: true,
         domain: true,
         hourly_rate: true,
         rating_avg: true,
@@ -124,20 +140,30 @@ export class MentorsSearchService {
       },
     });
 
+    const visibleMentors = mentors.filter((mentor) => {
+      const validationOverride =
+        this.mentorsAdminService.getMentorValidationOverride(mentor.user_id);
+      const validationStatus =
+        validationOverride ?? (mentor.is_validated ? 'validated' : 'pending_review');
+      const visibility =
+        this.mentorsAdminService.getMentorVisibilityStatus(mentor.user_id);
+      return validationStatus === 'validated' && visibility !== 'hidden';
+    });
+
     const domains = Array.from(
-      new Set(mentors.map((mentor) => mentor.domain)),
+      new Set(visibleMentors.map((mentor) => mentor.domain)),
     ).sort((a, b) => a.localeCompare(b));
     const ratings = [4.5, 4, 3.5, 3].filter((threshold) =>
-      mentors.some((mentor) => (mentor.rating_avg ?? 0) >= threshold),
+      visibleMentors.some((mentor) => (mentor.rating_avg ?? 0) >= threshold),
     );
-    const hasAvailable = mentors.some(
+    const hasAvailable = visibleMentors.some(
       (mentor) => mentor.availability?.is_available,
     );
-    const hasUnavailable = mentors.some(
+    const hasUnavailable = visibleMentors.some(
       (mentor) => !mentor.availability?.is_available,
     );
 
-    const prices = mentors
+    const prices = visibleMentors
       .map((mentor) => mentor.hourly_rate)
       .filter(
         (value): value is number =>

@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../prisma';
+import { MentorsAdminService } from './mentors-admin.service';
 import { MentorsSearchService } from './mentors-search.service';
 
 describe('MentorsSearchService', () => {
@@ -10,23 +11,31 @@ describe('MentorsSearchService', () => {
       findMany: jest.fn(),
     },
   };
+  const mockMentorsAdminService = {
+    getMentorValidationOverride: jest.fn(),
+    getMentorVisibilityStatus: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MentorsSearchService,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: MentorsAdminService, useValue: mockMentorsAdminService },
       ],
     }).compile();
 
     service = module.get<MentorsSearchService>(MentorsSearchService);
     jest.clearAllMocks();
+    mockMentorsAdminService.getMentorValidationOverride.mockReturnValue(null);
+    mockMentorsAdminService.getMentorVisibilityStatus.mockReturnValue('visible');
   });
 
   it('returns paginated search results sorted by relevance', async () => {
     mockPrismaService.mentor_profiles.findMany.mockResolvedValue([
       {
         user_id: 'mentor-2',
+        is_validated: true,
         domain: 'informatique',
         expertise_tags: ['react', 'typescript'],
         hourly_rate: 45,
@@ -40,6 +49,7 @@ describe('MentorsSearchService', () => {
       },
       {
         user_id: 'mentor-1',
+        is_validated: true,
         domain: 'commerce',
         expertise_tags: ['negociation'],
         hourly_rate: 25,
@@ -72,6 +82,7 @@ describe('MentorsSearchService', () => {
     mockPrismaService.mentor_profiles.findMany.mockResolvedValue([
       {
         user_id: 'mentor-1',
+        is_validated: true,
         domain: 'informatique',
         expertise_tags: ['react'],
         hourly_rate: 70,
@@ -81,6 +92,7 @@ describe('MentorsSearchService', () => {
       },
       {
         user_id: 'mentor-2',
+        is_validated: true,
         domain: 'informatique',
         expertise_tags: ['react'],
         hourly_rate: 30,
@@ -106,12 +118,16 @@ describe('MentorsSearchService', () => {
   it('returns facets for domain, price, availability and rating', async () => {
     mockPrismaService.mentor_profiles.findMany.mockResolvedValue([
       {
+        user_id: 'mentor-1',
+        is_validated: true,
         domain: 'informatique',
         hourly_rate: 20,
         rating_avg: 4.7,
         availability: { is_available: true },
       },
       {
+        user_id: 'mentor-2',
+        is_validated: true,
         domain: 'commerce',
         hourly_rate: 60,
         rating_avg: 3.9,
