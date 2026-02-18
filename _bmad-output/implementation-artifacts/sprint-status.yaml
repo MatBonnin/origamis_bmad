@@ -97,6 +97,19 @@ development_status:
   7-4-suppression-des-donn-es-personnelles: review
   epic-7-retrospective: optional
 
+  epic-8: in-progress
+  8-1-identite-mentor-professionnelle: in-progress
+  8-2-expertise-et-legitimite-structuree: ready-for-dev
+  8-3-televersement-diplomes-mentor: ready-for-dev
+  8-4-parametrage-offre-mentor: ready-for-dev
+  8-5-gating-strict-publication-mentor: ready-for-dev
+  8-6-fiabilisation-persistance-confiance: ready-for-dev
+  8-7-synchronisation-google-calendar: ready-for-dev
+  8-8-controle-mentor-demandes: ready-for-dev
+  8-9-parcours-mentor-configurables: ready-for-dev
+  8-10-stockage-documentaire-securise: ready-for-dev
+  epic-8-retrospective: optional
+
 
 
 

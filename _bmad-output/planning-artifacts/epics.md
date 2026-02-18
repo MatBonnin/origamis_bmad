@@ -627,3 +627,137 @@ So that exercer mon droit RGPD.
 **When** il demande la suppression de ses données
 **Then** la demande est enregistrée
 **And** un processus de suppression est déclenché
+
+## Epic 8: Renforcement du parcours mentor
+
+Les mentors configurent une identite professionnelle complete, prouvent leur legitimite, pilotent leur disponibilite/offre et structurent l'accompagnement.
+
+### Story 8.1: Identite mentor professionnelle
+
+As a mentor,
+I want configurer ma banniere, ma presentation et mes liens professionnels,
+So that renforcer la confiance et mon image professionnelle.
+
+**Acceptance Criteria:**
+
+**Given** un mentor authentifie
+**When** il met a jour son identite professionnelle
+**Then** ses champs `banner`, `about`, `professionalLinks` sont enregistres
+**And** ces informations sont visibles sur son profil public.
+
+### Story 8.2: Expertise et legitimite structuree
+
+As a mentor,
+I want renseigner niveau d'etudes, diplomes et mots-cles,
+So that ameliorer la qualite du matching et la credibilite de mon profil.
+
+**Acceptance Criteria:**
+
+**Given** un mentor authentifie
+**When** il complete ses informations de legitimite
+**Then** `educationLevel`, `degrees`, `keywords` sont persistes
+**And** exploitables dans la recherche/matching et la vue profil.
+
+### Story 8.3: Televersement diplomes mentor
+
+As a mentor,
+I want televerser mes diplomes et certificats,
+So that permettre leur verification admin.
+
+**Acceptance Criteria:**
+
+**Given** un mentor authentifie
+**When** il ajoute ou supprime un document
+**Then** le document est gere via des endpoints securises mentor
+**And** les admins peuvent consulter et statuer sur ces pieces.
+
+### Story 8.4: Parametrage d'offre mentor
+
+As a mentor,
+I want definir mon type d'accompagnement,
+So that controler mon positionnement economique et pedagogique.
+
+**Acceptance Criteria:**
+
+**Given** un mentor authentifie
+**When** il choisit ses `supportTypes`
+**Then** la configuration est enregistree
+**And** visible/filtrable cote etudiant.
+
+### Story 8.5: Gating strict publication mentor
+
+As a mentor,
+I want connaitre les prerequis de publication de mon profil,
+So that savoir quoi completer avant d'etre visible.
+
+**Acceptance Criteria:**
+
+**Given** un mentor avec profil incomplet
+**When** il tente de publier son profil
+**Then** la publication est bloquee
+**And** une liste explicite des elements manquants est affichee.
+
+### Story 8.6: Fiabilisation persistance confiance
+
+As a admin/support,
+I want que validation, visibilite et avis soient persistes en base,
+So that garantir stabilite et auditabilite apres redemarrage.
+
+**Acceptance Criteria:**
+
+**Given** une action admin/avis effectuee
+**When** le service redemarre
+**Then** l'etat reste coherent
+**And** les historiques restent consultables.
+
+### Story 8.7: Synchronisation Google Calendar
+
+As a mentor,
+I want synchroniser mon agenda Google,
+So that eviter les conflits entre disponibilites internes et agenda externe.
+
+**Acceptance Criteria:**
+
+**Given** un mentor connecte a Google
+**When** une plage est occupee en externe
+**Then** le systeme bloque les reservations en conflit
+**And** permet une synchronisation manuelle et automatique.
+
+### Story 8.8: Controle mentor des demandes
+
+As a mentor,
+I want accepter ou refuser des demandes d'accompagnement avec motif,
+So that garder l'autonomie sur mon perimetre d'intervention.
+
+**Acceptance Criteria:**
+
+**Given** une demande entrante
+**When** le mentor accepte ou refuse
+**Then** le statut est mis a jour
+**And** l'etudiant recoit une notification avec le motif si refus.
+
+### Story 8.9: Parcours mentor configurables
+
+As a mentor,
+I want creer des templates de parcours avec jalons et deadlines,
+So that structurer l'accompagnement de maniere reproductible.
+
+**Acceptance Criteria:**
+
+**Given** un mentor authentifie
+**When** il cree et assigne un template de parcours
+**Then** les jalons et echeances sont generes pour l'etudiant
+**And** le suivi mentor reste editable.
+
+### Story 8.10: Stockage documentaire securise d'accompagnement
+
+As a mentor,
+I want partager et gerer des documents avec mes etudiants dans un espace securise,
+So that centraliser les livrables de suivi.
+
+**Acceptance Criteria:**
+
+**Given** un mentor ou etudiant autorise
+**When** il charge, liste ou supprime un document
+**Then** les permissions sont strictement appliquees
+**And** les documents restent accessibles uniquement aux participants legitimes.

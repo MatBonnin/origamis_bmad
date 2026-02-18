@@ -34,6 +34,9 @@ describe('MentorsProfileService', () => {
     mockPrismaService.mentor_profiles.findUnique.mockResolvedValue({
       user_id: 'mentor-1',
       domain: 'informatique',
+      banner_url: 'https://cdn.origami.app/banner.png',
+      about: 'Mentor frontend',
+      professional_links: ['https://www.linkedin.com/in/alice-martin'],
       expertise_tags: ['react', 'typescript'],
       hourly_rate: 45,
       rating_avg: 4.2,
@@ -64,6 +67,11 @@ describe('MentorsProfileService', () => {
 
     expect(result.mentor.mentorId).toBe('mentor-1');
     expect(result.mentor.fullName).toBe('Alice Martin');
+    expect(result.mentor.bannerUrl).toBe('https://cdn.origami.app/banner.png');
+    expect(result.mentor.about).toBe('Mentor frontend');
+    expect(result.mentor.professionalLinks).toEqual([
+      'https://www.linkedin.com/in/alice-martin',
+    ]);
     expect(result.availability.isAvailable).toBe(true);
     expect(result.reviews).toHaveLength(1);
     expect(result.rating.reviewCount).toBe(1);

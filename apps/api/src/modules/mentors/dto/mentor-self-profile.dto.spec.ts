@@ -14,6 +14,9 @@ describe('MentorSelfProfileDto', () => {
       languages: ['fr', 'en'],
       certifications: ['coach-cert'],
       bio: 'Mentor frontend',
+      bannerUrl: 'https://cdn.origami.app/banner.png',
+      about: 'Mentor specialise front-end avec 7 ans d experience.',
+      professionalLinks: ['https://www.linkedin.com/in/alice-martin'],
       tariffs: { min: 30, max: 50, currency: 'EUR' },
       availability: {
         isAvailable: true,
@@ -68,6 +71,19 @@ describe('MentorSelfProfileDto', () => {
         isAvailable: true,
         slots: [{ dayOfWeek: 1, startTime: '25:00', endTime: '12:00' }],
       },
+    });
+
+    const errors = await validate(dto);
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it('rejects invalid professional link URL format', async () => {
+    const dto = plainToInstance(CreateMentorSelfProfileDto, {
+      domain: 'informatique',
+      expertiseTags: ['react'],
+      professionalLinks: ['linkedin.com/in/no-protocol'],
+      tariffs: { min: 30, max: 50, currency: 'EUR' },
+      availability: { isAvailable: true },
     });
 
     const errors = await validate(dto);

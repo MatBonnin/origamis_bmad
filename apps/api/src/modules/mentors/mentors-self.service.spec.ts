@@ -52,6 +52,9 @@ describe('MentorsSelfService', () => {
       .mockResolvedValueOnce({
         user_id: 'mentor-1',
         domain: 'informatique',
+        banner_url: 'https://cdn.origami.app/banner.png',
+        about: 'Mentor fullstack',
+        professional_links: ['https://www.linkedin.com/in/alice-martin'],
         expertise_tags: ['react'],
         supported_levels: ['intermediaire'],
         hourly_rate: 30,
@@ -87,6 +90,9 @@ describe('MentorsSelfService', () => {
       languages: ['fr'],
       certifications: ['react-cert'],
       bio: 'Mentor fullstack',
+      bannerUrl: 'https://cdn.origami.app/banner.png',
+      about: 'Mentor fullstack',
+      professionalLinks: ['https://www.linkedin.com/in/alice-martin'],
       tariffs: { min: 30, max: 50, currency: 'EUR' },
       availability: {
         isAvailable: true,
@@ -97,6 +103,10 @@ describe('MentorsSelfService', () => {
 
     expect(result.profile.mentorId).toBe('mentor-1');
     expect(result.profile.tariffs.min).toBe(30);
+    expect(result.profile.bannerUrl).toBe('https://cdn.origami.app/banner.png');
+    expect(result.profile.professionalLinks).toEqual([
+      'https://www.linkedin.com/in/alice-martin',
+    ]);
     expect(mockPrismaService.mentor_profiles.create).toHaveBeenCalled();
     expect(mockPrismaService.user_needs.upsert).toHaveBeenCalled();
   });
@@ -190,6 +200,23 @@ describe('MentorsSelfService', () => {
           isAvailable: true,
           slots: [{ dayOfWeek: 1, startTime: '12:00', endTime: '09:00' }],
         },
+      }),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('rejects professional links outside authorized domains', async () => {
+    mockPrismaService.users.findUnique.mockResolvedValue({
+      id: 'mentor-1',
+      user_roles: [{ role: { name: 'mentor' } }],
+    });
+
+    await expect(
+      service.createMyProfile('mentor-1', {
+        domain: 'informatique',
+        expertiseTags: ['react'],
+        professionalLinks: ['https://example.com/profile'],
+        tariffs: { min: 30, max: 50, currency: 'EUR' },
+        availability: { isAvailable: true },
       }),
     ).rejects.toThrow(BadRequestException);
   });
