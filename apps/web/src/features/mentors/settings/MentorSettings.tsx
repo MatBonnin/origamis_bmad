@@ -10,6 +10,9 @@ import {
   CardTitle,
   Input,
   Select,
+  SearchableSelect,
+  MultiSearchSelect,
+  LanguageSelect,
 } from '@/components/ui';
 import styles from './MentorSettings.module.css';
 
@@ -136,6 +139,7 @@ export function MentorSettings({ accessToken }: Props) {
   const [success, setSuccess] = useState('');
 
   const [domain, setDomain] = useState('');
+  const [domainLabel, setDomainLabel] = useState('');
   const [bio, setBio] = useState('');
   const [bannerUrl, setBannerUrl] = useState('');
   const [about, setAbout] = useState('');
@@ -143,8 +147,8 @@ export function MentorSettings({ accessToken }: Props) {
   const [degreesInput, setDegreesInput] = useState('');
   const [keywordsInput, setKeywordsInput] = useState('');
   const [professionalLinksInput, setProfessionalLinksInput] = useState('');
-  const [expertiseInput, setExpertiseInput] = useState('');
-  const [languagesInput, setLanguagesInput] = useState('');
+  const [expertiseTags, setExpertiseTags] = useState<string[]>([]);
+  const [languages, setLanguages] = useState<string[]>([]);
   const [certificationsInput, setCertificationsInput] = useState('');
   const [supportedLevels, setSupportedLevels] = useState<string[]>([]);
   const [supportTypes, setSupportTypes] = useState<string[]>([]);
@@ -184,6 +188,7 @@ export function MentorSettings({ accessToken }: Props) {
       const data = result.data as MentorSettingsPayload;
       setHasExistingProfile(true);
       setDomain(data.profile.domain);
+      setDomainLabel(data.profile.domain);
       setBio(data.profile.bio ?? '');
       setBannerUrl(data.profile.bannerUrl ?? '');
       setAbout(data.profile.about ?? '');
@@ -191,8 +196,8 @@ export function MentorSettings({ accessToken }: Props) {
       setDegreesInput((data.profile.degrees ?? []).join(', '));
       setKeywordsInput((data.profile.keywords ?? []).join(', '));
       setProfessionalLinksInput((data.profile.professionalLinks ?? []).join(', '));
-      setExpertiseInput(data.profile.expertiseTags.join(', '));
-      setLanguagesInput(data.profile.languages.join(', '));
+      setExpertiseTags(data.profile.expertiseTags ?? []);
+      setLanguages(data.profile.languages ?? []);
       setCertificationsInput(data.profile.certifications.join(', '));
       setSupportedLevels(data.profile.supportedLevels);
       setSupportTypes(data.profile.supportTypes ?? []);
@@ -222,21 +227,19 @@ export function MentorSettings({ accessToken }: Props) {
         .filter(Boolean);
 
     return {
-      expertise: toList(expertiseInput),
       degrees: toList(degreesInput),
       keywords: toList(keywordsInput),
-      languages: toList(languagesInput),
       certifications: toList(certificationsInput),
       professionalLinks: toList(professionalLinksInput),
     };
-  }, [certificationsInput, degreesInput, expertiseInput, keywordsInput, languagesInput, professionalLinksInput]);
+  }, [certificationsInput, degreesInput, keywordsInput, professionalLinksInput]);
 
   const validateClient = () => {
     if (!domain.trim()) {
       setError('Le domaine est requis');
       return false;
     }
-    if (normalizedSummary.expertise.length === 0) {
+    if (expertiseTags.length === 0) {
       setError('Au moins une competence est requise');
       return false;
     }
@@ -297,10 +300,10 @@ export function MentorSettings({ accessToken }: Props) {
       degrees: normalizedSummary.degrees,
       keywords: normalizedSummary.keywords,
       professionalLinks: normalizedSummary.professionalLinks,
-      expertiseTags: normalizedSummary.expertise,
+      expertiseTags,
       supportedLevels,
       supportTypes,
-      languages: normalizedSummary.languages,
+      languages,
       certifications: normalizedSummary.certifications,
       tariffs: {
         min: Number(tariffMin),
@@ -436,26 +439,32 @@ export function MentorSettings({ accessToken }: Props) {
         </CardHeader>
         <CardContent>
           <div className={styles.gridTwo}>
-            <Input
+            <SearchableSelect
               name="domain"
               label="Domaine"
+              placeholder="Rechercher un domaine..."
+              fetchUrl="/references/domains"
               value={domain}
-              onChange={(event) => setDomain(event.target.value)}
-              placeholder="ex: informatique"
+              valueLabel={domainLabel}
+              onChange={(value, label) => {
+                setDomain(value);
+                setDomainLabel(label);
+              }}
             />
-            <Input
+            <MultiSearchSelect
               name="expertise"
               label="Competences"
-              value={expertiseInput}
-              onChange={(event) => setExpertiseInput(event.target.value)}
-              placeholder="react, typescript, architecture"
+              placeholder="Rechercher une competence..."
+              fetchUrl="/references/skills"
+              domainFilter={domain || undefined}
+              values={expertiseTags}
+              onChange={setExpertiseTags}
+              maxItems={12}
             />
-            <Input
-              name="languages"
+            <LanguageSelect
               label="Langues"
-              value={languagesInput}
-              onChange={(event) => setLanguagesInput(event.target.value)}
-              placeholder="fr, en"
+              values={languages}
+              onChange={setLanguages}
             />
             <Input
               name="certifications"
@@ -798,7 +807,7 @@ export function MentorSettings({ accessToken }: Props) {
             </div>
             <div>
               <dt>Competences</dt>
-              <dd>{normalizedSummary.expertise.join(', ') || 'Non renseigne'}</dd>
+              <dd>{expertiseTags.join(', ') || 'Non renseigne'}</dd>
             </div>
             <div>
               <dt>Niveau d etudes</dt>
@@ -822,7 +831,7 @@ export function MentorSettings({ accessToken }: Props) {
             </div>
             <div>
               <dt>Langues</dt>
-              <dd>{normalizedSummary.languages.join(', ') || 'Non renseigne'}</dd>
+              <dd>{languages.join(', ') || 'Non renseigne'}</dd>
             </div>
             <div>
               <dt>Tarifs</dt>
