@@ -2,8 +2,8 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
-import { Menu } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
+import { Menu, LogOut } from 'lucide-react';
 import logo from '@/app/assets/logo.png';
 import styles from './AppHeader.module.css';
 
@@ -44,15 +44,25 @@ export function AppHeader({ onMenuToggle }: AppHeaderProps) {
       </div>
 
       {session && (
-        <Link href="/profil" className={styles.profileBadge}>
-          <div className={styles.avatar} aria-hidden="true">
-            {initials}
-          </div>
-          <div className={styles.profileInfo}>
-            <span className={styles.profileName}>{fullName}</span>
-            <span className={styles.profileRole}>{roleLabel}</span>
-          </div>
-        </Link>
+        <div className={styles.userActions}>
+          <Link href="/profil" className={styles.profileBadge}>
+            <div className={styles.avatar} aria-hidden="true">
+              {initials}
+            </div>
+            <div className={styles.profileInfo}>
+              <span className={styles.profileName}>{fullName}</span>
+              <span className={styles.profileRole}>{roleLabel}</span>
+            </div>
+          </Link>
+          <button
+            type="button"
+            className={styles.logoutButton}
+            onClick={() => void signOut({ callbackUrl: '/connexion' })}
+            aria-label="Se déconnecter"
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
       )}
     </header>
   );
