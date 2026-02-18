@@ -2,7 +2,7 @@
 
 export type IncidentStatus = 'open' | 'in_review' | 'resolved' | 'escalated';
 
-interface IncidentItem {
+export interface IncidentItem {
   id: string;
   sessionId: string;
   type: string;

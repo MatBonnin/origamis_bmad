@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CommunityService } from '../community';
 import { ContentReportsService } from '../content-reports';
 
-interface AuditLog {
+export interface AuditLog {
   entity: string;
   entityId: string;
   action: string;
@@ -43,7 +43,6 @@ export class ModerationService {
         await this.communityService.setPostStatus(
           report.targetId,
           'removed',
-          input.reason,
         );
       }
 
@@ -51,7 +50,6 @@ export class ModerationService {
         await this.communityService.setPostStatus(
           report.targetId,
           'published',
-          input.reason,
         );
       }
     }

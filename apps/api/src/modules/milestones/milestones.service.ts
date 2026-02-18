@@ -23,7 +23,7 @@ interface CurrentUser {
   roles: string[];
 }
 
-interface Milestone {
+export interface Milestone {
   id: string;
   sourceId: string;
   source: 'booking' | 'conversation';

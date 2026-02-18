@@ -96,7 +96,7 @@ export class MentorsController {
       : [];
 
     const data = {
-      ...(rawData as Record<string, unknown>),
+      ...(rawData as unknown as Record<string, unknown>),
       mentors: filteredMentors,
     };
 

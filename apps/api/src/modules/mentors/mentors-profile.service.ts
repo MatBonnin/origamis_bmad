@@ -290,7 +290,7 @@ export class MentorsProfileService {
         rating: Number(rating.toFixed(1)),
         comment: 'Session de mentorat validee par retour de session.',
         author: authorName,
-        source: 'session',
+        source: 'session' as const,
         createdAt: timestamp.toISOString(),
       };
     });
