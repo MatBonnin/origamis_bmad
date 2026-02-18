@@ -18,6 +18,15 @@ export interface CreateBookingDto {
   notes?: string;
 }
 
+export interface RescheduleBookingDto {
+  newSlotId: string;
+  newBookingDate: string; // ISO date string YYYY-MM-DD
+  reason?: string;
+}
+
+/** Minimum hours before a booking that cancel/reschedule is allowed */
+const MIN_NOTICE_HOURS = 4;
+
 @Injectable()
 export class BookingsService {
   constructor(
@@ -255,6 +264,8 @@ export class BookingsService {
       });
     }
 
+    this.checkNoticePolicy(booking.booking_date, booking.start_time);
+
     const updated = await this.prisma.bookings.update({
       where: { id: bookingId },
       data: {
@@ -276,6 +287,136 @@ export class BookingsService {
     );
 
     return { booking: this.mapBooking(updated) };
+  }
+
+  async rescheduleBooking(
+    userId: string,
+    bookingId: string,
+    dto: RescheduleBookingDto,
+  ) {
+    const booking = await this.prisma.bookings.findUnique({
+      where: { id: bookingId },
+    });
+
+    if (!booking) {
+      throw new NotFoundException({
+        code: 'BOOKING_NOT_FOUND',
+        message: 'Rendez-vous introuvable',
+      });
+    }
+
+    if (booking.student_id !== userId && booking.mentor_id !== userId) {
+      throw new ForbiddenException({
+        code: 'NOT_BOOKING_PARTICIPANT',
+        message: "Vous n'etes pas participant de ce rendez-vous",
+      });
+    }
+
+    if (booking.status !== 'confirmed' && booking.status !== 'pending') {
+      throw new BadRequestException({
+        code: 'CANNOT_RESCHEDULE',
+        message: 'Seuls les rendez-vous confirmes ou en attente peuvent etre reportes',
+      });
+    }
+
+    this.checkNoticePolicy(booking.booking_date, booking.start_time);
+
+    // Validate new slot
+    const newSlot = await this.prisma.mentor_availability_slots.findUnique({
+      where: { id: dto.newSlotId },
+      include: { availability: true },
+    });
+
+    if (!newSlot || newSlot.status !== 'published') {
+      throw new NotFoundException({
+        code: 'SLOT_NOT_FOUND',
+        message: 'Nouveau creneau introuvable ou indisponible',
+      });
+    }
+
+    // Validate new date
+    const newBookingDate = new Date(dto.newBookingDate);
+    if (isNaN(newBookingDate.getTime())) {
+      throw new BadRequestException({
+        code: 'INVALID_DATE',
+        message: 'Date de reservation invalide',
+      });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (newBookingDate < today) {
+      throw new BadRequestException({
+        code: 'DATE_IN_PAST',
+        message: 'La nouvelle date ne peut pas etre dans le passe',
+      });
+    }
+
+    if (newBookingDate.getDay() !== newSlot.day_of_week) {
+      throw new BadRequestException({
+        code: 'DAY_MISMATCH',
+        message: 'La date ne correspond pas au jour du creneau',
+      });
+    }
+
+    // Check conflict on new slot+date
+    const existingBooking = await this.prisma.bookings.findFirst({
+      where: {
+        slot_id: dto.newSlotId,
+        booking_date: newBookingDate,
+        status: { notIn: ['cancelled'] },
+        id: { not: bookingId },
+      },
+    });
+
+    if (existingBooking) {
+      throw new ConflictException({
+        code: 'SLOT_ALREADY_BOOKED',
+        message: 'Le nouveau creneau est deja reserve pour cette date',
+      });
+    }
+
+    // Update booking with new slot and date
+    const updated = await this.prisma.bookings.update({
+      where: { id: bookingId },
+      data: {
+        slot_id: dto.newSlotId,
+        booking_date: newBookingDate,
+        start_time: newSlot.start_time,
+        end_time: newSlot.end_time,
+        cancellation_reason: dto.reason ?? null,
+      },
+    });
+
+    // Notify the other participant
+    const otherUserId =
+      userId === booking.student_id ? booking.mentor_id : booking.student_id;
+
+    await this.emitBookingNotification(
+      otherUserId,
+      'Rendez-vous reporte',
+      `Le rendez-vous a ete reporte au ${this.formatDate(newBookingDate)} de ${newSlot.start_time} a ${newSlot.end_time}`,
+      { bookingId: booking.id },
+    );
+
+    return { booking: this.mapBooking(updated) };
+  }
+
+  private checkNoticePolicy(bookingDate: Date, startTime: string) {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const bookingStart = new Date(bookingDate);
+    bookingStart.setHours(hours, minutes, 0, 0);
+
+    const now = new Date();
+    const hoursUntilBooking =
+      (bookingStart.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    if (hoursUntilBooking < MIN_NOTICE_HOURS) {
+      throw new BadRequestException({
+        code: 'NOTICE_PERIOD_VIOLATION',
+        message: `Impossible de modifier un rendez-vous moins de ${MIN_NOTICE_HOURS}h a l'avance`,
+      });
+    }
   }
 
   private async emitBookingNotification(

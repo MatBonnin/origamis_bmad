@@ -90,7 +90,58 @@
   font-style: italic;
 }
 
+.actions {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
 .empty { margin: 0; color: var(--color-neutral-700); }
+
+/* Dialog overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--spacing-4);
+}
+
+.dialog {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-5);
+  max-width: 480px;
+  width: 100%;
+  display: grid;
+  gap: var(--spacing-4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.dialogTitle {
+  margin: 0;
+  color: var(--color-primary-900);
+  font-size: var(--font-size-xl);
+}
+
+.dialogText {
+  margin: 0;
+  color: var(--color-neutral-700);
+  font-size: var(--font-size-sm);
+}
+
+.dialogActions {
+  display: flex;
+  gap: var(--spacing-2);
+  justify-content: flex-end;
+}
+
+.rescheduleForm {
+  display: grid;
+  gap: var(--spacing-3);
+}
 
 .skeletonList { display: grid; gap: var(--spacing-2); }
 .skeletonItem {

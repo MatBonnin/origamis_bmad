@@ -16,7 +16,11 @@ import {
 } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators';
 import { JwtAuthGuard } from '../../common/guards';
-import { BookingsService, CreateBookingDto } from './bookings.service';
+import {
+  BookingsService,
+  CreateBookingDto,
+  RescheduleBookingDto,
+} from './bookings.service';
 
 @ApiTags('Bookings')
 @ApiBearerAuth()
@@ -74,6 +78,22 @@ export class BookingsController {
       user.id,
       bookingId,
       body.reason,
+    );
+    return { data, error: null };
+  }
+
+  @Post(':id/reschedule')
+  @ApiOperation({ summary: 'Reporter une reservation' })
+  @ApiResponse({ status: 200, description: 'Reservation reportee' })
+  async rescheduleBooking(
+    @CurrentUser() user: { id: string },
+    @Param('id') bookingId: string,
+    @Body() dto: RescheduleBookingDto,
+  ) {
+    const data = await this.bookingsService.rescheduleBooking(
+      user.id,
+      bookingId,
+      dto,
     );
     return { data, error: null };
   }

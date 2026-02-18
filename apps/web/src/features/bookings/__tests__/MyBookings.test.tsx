@@ -7,7 +7,7 @@ describe('MyBookings', () => {
   const fetchMock = vi.fn<typeof fetch>();
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     vi.stubGlobal('fetch', fetchMock);
   });
 
@@ -17,21 +17,20 @@ describe('MyBookings', () => {
       json: async () => ({ data: { bookings }, error: null }),
     }) as Response;
 
+  const confirmedBooking = {
+    bookingId: 'b-1',
+    mentorId: 'mentor-1',
+    bookingDate: '2026-03-04',
+    startTime: '14:00',
+    endTime: '16:00',
+    status: 'confirmed',
+    notes: null,
+    student: { id: 'student-1', firstName: 'Alice', lastName: 'Dupont' },
+    mentor: { id: 'mentor-1', firstName: 'Marc', lastName: 'Martin' },
+  };
+
   it('loads and displays bookings', async () => {
-    fetchMock.mockResolvedValueOnce(
-      mockBookings([
-        {
-          bookingId: 'b-1',
-          bookingDate: '2026-03-04',
-          startTime: '14:00',
-          endTime: '16:00',
-          status: 'confirmed',
-          notes: null,
-          student: { id: 'student-1', firstName: 'Alice', lastName: 'Dupont' },
-          mentor: { id: 'mentor-1', firstName: 'Marc', lastName: 'Martin' },
-        },
-      ]),
-    );
+    fetchMock.mockResolvedValueOnce(mockBookings([confirmedBooking]));
 
     render(<MyBookings accessToken="token-1" userId="student-1" />);
 
@@ -40,26 +39,9 @@ describe('MyBookings', () => {
     expect(screen.getByText('Confirme')).toBeInTheDocument();
   });
 
-  it('cancels a booking', async () => {
+  it('opens cancel dialog and confirms cancellation', async () => {
     fetchMock
-      .mockResolvedValueOnce(
-        mockBookings([
-          {
-            bookingId: 'b-1',
-            bookingDate: '2026-03-04',
-            startTime: '14:00',
-            endTime: '16:00',
-            status: 'confirmed',
-            notes: null,
-            student: {
-              id: 'student-1',
-              firstName: 'Alice',
-              lastName: 'Dupont',
-            },
-            mentor: { id: 'mentor-1', firstName: 'Marc', lastName: 'Martin' },
-          },
-        ]),
-      )
+      .mockResolvedValueOnce(mockBookings([confirmedBooking]))
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -71,7 +53,19 @@ describe('MyBookings', () => {
     render(<MyBookings accessToken="token-1" userId="student-1" />);
 
     await screen.findByText('Confirme');
+
+    // Click the Annuler button on the booking card
     await userEvent.click(screen.getByRole('button', { name: /Annuler/i }));
+
+    // Dialog should appear
+    expect(
+      await screen.findByRole('heading', { name: "Confirmer l'annulation" }),
+    ).toBeInTheDocument();
+
+    // Confirm cancellation
+    await userEvent.click(
+      screen.getByRole('button', { name: "Confirmer l'annulation" }),
+    );
 
     await waitFor(() => {
       const cancelCall = fetchMock.mock.calls.find(
@@ -83,6 +77,101 @@ describe('MyBookings', () => {
     });
 
     expect(await screen.findByText('Rendez-vous annule')).toBeInTheDocument();
+  });
+
+  it('opens reschedule dialog', async () => {
+    fetchMock
+      .mockResolvedValueOnce(mockBookings([confirmedBooking]))
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: {
+            isAvailable: true,
+            timezone: 'Europe/Paris',
+            slots: [
+              {
+                slotId: 'slot-2',
+                dayOfWeek: 4,
+                startTime: '10:00',
+                endTime: '12:00',
+              },
+            ],
+          },
+          error: null,
+        }),
+      } as Response);
+
+    render(<MyBookings accessToken="token-1" userId="student-1" />);
+
+    await screen.findByText('Confirme');
+
+    // Click the Reporter button
+    await userEvent.click(screen.getByRole('button', { name: /Reporter/i }));
+
+    // Reschedule dialog should appear
+    expect(
+      await screen.findByText('Reporter le rendez-vous'),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Nouveau creneau')).toBeInTheDocument();
+    expect(screen.getByLabelText('Nouvelle date')).toBeInTheDocument();
+  });
+
+  it('submits reschedule successfully', async () => {
+    fetchMock
+      .mockResolvedValueOnce(mockBookings([confirmedBooking]))
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: {
+            isAvailable: true,
+            timezone: 'Europe/Paris',
+            slots: [
+              {
+                slotId: 'slot-2',
+                dayOfWeek: 4,
+                startTime: '10:00',
+                endTime: '12:00',
+              },
+            ],
+          },
+          error: null,
+        }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: {
+            booking: {
+              bookingId: 'b-1',
+              slotId: 'slot-2',
+              startTime: '10:00',
+              endTime: '12:00',
+            },
+          },
+          error: null,
+        }),
+      } as Response)
+      // reload bookings after reschedule
+      .mockResolvedValue(mockBookings([{ ...confirmedBooking, startTime: '10:00', endTime: '12:00' }]));
+
+    render(<MyBookings accessToken="token-1" userId="student-1" />);
+
+    await screen.findByText('Confirme');
+    await userEvent.click(screen.getByRole('button', { name: /Reporter/i }));
+    await screen.findByText('Reporter le rendez-vous');
+
+    // Select new slot and date
+    await userEvent.selectOptions(
+      screen.getByLabelText('Nouveau creneau'),
+      'slot-2',
+    );
+    await userEvent.type(screen.getByLabelText('Nouvelle date'), '2026-03-05');
+
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Confirmer le report' }),
+    );
+
+    expect(await screen.findByText('Rendez-vous reporte')).toBeInTheDocument();
   });
 
   it('shows empty state', async () => {

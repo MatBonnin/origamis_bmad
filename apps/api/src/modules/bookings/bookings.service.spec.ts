@@ -63,6 +63,35 @@ describe('BookingsService', () => {
     return d.toISOString().split('T')[0];
   };
 
+  // A future date far enough for notice policy to pass
+  const getFutureBookingDate = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 14); // 2 weeks ahead
+    // Adjust to Wednesday
+    d.setDate(d.getDate() + ((3 + 7 - d.getDay()) % 7 || 7));
+    return d;
+  };
+
+  const makeFutureBooking = (overrides: Record<string, unknown> = {}) => {
+    const futureDate = getFutureBookingDate();
+    return {
+      id: 'booking-1',
+      student_id: 'student-1',
+      mentor_id: 'mentor-1',
+      slot_id: 'slot-1',
+      booking_date: futureDate,
+      start_time: '14:00',
+      end_time: '16:00',
+      status: 'confirmed',
+      notes: null,
+      cancelled_by: null,
+      cancellation_reason: null,
+      created_at: new Date(),
+      updated_at: new Date(),
+      ...overrides,
+    };
+  };
+
   describe('createBooking', () => {
     it('creates a confirmed booking', async () => {
       const bookingDate = getNextWednesday();
@@ -137,7 +166,6 @@ describe('BookingsService', () => {
     it('rejects when day of week does not match slot', async () => {
       mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(validSlot);
 
-      // Pick a Thursday (day_of_week=4) instead of Wednesday (3)
       const d = new Date();
       d.setDate(d.getDate() + ((4 + 7 - d.getDay()) % 7 || 7));
       const thursdayDate = d.toISOString().split('T')[0];
@@ -170,36 +198,14 @@ describe('BookingsService', () => {
   });
 
   describe('cancelBooking', () => {
-    it('cancels a confirmed booking', async () => {
-      mockPrisma.bookings.findUnique.mockResolvedValue({
-        id: 'booking-1',
-        student_id: 'student-1',
-        mentor_id: 'mentor-1',
-        slot_id: 'slot-1',
-        booking_date: new Date(),
-        start_time: '14:00',
-        end_time: '16:00',
-        status: 'confirmed',
-        notes: null,
-        cancelled_by: null,
-        cancellation_reason: null,
-        created_at: new Date(),
-        updated_at: new Date(),
-      });
+    it('cancels a confirmed booking with sufficient notice', async () => {
+      const futureBooking = makeFutureBooking();
+      mockPrisma.bookings.findUnique.mockResolvedValue(futureBooking);
       mockPrisma.bookings.update.mockResolvedValue({
-        id: 'booking-1',
-        student_id: 'student-1',
-        mentor_id: 'mentor-1',
-        slot_id: 'slot-1',
-        booking_date: new Date(),
-        start_time: '14:00',
-        end_time: '16:00',
+        ...futureBooking,
         status: 'cancelled',
-        notes: null,
         cancelled_by: 'student-1',
         cancellation_reason: 'Plus disponible',
-        created_at: new Date(),
-        updated_at: new Date(),
       });
 
       const result = await service.cancelBooking(
@@ -213,12 +219,9 @@ describe('BookingsService', () => {
     });
 
     it('rejects cancellation by non-participant', async () => {
-      mockPrisma.bookings.findUnique.mockResolvedValue({
-        id: 'booking-1',
-        student_id: 'student-1',
-        mentor_id: 'mentor-1',
-        status: 'confirmed',
-      });
+      mockPrisma.bookings.findUnique.mockResolvedValue(
+        makeFutureBooking(),
+      );
 
       await expect(
         service.cancelBooking('other-user', 'booking-1'),
@@ -226,16 +229,122 @@ describe('BookingsService', () => {
     });
 
     it('rejects cancellation of already cancelled booking', async () => {
-      mockPrisma.bookings.findUnique.mockResolvedValue({
-        id: 'booking-1',
-        student_id: 'student-1',
-        mentor_id: 'mentor-1',
-        status: 'cancelled',
-      });
+      mockPrisma.bookings.findUnique.mockResolvedValue(
+        makeFutureBooking({ status: 'cancelled' }),
+      );
 
       await expect(
         service.cancelBooking('student-1', 'booking-1'),
       ).rejects.toThrow(BadRequestException);
+    });
+
+    it('rejects cancellation within notice period (< 4h)', async () => {
+      // Booking starting in 1 hour
+      const soonDate = new Date();
+      soonDate.setMinutes(soonDate.getMinutes() + 60);
+      const startTime = `${String(soonDate.getHours()).padStart(2, '0')}:${String(soonDate.getMinutes()).padStart(2, '0')}`;
+
+      mockPrisma.bookings.findUnique.mockResolvedValue(
+        makeFutureBooking({
+          booking_date: soonDate,
+          start_time: startTime,
+          status: 'confirmed',
+        }),
+      );
+
+      await expect(
+        service.cancelBooking('student-1', 'booking-1'),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('rescheduleBooking', () => {
+    const newSlot = {
+      id: 'slot-2',
+      availability_id: 'avail-1',
+      day_of_week: 4, // Thursday
+      start_time: '10:00',
+      end_time: '12:00',
+      is_recurring: true,
+      status: 'published',
+      availability: {
+        id: 'avail-1',
+        mentor_user_id: 'mentor-1',
+        is_available: true,
+        timezone: 'Europe/Paris',
+      },
+    };
+
+    const getNextThursday = () => {
+      const d = new Date();
+      d.setDate(d.getDate() + 14);
+      d.setDate(d.getDate() + ((4 + 7 - d.getDay()) % 7 || 7));
+      return d.toISOString().split('T')[0];
+    };
+
+    it('reschedules a booking to a new slot and date', async () => {
+      const newDate = getNextThursday();
+      mockPrisma.bookings.findUnique.mockResolvedValue(makeFutureBooking());
+      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(newSlot);
+      mockPrisma.bookings.findFirst.mockResolvedValue(null);
+      mockPrisma.bookings.update.mockResolvedValue({
+        ...makeFutureBooking(),
+        slot_id: 'slot-2',
+        booking_date: new Date(newDate),
+        start_time: '10:00',
+        end_time: '12:00',
+      });
+
+      const result = await service.rescheduleBooking('student-1', 'booking-1', {
+        newSlotId: 'slot-2',
+        newBookingDate: newDate,
+        reason: 'Conflit agenda',
+      });
+
+      expect(result.booking.slotId).toBe('slot-2');
+      expect(result.booking.startTime).toBe('10:00');
+      expect(mockNotifications.emitNotification).toHaveBeenCalledTimes(1);
+    });
+
+    it('rejects reschedule by non-participant', async () => {
+      mockPrisma.bookings.findUnique.mockResolvedValue(makeFutureBooking());
+
+      await expect(
+        service.rescheduleBooking('other-user', 'booking-1', {
+          newSlotId: 'slot-2',
+          newBookingDate: getNextThursday(),
+        }),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('rejects reschedule of cancelled booking', async () => {
+      mockPrisma.bookings.findUnique.mockResolvedValue(
+        makeFutureBooking({ status: 'cancelled' }),
+      );
+
+      await expect(
+        service.rescheduleBooking('student-1', 'booking-1', {
+          newSlotId: 'slot-2',
+          newBookingDate: getNextThursday(),
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('rejects reschedule when new slot already booked', async () => {
+      const newDate = getNextThursday();
+      mockPrisma.bookings.findUnique.mockResolvedValue(makeFutureBooking());
+      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(newSlot);
+      mockPrisma.bookings.findFirst.mockResolvedValue({
+        id: 'other-booking',
+        status: 'confirmed',
+      });
+
+      await expect(
+        service.rescheduleBooking('student-1', 'booking-1', {
+          newSlotId: 'slot-2',
+          newBookingDate: newDate,
+        }),
+      ).rejects.toThrow(ConflictException);
     });
   });
 

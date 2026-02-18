@@ -7,10 +7,22 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  Input,
+  Select,
 } from '@/components/ui';
 import styles from './MyBookings.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
+const DAY_LABELS = [
+  'Dimanche',
+  'Lundi',
+  'Mardi',
+  'Mercredi',
+  'Jeudi',
+  'Vendredi',
+  'Samedi',
+];
 
 const STATUS_LABELS: Record<string, string> = {
   pending: 'En attente',
@@ -19,8 +31,16 @@ const STATUS_LABELS: Record<string, string> = {
   completed: 'Termine',
 };
 
+interface Slot {
+  slotId: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+}
+
 interface Booking {
   bookingId: string;
+  mentorId: string;
   bookingDate: string;
   startTime: string;
   endTime: string;
@@ -41,6 +61,17 @@ export function MyBookings({ accessToken, userId }: Props) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Cancel dialog state
+  const [cancelTarget, setCancelTarget] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
+
+  // Reschedule dialog state
+  const [rescheduleTarget, setRescheduleTarget] = useState<string | null>(null);
+  const [rescheduleReason, setRescheduleReason] = useState('');
+  const [mentorSlots, setMentorSlots] = useState<Slot[]>([]);
+  const [newSlotId, setNewSlotId] = useState('');
+  const [newDate, setNewDate] = useState('');
+
   const headers = { Authorization: `Bearer ${accessToken}` };
 
   const loadBookings = useCallback(async () => {
@@ -58,9 +89,8 @@ export function MyBookings({ accessToken, userId }: Props) {
         );
         return;
       }
-      setBookings(
-        (result.data as { bookings: Booking[] }).bookings,
-      );
+      const data = result.data as { bookings: Booking[] };
+      setBookings(data.bookings ?? []);
     } catch {
       setError('Erreur de connexion au serveur');
     } finally {
@@ -73,15 +103,25 @@ export function MyBookings({ accessToken, userId }: Props) {
     void loadBookings();
   }, [loadBookings]);
 
-  const cancelBooking = async (bookingId: string) => {
+  // Cancel flow
+  const openCancelDialog = (bookingId: string) => {
+    setCancelTarget(bookingId);
+    setCancelReason('');
+  };
+
+  const confirmCancel = async () => {
+    if (!cancelTarget) return;
     setError('');
     setSuccess('');
     try {
-      const res = await fetch(`${API_URL}/bookings/${bookingId}/cancel`, {
-        method: 'PATCH',
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-      });
+      const res = await fetch(
+        `${API_URL}/bookings/${cancelTarget}/cancel`,
+        {
+          method: 'PATCH',
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: cancelReason || undefined }),
+        },
+      );
       const result = await res.json();
       if (!res.ok || result.error) {
         setError(result.error?.message || "Erreur lors de l'annulation");
@@ -89,12 +129,71 @@ export function MyBookings({ accessToken, userId }: Props) {
       }
       setBookings((prev) =>
         prev.map((b) =>
-          b.bookingId === bookingId ? { ...b, status: 'cancelled' } : b,
+          b.bookingId === cancelTarget ? { ...b, status: 'cancelled' } : b,
         ),
       );
       setSuccess('Rendez-vous annule');
     } catch {
       setError('Erreur de connexion');
+    } finally {
+      setCancelTarget(null);
+    }
+  };
+
+  // Reschedule flow
+  const openRescheduleDialog = async (booking: Booking) => {
+    setRescheduleTarget(booking.bookingId);
+    setRescheduleReason('');
+    setNewSlotId('');
+    setNewDate('');
+    setMentorSlots([]);
+
+    try {
+      const res = await fetch(
+        `${API_URL}/mentors/${booking.mentorId}/availability`,
+        { headers, cache: 'no-store' },
+      );
+      const result = await res.json();
+      if (res.ok && !result.error) {
+        const data = result.data as { slots: Slot[] };
+        setMentorSlots(data.slots);
+      }
+    } catch {
+      // Non-blocking
+    }
+  };
+
+  const confirmReschedule = async () => {
+    if (!rescheduleTarget || !newSlotId || !newDate) {
+      setError('Veuillez selectionner un creneau et une date');
+      return;
+    }
+    setError('');
+    setSuccess('');
+    try {
+      const res = await fetch(
+        `${API_URL}/bookings/${rescheduleTarget}/reschedule`,
+        {
+          method: 'POST',
+          headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            newSlotId,
+            newBookingDate: newDate,
+            reason: rescheduleReason || undefined,
+          }),
+        },
+      );
+      const result = await res.json();
+      if (!res.ok || result.error) {
+        setError(result.error?.message || 'Erreur lors du report');
+        return;
+      }
+      setSuccess('Rendez-vous reporte');
+      void loadBookings();
+    } catch {
+      setError('Erreur de connexion');
+    } finally {
+      setRescheduleTarget(null);
     }
   };
 
@@ -114,6 +213,14 @@ export function MyBookings({ accessToken, userId }: Props) {
     }
     return `${booking.student.firstName} ${booking.student.lastName}`;
   };
+
+  const slotOptions = mentorSlots.map((slot) => ({
+    value: slot.slotId,
+    label: `${DAY_LABELS[slot.dayOfWeek]} ${slot.startTime} - ${slot.endTime}`,
+  }));
+
+  const isActive = (status: string) =>
+    status === 'confirmed' || status === 'pending';
 
   return (
     <section className={styles.container} aria-labelledby="bookings-title">
@@ -155,9 +262,7 @@ export function MyBookings({ accessToken, userId }: Props) {
           {bookings.map((booking) => (
             <Card key={booking.bookingId}>
               <CardHeader>
-                <CardTitle>
-                  {formatDate(booking.bookingDate)}
-                </CardTitle>
+                <CardTitle>{formatDate(booking.bookingDate)}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className={styles.bookingDetails} role="listitem">
@@ -178,22 +283,136 @@ export function MyBookings({ accessToken, userId }: Props) {
                   {booking.notes && (
                     <p className={styles.notes}>{booking.notes}</p>
                   )}
-                  {(booking.status === 'confirmed' ||
-                    booking.status === 'pending') && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      type="button"
-                      onClick={() => void cancelBooking(booking.bookingId)}
-                      aria-label={`Annuler le rendez-vous du ${formatDate(booking.bookingDate)}`}
-                    >
-                      Annuler
-                    </Button>
+                  {isActive(booking.status) && (
+                    <div className={styles.actions}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        type="button"
+                        onClick={() => openCancelDialog(booking.bookingId)}
+                        aria-label={`Annuler le rendez-vous du ${formatDate(booking.bookingDate)}`}
+                      >
+                        Annuler
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        type="button"
+                        onClick={() => void openRescheduleDialog(booking)}
+                        aria-label={`Reporter le rendez-vous du ${formatDate(booking.bookingDate)}`}
+                      >
+                        Reporter
+                      </Button>
+                    </div>
                   )}
                 </div>
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      {/* Cancel confirmation dialog */}
+      {cancelTarget && (
+        <div
+          className={styles.overlay}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cancel-dialog-title"
+        >
+          <div className={styles.dialog}>
+            <h2 id="cancel-dialog-title" className={styles.dialogTitle}>
+              Confirmer l&apos;annulation
+            </h2>
+            <p className={styles.dialogText}>
+              Attention : l&apos;annulation est soumise a un preavis de 4h minimum.
+            </p>
+            <Input
+              name="cancel-reason"
+              label="Raison (optionnel)"
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+            />
+            <div className={styles.dialogActions}>
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                onClick={() => setCancelTarget(null)}
+              >
+                Retour
+              </Button>
+              <Button
+                size="sm"
+                type="button"
+                onClick={() => void confirmCancel()}
+              >
+                Confirmer l&apos;annulation
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reschedule dialog */}
+      {rescheduleTarget && (
+        <div
+          className={styles.overlay}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="reschedule-dialog-title"
+        >
+          <div className={styles.dialog}>
+            <h2
+              id="reschedule-dialog-title"
+              className={styles.dialogTitle}
+            >
+              Reporter le rendez-vous
+            </h2>
+            <p className={styles.dialogText}>
+              Choisissez un nouveau creneau et une nouvelle date.
+            </p>
+            <div className={styles.rescheduleForm}>
+              <Select
+                name="new-slot"
+                label="Nouveau creneau"
+                value={newSlotId}
+                placeholder="Selectionnez un creneau"
+                options={slotOptions}
+                onChange={(e) => setNewSlotId(e.target.value)}
+              />
+              <Input
+                name="new-date"
+                label="Nouvelle date"
+                type="date"
+                value={newDate}
+                onChange={(e) => setNewDate(e.target.value)}
+              />
+              <Input
+                name="reschedule-reason"
+                label="Raison (optionnel)"
+                value={rescheduleReason}
+                onChange={(e) => setRescheduleReason(e.target.value)}
+              />
+            </div>
+            <div className={styles.dialogActions}>
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                onClick={() => setRescheduleTarget(null)}
+              >
+                Retour
+              </Button>
+              <Button
+                size="sm"
+                type="button"
+                onClick={() => void confirmReschedule()}
+              >
+                Confirmer le report
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </section>
