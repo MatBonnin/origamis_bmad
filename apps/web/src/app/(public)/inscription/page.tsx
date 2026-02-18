@@ -121,7 +121,7 @@ export default function InscriptionPage() {
         if (selectedRole === 'etudiant') {
           router.push('/onboarding');
         } else {
-          router.push('/dashboard');
+          router.push('/onboarding/mentor');
         }
         router.refresh();
       } else {

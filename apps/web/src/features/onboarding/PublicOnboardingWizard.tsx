@@ -159,7 +159,7 @@ export function PublicOnboardingWizard() {
         if (data.profileType === 'etudiant') {
           router.push('/profile-suggestion');
         } else {
-          router.push('/dashboard');
+          router.push('/onboarding/mentor');
         }
         router.refresh();
       } else {
