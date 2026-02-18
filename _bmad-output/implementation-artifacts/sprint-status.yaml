@@ -79,9 +79,9 @@ development_status:
   epic-4-retrospective: optional
 
   epic-5: in-progress
-  5-1-publier-et-r-pondre-dans-la-communaut: ready-for-dev
-  5-2-signalement-de-contenu: ready-for-dev
-  5-3-mod-ration-admin: ready-for-dev
+  5-1-publier-et-r-pondre-dans-la-communaut: review
+  5-2-signalement-de-contenu: review
+  5-3-mod-ration-admin: review
   epic-5-retrospective: optional
 
   epic-6: in-progress
@@ -96,6 +96,7 @@ development_status:
   7-3-tableaux-de-bord-de-base: ready-for-dev
   7-4-suppression-des-donn-es-personnelles: ready-for-dev
   epic-7-retrospective: optional
+
 
 
 

@@ -1,6 +1,6 @@
 # Story 5.3: ModÃ©ration admin
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -16,11 +16,11 @@ so that maintenir un espace sÃ»r.
 
 ## Tasks / Subtasks
 
-- [ ] Endpoint admin `GET /reports/pending`, `PATCH /reports/:id/status`, `POST /reports/:id/actions` (AC: #1)
-- [ ] Action workflow (hide content, restore, warn user, escalate) (AC: #1)
-- [ ] UI admin dashboard (liste rapports, filtre, preview, action buttons) (AC: #1)
-- [ ] Log & audit actions (who, when, reason) (AC: #1)
-- [ ] Tests API + UI + audit trail + RBAC (AC: #1)
+- [x] Endpoint admin `GET /reports/pending`, `PATCH /reports/:id/status`, `POST /reports/:id/actions` (AC: #1)
+- [x] Action workflow (hide content, restore, warn user, escalate) (AC: #1)
+- [x] UI admin dashboard (liste rapports, filtre, preview, action buttons) (AC: #1)
+- [x] Log & audit actions (who, when, reason) (AC: #1)
+- [x] Tests API + UI + audit trail + RBAC (AC: #1)
 
 ## Dev Notes
 
@@ -97,31 +97,53 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
-### Completion Notes List
-
-### File List
-
-### Project Structure Notes
-
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
-
-### References
-
-- _bmad-output/planning-artifacts/epics.md
-- _bmad-output/planning-artifacts/prd.md
-- _bmad-output/planning-artifacts/architecture.md
-- _bmad-output/planning-artifacts/ux-design-specification.md
-
-## Dev Agent Record
-
-### Agent Model Used
-
-GPT-5 (Codex)
-
-### Debug Log References
+- Module `moderation` implémenté avec endpoint pending/actions et journal d audit en mémoire.
+- Workflow admin appliqué: hide/restore/warn/escalate et impact statut post communautaire.
+- UI admin livrée sur `/admin/moderation` avec filtres, actions rapides et feedback aria-live.
+- RBAC appliqué sur endpoints de modération (admin/support).
+- Tests ciblés passants: controller/service moderation + dashboard admin.
 
 ### Completion Notes List
 
+- Story 5.3 finalisée: traitement admin des signalements, actions de modération, audit trail et tests.
+
 ### File List
+
+- apps/api/src/modules/community/community.service.ts
+- apps/api/src/modules/community/community.controller.ts
+- apps/api/src/modules/community/community.gateway.ts
+- apps/api/src/modules/community/community.module.ts
+- apps/api/src/modules/community/index.ts
+- apps/api/src/modules/community/community.service.spec.ts
+- apps/api/src/modules/community/community.controller.spec.ts
+- apps/api/src/modules/content-reports/content-reports.service.ts
+- apps/api/src/modules/content-reports/content-reports.controller.ts
+- apps/api/src/modules/content-reports/content-reports.module.ts
+- apps/api/src/modules/content-reports/index.ts
+- apps/api/src/modules/content-reports/content-reports.service.spec.ts
+- apps/api/src/modules/content-reports/content-reports.controller.spec.ts
+- apps/api/src/modules/moderation/moderation.service.ts
+- apps/api/src/modules/moderation/moderation.controller.ts
+- apps/api/src/modules/moderation/moderation.module.ts
+- apps/api/src/modules/moderation/index.ts
+- apps/api/src/modules/moderation/moderation.service.spec.ts
+- apps/api/src/modules/moderation/moderation.controller.spec.ts
+- apps/api/src/app.module.ts
+- apps/web/src/app/(app)/communaute/page.tsx
+- apps/web/src/app/(app)/admin/moderation/page.tsx
+- apps/web/src/features/community/index.ts
+- apps/web/src/features/community/CommunityFeed.tsx
+- apps/web/src/features/community/CommunityFeed.module.css
+- apps/web/src/features/community/report/index.ts
+- apps/web/src/features/community/report/ReportModal.tsx
+- apps/web/src/features/community/report/ReportModal.module.css
+- apps/web/src/features/community/__tests__/CommunityFeed.test.tsx
+- apps/web/src/features/admin/moderation/index.ts
+- apps/web/src/features/admin/moderation/ModerationDashboard.tsx
+- apps/web/src/features/admin/moderation/ModerationDashboard.module.css
+- apps/web/src/features/admin/moderation/__tests__/ModerationDashboard.test.tsx
+- apps/web/src/components/layout/Sidebar.tsx
+
+## Change Log
+
+- 2026-02-18: Story 5.3 completee (moderation admin endpoints/actions, dashboard, audit logs, tests).

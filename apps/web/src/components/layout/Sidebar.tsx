@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, GraduationCap, FolderOpen, MessageSquare, Calendar } from 'lucide-react';
+import { Home, GraduationCap, FolderOpen, MessageSquare, Calendar, Users } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
 const NAV_ITEMS = [
   { label: 'Tableau de bord', icon: Home, href: '/dashboard' },
   { label: 'Mentors', icon: GraduationCap, href: '/mentors' },
   { label: 'Projets', icon: FolderOpen, href: '/projets' },
+  { label: 'Communaute', icon: Users, href: '/communaute' },
   { label: 'Messages', icon: MessageSquare, href: '/messages' },
   { label: 'Calendrier', icon: Calendar, href: '/calendrier' },
 ] as const;

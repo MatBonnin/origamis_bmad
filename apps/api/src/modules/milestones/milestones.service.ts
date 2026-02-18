@@ -318,7 +318,10 @@ export class MilestonesService {
     }
   }
 
-  private assertCanAccessMilestone(currentUser: CurrentUser, milestone: Milestone) {
+  private assertCanAccessMilestone(
+    currentUser: CurrentUser,
+    milestone: Milestone,
+  ) {
     const isOwner = milestone.userId === currentUser.id;
     const isMentor = milestone.mentorId === currentUser.id;
     const isStaff =

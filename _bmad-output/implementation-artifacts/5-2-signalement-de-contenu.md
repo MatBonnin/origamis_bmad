@@ -1,6 +1,6 @@
 # Story 5.2: Signalement de contenu
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -16,11 +16,11 @@ so that contribuer Ã  la modÃ©ration.
 
 ## Tasks / Subtasks
 
-- [ ] Ajouter tables `content_reports`, `content_report_tags`, `content_report_status` (AC: #1)
-- [ ] Endpoint `POST /reports` + `GET /reports/:id` + `PATCH /reports/:id/status` (AC: #1)
-- [ ] UI de signalement (modal, champs raison + captures, challenge captchas) (AC: #1)
-- [ ] Envoi notification admin + auteur (le cas Ã©chÃ©ant) (AC: #1)
-- [ ] Tests API + UI + workflow statut (AC: #1)
+- [x] Ajouter tables `content_reports`, `content_report_tags`, `content_report_status` (AC: #1)
+- [x] Endpoint `POST /reports` + `GET /reports/:id` + `PATCH /reports/:id/status` (AC: #1)
+- [x] UI de signalement (modal, champs raison + captures, challenge captchas) (AC: #1)
+- [x] Envoi notification admin + auteur (le cas échéant) (AC: #1)
+- [x] Tests API + UI + workflow statut (AC: #1)
 
 ## Dev Notes
 
@@ -96,31 +96,53 @@ GPT-5 (Codex)
 
 ### Debug Log References
 
-### Completion Notes List
-
-### File List
-
-### Project Structure Notes
-
-- Monorepo: `apps/web` (Next.js), `apps/api` (NestJS), `packages/shared`
-- Feature-first dans `apps/api/src/modules` et `apps/web/src/features`
-- Conventions: snake_case DB, camelCase JSON, endpoints pluriel
-
-### References
-
-- _bmad-output/planning-artifacts/epics.md
-- _bmad-output/planning-artifacts/prd.md
-- _bmad-output/planning-artifacts/architecture.md
-- _bmad-output/planning-artifacts/ux-design-specification.md
-
-## Dev Agent Record
-
-### Agent Model Used
-
-GPT-5 (Codex)
-
-### Debug Log References
+- Module `content-reports` créé avec gestion des statuts `new|in_review|escalated|resolved`.
+- Endpoint signalement sécurisé avec captcha token requis et option anonymat reporter.
+- Modal de signalement intégrée dans la communauté (raison, détails, anonymat, captcha).
+- Notifications déclenchées à la création et aux changements de statut.
+- Tests ciblés passants: service/controller reports + UI report flow.
 
 ### Completion Notes List
 
+- Story 5.2 finalisée: workflow de signalement complet API/UI avec statut et notifications.
+
 ### File List
+
+- apps/api/src/modules/community/community.service.ts
+- apps/api/src/modules/community/community.controller.ts
+- apps/api/src/modules/community/community.gateway.ts
+- apps/api/src/modules/community/community.module.ts
+- apps/api/src/modules/community/index.ts
+- apps/api/src/modules/community/community.service.spec.ts
+- apps/api/src/modules/community/community.controller.spec.ts
+- apps/api/src/modules/content-reports/content-reports.service.ts
+- apps/api/src/modules/content-reports/content-reports.controller.ts
+- apps/api/src/modules/content-reports/content-reports.module.ts
+- apps/api/src/modules/content-reports/index.ts
+- apps/api/src/modules/content-reports/content-reports.service.spec.ts
+- apps/api/src/modules/content-reports/content-reports.controller.spec.ts
+- apps/api/src/modules/moderation/moderation.service.ts
+- apps/api/src/modules/moderation/moderation.controller.ts
+- apps/api/src/modules/moderation/moderation.module.ts
+- apps/api/src/modules/moderation/index.ts
+- apps/api/src/modules/moderation/moderation.service.spec.ts
+- apps/api/src/modules/moderation/moderation.controller.spec.ts
+- apps/api/src/app.module.ts
+- apps/web/src/app/(app)/communaute/page.tsx
+- apps/web/src/app/(app)/admin/moderation/page.tsx
+- apps/web/src/features/community/index.ts
+- apps/web/src/features/community/CommunityFeed.tsx
+- apps/web/src/features/community/CommunityFeed.module.css
+- apps/web/src/features/community/report/index.ts
+- apps/web/src/features/community/report/ReportModal.tsx
+- apps/web/src/features/community/report/ReportModal.module.css
+- apps/web/src/features/community/__tests__/CommunityFeed.test.tsx
+- apps/web/src/features/admin/moderation/index.ts
+- apps/web/src/features/admin/moderation/ModerationDashboard.tsx
+- apps/web/src/features/admin/moderation/ModerationDashboard.module.css
+- apps/web/src/features/admin/moderation/__tests__/ModerationDashboard.test.tsx
+- apps/web/src/components/layout/Sidebar.tsx
+
+## Change Log
+
+- 2026-02-18: Story 5.2 completee (content reports API/UI, captcha, statuts, notifications, tests).
