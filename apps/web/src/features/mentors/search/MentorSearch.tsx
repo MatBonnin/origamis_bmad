@@ -184,7 +184,8 @@ export function MentorSearch({ accessToken }: Props) {
 
   const domainValue = filters.domains?.[0] ?? '';
   const supportTypeValue = filters.supportTypes?.[0] ?? '';
-  const maxPriceValue = filters.maxPrice !== undefined ? String(filters.maxPrice) : '';
+  const maxPriceSliderMax = facets?.price_ranges.max ?? 200;
+  const maxPriceValue = filters.maxPrice !== undefined ? filters.maxPrice : maxPriceSliderMax;
   const minRatingValue = filters.minRating !== undefined ? String(filters.minRating) : '';
   const onlyAvailable = filters.availability === 'available';
 
@@ -193,10 +194,6 @@ export function MentorSearch({ accessToken }: Props) {
     value: String(threshold),
     label: `${threshold}+`,
   }));
-  const priceOptions = (facets?.price_ranges.presets ?? []).map((preset) => ({
-    value: String(preset.max ?? 9999),
-    label: preset.label,
-  }));
   const supportTypeOptions = (facets?.support_types ?? []).map((value) => ({
     value,
     label: value,
@@ -204,7 +201,7 @@ export function MentorSearch({ accessToken }: Props) {
 
   const activeFilters = [
     domainValue ? `Domaine: ${domainValue}` : '',
-    maxPriceValue ? `Prix max: ${maxPriceValue} EUR/h` : '',
+    filters.maxPrice !== undefined ? `Prix max: ${filters.maxPrice} €/h` : '',
     supportTypeValue ? `Accompagnement: ${supportTypeValue}` : '',
     minRatingValue ? `Note min: ${minRatingValue}` : '',
     onlyAvailable ? 'Disponible maintenant' : '',
@@ -242,20 +239,34 @@ export function MentorSearch({ accessToken }: Props) {
         }}
       />
 
-      <Select
-        label="Prix"
-        name="price"
-        value={maxPriceValue}
-        options={priceOptions}
-        placeholder="Tous les prix"
-        onChange={(event) => {
-          const nextValue = event.target.value;
-          setFilters((previous) => ({
-            ...previous,
-            maxPrice: nextValue ? Number(nextValue) : undefined,
-          }));
-        }}
-      />
+      <div className={styles.sliderField}>
+        <div className={styles.sliderHeader}>
+          <label htmlFor="price-slider" className={styles.sliderLabel}>Prix max</label>
+          <span className={styles.sliderValue}>
+            {maxPriceValue >= maxPriceSliderMax ? 'Tous les prix' : `${maxPriceValue} €/h`}
+          </span>
+        </div>
+        <input
+          id="price-slider"
+          type="range"
+          min={0}
+          max={maxPriceSliderMax}
+          step={5}
+          value={maxPriceValue}
+          className={styles.slider}
+          onChange={(event) => {
+            const value = Number(event.target.value);
+            setFilters((previous) => ({
+              ...previous,
+              maxPrice: value >= maxPriceSliderMax ? undefined : value,
+            }));
+          }}
+        />
+        <div className={styles.sliderTicks}>
+          <span>0</span>
+          <span>{maxPriceSliderMax} €/h</span>
+        </div>
+      </div>
 
       <Select
         label="Note minimale"

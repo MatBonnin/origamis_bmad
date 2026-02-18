@@ -3,18 +3,21 @@
 }
 
 .header {
-  margin-bottom: var(--spacing-5);
+  margin-bottom: var(--spacing-6);
+  padding-bottom: var(--spacing-5);
+  border-bottom: 1px solid var(--color-neutral-200);
 }
 
 .title {
-  margin: 0 0 var(--spacing-2) 0;
+  margin: 0 0 var(--spacing-1) 0;
   font-size: var(--font-size-3xl);
   color: var(--color-primary-900);
 }
 
 .subtitle {
   margin: 0;
-  color: var(--color-neutral-700);
+  color: var(--color-neutral-500);
+  font-size: var(--font-size-sm);
 }
 
 .searchRow {
@@ -37,13 +40,14 @@
 }
 
 .filtersDesktop {
-  background: var(--color-neutral-50);
+  background: var(--color-white);
   border: 1px solid var(--color-neutral-200);
   border-radius: var(--radius-xl);
-  padding: var(--spacing-4);
+  padding: var(--spacing-5);
   height: fit-content;
   display: grid;
-  gap: var(--spacing-4);
+  gap: var(--spacing-5);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .filtersContent {
@@ -102,17 +106,26 @@
 .grid {
   display: grid;
   gap: var(--spacing-4);
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 }
 
 .card {
   display: flex;
   flex-direction: column;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
 }
 
 .domain {
-  margin: 0;
-  color: var(--color-primary-700);
+  margin: var(--spacing-1) 0 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary-600);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .tags {
@@ -123,30 +136,39 @@
 }
 
 .tag {
-  border: 1px solid var(--color-neutral-200);
+  border: 1px solid var(--color-accent-300);
+  background: var(--color-accent-50, #fefce8);
   border-radius: var(--radius-full);
-  padding: var(--spacing-1) var(--spacing-2);
-  font-size: var(--font-size-sm);
-  color: var(--color-neutral-700);
+  padding: var(--spacing-1) var(--spacing-3);
+  font-size: var(--font-size-xs, 11px);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary-800);
 }
 
 .meta {
   margin: 0;
   display: grid;
   gap: var(--spacing-2);
+  background: var(--color-neutral-50);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3);
 }
 
 .meta div {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .meta dt {
-  color: var(--color-neutral-700);
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-600);
 }
 
 .meta dd {
   margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-primary-900);
 }
 
@@ -203,6 +225,74 @@
 
 .drawerLoading {
   color: var(--color-neutral-700);
+}
+
+/* ─── Slider prix ──────────────────────────────────────────────────────────── */
+
+.sliderField {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.sliderLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-neutral-700);
+}
+
+.sliderValue {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-700);
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-neutral-200);
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-accent-500);
+  border: 2px solid var(--color-primary-900);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-accent-500);
+  border: 2px solid var(--color-primary-900);
+  cursor: pointer;
+}
+
+.sliderTicks {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-xs, 11px);
+  color: var(--color-neutral-500);
 }
 
 @media (max-width: 960px) {

@@ -158,6 +158,8 @@ export class MentorsSelfService {
       availabilitySlots: dto.availability.slots ?? [],
     });
 
+    await this.refreshPublishReadiness(userId);
+
     return this.getMyProfile(userId);
   }
 
@@ -302,6 +304,8 @@ export class MentorsSelfService {
       tariffs: dto.tariffs ?? currentMeta.tariffs,
       availabilitySlots: nextSlots,
     });
+
+    await this.refreshPublishReadiness(userId);
 
     return this.getMyProfile(userId);
   }
@@ -606,31 +610,17 @@ export class MentorsSelfService {
       return { isPublishReady: false, missingRequirements: ['profile'] };
     }
 
-    const docsCount = this.prisma.mentor_documents?.count
-      ? await this.prisma.mentor_documents.count({
-          where: {
-            mentor_id: userId,
-            deleted_at: null,
-            verification_status: { in: ['pending', 'verified'] },
-          },
-        })
-      : 0;
-
     const missingRequirements: string[] = [];
 
     if (!mentor.about?.trim()) missingRequirements.push('about');
-    if ((mentor.professional_links?.length ?? 0) < 1)
-      missingRequirements.push('professional_link');
     if (!mentor.banner_url && !mentor.user.avatar_url)
       missingRequirements.push('banner_or_avatar');
     if (!mentor.domain?.trim()) missingRequirements.push('domain');
     if ((mentor.expertise_tags?.length ?? 0) < 1)
       missingRequirements.push('expertise_tags');
-    if (!mentor.education_level) missingRequirements.push('education_level');
     if ((mentor.support_types?.length ?? 0) < 1)
       missingRequirements.push('support_types');
     if (mentor.hourly_rate === null) missingRequirements.push('tariff');
-    if (docsCount < 1) missingRequirements.push('legitimacy_document');
 
     const isPublishReady = missingRequirements.length === 0;
 

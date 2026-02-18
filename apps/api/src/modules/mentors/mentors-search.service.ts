@@ -136,28 +136,34 @@ export class MentorsSearchService {
   }
 
   async getFilterFacets() {
-    const mentors = await this.prisma.mentor_profiles.findMany({
-      where: { is_validated: true, is_publish_ready: true },
-      select: {
-        user_id: true,
-        is_validated: true,
-        domain: true,
-        support_types: true,
-        hourly_rate: true,
-        rating_avg: true,
-        visibility: { select: { status: true } },
-        validation_checks: {
-          select: { status: true },
-          orderBy: { created_at: 'desc' },
-          take: 1,
-        },
-        availability: {
-          select: {
-            is_available: true,
+    const [mentors, domainRefs] = await Promise.all([
+      this.prisma.mentor_profiles.findMany({
+        where: { is_validated: true, is_publish_ready: true },
+        select: {
+          user_id: true,
+          is_validated: true,
+          domain: true,
+          support_types: true,
+          hourly_rate: true,
+          rating_avg: true,
+          visibility: { select: { status: true } },
+          validation_checks: {
+            select: { status: true },
+            orderBy: { created_at: 'desc' },
+            take: 1,
+          },
+          availability: {
+            select: {
+              is_available: true,
+            },
           },
         },
-      },
-    });
+      }),
+      this.prisma.domain_refs.findMany({
+        select: { label: true },
+        orderBy: { label: 'asc' },
+      }),
+    ]);
 
     const visibleMentors = mentors.filter((mentor) => {
       const validationStatus =
@@ -167,9 +173,7 @@ export class MentorsSearchService {
       return validationStatus === 'validated' && visibility !== 'hidden';
     });
 
-    const domains = Array.from(
-      new Set(visibleMentors.map((mentor) => mentor.domain)),
-    ).sort((a, b) => a.localeCompare(b));
+    const domains = domainRefs.map((d) => d.label);
     const ratings = [4.5, 4, 3.5, 3].filter((threshold) =>
       visibleMentors.some((mentor) => (mentor.rating_avg ?? 0) >= threshold),
     );
