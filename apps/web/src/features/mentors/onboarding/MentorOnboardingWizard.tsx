@@ -364,14 +364,20 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
     }
   };
 
-  const goNext = async () => {
-    const saved = await upsertProfile();
-    if (!saved) return;
+  const goNext = () => {
+    const validationMessage = validateCurrentStep();
+    if (validationMessage) {
+      setError(validationMessage);
+      return;
+    }
+    setError('');
+    setSuccess('');
     setStep((prev) => Math.min(prev + 1, STEPS.length - 1));
   };
 
   const goBack = () => {
     setError('');
+    setSuccess('');
     setStep((prev) => Math.max(prev - 1, 0));
   };
 
@@ -405,14 +411,14 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
 
       <div className={styles.stepPills}>
         {STEPS.map((label, index) => (
-          <button
+          <div
             key={label}
-            type="button"
-            className={`${styles.stepPill} ${index === step ? styles.stepPillActive : ''}`}
-            onClick={() => setStep(index)}
+            className={`${styles.stepPill} ${index === step ? styles.stepPillActive : ''} ${index < step ? styles.stepPillDone : ''}`}
+            aria-current={index === step ? 'step' : undefined}
           >
+            <span className={styles.stepNumber}>{index < step ? '✓' : index + 1}</span>
             {label}
-          </button>
+          </div>
         ))}
       </div>
 
@@ -703,12 +709,12 @@ export function MentorOnboardingWizard({ accessToken }: Props) {
           </Button>
         )}
         {step < STEPS.length - 1 ? (
-          <Button type="button" variant="secondary" isLoading={saving} onClick={() => void goNext()}>
-            Sauvegarder et continuer
+          <Button type="button" variant="secondary" onClick={goNext}>
+            Suivant →
           </Button>
         ) : (
           <Button type="button" isLoading={saving} onClick={() => void finishOnboarding()}>
-            Terminer mon onboarding mentor
+            Enregistrer mon profil
           </Button>
         )}
       </div>

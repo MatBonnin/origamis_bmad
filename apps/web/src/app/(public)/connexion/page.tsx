@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
+import logo from '@/app/assets/logo.png';
 import styles from './page.module.css';
 
 interface FormErrors {
@@ -41,7 +43,7 @@ function ConnexionForm() {
     const password = formData.get('password') as string;
 
     if (!email) {
-      newErrors.email = 'L\'email est requis';
+      newErrors.email = "L'email est requis";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = 'Veuillez entrer un email valide';
     }
@@ -94,9 +96,13 @@ function ConnexionForm() {
   return (
     <main className={styles.main}>
       <div className={styles.container}>
+        <div className={styles.logoWrapper}>
+          <Image src={logo} alt="Orig'AMI" height={48} priority />
+        </div>
+
         <h1 className={styles.title}>Connexion</h1>
         <p className={styles.subtitle}>
-          Connectez-vous pour accéder à votre espace
+          Accédez à votre espace personnel
         </p>
 
         {hasErrors && (
@@ -170,8 +176,8 @@ function ConnexionForm() {
             )}
           </div>
 
-          <div style={{ textAlign: 'right', marginTop: '-0.5rem' }}>
-            <Link href="/mot-de-passe-oublie" className={styles.link} style={{ fontSize: '0.875rem' }}>
+          <div className={styles.forgotLink}>
+            <Link href="/mot-de-passe-oublie" className={styles.link}>
               Mot de passe oublié ?
             </Link>
           </div>
@@ -188,7 +194,7 @@ function ConnexionForm() {
 
         <p className={styles.footerText}>
           Pas encore de compte ?{' '}
-          <Link href="/inscription" className={styles.link}>
+          <Link href="/onboarding" className={styles.link}>
             Créer un compte
           </Link>
         </p>
@@ -199,13 +205,15 @@ function ConnexionForm() {
 
 export default function ConnexionPage() {
   return (
-    <Suspense fallback={
-      <main className={styles.main}>
-        <div className={styles.container}>
-          <p className={styles.subtitle}>Chargement...</p>
-        </div>
-      </main>
-    }>
+    <Suspense
+      fallback={
+        <main className={styles.main}>
+          <div className={styles.container}>
+            <p className={styles.subtitle}>Chargement...</p>
+          </div>
+        </main>
+      }
+    >
       <ConnexionForm />
     </Suspense>
   );

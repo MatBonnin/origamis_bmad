@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import Image from 'next/image';
@@ -52,6 +52,7 @@ export function PublicOnboardingWizard() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const isRegistering = useRef(false);
 
   // Load from sessionStorage on mount
   useEffect(() => {
@@ -76,9 +77,9 @@ export function PublicOnboardingWizard() {
     }
   }, [data, isInitialized]);
 
-  // Redirect if already logged in
+  // Redirect if already logged in (not triggered after a fresh registration)
   useEffect(() => {
-    if (status === 'authenticated') {
+    if (status === 'authenticated' && !isRegistering.current) {
       router.push('/dashboard');
     }
   }, [status, router]);
@@ -110,6 +111,7 @@ export function PublicOnboardingWizard() {
   const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
+    isRegistering.current = true;
 
     try {
       // Build onboarding data for API
@@ -142,6 +144,7 @@ export function PublicOnboardingWizard() {
 
       if (!response.ok || result.error) {
         setError(result.error?.message || 'Erreur lors de la creation du compte');
+        isRegistering.current = false;
         return;
       }
 
