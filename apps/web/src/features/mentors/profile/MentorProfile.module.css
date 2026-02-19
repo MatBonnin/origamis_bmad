@@ -68,7 +68,7 @@
   border-radius: 50%;
   border: 4px solid white;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-primary-500) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -310,8 +310,8 @@
   display: inline-flex;
   align-items: center;
   padding: var(--spacing-2) var(--spacing-3);
-  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
-  color: #5b21b6;
+  background: linear-gradient(135deg, var(--color-accent-300) 0%, #fde68a 100%);
+  color: var(--color-accent-700);
   border-radius: var(--radius-full);
   font-size: 0.9rem;
   font-weight: 500;
@@ -320,7 +320,7 @@
 
 .skillTag:hover {
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(91, 33, 182, 0.2);
+  box-shadow: 0 2px 8px rgba(242, 159, 8, 0.3);
 }
 
 .keywordsRow {
@@ -383,7 +383,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -589,8 +589,8 @@
 .levelBadge {
   display: inline-block;
   padding: var(--spacing-2) var(--spacing-3);
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #1e40af;
+  background: linear-gradient(135deg, var(--color-neutral-100) 0%, var(--color-neutral-50) 100%);
+  color: var(--color-primary-700);
   border-radius: var(--radius-full);
   font-size: 0.85rem;
   font-weight: 500;

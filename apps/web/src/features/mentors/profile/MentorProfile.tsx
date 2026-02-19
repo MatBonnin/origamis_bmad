@@ -268,7 +268,7 @@ export function MentorProfile({ accessToken, mentorId }: Props) {
           style={{
             backgroundImage: mentor.bannerUrl
               ? `url(${mentor.bannerUrl})`
-              : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              : 'linear-gradient(135deg, #00064F 0%, #36529B 50%, #3A68AD 100%)',
           }}
         >
           <div className={styles.bannerOverlay} />
