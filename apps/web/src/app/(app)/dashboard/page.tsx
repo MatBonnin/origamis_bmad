@@ -110,6 +110,25 @@ function formatDueDate(isoStr?: string): string {
   return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 }
 
+function toSafeNumber(value: unknown, fallback = 0): number {
+  const n = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function normalizeStudentProgression(
+  data: StudentProgression | null,
+): StudentProgression {
+  const milestones = Array.isArray(data?.milestones) ? data.milestones : [];
+
+  return {
+    completionRate: Math.max(0, toSafeNumber(data?.completionRate)),
+    totalMilestones: Math.max(0, toSafeNumber(data?.totalMilestones)),
+    completedMilestones: Math.max(0, toSafeNumber(data?.completedMilestones)),
+    inProgressMilestones: Math.max(0, toSafeNumber(data?.inProgressMilestones)),
+    milestones,
+  };
+}
+
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default async function DashboardPage() {
@@ -422,13 +441,13 @@ export default async function DashboardPage() {
     fetchJson<StudentMentor>(`${API_URL}/students/me/mentor`, accessToken),
   ]);
 
-  const progression: StudentProgression = progressionData ?? {
-    completionRate: 0,
-    totalMilestones: 0,
-    completedMilestones: 0,
-    inProgressMilestones: 0,
-    milestones: [],
-  };
+  const progression = normalizeStudentProgression(progressionData);
+  const upcomingMilestones = Math.max(
+    0,
+    progression.totalMilestones -
+      progression.completedMilestones -
+      progression.inProgressMilestones,
+  );
 
   const recentMilestones = progression.milestones
     .filter((m) => m.status !== 'done')
@@ -480,7 +499,7 @@ export default async function DashboardPage() {
               </div>
               <div className={styles.progressionStat}>
                 <span className={styles.progressionStatValue}>
-                  {progression.totalMilestones - progression.completedMilestones - progression.inProgressMilestones}
+                  {upcomingMilestones}
                 </span>
                 <span className={styles.progressionStatLabel}>A venir</span>
               </div>
