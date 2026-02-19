@@ -43,7 +43,11 @@
       "Bash(node -e:*)",
       "Bash(npx ts-node:*)",
       "Bash(npm run prisma:seed:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "WebFetch(domain:adplist.org)",
+      "WebFetch(domain:mentorcruise.com)",
+      "WebFetch(domain:dribbble.com)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }
