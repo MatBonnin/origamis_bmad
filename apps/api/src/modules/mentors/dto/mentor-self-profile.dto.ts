@@ -143,7 +143,7 @@ export class CreateMentorSelfProfileDto {
   @ApiPropertyOptional({ description: 'URL de la banniere mentor' })
   @IsOptional()
   @IsString()
-  @IsUrl({ require_protocol: true, protocols: ['https'] })
+  @IsUrl({ require_protocol: true, protocols: ['https', 'http'], require_tld: false })
   @MaxLength(500)
   bannerUrl?: string;
 
@@ -278,7 +278,7 @@ export class UpdateMentorSelfProfileDto {
   @ApiPropertyOptional({ description: 'URL de la banniere mentor' })
   @IsOptional()
   @IsString()
-  @IsUrl({ require_protocol: true, protocols: ['https'] })
+  @IsUrl({ require_protocol: true, protocols: ['https', 'http'], require_tld: false })
   @MaxLength(500)
   bannerUrl?: string;
 
