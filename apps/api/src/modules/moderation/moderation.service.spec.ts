@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CommunityService } from '../community';
 import { ContentReportsService } from '../content-reports';
 import { ModerationService } from './moderation.service';
 
@@ -11,16 +10,11 @@ describe('ModerationService', () => {
     addAction: jest.fn(),
   };
 
-  const mockCommunity = {
-    setPostStatus: jest.fn(),
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ModerationService,
         { provide: ContentReportsService, useValue: mockReports },
-        { provide: CommunityService, useValue: mockCommunity },
       ],
     }).compile();
 
@@ -40,11 +34,6 @@ describe('ModerationService', () => {
       { actionType: 'hide', reason: 'Violation' },
     );
 
-    expect(mockCommunity.setPostStatus).toHaveBeenCalledWith(
-      'post-1',
-      'removed',
-      'Violation',
-    );
     expect(result.audit.action).toBe('hide');
   });
 });

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CommunityService } from '../community';
 import { ContentReportsService } from '../content-reports';
 
 export interface AuditLog {
@@ -17,7 +16,6 @@ export class ModerationService {
 
   constructor(
     private readonly reportsService: ContentReportsService,
-    private readonly communityService: CommunityService,
   ) {}
 
   async listPending(user: { id: string; roles: string[] }) {
@@ -37,22 +35,6 @@ export class ModerationService {
       reportId,
       input,
     );
-
-    if (report.targetType === 'post') {
-      if (input.actionType === 'hide') {
-        await this.communityService.setPostStatus(
-          report.targetId,
-          'removed',
-        );
-      }
-
-      if (input.actionType === 'restore') {
-        await this.communityService.setPostStatus(
-          report.targetId,
-          'published',
-        );
-      }
-    }
 
     const log: AuditLog = {
       entity: 'report',
