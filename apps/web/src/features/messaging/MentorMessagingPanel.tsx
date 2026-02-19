@@ -6,6 +6,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/compo
 import styles from './MentorMessagingPanel.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const MESSAGING_API_URL = `${API_URL}/messaging`;
 
 interface ConversationItem {
   conversationId: string;
@@ -104,7 +105,7 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
     setLoadingConversations(true);
     setError('');
     try {
-      const res = await fetch(`${API_URL}/conversations`, {
+      const res = await fetch(`${MESSAGING_API_URL}/conversations`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         cache: 'no-store',
       });
@@ -137,7 +138,7 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
         if (cursor) params.set('cursor', cursor);
 
         const res = await fetch(
-          `${API_URL}/conversations/${conversationId}/messages?${params.toString()}`,
+          `${MESSAGING_API_URL}/conversations/${conversationId}/messages?${params.toString()}`,
           { headers: { Authorization: `Bearer ${accessToken}` }, cache: 'no-store' },
         );
         const result = await res.json();
@@ -222,7 +223,7 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
         metadata.attachmentType = attachment.type;
       }
 
-      const res = await fetch(`${API_URL}/messages`, {
+      const res = await fetch(`${MESSAGING_API_URL}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
