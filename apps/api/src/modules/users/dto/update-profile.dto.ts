@@ -62,7 +62,10 @@ export class UpdateProfileDto {
   })
   @IsOptional()
   @IsString()
-  @IsUrl({}, { message: "L'URL de l'avatar doit être une URL valide" })
+  @IsUrl(
+    { require_tld: false, require_protocol: true },
+    { message: "L'URL de l'avatar doit être une URL valide" },
+  )
   @MaxLength(500, {
     message: "L'URL de l'avatar ne peut pas dépasser 500 caractères",
   })

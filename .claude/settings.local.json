@@ -47,7 +47,8 @@
       "WebFetch(domain:adplist.org)",
       "WebFetch(domain:mentorcruise.com)",
       "WebFetch(domain:dribbble.com)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(xargs ls:*)"
     ]
   }
 }

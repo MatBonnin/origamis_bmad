@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { JSX } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   Button,
@@ -245,6 +246,11 @@ export function MentorSettings({ accessToken }: Props) {
   const [success, setSuccess] = useState('');
   const [activeSection, setActiveSection] = useState<SectionId>('account');
 
+  // Avatar upload
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarError, setAvatarError] = useState('');
+
   // Account data (user info)
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -360,6 +366,86 @@ export function MentorSettings({ accessToken }: Props) {
       setLoading(false);
     }
   }, [accessToken]);
+
+  const handleAvatarUpload = useCallback(
+    async (file: File) => {
+      setAvatarError('');
+      setUploadingAvatar(true);
+
+      try {
+        // Upload de l'image
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const uploadResponse = await fetch(`${API_URL}/upload/image`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${accessToken}` },
+          body: formData,
+        });
+
+        const uploadResult = await uploadResponse.json();
+        if (!uploadResponse.ok || uploadResult.error) {
+          setAvatarError(uploadResult.error?.message || "Erreur lors de l'upload");
+          return;
+        }
+
+        const newAvatarUrl = uploadResult.data.url;
+
+        // Mise à jour du profil utilisateur
+        const updateResponse = await fetch(`${API_URL}/users/me`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ avatarUrl: newAvatarUrl }),
+        });
+
+        const updateResult = await updateResponse.json();
+        if (!updateResponse.ok || updateResult.error) {
+          setAvatarError(updateResult.error?.message || 'Erreur lors de la sauvegarde');
+          return;
+        }
+
+        setAvatarUrl(newAvatarUrl);
+        setSuccess('Photo de profil mise à jour');
+      } catch {
+        setAvatarError('Erreur de connexion au serveur');
+      } finally {
+        setUploadingAvatar(false);
+        if (avatarInputRef.current) {
+          avatarInputRef.current.value = '';
+        }
+      }
+    },
+    [accessToken],
+  );
+
+  const handleAvatarClick = useCallback(() => {
+    if (!uploadingAvatar) {
+      avatarInputRef.current?.click();
+    }
+  }, [uploadingAvatar]);
+
+  const handleAvatarFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        // Vérifier le type
+        if (!file.type.startsWith('image/')) {
+          setAvatarError('Veuillez sélectionner une image');
+          return;
+        }
+        // Vérifier la taille (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          setAvatarError("L'image ne doit pas dépasser 5 Mo");
+          return;
+        }
+        void handleAvatarUpload(file);
+      }
+    },
+    [handleAvatarUpload],
+  );
 
   const saveAccountInfo = async () => {
     setError('');
@@ -861,7 +947,21 @@ export function MentorSettings({ accessToken }: Props) {
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Photo de profil</label>
                 <div className={styles.avatarUpload}>
-                  <div className={styles.avatarPreview}>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={handleAvatarFileChange}
+                    className={styles.hiddenInput}
+                  />
+                  <div
+                    className={`${styles.avatarPreview} ${styles.avatarClickable}`}
+                    onClick={handleAvatarClick}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAvatarClick()}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Modifier la photo de profil"
+                  >
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="Avatar" />
                     ) : (
@@ -869,9 +969,26 @@ export function MentorSettings({ accessToken }: Props) {
                         {fullName ? fullName.charAt(0).toUpperCase() : 'M'}
                       </div>
                     )}
+                    {uploadingAvatar ? (
+                      <div className={styles.avatarUploading}>
+                        <div className={styles.avatarSpinner} />
+                      </div>
+                    ) : (
+                      <div className={styles.avatarOverlay}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                          <circle cx="12" cy="13" r="4" />
+                        </svg>
+                      </div>
+                    )}
                   </div>
                   <div className={styles.avatarActions}>
-                    <p className={styles.avatarHint}>Format recommandé : JPG ou PNG, 400x400px minimum</p>
+                    <p className={styles.avatarHint}>
+                      Cliquez pour modifier - JPG ou PNG, 400x400px min
+                    </p>
+                    {avatarError && (
+                      <p className={styles.avatarError}>{avatarError}</p>
+                    )}
                   </div>
                 </div>
               </div>
