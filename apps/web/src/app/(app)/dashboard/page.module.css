@@ -1,315 +1,521 @@
-.main {
-  padding: var(--spacing-6);
+/* ================================
+   Dashboard - Design inspiré ADPList/MentorCruise
+   ================================ */
+
+.page {
   min-height: 100vh;
-  background: #f8f9fb;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 2rem 1.5rem;
 }
 
 .container {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
-  display: grid;
-  gap: var(--spacing-6, 1.5rem);
 }
 
 /* ── Header ─────────────────────────────────── */
 .header {
-  display: grid;
-  gap: 0.25rem;
+  margin-bottom: 2rem;
 }
 
-.title {
+.greeting {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #1a1a2e;
-  margin: 0;
+  color: #0f172a;
+  margin: 0 0 0.25rem;
 }
 
 .subtitle {
-  color: #6b7280;
+  color: #64748b;
   margin: 0;
+  font-size: 1rem;
 }
 
-/* ── Grid 3 colonnes ─────────────────────────── */
-.grid {
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500));
+  color: white;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+/* ================================
+   MENTOR DASHBOARD
+   ================================ */
+
+/* ── Impact Stats Grid ─────────────────────── */
+.impactGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-  align-items: start;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-@media (max-width: 960px) {
-  .grid {
+@media (max-width: 900px) {
+  .impactGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .impactGrid {
     grid-template-columns: 1fr;
   }
 }
 
-/* ── Card générique ──────────────────────────── */
-.card {
+.impactCard {
   background: white;
-  border-radius: 14px;
-  padding: 1.35rem 1.5rem;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.impactCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.impactIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.impactIcon.sessions { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
+.impactIcon.hours { background: linear-gradient(135deg, #dcfce7, #bbf7d0); }
+.impactIcon.students { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+.impactIcon.rating { background: linear-gradient(135deg, #fce7f3, #fbcfe8); }
+
+.impactContent {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+}
+
+.impactValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.impactLabel {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* ── Main Grid Layout ──────────────────────── */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wideCard {
+  grid-column: span 2;
+}
+
+@media (max-width: 900px) {
+  .wideCard {
+    grid-column: span 1;
+  }
+}
+
+/* ── Card Base ─────────────────────────────── */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .cardHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 1.25rem;
 }
 
 .cardTitle {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #0f172a;
   margin: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.seeAll {
-  font-size: 0.78rem;
-  color: #36529b;
-  text-decoration: none;
-  font-weight: 500;
+.cardTitleIcon {
+  font-size: 1.1rem;
 }
 
-.seeAll:hover {
+.seeAllLink {
+  font-size: 0.8rem;
+  color: var(--color-primary-700);
+  text-decoration: none;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: color 0.2s;
+}
+
+.seeAllLink:hover {
+  color: var(--color-primary-900);
   text-decoration: underline;
 }
 
-.empty {
-  font-size: 0.875rem;
-  color: #9ca3af;
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.5;
+}
+
+.emptyText {
+  color: #94a3b8;
+  font-size: 0.9rem;
   margin: 0;
 }
 
-/* ── Item list ───────────────────────────────── */
-.itemList {
+.emptyAction {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary-700);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.emptyAction:hover {
+  background: var(--color-primary-900);
+}
+
+/* ── Mentees List ──────────────────────────── */
+.menteesList {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: grid;
-  gap: 0;
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-/* ── Rendez-vous ─────────────────────────────── */
+.menteeItem {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  transition: background 0.2s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.menteeItem:hover {
+  background: #f1f5f9;
+}
+
+.menteeAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.menteeInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.menteeName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.125rem;
+}
+
+.menteeMeta {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.menteeBadge {
+  padding: 0.25rem 0.5rem;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.menteeBadge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* ── Requests List ─────────────────────────── */
+.requestsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.requestItem {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+}
+
+.requestAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.requestInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.requestName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.25rem;
+}
+
+.requestDetails {
+  font-size: 0.75rem;
+  color: #78716c;
+}
+
+.requestActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.requestBtn {
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.requestBtn:hover {
+  transform: scale(1.02);
+}
+
+.requestBtn.accept {
+  background: #16a34a;
+  color: white;
+}
+
+.requestBtn.decline {
+  background: white;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+/* ── Bookings List ─────────────────────────── */
+.bookingsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .bookingItem {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 0;
-  border-bottom: 1px solid #f3f4f6;
+  gap: 0.875rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  transition: background 0.2s;
 }
 
-.bookingItem:last-child {
-  border-bottom: none;
+.bookingItem:hover {
+  background: #f1f5f9;
 }
 
 .bookingDate {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #eef2ff;
-  border-radius: 8px;
-  padding: 0.3rem 0.5rem;
-  min-width: 40px;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500));
+  border-radius: 10px;
   flex-shrink: 0;
 }
 
 .bookingDay {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #36529b;
+  color: white;
   line-height: 1.1;
 }
 
 .bookingMonth {
   font-size: 0.6rem;
   text-transform: uppercase;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.85);
   letter-spacing: 0.05em;
 }
 
 .bookingInfo {
-  display: flex;
-  flex-direction: column;
   flex: 1;
   min-width: 0;
 }
 
 .bookingTime {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #1a1a2e;
+  color: #0f172a;
+  margin: 0 0 0.125rem;
 }
 
 .bookingPeer {
   font-size: 0.78rem;
-  color: #6b7280;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: #64748b;
 }
 
-.cardAction {
-  font-size: 0.82rem;
-  color: #36529b;
-  text-decoration: none;
-  font-weight: 500;
-  padding-top: 0.5rem;
-  border-top: 1px solid #f3f4f6;
+.bookingStatus {
+  padding: 0.25rem 0.5rem;
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
-.cardAction:hover {
-  text-decoration: underline;
-}
-
-/* ── Programmes ──────────────────────────────── */
-.programItem {
+/* ── Messages List ─────────────────────────── */
+.messagesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  padding: 0.65rem 0;
-  border-bottom: 1px solid #f3f4f6;
 }
 
-.programItem:last-child {
-  border-bottom: none;
-}
-
-.programInfo {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.5rem;
-}
-
-.programTitle {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #1a1a2e;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.programMeta {
-  font-size: 0.72rem;
-  color: #9ca3af;
-  flex-shrink: 0;
-}
-
-.progressBar {
-  height: 5px;
-  background: #e5e7eb;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.progressFill {
-  height: 100%;
-  background: #36529b;
-  border-radius: 999px;
-}
-
-/* ── CTA card (étudiant) ─────────────────────── */
-.ctaCard {
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
-  border: 1.5px dashed #c7d2fe;
-}
-
-.ctaIcon {
-  font-size: 2rem;
-  line-height: 1;
-}
-
-.ctaText {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0;
-  line-height: 1.5;
-}
-
-.ctaButton {
-  display: inline-block;
-  padding: 0.55rem 1.2rem;
-  background: #36529b;
-  color: white;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.875rem;
-}
-
-.ctaButton:hover {
-  background: #243f84;
-}
-
-/* ── Messages ────────────────────────────────── */
 .messageItem {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.65rem 0;
-  border-bottom: 1px solid #f3f4f6;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .messageItem:last-child {
   border-bottom: none;
 }
 
-.avatar {
-  width: 34px;
-  height: 34px;
+.messageAvatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: #36529b;
+  background: linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500));
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 0.8rem;
+  font-weight: 600;
+  font-size: 0.85rem;
   flex-shrink: 0;
 }
 
-.messageInfo {
+.messageContent {
   flex: 1;
   min-width: 0;
 }
 
-.messageTop {
+.messageHeader {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 0.5rem;
+  margin-bottom: 0.125rem;
 }
 
-.messagePeer {
+.messageName {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #1a1a2e;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: #0f172a;
 }
 
 .messageTime {
-  font-size: 0.72rem;
-  color: #9ca3af;
+  font-size: 0.7rem;
+  color: #94a3b8;
   flex-shrink: 0;
 }
 
 .messagePreview {
-  font-size: 0.78rem;
-  color: #6b7280;
+  font-size: 0.8rem;
+  color: #64748b;
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -319,8 +525,8 @@
 .unreadDot {
   width: 8px;
   height: 8px;
+  background: var(--color-primary-700);
   border-radius: 50%;
-  background: #36529b;
   flex-shrink: 0;
 }
 
@@ -328,41 +534,328 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 4px;
-  border-radius: 999px;
-  background: #36529b;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--color-primary-700);
   color: white;
-  font-size: 0.65rem;
+  border-radius: 100px;
+  font-size: 0.7rem;
   font-weight: 700;
 }
 
-/* ── Liens rapides ───────────────────────────── */
+/* ================================
+   STUDENT DASHBOARD
+   ================================ */
+
+/* ── Progression Card ──────────────────────── */
+.progressionCard {
+  background: linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500));
+  color: white;
+  padding: 1.75rem;
+}
+
+.progressionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.progressionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.progressionSubtitle {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin: 0;
+}
+
+.progressionPercent {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.progressionBar {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.progressionFill {
+  height: 100%;
+  background: white;
+  border-radius: 100px;
+  transition: width 0.5s ease;
+}
+
+.progressionStats {
+  display: flex;
+  gap: 2rem;
+}
+
+.progressionStat {
+  display: flex;
+  flex-direction: column;
+}
+
+.progressionStatValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.progressionStatLabel {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+/* ── My Mentor Card ────────────────────────── */
+.myMentorCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.myMentorAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary-700), var(--color-primary-500));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.myMentorAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.myMentorInfo {
+  flex: 1;
+}
+
+.myMentorLabel {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.myMentorName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.25rem;
+}
+
+.myMentorDomain {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.myMentorActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.myMentorBtn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.15s;
+}
+
+.myMentorBtn:hover {
+  transform: scale(1.02);
+}
+
+.myMentorBtn.primary {
+  background: var(--color-primary-700);
+  color: white;
+}
+
+.myMentorBtn.secondary {
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+}
+
+/* ── Find Mentor CTA ───────────────────────── */
+.findMentorCta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  background: linear-gradient(135deg, var(--color-neutral-50) 0%, var(--color-neutral-100) 100%);
+  border: 2px dashed var(--color-accent-300);
+  text-align: center;
+}
+
+.findMentorIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.findMentorTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 0.5rem;
+}
+
+.findMentorText {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0 0 1.25rem;
+  max-width: 280px;
+}
+
+.findMentorBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--color-accent-500), var(--color-accent-700));
+  color: white;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.findMentorBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(242, 159, 8, 0.4);
+}
+
+/* ── Milestones List ───────────────────────── */
+.milestonesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.milestoneItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.milestoneIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.milestoneIcon.done {
+  background: #dcfce7;
+}
+
+.milestoneIcon.inProgress {
+  background: #dbeafe;
+}
+
+.milestoneIcon.pending {
+  background: #f1f5f9;
+}
+
+.milestoneInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.milestoneTitle {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #0f172a;
+  margin: 0 0 0.125rem;
+}
+
+.milestoneDue {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.milestoneStatus {
+  padding: 0.2rem 0.5rem;
+  border-radius: 100px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.milestoneStatus.done {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.milestoneStatus.inProgress {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.milestoneStatus.pending {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+/* ── Quick Links ───────────────────────────── */
 .quickLinks {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+  margin-top: 1.5rem;
 }
 
 .quickLink {
-  display: inline-block;
-  padding: 0.4rem 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
   background: white;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 0.8rem;
-  color: #374151;
+  color: #475569;
   text-decoration: none;
   font-weight: 500;
-  transition:
-    border-color 0.15s,
-    background 0.15s,
-    color 0.15s;
+  transition: all 0.2s;
 }
 
 .quickLink:hover {
-  border-color: #36529b;
-  background: #eef2ff;
-  color: #36529b;
+  border-color: var(--color-primary-700);
+  background: var(--color-neutral-50);
+  color: var(--color-primary-700);
 }

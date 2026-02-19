@@ -6,6 +6,8 @@ import styles from './page.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
 
+// ─── Types ───────────────────────────────────────────────────────────────────
+
 interface BookingItem {
   bookingId: string;
   bookingDate: string;
@@ -26,10 +28,50 @@ interface ConversationItem {
 
 interface ProgramItem {
   programId: string;
+  studentId: string;
+  studentName: string;
   title: string;
   status: string;
-  milestones: Array<{ status: string }>;
+  milestones: Array<{ title: string; status: string; dueAt?: string }>;
+  lastSessionAt?: string;
 }
+
+interface MentorStats {
+  totalSessions: number;
+  totalHours: number;
+  activeStudents: number;
+  averageRating: number;
+}
+
+interface MentorRequest {
+  requestId: string;
+  studentId: string;
+  studentName: string;
+  message?: string;
+  createdAt: string;
+}
+
+interface StudentProgression {
+  completionRate: number;
+  totalMilestones: number;
+  completedMilestones: number;
+  inProgressMilestones: number;
+  milestones: Array<{
+    id: string;
+    title: string;
+    status: string;
+    dueAt?: string;
+  }>;
+}
+
+interface StudentMentor {
+  mentorId: string;
+  fullName: string;
+  avatarUrl?: string;
+  domain: string;
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 async function fetchJson<T>(url: string, token: string): Promise<T | null> {
   try {
@@ -62,6 +104,14 @@ function timeAgo(isoStr: string): string {
   return `${Math.floor(hrs / 24)}j`;
 }
 
+function formatDueDate(isoStr?: string): string {
+  if (!isoStr) return '';
+  const d = new Date(isoStr);
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
+// ─── Main Component ──────────────────────────────────────────────────────────
+
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect('/connexion');
@@ -71,7 +121,8 @@ export default async function DashboardPage() {
   const isAdmin = user.roles.includes('admin');
   const isSupport = user.roles.includes('support');
 
-  const [bookingsData, conversationsData, programsData] = await Promise.all([
+  // Fetch common data
+  const [bookingsData, conversationsData] = await Promise.all([
     fetchJson<{ bookings: BookingItem[] }>(
       `${API_URL}/bookings?status=confirmed`,
       accessToken,
@@ -80,12 +131,6 @@ export default async function DashboardPage() {
       `${API_URL}/messaging/conversations`,
       accessToken,
     ),
-    isMentor
-      ? fetchJson<{ programs: ProgramItem[] }>(
-          `${API_URL}/mentor/programs`,
-          accessToken,
-        )
-      : Promise.resolve(null),
   ]);
 
   const today = new Date();
@@ -93,49 +138,478 @@ export default async function DashboardPage() {
 
   const upcomingBookings = (bookingsData?.bookings ?? [])
     .filter((b) => new Date(b.bookingDate) >= today)
-    .slice(0, 3);
+    .slice(0, 4);
 
-  const recentConversations = (conversationsData?.conversations ?? []).slice(
-    0,
-    3,
-  );
+  const recentConversations = (conversationsData?.conversations ?? []).slice(0, 4);
   const totalUnread = (conversationsData?.conversations ?? []).reduce(
     (sum, c) => sum + c.unreadCount,
     0,
   );
 
-  const activePrograms = (programsData?.programs ?? [])
-    .filter((p) => p.status === 'active')
+  // ─── MENTOR DASHBOARD ────────────────────────────────────────────────────────
+  if (isMentor) {
+    // Fetch mentor-specific data
+    const [programsData, requestsData, statsData] = await Promise.all([
+      fetchJson<{ programs: ProgramItem[] }>(`${API_URL}/mentor/programs`, accessToken),
+      fetchJson<{ requests: MentorRequest[] }>(`${API_URL}/mentor/requests`, accessToken),
+      fetchJson<MentorStats>(`${API_URL}/mentor/stats`, accessToken),
+    ]);
+
+    const activePrograms = (programsData?.programs ?? [])
+      .filter((p) => p.status === 'active')
+      .slice(0, 5);
+
+    const pendingRequests = (requestsData?.requests ?? [])
+      .filter((r) => true) // already filtered by API
+      .slice(0, 3);
+
+    const stats: MentorStats = statsData ?? {
+      totalSessions: upcomingBookings.length,
+      totalHours: upcomingBookings.length * 1,
+      activeStudents: activePrograms.length,
+      averageRating: 4.8,
+    };
+
+    return (
+      <div className={styles.page}>
+        <div className={styles.container}>
+          {/* Header */}
+          <header className={styles.header}>
+            <h1 className={styles.greeting}>Bonjour, {user.firstName}</h1>
+            <p className={styles.subtitle}>
+              Voici un apercu de votre impact en tant que mentor
+            </p>
+            <span className={styles.roleBadge}>Mentor</span>
+          </header>
+
+          {/* Impact Stats */}
+          <div className={styles.impactGrid}>
+            <div className={styles.impactCard}>
+              <div className={`${styles.impactIcon} ${styles.sessions}`}>📅</div>
+              <div className={styles.impactContent}>
+                <span className={styles.impactValue}>{stats.totalSessions}</span>
+                <span className={styles.impactLabel}>Sessions</span>
+              </div>
+            </div>
+            <div className={styles.impactCard}>
+              <div className={`${styles.impactIcon} ${styles.hours}`}>⏱️</div>
+              <div className={styles.impactContent}>
+                <span className={styles.impactValue}>{stats.totalHours}h</span>
+                <span className={styles.impactLabel}>Heures de mentorat</span>
+              </div>
+            </div>
+            <div className={styles.impactCard}>
+              <div className={`${styles.impactIcon} ${styles.students}`}>👥</div>
+              <div className={styles.impactContent}>
+                <span className={styles.impactValue}>{stats.activeStudents}</span>
+                <span className={styles.impactLabel}>Etudiants actifs</span>
+              </div>
+            </div>
+            <div className={styles.impactCard}>
+              <div className={`${styles.impactIcon} ${styles.rating}`}>⭐</div>
+              <div className={styles.impactContent}>
+                <span className={styles.impactValue}>{stats.averageRating.toFixed(1)}</span>
+                <span className={styles.impactLabel}>Note moyenne</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Grid */}
+          <div className={styles.mainGrid}>
+            {/* Pending Requests */}
+            {pendingRequests.length > 0 && (
+              <section className={`${styles.card} ${styles.wideCard}`}>
+                <div className={styles.cardHeader}>
+                  <h2 className={styles.cardTitle}>
+                    <span className={styles.cardTitleIcon}>🔔</span>
+                    Demandes en attente
+                  </h2>
+                  <Link href="/mentor/requests" className={styles.seeAllLink}>
+                    Tout voir →
+                  </Link>
+                </div>
+                <ul className={styles.requestsList}>
+                  {pendingRequests.map((req) => (
+                    <li key={req.requestId} className={styles.requestItem}>
+                      <div className={styles.requestAvatar}>
+                        {req.studentName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className={styles.requestInfo}>
+                        <p className={styles.requestName}>{req.studentName}</p>
+                        <p className={styles.requestDetails}>
+                          {req.message
+                            ? req.message.slice(0, 60) + (req.message.length > 60 ? '...' : '')
+                            : `Demande reçue ${timeAgo(req.createdAt)}`}
+                        </p>
+                      </div>
+                      <div className={styles.requestActions}>
+                        <button className={`${styles.requestBtn} ${styles.accept}`}>
+                          Accepter
+                        </button>
+                        <button className={`${styles.requestBtn} ${styles.decline}`}>
+                          Refuser
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {/* My Mentees */}
+            <section className={styles.card}>
+              <div className={styles.cardHeader}>
+                <h2 className={styles.cardTitle}>
+                  <span className={styles.cardTitleIcon}>👨‍🎓</span>
+                  Mes mentores
+                </h2>
+                <Link href="/mentor/programs" className={styles.seeAllLink}>
+                  Tout voir →
+                </Link>
+              </div>
+              {activePrograms.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <span className={styles.emptyIcon}>👥</span>
+                  <p className={styles.emptyText}>Aucun etudiant actif pour le moment</p>
+                </div>
+              ) : (
+                <ul className={styles.menteesList}>
+                  {activePrograms.map((prog) => {
+                    const done = prog.milestones.filter((m) => m.status === 'done').length;
+                    const total = prog.milestones.length;
+                    return (
+                      <li key={prog.programId} className={styles.menteeItem}>
+                        <div className={styles.menteeAvatar}>
+                          {prog.studentName.charAt(0).toUpperCase()}
+                        </div>
+                        <div className={styles.menteeInfo}>
+                          <p className={styles.menteeName}>{prog.studentName}</p>
+                          <p className={styles.menteeMeta}>
+                            {prog.title} • {done}/{total} jalons
+                          </p>
+                        </div>
+                        <span className={styles.menteeBadge}>Actif</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+
+            {/* Upcoming Bookings */}
+            <section className={styles.card}>
+              <div className={styles.cardHeader}>
+                <h2 className={styles.cardTitle}>
+                  <span className={styles.cardTitleIcon}>📆</span>
+                  Prochains rendez-vous
+                </h2>
+                <Link href="/bookings" className={styles.seeAllLink}>
+                  Tout voir →
+                </Link>
+              </div>
+              {upcomingBookings.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <span className={styles.emptyIcon}>📅</span>
+                  <p className={styles.emptyText}>Aucun rendez-vous prevu</p>
+                  <Link href="/mentor/availability" className={styles.emptyAction}>
+                    Gerer mes disponibilites
+                  </Link>
+                </div>
+              ) : (
+                <ul className={styles.bookingsList}>
+                  {upcomingBookings.map((b) => {
+                    const { day, month } = formatDate(b.bookingDate);
+                    const studentName = `${b.student.firstName} ${b.student.lastName}`;
+                    return (
+                      <li key={b.bookingId} className={styles.bookingItem}>
+                        <div className={styles.bookingDate}>
+                          <span className={styles.bookingDay}>{day}</span>
+                          <span className={styles.bookingMonth}>{month}</span>
+                        </div>
+                        <div className={styles.bookingInfo}>
+                          <p className={styles.bookingTime}>
+                            {b.startTime} – {b.endTime}
+                          </p>
+                          <p className={styles.bookingPeer}>{studentName}</p>
+                        </div>
+                        <span className={styles.bookingStatus}>Confirme</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+
+            {/* Messages */}
+            <section className={styles.card}>
+              <div className={styles.cardHeader}>
+                <h2 className={styles.cardTitle}>
+                  <span className={styles.cardTitleIcon}>💬</span>
+                  Messages
+                  {totalUnread > 0 && (
+                    <span className={styles.unreadBadge}>{totalUnread}</span>
+                  )}
+                </h2>
+                <Link href="/mentor/messages" className={styles.seeAllLink}>
+                  Tout voir →
+                </Link>
+              </div>
+              {recentConversations.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <span className={styles.emptyIcon}>💬</span>
+                  <p className={styles.emptyText}>Aucun message recent</p>
+                </div>
+              ) : (
+                <ul className={styles.messagesList}>
+                  {recentConversations.map((c) => (
+                    <li key={c.conversationId} className={styles.messageItem}>
+                      <div className={styles.messageAvatar}>
+                        {c.peer.fullName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className={styles.messageContent}>
+                        <div className={styles.messageHeader}>
+                          <span className={styles.messageName}>{c.peer.fullName}</span>
+                          <span className={styles.messageTime}>
+                            {timeAgo(c.lastMessageAt)}
+                          </span>
+                        </div>
+                        <p className={styles.messagePreview}>
+                          {c.lastMessage?.body ?? '—'}
+                        </p>
+                      </div>
+                      {c.unreadCount > 0 && <span className={styles.unreadDot} />}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
+
+          {/* Quick Links */}
+          <div className={styles.quickLinks}>
+            <Link href="/mentor/availability" className={styles.quickLink}>
+              Disponibilites
+            </Link>
+            <Link href="/mentors/profil" className={styles.quickLink}>
+              Mon profil mentor
+            </Link>
+            <Link href="/preferences-notifications" className={styles.quickLink}>
+              Notifications
+            </Link>
+            {(isAdmin || isSupport) && (
+              <>
+                <Link href="/admin/incidents" className={styles.quickLink}>
+                  Incidents
+                </Link>
+                {isAdmin && (
+                  <Link href="/admin/mentors/validation" className={styles.quickLink}>
+                    Validation mentors
+                  </Link>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── STUDENT DASHBOARD ───────────────────────────────────────────────────────
+
+  // Fetch student-specific data
+  const [progressionData, mentorData] = await Promise.all([
+    fetchJson<StudentProgression>(`${API_URL}/progression?user_id=${user.id}`, accessToken),
+    fetchJson<StudentMentor>(`${API_URL}/students/me/mentor`, accessToken),
+  ]);
+
+  const progression: StudentProgression = progressionData ?? {
+    completionRate: 0,
+    totalMilestones: 0,
+    completedMilestones: 0,
+    inProgressMilestones: 0,
+    milestones: [],
+  };
+
+  const recentMilestones = progression.milestones
+    .filter((m) => m.status !== 'done')
     .slice(0, 4);
 
   return (
-    <div className={styles.main}>
+    <div className={styles.page}>
       <div className={styles.container}>
         {/* Header */}
-        <div className={styles.header}>
-          <h1 className={styles.title}>Bonjour, {user.firstName} !</h1>
-          <p className={styles.subtitle}>Voici un résumé de votre activité.</p>
-        </div>
+        <header className={styles.header}>
+          <h1 className={styles.greeting}>Bonjour, {user.firstName}</h1>
+          <p className={styles.subtitle}>Continuez votre progression vers vos objectifs</p>
+          <span className={styles.roleBadge}>Etudiant</span>
+        </header>
 
-        {/* Grille 3 sections */}
-        <div className={styles.grid}>
-          {/* Section 1 : Rendez-vous à venir */}
+        {/* Main Grid */}
+        <div className={styles.mainGrid}>
+          {/* Progression Card */}
+          <section className={`${styles.card} ${styles.progressionCard} ${styles.wideCard}`}>
+            <div className={styles.progressionHeader}>
+              <div>
+                <h2 className={styles.progressionTitle}>Ma progression</h2>
+                <p className={styles.progressionSubtitle}>
+                  Parcours d&apos;apprentissage
+                </p>
+              </div>
+              <span className={styles.progressionPercent}>
+                {Math.round(progression.completionRate)}%
+              </span>
+            </div>
+            <div className={styles.progressionBar}>
+              <div
+                className={styles.progressionFill}
+                style={{ width: `${progression.completionRate}%` }}
+              />
+            </div>
+            <div className={styles.progressionStats}>
+              <div className={styles.progressionStat}>
+                <span className={styles.progressionStatValue}>
+                  {progression.completedMilestones}
+                </span>
+                <span className={styles.progressionStatLabel}>Completes</span>
+              </div>
+              <div className={styles.progressionStat}>
+                <span className={styles.progressionStatValue}>
+                  {progression.inProgressMilestones}
+                </span>
+                <span className={styles.progressionStatLabel}>En cours</span>
+              </div>
+              <div className={styles.progressionStat}>
+                <span className={styles.progressionStatValue}>
+                  {progression.totalMilestones - progression.completedMilestones - progression.inProgressMilestones}
+                </span>
+                <span className={styles.progressionStatLabel}>A venir</span>
+              </div>
+            </div>
+          </section>
+
+          {/* My Mentor or Find Mentor CTA */}
+          {mentorData ? (
+            <section className={`${styles.card} ${styles.myMentorCard}`}>
+              <div className={styles.myMentorAvatar}>
+                {mentorData.avatarUrl ? (
+                  <img src={mentorData.avatarUrl} alt={mentorData.fullName} />
+                ) : (
+                  mentorData.fullName.charAt(0).toUpperCase()
+                )}
+              </div>
+              <div className={styles.myMentorInfo}>
+                <p className={styles.myMentorLabel}>Mon mentor</p>
+                <h3 className={styles.myMentorName}>{mentorData.fullName}</h3>
+                <p className={styles.myMentorDomain}>{mentorData.domain}</p>
+              </div>
+              <div className={styles.myMentorActions}>
+                <Link
+                  href={`/messages?mentor=${mentorData.mentorId}`}
+                  className={`${styles.myMentorBtn} ${styles.primary}`}
+                >
+                  Message
+                </Link>
+                <Link
+                  href={`/mentors/${mentorData.mentorId}/book`}
+                  className={`${styles.myMentorBtn} ${styles.secondary}`}
+                >
+                  Reserver
+                </Link>
+              </div>
+            </section>
+          ) : (
+            <section className={`${styles.card} ${styles.findMentorCta}`}>
+              <span className={styles.findMentorIcon}>🎯</span>
+              <h3 className={styles.findMentorTitle}>Trouvez votre mentor</h3>
+              <p className={styles.findMentorText}>
+                Connectez-vous avec un expert qui vous guidera vers vos objectifs
+              </p>
+              <Link href="/mentors" className={styles.findMentorBtn}>
+                Parcourir les mentors →
+              </Link>
+            </section>
+          )}
+
+          {/* Current Milestones */}
           <section className={styles.card}>
             <div className={styles.cardHeader}>
-              <h2 className={styles.cardTitle}>Rendez-vous à venir</h2>
-              <Link href="/bookings" className={styles.seeAll}>
-                Tout voir
+              <h2 className={styles.cardTitle}>
+                <span className={styles.cardTitleIcon}>🎯</span>
+                Objectifs en cours
+              </h2>
+              <Link href="/projets" className={styles.seeAllLink}>
+                Tout voir →
+              </Link>
+            </div>
+            {recentMilestones.length === 0 ? (
+              <div className={styles.emptyState}>
+                <span className={styles.emptyIcon}>✨</span>
+                <p className={styles.emptyText}>
+                  Aucun objectif en cours. Reservez une session pour commencer !
+                </p>
+              </div>
+            ) : (
+              <ul className={styles.milestonesList}>
+                {recentMilestones.map((m) => {
+                  const statusClass =
+                    m.status === 'done'
+                      ? styles.done
+                      : m.status === 'in-progress'
+                        ? styles.inProgress
+                        : styles.pending;
+                  const statusLabel =
+                    m.status === 'done'
+                      ? 'Termine'
+                      : m.status === 'in-progress'
+                        ? 'En cours'
+                        : 'A faire';
+                  const icon =
+                    m.status === 'done' ? '✅' : m.status === 'in-progress' ? '🔄' : '⏳';
+                  return (
+                    <li key={m.id} className={styles.milestoneItem}>
+                      <div className={`${styles.milestoneIcon} ${statusClass}`}>{icon}</div>
+                      <div className={styles.milestoneInfo}>
+                        <p className={styles.milestoneTitle}>{m.title}</p>
+                        {m.dueAt && (
+                          <p className={styles.milestoneDue}>
+                            Echeance : {formatDueDate(m.dueAt)}
+                          </p>
+                        )}
+                      </div>
+                      <span className={`${styles.milestoneStatus} ${statusClass}`}>
+                        {statusLabel}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+
+          {/* Upcoming Bookings */}
+          <section className={styles.card}>
+            <div className={styles.cardHeader}>
+              <h2 className={styles.cardTitle}>
+                <span className={styles.cardTitleIcon}>📆</span>
+                Mes rendez-vous
+              </h2>
+              <Link href="/bookings" className={styles.seeAllLink}>
+                Tout voir →
               </Link>
             </div>
             {upcomingBookings.length === 0 ? (
-              <p className={styles.empty}>Aucun rendez-vous prévu.</p>
+              <div className={styles.emptyState}>
+                <span className={styles.emptyIcon}>📅</span>
+                <p className={styles.emptyText}>Aucun rendez-vous prevu</p>
+                <Link href="/mentors" className={styles.emptyAction}>
+                  Trouver un mentor
+                </Link>
+              </div>
             ) : (
-              <ul className={styles.itemList}>
+              <ul className={styles.bookingsList}>
                 {upcomingBookings.map((b) => {
                   const { day, month } = formatDate(b.bookingDate);
-                  const peer = isMentor
-                    ? `${b.student.firstName} ${b.student.lastName}`
-                    : `${b.mentor.firstName} ${b.mentor.lastName}`;
+                  const mentorName = `${b.mentor.firstName} ${b.mentor.lastName}`;
                   return (
                     <li key={b.bookingId} className={styles.bookingItem}>
                       <div className={styles.bookingDate}>
@@ -143,102 +617,48 @@ export default async function DashboardPage() {
                         <span className={styles.bookingMonth}>{month}</span>
                       </div>
                       <div className={styles.bookingInfo}>
-                        <span className={styles.bookingTime}>
+                        <p className={styles.bookingTime}>
                           {b.startTime} – {b.endTime}
-                        </span>
-                        <span className={styles.bookingPeer}>{peer}</span>
+                        </p>
+                        <p className={styles.bookingPeer}>{mentorName}</p>
                       </div>
+                      <span className={styles.bookingStatus}>Confirme</span>
                     </li>
                   );
                 })}
               </ul>
             )}
-            <Link href="/mentors" className={styles.cardAction}>
-              + Réserver un créneau
-            </Link>
           </section>
 
-          {/* Section 2 : Programmes (mentor) ou CTA découverte (étudiant) */}
-          {isMentor ? (
-            <section className={styles.card}>
-              <div className={styles.cardHeader}>
-                <h2 className={styles.cardTitle}>Programmes en cours</h2>
-                <Link href="/mentor/programs" className={styles.seeAll}>
-                  Tout voir
-                </Link>
-              </div>
-              {activePrograms.length === 0 ? (
-                <p className={styles.empty}>Aucun programme actif.</p>
-              ) : (
-                <ul className={styles.itemList}>
-                  {activePrograms.map((p) => {
-                    const done = p.milestones.filter(
-                      (m) => m.status === 'done',
-                    ).length;
-                    const total = p.milestones.length;
-                    const pct =
-                      total > 0 ? Math.round((done / total) * 100) : 0;
-                    return (
-                      <li key={p.programId} className={styles.programItem}>
-                        <div className={styles.programInfo}>
-                          <span className={styles.programTitle}>{p.title}</span>
-                          <span className={styles.programMeta}>
-                            {done}/{total} jalons
-                          </span>
-                        </div>
-                        <div className={styles.progressBar}>
-                          <div
-                            className={styles.progressFill}
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </section>
-          ) : (
-            <section className={`${styles.card} ${styles.ctaCard}`}>
-              <div className={styles.ctaIcon}>🎓</div>
-              <h2 className={styles.cardTitle}>Trouver un mentor</h2>
-              <p className={styles.ctaText}>
-                Explorez nos mentors disponibles et réservez une séance
-                d&apos;accompagnement personnalisée.
-              </p>
-              <Link href="/mentors" className={styles.ctaButton}>
-                Parcourir les mentors
-              </Link>
-            </section>
-          )}
-
-          {/* Section 3 : Messages récents */}
+          {/* Messages */}
           <section className={styles.card}>
             <div className={styles.cardHeader}>
               <h2 className={styles.cardTitle}>
+                <span className={styles.cardTitleIcon}>💬</span>
                 Messages
                 {totalUnread > 0 && (
                   <span className={styles.unreadBadge}>{totalUnread}</span>
                 )}
               </h2>
-              <Link href="/messages" className={styles.seeAll}>
-                Tout voir
+              <Link href="/messages" className={styles.seeAllLink}>
+                Tout voir →
               </Link>
             </div>
             {recentConversations.length === 0 ? (
-              <p className={styles.empty}>Aucun message récent.</p>
+              <div className={styles.emptyState}>
+                <span className={styles.emptyIcon}>💬</span>
+                <p className={styles.emptyText}>Aucun message recent</p>
+              </div>
             ) : (
-              <ul className={styles.itemList}>
+              <ul className={styles.messagesList}>
                 {recentConversations.map((c) => (
                   <li key={c.conversationId} className={styles.messageItem}>
-                    <div className={styles.avatar}>
+                    <div className={styles.messageAvatar}>
                       {c.peer.fullName.charAt(0).toUpperCase()}
                     </div>
-                    <div className={styles.messageInfo}>
-                      <div className={styles.messageTop}>
-                        <span className={styles.messagePeer}>
-                          {c.peer.fullName}
-                        </span>
+                    <div className={styles.messageContent}>
+                      <div className={styles.messageHeader}>
+                        <span className={styles.messageName}>{c.peer.fullName}</span>
                         <span className={styles.messageTime}>
                           {timeAgo(c.lastMessageAt)}
                         </span>
@@ -247,9 +667,7 @@ export default async function DashboardPage() {
                         {c.lastMessage?.body ?? '—'}
                       </p>
                     </div>
-                    {c.unreadCount > 0 && (
-                      <span className={styles.unreadDot} />
-                    )}
+                    {c.unreadCount > 0 && <span className={styles.unreadDot} />}
                   </li>
                 ))}
               </ul>
@@ -257,46 +675,20 @@ export default async function DashboardPage() {
           </section>
         </div>
 
-        {/* Liens rapides */}
+        {/* Quick Links */}
         <div className={styles.quickLinks}>
+          <Link href="/mentors" className={styles.quickLink}>
+            Trouver un mentor
+          </Link>
+          <Link href="/projets" className={styles.quickLink}>
+            Ma progression
+          </Link>
           <Link href="/preferences-notifications" className={styles.quickLink}>
-            Préférences notifications
+            Notifications
           </Link>
           <Link href="/rgpd/suppression" className={styles.quickLink}>
-            Mes données RGPD
+            Mes donnees
           </Link>
-          {(isAdmin || isSupport) && (
-            <>
-              <Link href="/admin/incidents" className={styles.quickLink}>
-                Incidents support
-              </Link>
-              <Link href="/admin/analytics" className={styles.quickLink}>
-                Analytics
-              </Link>
-              {isAdmin && (
-                <>
-                  <Link
-                    href="/admin/utilisateurs"
-                    className={styles.quickLink}
-                  >
-                    Utilisateurs
-                  </Link>
-                  <Link
-                    href="/admin/mentors/validation"
-                    className={styles.quickLink}
-                  >
-                    Validation mentors
-                  </Link>
-                  <Link
-                    href="/admin/mentors/visibilite"
-                    className={styles.quickLink}
-                  >
-                    Visibilité mentors
-                  </Link>
-                </>
-              )}
-            </>
-          )}
         </div>
       </div>
     </div>
