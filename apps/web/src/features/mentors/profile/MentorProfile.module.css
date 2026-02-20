@@ -1,187 +1,814 @@
-.container {
-  padding: var(--spacing-6);
-  display: grid;
-  gap: var(--spacing-5);
-}
+/* ================================
+   Page de Profil Mentor - Design Moderne
+   Inspiré de ADPList & MentorCruise
+   ================================ */
 
-.header {
-  display: grid;
-  gap: var(--spacing-2);
-}
-
-.title {
-  margin: 0;
-  color: var(--color-primary-900);
-  font-size: var(--font-size-3xl);
-}
-
-.subtitle {
-  margin: 0;
-  color: var(--color-primary-700);
-}
-
-.skeletonCard {
-  height: 220px;
-  border-radius: var(--radius-2xl);
-  background: linear-gradient(
-    90deg,
-    var(--color-neutral-100) 0%,
-    var(--color-neutral-50) 50%,
-    var(--color-neutral-100) 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.2s linear infinite;
-}
-
-.liveRegion {
-  min-height: var(--spacing-6);
-  margin: 0;
-}
-
-.error {
-  border: 1px solid var(--color-error);
-  background: var(--color-error-light);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-3);
-  color: var(--color-error);
-}
-
-.bio {
-  margin: 0 0 var(--spacing-4) 0;
-  color: var(--color-neutral-700);
-}
-
-.meta {
-  margin: 0;
-  display: grid;
-  gap: var(--spacing-2);
-}
-
-.meta div {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--spacing-3);
-}
-
-.meta dt {
-  color: var(--color-neutral-700);
-}
-
-.meta dd {
-  margin: 0;
-  color: var(--color-primary-900);
-}
-
-.actions {
-  margin-top: var(--spacing-4);
-  display: flex;
-  gap: var(--spacing-3);
-  flex-wrap: wrap;
-}
-
-.twoColumns {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--spacing-4);
-}
-
-.tags {
-  display: flex;
-  gap: var(--spacing-2);
-  flex-wrap: wrap;
-}
-
-.tag {
-  border: 1px solid var(--color-neutral-200);
-  border-radius: var(--radius-full);
-  padding: var(--spacing-1) var(--spacing-2);
-  color: var(--color-neutral-700);
-  font-size: var(--font-size-sm);
-}
-
-.fallback {
-  color: var(--color-neutral-700);
-}
-
-.review {
-  border: 1px solid var(--color-neutral-200);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-3);
-  margin-bottom: var(--spacing-3);
+/* Container principal */
+.pageContainer {
+  min-height: 100vh;
   background: var(--color-neutral-50);
 }
 
-.review:last-child {
-  margin-bottom: 0;
+/* ================================
+   Hero Section
+   ================================ */
+.heroSection {
+  position: relative;
+  margin-bottom: var(--spacing-8);
 }
 
-.reviewHeader,
-.reviewComment,
-.reviewMeta {
-  margin: 0;
+.heroBanner {
+  height: 280px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
 }
 
-.reviewComment {
-  margin-top: var(--spacing-2);
+.bannerOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+}
+
+.heroContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-6);
+  display: flex;
+  gap: var(--spacing-8);
+  margin-top: -80px;
+  position: relative;
+  z-index: 10;
+}
+
+.avatarWrapper {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.avatar {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 4px solid white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 4px solid white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-primary-500) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  font-weight: 600;
+  color: white;
+}
+
+.heroInfo {
+  flex: 1;
+  padding-top: 90px;
+}
+
+.mentorName {
+  margin: 0 0 var(--spacing-1) 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-primary-900);
+  line-height: 1.2;
+}
+
+.mentorDomain {
+  margin: 0 0 var(--spacing-3) 0;
+  font-size: 1.25rem;
+  color: var(--color-neutral-600);
+  font-weight: 500;
+}
+
+.ratingRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-4);
+}
+
+.ratingText {
+  font-size: 1rem;
   color: var(--color-neutral-700);
+  font-weight: 500;
 }
 
-.reviewMeta {
-  margin-top: var(--spacing-2);
-  font-size: var(--font-size-sm);
+.heroBio {
+  margin: 0 0 var(--spacing-5) 0;
+  font-size: 1.1rem;
   color: var(--color-neutral-700);
+  line-height: 1.6;
+  max-width: 600px;
 }
 
-.reviewForm {
-  margin-top: var(--spacing-3);
-  border-top: 1px solid var(--color-neutral-200);
-  padding-top: var(--spacing-3);
+.heroActions {
+  display: flex;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-4);
+  flex-wrap: wrap;
+}
+
+.priceTag {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--spacing-1);
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1px solid #86efac;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-2) var(--spacing-4);
+}
+
+.priceAmount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #166534;
+}
+
+.priceUnit {
+  font-size: 0.9rem;
+  color: #15803d;
+}
+
+/* ================================
+   Badges de disponibilité
+   ================================ */
+.availabilityBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.availableNow {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.availableLater {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.unavailable {
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-600);
+}
+
+.availabilityDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.availabilityDotLater {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+/* ================================
+   Étoiles de notation
+   ================================ */
+.starRating {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.star {
+  display: inline-block;
+  line-height: 1;
+}
+
+.starFilled {
+  color: #fbbf24;
+}
+
+.starHalf {
+  color: #fbbf24;
+  opacity: 0.5;
+}
+
+.starEmpty {
+  color: #e5e7eb;
+}
+
+.starsm {
+  font-size: 14px;
+}
+
+.starmd {
+  font-size: 18px;
+}
+
+.starlg {
+  font-size: 22px;
+}
+
+/* ================================
+   Contenu principal
+   ================================ */
+.mainContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-6) var(--spacing-10);
+}
+
+.contentGrid {
   display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--spacing-6);
+  align-items: start;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+}
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+}
+
+.card {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.sectionTitle {
+  margin: 0 0 var(--spacing-4) 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-primary-900);
+}
+
+.subsectionTitle {
+  margin: var(--spacing-5) 0 var(--spacing-3) 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-neutral-700);
+}
+
+/* ================================
+   À propos
+   ================================ */
+.aboutText {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-neutral-700);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+/* ================================
+   Compétences
+   ================================ */
+.skillsGrid {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--spacing-2);
 }
 
-.reviewFormTitle {
+.skillTag {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-2) var(--spacing-3);
+  background: linear-gradient(135deg, var(--color-accent-300) 0%, #fde68a 100%);
+  color: var(--color-accent-700);
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.skillTag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(242, 159, 8, 0.3);
+}
+
+.keywordsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.keyword {
+  color: var(--color-primary-600);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.emptyState {
   margin: 0;
+  color: var(--color-neutral-500);
+  font-style: italic;
+}
+
+/* ================================
+   Avis
+   ================================ */
+.reviewsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-4);
+}
+
+.reviewCount {
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.reviewsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.reviewCard {
+  padding: var(--spacing-4);
+  background: var(--color-neutral-50);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-neutral-100);
+}
+
+.reviewHeader {
+  display: flex;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-3);
+}
+
+.reviewAuthorAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.reviewAuthorInfo {
+  flex: 1;
+}
+
+.reviewAuthorName {
+  display: block;
+  font-weight: 600;
+  color: var(--color-primary-900);
+  margin-bottom: var(--spacing-1);
+}
+
+.reviewMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  flex-wrap: wrap;
+}
+
+.reviewDate {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: 0.85rem;
+  color: var(--color-neutral-500);
+}
+
+.reviewDate svg {
+  opacity: 0.7;
+}
+
+.reviewBody {
+  margin: 0;
+  color: var(--color-neutral-700);
+  line-height: 1.6;
+}
+
+/* Formulaire d'avis */
+.reviewForm {
+  margin-top: var(--spacing-6);
+  padding-top: var(--spacing-5);
+  border-top: 1px solid var(--color-neutral-200);
+}
+
+.reviewFormTitle {
+  margin: 0 0 var(--spacing-4) 0;
+  font-size: 1.1rem;
+  font-weight: 600;
   color: var(--color-primary-900);
 }
 
-.reviewFormLabel {
-  display: grid;
-  gap: var(--spacing-1);
-  color: var(--color-neutral-700);
-  font-size: var(--font-size-sm);
+.ratingInput {
+  margin-bottom: var(--spacing-4);
 }
 
-.reviewInput,
+.ratingInputLabel {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--color-neutral-600);
+  margin-bottom: var(--spacing-2);
+}
+
+.ratingStars {
+  display: flex;
+  gap: var(--spacing-1);
+}
+
+.ratingStar {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #e5e7eb;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.ratingStar:hover {
+  transform: scale(1.1);
+}
+
+.ratingStarActive {
+  color: #fbbf24;
+}
+
 .reviewTextarea {
   width: 100%;
-  border-radius: var(--radius-md);
+  padding: var(--spacing-3);
   border: 1px solid var(--color-neutral-300);
-  padding: var(--spacing-2);
-  font-size: var(--font-size-base);
-  background: var(--color-neutral-0);
+  border-radius: var(--radius-lg);
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: var(--spacing-4);
+}
+
+.reviewTextarea:focus {
+  outline: none;
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.reviewTextarea::placeholder {
+  color: var(--color-neutral-400);
+}
+
+.formError {
+  margin: 0 0 var(--spacing-3) 0;
+  color: var(--color-error);
+  font-size: 0.9rem;
+}
+
+/* ================================
+   Sidebar - Informations
+   ================================ */
+.infoList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.infoItem {
+  display: flex;
+  gap: var(--spacing-3);
+}
+
+.infoIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-lg);
+  background: var(--color-neutral-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-700);
+  flex-shrink: 0;
+}
+
+.infoContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.infoLabel {
+  font-size: 0.85rem;
+  color: var(--color-neutral-500);
+}
+
+.infoValue {
+  font-size: 0.95rem;
+  color: var(--color-primary-900);
+  font-weight: 500;
+}
+
+.supportTypes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-1);
+}
+
+.supportTypeBadge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.linkedinLink {
+  color: #0077b5;
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.linkedinLink:hover {
+  color: #005885;
+  text-decoration: underline;
+}
+
+/* Niveaux accompagnés */
+.levelsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.levelBadge {
+  display: inline-block;
+  padding: var(--spacing-2) var(--spacing-3);
+  background: linear-gradient(135deg, var(--color-neutral-100) 0%, var(--color-neutral-50) 100%);
+  color: var(--color-primary-700);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* CTA Sticky */
+.stickyCta {
+  position: sticky;
+  top: var(--spacing-6);
+}
+
+.stickyCtaContent {
+  padding: var(--spacing-5);
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-neutral-100);
+}
+
+.stickyCtaPrice {
+  text-align: center;
+  margin-bottom: var(--spacing-4);
+}
+
+.stickyCtaPriceAmount {
+  font-size: 1.75rem;
+  font-weight: 700;
   color: var(--color-primary-900);
 }
 
-.reviewTextarea {
-  min-height: 92px;
-  resize: vertical;
+.stickyCtaPriceUnit {
+  font-size: 1rem;
+  color: var(--color-neutral-600);
+}
+
+/* ================================
+   États de chargement
+   ================================ */
+.heroSkeleton {
+  position: relative;
+}
+
+.bannerSkeleton {
+  height: 280px;
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-200) 0%,
+    var(--color-neutral-100) 50%,
+    var(--color-neutral-200) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.avatarSkeleton {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: var(--color-neutral-200);
+  position: absolute;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.contentSkeleton {
+  padding: var(--spacing-10) var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.textSkeleton {
+  height: 20px;
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-200) 0%,
+    var(--color-neutral-100) 50%,
+    var(--color-neutral-200) 100%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--radius-md);
+  animation: shimmer 1.5s ease-in-out infinite;
 }
 
 @keyframes shimmer {
-  to {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
     background-position: -200% 0;
   }
 }
 
-@media (max-width: 960px) {
-  .twoColumns {
+/* État d'erreur */
+.errorContainer {
+  text-align: center;
+  padding: var(--spacing-16) var(--spacing-6);
+}
+
+.errorContainer h1 {
+  margin: 0 0 var(--spacing-4) 0;
+  font-size: 1.5rem;
+  color: var(--color-primary-900);
+}
+
+.errorContainer p {
+  margin: 0 0 var(--spacing-6) 0;
+  color: var(--color-neutral-600);
+}
+
+/* ================================
+   Responsive Design
+   ================================ */
+@media (max-width: 1024px) {
+  .contentGrid {
     grid-template-columns: 1fr;
+  }
+
+  .rightColumn {
+    order: -1;
+  }
+
+  .stickyCta {
+    position: static;
   }
 }
 
-@media (max-width: 767px) {
-  .container {
-    padding: var(--spacing-4);
+@media (max-width: 768px) {
+  .heroBanner {
+    height: 200px;
+  }
+
+  .heroContent {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: -60px;
+    padding: 0 var(--spacing-4);
+  }
+
+  .avatar,
+  .avatarPlaceholder {
+    width: 120px;
+    height: 120px;
+  }
+
+  .avatarPlaceholder {
+    font-size: 48px;
+  }
+
+  .heroInfo {
+    padding-top: var(--spacing-4);
+  }
+
+  .mentorName {
+    font-size: 1.75rem;
+  }
+
+  .mentorDomain {
+    font-size: 1rem;
+  }
+
+  .ratingRow {
+    justify-content: center;
+  }
+
+  .heroBio {
+    text-align: center;
+  }
+
+  .heroActions {
+    justify-content: center;
+  }
+
+  .priceTag {
+    margin: 0 auto;
+  }
+
+  .mainContent {
+    padding: 0 var(--spacing-4) var(--spacing-8);
+  }
+
+  .reviewsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-2);
+  }
+}
+
+@media (max-width: 480px) {
+  .heroActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .heroActions button {
+    width: 100%;
+  }
+
+  .heroBanner {
+    height: 160px;
+  }
+
+  .avatar,
+  .avatarPlaceholder {
+    width: 100px;
+    height: 100px;
+  }
+
+  .avatarPlaceholder {
+    font-size: 40px;
+  }
+
+  .mentorName {
+    font-size: 1.5rem;
   }
 }

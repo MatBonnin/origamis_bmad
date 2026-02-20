@@ -60,6 +60,7 @@ describe('MentorSelfProfileDto', () => {
   it('accepts partial update payload', async () => {
     const dto = plainToInstance(UpdateMentorSelfProfileDto, {
       domain: 'informatique',
+      bannerUrl: 'http://localhost:4000/uploads/images/banner.webp',
       availability: {
         isAvailable: false,
       },

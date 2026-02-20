@@ -72,8 +72,9 @@ export class UploadService {
     file: Express.Multer.File,
     category: 'images' | 'documents',
   ): UploadedFile {
+    // diskStorage sets file.filename; keep it to avoid returning a URL to a non-existent file
     const ext = extname(file.originalname).toLowerCase();
-    const filename = `${uuidv4()}${ext}`;
+    const filename = file.filename || `${uuidv4()}${ext}`;
     const relativePath = `uploads/${category}/${filename}`;
 
     return {

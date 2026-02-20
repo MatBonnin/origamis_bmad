@@ -16,7 +16,6 @@ import { MessagingModule } from './modules/messaging';
 import { BookingsModule } from './modules/bookings';
 import { SessionsModule } from './modules/sessions';
 import { MilestonesModule } from './modules/milestones';
-import { CommunityModule } from './modules/community';
 import { ContentReportsModule } from './modules/content-reports';
 import { ModerationModule } from './modules/moderation';
 import { SupportModule } from './modules/support';
@@ -61,7 +60,6 @@ import { UploadModule } from './modules/upload';
     BookingsModule,
     SessionsModule,
     MilestonesModule,
-    CommunityModule,
     ContentReportsModule,
     ModerationModule,
     SupportModule,
