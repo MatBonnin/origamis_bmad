@@ -70,7 +70,14 @@ export class MentorsSelfService {
             avatar_url: true,
           },
         },
-        availability: true,
+        availability: {
+          include: {
+            slots: {
+              where: { status: 'published' },
+              orderBy: [{ day_of_week: 'asc' }, { start_time: 'asc' }],
+            },
+          },
+        },
       },
     });
 
@@ -151,6 +158,8 @@ export class MentorsSelfService {
       },
     });
 
+    await this.syncAvailabilitySlotsToTable(userId, dto.availability.slots ?? []);
+
     await this.saveMentorMetadata(userId, {
       languages: this.cleanTags(dto.languages ?? []),
       certifications: this.cleanTags(dto.certifications ?? []),
@@ -180,7 +189,14 @@ export class MentorsSelfService {
             avatar_url: true,
           },
         },
-        availability: true,
+        availability: {
+          include: {
+            slots: {
+              where: { status: 'published' },
+              orderBy: [{ day_of_week: 'asc' }, { start_time: 'asc' }],
+            },
+          },
+        },
       },
     });
 
@@ -287,9 +303,10 @@ export class MentorsSelfService {
           is_available: dto.availability.isAvailable,
           next_available_at: dto.availability.nextAvailableAt
             ? new Date(dto.availability.nextAvailableAt)
-            : null,
+          : null,
         },
       });
+      await this.syncAvailabilitySlotsToTable(userId, dto.availability.slots ?? []);
     }
 
     await this.saveMentorMetadata(userId, {
@@ -561,6 +578,11 @@ export class MentorsSelfService {
       availability: {
         is_available: boolean;
         next_available_at: Date | null;
+        slots?: Array<{
+          day_of_week: number;
+          start_time: string;
+          end_time: string;
+        }>;
       } | null;
     },
     metadata: MentorMeta,
@@ -583,12 +605,17 @@ export class MentorsSelfService {
         languages: metadata.languages,
         certifications: metadata.certifications,
         tariffs: metadata.tariffs,
-        availability: {
-          isAvailable: mentor.availability?.is_available ?? false,
-          nextAvailableAt:
-            mentor.availability?.next_available_at?.toISOString() ?? null,
-          slots: metadata.availabilitySlots,
-        },
+      availability: {
+        isAvailable: mentor.availability?.is_available ?? false,
+        nextAvailableAt:
+          mentor.availability?.next_available_at?.toISOString() ?? null,
+        slots:
+          mentor.availability?.slots?.map((slot) => ({
+            dayOfWeek: slot.day_of_week,
+            startTime: slot.start_time,
+            endTime: slot.end_time,
+          })) ?? metadata.availabilitySlots,
+      },
         isPublished: mentor.is_publish_ready && mentor.is_validated,
         updatedAt: mentor.updated_at.toISOString(),
       },
@@ -632,5 +659,38 @@ export class MentorsSelfService {
     }
 
     return { isPublishReady, missingRequirements };
+  }
+
+  private async syncAvailabilitySlotsToTable(
+    userId: string,
+    slots: MentorAvailabilitySlotDto[],
+  ) {
+    const availability = await this.prisma.mentor_availability.findUnique({
+      where: { mentor_user_id: userId },
+      select: { id: true },
+    });
+
+    if (!availability) {
+      return;
+    }
+
+    await this.prisma.mentor_availability_slots.deleteMany({
+      where: { availability_id: availability.id },
+    });
+
+    if (slots.length === 0) {
+      return;
+    }
+
+    await this.prisma.mentor_availability_slots.createMany({
+      data: slots.map((slot) => ({
+        availability_id: availability.id,
+        day_of_week: slot.dayOfWeek,
+        start_time: slot.startTime,
+        end_time: slot.endTime,
+        is_recurring: true,
+        status: 'published',
+      })),
+    });
   }
 }

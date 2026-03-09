@@ -23,6 +23,11 @@ describe('MentorsSelfService', () => {
     },
     mentor_availability: {
       upsert: jest.fn(),
+      findUnique: jest.fn(),
+    },
+    mentor_availability_slots: {
+      deleteMany: jest.fn(),
+      createMany: jest.fn(),
     },
     user_needs: {
       findUnique: jest.fn(),
@@ -40,6 +45,9 @@ describe('MentorsSelfService', () => {
 
     service = module.get<MentorsSelfService>(MentorsSelfService);
     jest.clearAllMocks();
+    mockPrismaService.mentor_availability.findUnique.mockResolvedValue({
+      id: 'avail-1',
+    });
   });
 
   it('creates mentor profile with tariffs and availability metadata', async () => {
@@ -47,9 +55,7 @@ describe('MentorsSelfService', () => {
       id: 'mentor-1',
       user_roles: [{ role: { name: 'mentor' } }],
     });
-    mockPrismaService.mentor_profiles.findUnique
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({
+    const persistedProfile = {
         user_id: 'mentor-1',
         domain: 'informatique',
         banner_url: 'https://cdn.origami.app/banner.png',
@@ -68,8 +74,12 @@ describe('MentorsSelfService', () => {
         availability: {
           is_available: true,
           next_available_at: new Date('2026-02-17T10:00:00.000Z'),
+          slots: [{ day_of_week: 1, start_time: '09:00', end_time: '12:00' }],
         },
-      });
+      };
+    mockPrismaService.mentor_profiles.findUnique
+      .mockResolvedValueOnce(null)
+      .mockResolvedValue(persistedProfile);
     mockPrismaService.user_needs.findUnique.mockResolvedValue({
       needs_json: {
         mentorProfile: {
