@@ -47,7 +47,7 @@ describe('SessionsService', () => {
     const result = await service.getHistory('user-1', { category: 'rdv' });
 
     expect(result.sessions).toEqual([]);
-    expect(result.metadata.rgpdRestricted).toBe(true);
+    expect('rgpdRestricted' in result.metadata && result.metadata.rgpdRestricted).toBe(true);
   });
 
   it('supports rdv filter and cursor pagination', async () => {

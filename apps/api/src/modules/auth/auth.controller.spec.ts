@@ -32,6 +32,7 @@ describe('AuthController', () => {
       firstName: 'John',
       lastName: 'Doe',
       role: 'etudiant',
+      consentGiven: true,
     };
 
     const mockAuthResponse = {

@@ -7,7 +7,7 @@ describe('MessagingGateway', () => {
     markConversationRead: jest.fn(),
   };
 
-  const makeSocket = (userId?: string) =>
+  const makeSocket = (userId?: string): any =>
     ({
       data: {},
       handshake: {
@@ -16,7 +16,7 @@ describe('MessagingGateway', () => {
       },
       join: jest.fn(),
       disconnect: jest.fn(),
-    }) as never;
+    });
 
   let gateway: MessagingGateway;
 

@@ -35,6 +35,16 @@ describe('MentorsController', () => {
     getMentorVisibilityStatus: jest.fn(),
     getMentorValidationOverride: jest.fn(),
   };
+  const mockMentorsEpic8Service = {
+    listMyDocuments: jest.fn(),
+    uploadMyDocument: jest.fn(),
+    deleteMyDocument: jest.fn(),
+    connectGoogleCalendar: jest.fn(),
+    disconnectGoogleCalendar: jest.fn(),
+    syncGoogleCalendar: jest.fn(),
+    getMentorDocumentsForAdmin: jest.fn(),
+    updateMentorDocumentStatus: jest.fn(),
+  };
 
   let controller: MentorsController;
 
@@ -46,6 +56,7 @@ describe('MentorsController', () => {
       mockMentorsSelfService as unknown as MentorsSelfService,
       {} as never,
       mockMentorsAdminService as unknown as MentorsAdminService,
+      mockMentorsEpic8Service as never,
     );
     jest.clearAllMocks();
     mockMentorsAdminService.getMentorVisibilityStatus.mockReturnValue('visible');

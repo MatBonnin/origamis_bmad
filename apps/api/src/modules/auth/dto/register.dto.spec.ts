@@ -112,7 +112,7 @@ describe('RegisterDto', () => {
 
     it('should fail without consentGiven', async () => {
       const dto = createDto({});
-      delete (dto as Record<string, unknown>).consentGiven;
+      delete (dto as unknown as { consentGiven?: boolean }).consentGiven;
       const errors = await validate(dto);
       expect(errors.some((e) => e.property === 'consentGiven')).toBe(true);
     });
