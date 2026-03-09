@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button, Card, CardContent } from '@/components/ui';
 import styles from './MentorProfile.module.css';
 
@@ -146,6 +147,7 @@ const Icons = {
 };
 
 export function MentorProfile({ accessToken, mentorId }: Props) {
+  const router = useRouter();
   const [data, setData] = useState<MentorProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -258,6 +260,7 @@ export function MentorProfile({ accessToken, mentorId }: Props) {
   }
 
   const { mentor, reviews, availability, rating } = data;
+  const encodedMentorName = encodeURIComponent(mentor.fullName);
 
   return (
     <div className={styles.pageContainer}>
@@ -309,10 +312,19 @@ export function MentorProfile({ accessToken, mentorId }: Props) {
             )}
 
             <div className={styles.heroActions}>
-              <Button size="lg" leftIcon={<Icons.Calendar />}>
+              <Button
+                size="lg"
+                leftIcon={<Icons.Calendar />}
+                onClick={() => router.push(`/mentors/${mentorId}/book?name=${encodedMentorName}`)}
+              >
                 Réserver une session
               </Button>
-              <Button variant="outline" size="lg" leftIcon={<Icons.Message />}>
+              <Button
+                variant="outline"
+                size="lg"
+                leftIcon={<Icons.Message />}
+                onClick={() => router.push(`/messages?mentor=${mentorId}&name=${encodedMentorName}`)}
+              >
                 Envoyer un message
               </Button>
             </div>
@@ -560,7 +572,11 @@ export function MentorProfile({ accessToken, mentorId }: Props) {
                     <span className={styles.stickyCtaPriceAmount}>Tarif sur demande</span>
                   )}
                 </div>
-                <Button fullWidth size="lg">
+                <Button
+                  fullWidth
+                  size="lg"
+                  onClick={() => router.push(`/mentors/${mentorId}/book?name=${encodedMentorName}`)}
+                >
                   Réserver une session
                 </Button>
               </div>

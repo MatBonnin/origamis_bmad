@@ -63,7 +63,7 @@ describe('MessagingPanel', () => {
     expect(await screen.findByText('Bonjour')).toBeInTheDocument();
   });
 
-  it('sends a message with selected push channel', async () => {
+  it('sends a message to the selected conversation', async () => {
     fetchMock
       .mockResolvedValueOnce({
         ok: true,
@@ -154,7 +154,6 @@ describe('MessagingPanel', () => {
     render(<MessagingPanel accessToken="token-1" currentUserId="student-1" />);
 
     await screen.findByRole('heading', { name: 'Alice Martin' });
-    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Canal de notification' }), 'push');
     await userEvent.type(screen.getByRole('textbox', { name: 'Votre message' }), 'Salut Alice');
     await userEvent.click(screen.getByRole('button', { name: 'Envoyer' }));
 
@@ -166,7 +165,7 @@ describe('MessagingPanel', () => {
       const body = JSON.parse((postCall?.[1] as RequestInit).body as string) as {
         notifyChannel: string;
       };
-      expect(body.notifyChannel).toBe('push');
+      expect(body.notifyChannel).toBe('in_app');
     });
   });
 

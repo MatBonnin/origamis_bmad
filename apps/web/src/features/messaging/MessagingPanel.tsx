@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Button, Input } from '@/components/ui';
 import styles from './MessagingPanel.module.css';
 
@@ -37,6 +38,8 @@ interface Props {
   accessToken: string;
   currentUserId: string;
 }
+
+type ConversationPeer = ConversationItem['peer'];
 
 function formatConversationTime(value: string): string {
   const date = new Date(value);
@@ -77,8 +80,13 @@ function getInitials(fullName: string): string {
 }
 
 export function MessagingPanel({ accessToken, currentUserId }: Props) {
+  const searchParams = useSearchParams();
+  const initialMentorId = searchParams?.get('mentor')?.trim() ?? '';
+  const initialMentorName = searchParams?.get('name')?.trim() || 'Mentor';
+
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [selectedConversationId, setSelectedConversationId] = useState<string>('');
+  const [draftRecipient, setDraftRecipient] = useState<ConversationPeer | null>(null);
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loadingConversations, setLoadingConversations] = useState(true);
@@ -92,11 +100,13 @@ export function MessagingPanel({ accessToken, currentUserId }: Props) {
   const [mobileThreadOpen, setMobileThreadOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const initialRecipientHandledRef = useRef(false);
 
   const selectedConversation = useMemo(
     () => conversations.find((item) => item.conversationId === selectedConversationId) ?? null,
     [conversations, selectedConversationId],
   );
+  const activeRecipient = selectedConversation?.peer ?? draftRecipient;
 
   const filteredConversations = useMemo(() => {
     const lowered = searchValue.trim().toLowerCase();
@@ -220,14 +230,47 @@ export function MessagingPanel({ accessToken, currentUserId }: Props) {
     }
   }, [selectedConversationId, loadMessages]);
 
+  useEffect(() => {
+    if (initialRecipientHandledRef.current || loadingConversations) {
+      return;
+    }
+
+    if (!initialMentorId) {
+      initialRecipientHandledRef.current = true;
+      return;
+    }
+
+    const existingConversation = conversations.find(
+      (item) => item.peer.userId === initialMentorId,
+    );
+
+    if (existingConversation) {
+      setSelectedConversationId(existingConversation.conversationId);
+      setDraftRecipient(null);
+    } else {
+      setDraftRecipient({
+        userId: initialMentorId,
+        fullName: initialMentorName,
+        role: 'mentor',
+      });
+      setSelectedConversationId('');
+      setMessages([]);
+    }
+
+    setMobileThreadOpen(true);
+    initialRecipientHandledRef.current = true;
+  }, [conversations, initialMentorId, initialMentorName, loadingConversations]);
+
   const handleSelectConversation = (conversationId: string) => {
     setSelectedConversationId(conversationId);
+    setDraftRecipient(null);
     setMobileThreadOpen(true);
   };
 
   const sendMessage = async () => {
     const trimmed = body.trim();
-    if (!trimmed || !selectedConversation) {
+    const recipient = selectedConversation?.peer ?? draftRecipient;
+    if (!trimmed || !recipient) {
       return;
     }
 
@@ -242,7 +285,7 @@ export function MessagingPanel({ accessToken, currentUserId }: Props) {
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          receiverId: selectedConversation.peer.userId,
+          receiverId: recipient.userId,
           body: trimmed,
           notifyChannel: 'in_app',
           clientMessageId: `client-${Date.now()}`,
@@ -257,6 +300,8 @@ export function MessagingPanel({ accessToken, currentUserId }: Props) {
 
       const data = result.data as { message: MessageItem; conversationId: string };
       setMessages((previous) => [...previous, data.message]);
+      setSelectedConversationId(data.conversationId);
+      setDraftRecipient(null);
       setBody('');
       void loadConversations();
     } catch {
@@ -379,11 +424,11 @@ export function MessagingPanel({ accessToken, currentUserId }: Props) {
             </button>
 
             <div className={styles.threadIdentity}>
-              <h2 className={styles.threadName}>{selectedConversation?.peer.fullName || 'Conversation'}</h2>
-              {selectedConversation && (
+              <h2 className={styles.threadName}>{activeRecipient?.fullName || 'Conversation'}</h2>
+              {activeRecipient && (
                 <p className={styles.threadMeta}>
-                  {selectedConversation.peer.role === 'mentor' ? 'Mentor' : 'Etudiant'} -
-                  dernier message {formatConversationTime(selectedConversation.lastMessageAt)}
+                  {activeRecipient.role === 'mentor' ? 'Mentor' : 'Etudiant'}
+                  {selectedConversation ? ` - dernier message ${formatConversationTime(selectedConversation.lastMessageAt)}` : ''}
                 </p>
               )}
             </div>
