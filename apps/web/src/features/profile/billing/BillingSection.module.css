@@ -1,0 +1,145 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.error {
+  padding: 0.75rem;
+  border-radius: 6px;
+  background: var(--color-error-bg, #fef2f2);
+  color: var(--color-error, #dc2626);
+  font-size: 0.875rem;
+}
+
+.success {
+  padding: 0.75rem;
+  border-radius: 6px;
+  background: var(--color-success-bg, #f0fdf4);
+  color: var(--color-success, #16a34a);
+  font-size: 0.875rem;
+}
+
+.planBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--color-bg-muted, #f3f4f6);
+  color: var(--color-text-primary, #111827);
+  margin-bottom: 0.5rem;
+}
+
+.planBadge[data-plan='premium'] {
+  background: var(--color-primary-light, #ede9fe);
+  color: var(--color-primary, #4f46e5);
+}
+
+.planStatus {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, #6b7280);
+  margin-bottom: 1rem;
+}
+
+.planActions {
+  margin-top: 0.5rem;
+}
+
+.invoices {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--color-border, #e5e7eb);
+  padding-top: 1rem;
+}
+
+.invoicesTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.invoiceList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.invoiceItem {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.pdfLink {
+  color: var(--color-primary, #4f46e5);
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.empty {
+  color: var(--color-text-secondary, #6b7280);
+  font-size: 0.875rem;
+}
+
+.paymentList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.paymentItem {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.875rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.paymentDate {
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.paymentTime {
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.paymentAmount {
+  font-weight: 600;
+}
+
+.paymentStatus {
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  background: var(--color-bg-muted, #f3f4f6);
+}
+
+.paymentStatus[data-status='succeeded'] {
+  background: var(--color-success-bg, #f0fdf4);
+  color: var(--color-success, #16a34a);
+}
+
+.paymentStatus[data-status='failed'] {
+  background: var(--color-error-bg, #fef2f2);
+  color: var(--color-error, #dc2626);
+}
+
+.paymentStatus[data-status='refunded'] {
+  background: var(--color-warning-bg, #fffbeb);
+  color: var(--color-warning, #d97706);
+}

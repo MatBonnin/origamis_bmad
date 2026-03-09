@@ -1,10 +1,12 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma';
+import { NotificationsService } from '../notifications';
 
 export type SessionHistoryCategory = 'message' | 'rdv' | 'visio';
 export type SessionHistoryExportFormat = 'csv' | 'pdf';
@@ -33,7 +35,10 @@ export interface SessionHistoryItem {
 export class SessionsService {
   private readonly logger = new Logger(SessionsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+  ) {}
 
   async getHistory(currentUserId: string, query: GetSessionHistoryQuery) {
     const targetUserId = this.assertOwnerAccess(currentUserId, query.userId);
@@ -339,6 +344,143 @@ trailer
 startxref
 330
 %%EOF`;
+  }
+
+  // ─── Notes ──────────────────────────────────────────────────────────────────
+
+  async createNote(
+    userId: string,
+    bookingId: string,
+    input: { content: string },
+  ) {
+    const booking = await this.prisma.bookings.findUnique({
+      where: { id: bookingId },
+    });
+
+    if (!booking) {
+      throw new NotFoundException({ code: 'BOOKING_NOT_FOUND', message: 'Session introuvable' });
+    }
+
+    if (booking.student_id !== userId && booking.mentor_id !== userId) {
+      throw new ForbiddenException({ code: 'NOT_PARTICIPANT', message: 'Vous n\'etes pas participant de cette session' });
+    }
+
+    if (booking.status !== 'completed') {
+      throw new BadRequestException({ code: 'SESSION_NOT_COMPLETED', message: 'La session doit etre terminee pour ajouter des notes' });
+    }
+
+    if (input.content.length > 2000) {
+      throw new BadRequestException({ code: 'CONTENT_TOO_LONG', message: 'Le contenu ne peut pas depasser 2000 caracteres' });
+    }
+
+    const role = booking.mentor_id === userId ? 'mentor' : 'student';
+
+    const note = await this.prisma.session_notes.upsert({
+      where: { booking_id_author_id: { booking_id: bookingId, author_id: userId } },
+      create: { booking_id: bookingId, author_id: userId, role, content: input.content },
+      update: { content: input.content },
+    });
+
+    return note;
+  }
+
+  async getNotes(userId: string, bookingId: string) {
+    const booking = await this.prisma.bookings.findUnique({
+      where: { id: bookingId },
+    });
+
+    if (!booking) {
+      throw new NotFoundException({ code: 'BOOKING_NOT_FOUND', message: 'Session introuvable' });
+    }
+
+    if (booking.student_id !== userId && booking.mentor_id !== userId) {
+      throw new ForbiddenException({ code: 'NOT_PARTICIPANT', message: 'Acces refuse' });
+    }
+
+    const notes = await this.prisma.session_notes.findMany({
+      where: { booking_id: bookingId },
+      orderBy: { created_at: 'asc' },
+    });
+
+    return notes;
+  }
+
+  // ─── Feedback ───────────────────────────────────────────────────────────────
+
+  async submitFeedback(
+    mentorId: string,
+    bookingId: string,
+    input: {
+      nextActions: string[];
+      objectivesMet: boolean;
+      linkedMilestoneId?: string;
+      notesForStudent?: string;
+    },
+  ) {
+    const booking = await this.prisma.bookings.findUnique({
+      where: { id: bookingId },
+    });
+
+    if (!booking) {
+      throw new NotFoundException({ code: 'BOOKING_NOT_FOUND', message: 'Session introuvable' });
+    }
+
+    if (booking.mentor_id !== mentorId) {
+      throw new ForbiddenException({ code: 'NOT_MENTOR', message: 'Seul le mentor peut soumettre le feedback' });
+    }
+
+    if (booking.status !== 'completed') {
+      throw new BadRequestException({ code: 'SESSION_NOT_COMPLETED', message: 'La session doit etre terminee' });
+    }
+
+    const feedback = await this.prisma.session_feedback.upsert({
+      where: { booking_id: bookingId },
+      create: {
+        booking_id: bookingId,
+        submitted_by: mentorId,
+        next_actions: input.nextActions,
+        objectives_met: input.objectivesMet,
+        linked_milestone_id: input.linkedMilestoneId ?? null,
+        notes_for_student: input.notesForStudent ?? null,
+      },
+      update: {
+        next_actions: input.nextActions,
+        objectives_met: input.objectivesMet,
+        linked_milestone_id: input.linkedMilestoneId ?? null,
+        notes_for_student: input.notesForStudent ?? null,
+      },
+    });
+
+    await this.notifications.emitNotification({
+      userId: booking.student_id,
+      category: 'rdv',
+      channel: 'in_app',
+      title: 'Feedback de session disponible',
+      message: 'Votre mentor a soumis un feedback pour votre derniere session.',
+      payload: { bookingId },
+    });
+
+    return feedback;
+  }
+
+  async getFeedback(userId: string, bookingId: string) {
+    const booking = await this.prisma.bookings.findUnique({
+      where: { id: bookingId },
+    });
+
+    if (!booking) {
+      throw new NotFoundException({ code: 'BOOKING_NOT_FOUND', message: 'Session introuvable' });
+    }
+
+    if (booking.student_id !== userId && booking.mentor_id !== userId) {
+      throw new ForbiddenException({ code: 'NOT_PARTICIPANT', message: 'Acces refuse' });
+    }
+
+    const feedback = await this.prisma.session_feedback.findUnique({
+      where: { booking_id: bookingId },
+    });
+
+    return feedback;
   }
 
   private auditAccess(

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Button,
   Card,
@@ -250,6 +251,29 @@ export function MyBookings({ accessToken, userId }: Props) {
   const isActive = (status: string) =>
     status === 'confirmed' || status === 'pending';
 
+  const [dismissedNotes, setDismissedNotes] = useState<Set<string>>(() => {
+    if (typeof window === 'undefined') return new Set();
+    try {
+      const stored = localStorage.getItem('dismissedSessionNotes');
+      return new Set(stored ? (JSON.parse(stored) as string[]) : []);
+    } catch {
+      return new Set();
+    }
+  });
+
+  const dismissNotesBanner = (bookingId: string) => {
+    setDismissedNotes((prev) => {
+      const next = new Set(prev);
+      next.add(bookingId);
+      try {
+        localStorage.setItem('dismissedSessionNotes', JSON.stringify([...next]));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
+
   return (
     <section className={styles.container} aria-labelledby="bookings-title">
       <header className={styles.header}>
@@ -311,20 +335,50 @@ export function MyBookings({ accessToken, userId }: Props) {
                   {booking.notes && (
                     <p className={styles.notes}>{booking.notes}</p>
                   )}
+                  {booking.status === 'completed' && !dismissedNotes.has(booking.bookingId) && (
+                    <div className={styles.notesBanner} role="status">
+                      <span>Session terminee — laissez vos notes</span>
+                      <div className={styles.notesBannerActions}>
+                        <Link
+                          href={`/sessions/history`}
+                          className={styles.notesLink}
+                        >
+                          Notes &amp; Retours
+                        </Link>
+                        <button
+                          type="button"
+                          className={styles.dismissButton}
+                          onClick={() => dismissNotesBanner(booking.bookingId)}
+                          aria-label="Fermer ce message"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   {isActive(booking.status) && (
                     <div className={styles.actions}>
                       {booking.status === 'confirmed' && (
-                        <Button
-                          size="sm"
-                          type="button"
-                          onClick={() => void joinSession(booking.bookingId)}
-                          disabled={sessionLoading === booking.bookingId}
-                          aria-label={`Rejoindre la visio du ${formatDate(booking.bookingDate)}`}
-                        >
-                          {sessionLoading === booking.bookingId
-                            ? 'Chargement...'
-                            : 'Rejoindre visio'}
-                        </Button>
+                        <>
+                          <Button
+                            size="sm"
+                            type="button"
+                            onClick={() => void joinSession(booking.bookingId)}
+                            disabled={sessionLoading === booking.bookingId}
+                            aria-label={`Rejoindre la visio du ${formatDate(booking.bookingDate)}`}
+                          >
+                            {sessionLoading === booking.bookingId
+                              ? 'Chargement...'
+                              : 'Rejoindre visio'}
+                          </Button>
+                          <Link
+                            href={`/paiement?bookingId=${booking.bookingId}`}
+                            className={styles.payButton}
+                            aria-label={`Payer la session du ${formatDate(booking.bookingDate)}`}
+                          >
+                            Payer
+                          </Link>
+                        </>
                       )}
                       <Button
                         variant="outline"

@@ -1,0 +1,16 @@
+.calendarWrapper {
+  padding: 0.5rem 0;
+}
+
+.calendarWrapper :global(.rbc-calendar) {
+  font-family: inherit;
+}
+
+.calendarWrapper :global(.rbc-toolbar button) {
+  font-size: 0.875rem;
+}
+
+.calendarWrapper :global(.rbc-header) {
+  font-size: 0.8rem;
+  font-weight: 600;
+}

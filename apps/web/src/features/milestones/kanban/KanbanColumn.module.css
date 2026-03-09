@@ -1,0 +1,52 @@
+.column {
+  flex: 1;
+  min-width: 200px;
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 0.75rem;
+  border: 2px solid transparent;
+  transition: border-color 0.15s;
+  min-height: 300px;
+}
+
+.over {
+  border-color: #4f46e5;
+  background: #ede9fe;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.count {
+  font-size: 0.75rem;
+  background: #e5e7eb;
+  color: #6b7280;
+  border-radius: 9999px;
+  padding: 0.1rem 0.45rem;
+  font-weight: 600;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.empty {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  text-align: center;
+  padding: 1rem 0;
+}

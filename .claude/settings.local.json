@@ -49,7 +49,9 @@
       "WebFetch(domain:dribbble.com)",
       "mcp__ide__getDiagnostics",
       "Bash(xargs ls:*)",
-      "WebFetch(domain:blog.adplist.org)"
+      "WebFetch(domain:blog.adplist.org)",
+      "Bash(python3:*)",
+      "Bash(tail:*)"
     ]
   }
 }

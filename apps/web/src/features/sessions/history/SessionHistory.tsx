@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { PostSessionFeedbackModal } from '../feedback/PostSessionFeedbackModal';
 import styles from './SessionHistory.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -22,6 +23,7 @@ type HistoryEntry = {
 interface Props {
   accessToken: string;
   userId: string;
+  isMentor?: boolean;
 }
 
 const CATEGORY_LABELS: Record<CategoryFilter, string> = {
@@ -38,12 +40,13 @@ const STATUS_LABELS: Record<string, string> = {
   pending: 'En attente',
 };
 
-export function SessionHistory({ accessToken, userId }: Props) {
+export function SessionHistory({ accessToken, userId, isMentor = false }: Props) {
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
   const [filter, setFilter] = useState<CategoryFilter>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [announcement, setAnnouncement] = useState('');
+  const [feedbackModalBookingId, setFeedbackModalBookingId] = useState<string | null>(null);
 
   const headers = useMemo(
     () => ({
@@ -225,11 +228,33 @@ export function SessionHistory({ accessToken, userId }: Props) {
                       Ouvrir replay
                     </Button>
                   )}
+                  {entry.status === 'completed' && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => setFeedbackModalBookingId(entry.id)}
+                      aria-label="Voir les notes et retours de cette session"
+                    >
+                      Notes &amp; Retours
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </li>
           ))}
         </ol>
+      )}
+
+      {feedbackModalBookingId && (
+        <PostSessionFeedbackModal
+          open={Boolean(feedbackModalBookingId)}
+          onClose={() => setFeedbackModalBookingId(null)}
+          accessToken={accessToken}
+          bookingId={feedbackModalBookingId}
+          userId={userId}
+          isMentor={isMentor}
+        />
       )}
     </section>
   );

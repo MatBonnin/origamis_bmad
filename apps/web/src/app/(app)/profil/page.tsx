@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { MentorSettings } from '@/features/mentors/settings';
+import { BillingSection } from '@/features/profile/billing/BillingSection';
 import styles from './page.module.css';
 
 interface UserProfile {
@@ -36,6 +37,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 export default function ProfilPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<'profil' | 'facturation'>(
+    searchParams.get('tab') === 'facturation' ? 'facturation' : 'profil',
+  );
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -311,6 +316,31 @@ export default function ProfilPage() {
           </Link>
         </div>
 
+        <div className={styles.tabs} role="tablist" aria-label="Sections du profil">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'profil'}
+            className={activeTab === 'profil' ? styles.tabActive : styles.tab}
+            onClick={() => setActiveTab('profil')}
+          >
+            Profil
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === 'facturation'}
+            className={activeTab === 'facturation' ? styles.tabActive : styles.tab}
+            onClick={() => setActiveTab('facturation')}
+          >
+            Facturation
+          </button>
+        </div>
+
+        {activeTab === 'facturation' && session?.accessToken ? (
+          <BillingSection accessToken={session.accessToken} />
+        ) : activeTab === 'profil' ? (
+          <>
         {successMessage && (
           <div
             ref={successRef}
@@ -548,6 +578,8 @@ export default function ProfilPage() {
             </button>
           </div>
         </form>
+          </>
+        ) : null}
       </div>
     </div>
   );

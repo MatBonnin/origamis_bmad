@@ -2,12 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Card, CardContent, CardHeader, CardTitle, ProgressBar } from '@/components/ui';
+import { KanbanBoard } from '../kanban/KanbanBoard';
+import { CalendarView } from '../calendar/CalendarView';
 import styles from './StudentProgression.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 type MilestoneType = 'all' | 'message' | 'rdv' | 'visio';
-type MilestoneStatus = 'planned' | 'in-progress' | 'review' | 'done' | 'blocked';
+type MilestoneStatus = 'planned' | 'in_progress' | 'review' | 'done' | 'blocked';
+type ViewMode = 'list' | 'kanban' | 'calendar';
 
 interface Milestone {
   id: string;
@@ -39,7 +42,7 @@ const TYPE_LABELS: Record<MilestoneType, string> = {
 
 const STATUS_LABELS: Record<MilestoneStatus, string> = {
   planned: 'Planifie',
-  'in-progress': 'En cours',
+  in_progress: 'En cours',
   review: 'En validation',
   done: 'Termine',
   blocked: 'Bloque',
@@ -54,6 +57,7 @@ export function StudentProgression({ accessToken, userId }: Props) {
     completionRate: 0,
   });
   const [filter, setFilter] = useState<MilestoneType>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [liveMessage, setLiveMessage] = useState('');
@@ -110,6 +114,12 @@ export function StudentProgression({ accessToken, userId }: Props) {
     void loadProgression();
   }, [loadProgression]);
 
+  const handleStatusChange = (milestoneId: string, newStatus: MilestoneStatus) => {
+    setMilestones((current) =>
+      current.map((item) => (item.id === milestoneId ? { ...item, status: newStatus } : item)),
+    );
+  };
+
   const markMilestoneDone = async (milestoneId: string) => {
     const confirmed = window.confirm('Confirmer la demande de validation de ce jalon ?');
     if (!confirmed) {
@@ -121,7 +131,7 @@ export function StudentProgression({ accessToken, userId }: Props) {
     const response = await fetch(`${API_URL}/milestones/${milestoneId}/status`, {
       method: 'PATCH',
       headers,
-      body: JSON.stringify({ status: 'done' }),
+      body: JSON.stringify({ status: 'review' }),
     });
     const result = await response.json();
 
@@ -175,6 +185,20 @@ export function StudentProgression({ accessToken, userId }: Props) {
         </CardContent>
       </Card>
 
+      <nav className={styles.viewToggle} aria-label="Changer la vue">
+        {(['list', 'kanban', 'calendar'] as ViewMode[]).map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            className={viewMode === mode ? styles.viewToggleActive : styles.viewToggleButton}
+            onClick={() => setViewMode(mode)}
+            aria-pressed={viewMode === mode}
+          >
+            {mode === 'list' ? 'Liste' : mode === 'kanban' ? 'Kanban' : 'Calendrier'}
+          </button>
+        ))}
+      </nav>
+
       <nav className={styles.filters} aria-label="Filtrer les jalons">
         {(Object.keys(TYPE_LABELS) as MilestoneType[]).map((type) => (
           <button
@@ -202,6 +226,14 @@ export function StudentProgression({ accessToken, userId }: Props) {
             <p className={styles.empty}>Aucun jalon pour ce filtre.</p>
           </CardContent>
         </Card>
+      ) : viewMode === 'kanban' ? (
+        <KanbanBoard
+          accessToken={accessToken}
+          milestones={milestones}
+          onStatusChange={handleStatusChange}
+        />
+      ) : viewMode === 'calendar' ? (
+        <CalendarView milestones={milestones} />
       ) : (
         <ol className={styles.timeline}>
           {milestones.map((milestone) => (
@@ -218,7 +250,7 @@ export function StudentProgression({ accessToken, userId }: Props) {
                   <p className={styles.meta}>Echeance: {formatDate(milestone.dueAt)}</p>
                   {milestone.notes && <p className={styles.notes}>{milestone.notes}</p>}
 
-                  {(milestone.status === 'in-progress' || milestone.status === 'planned') && (
+                  {(milestone.status === 'in_progress' || milestone.status === 'planned') && (
                     <Button
                       type="button"
                       size="sm"

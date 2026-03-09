@@ -153,3 +153,56 @@
 @media (max-width: 767px) {
   .container { padding: var(--spacing-4); }
 }
+
+.payButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.payButton:hover {
+  background: #4338ca;
+}
+
+.notesBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  font-size: 0.85rem;
+  color: #92400e;
+}
+
+.notesBannerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notesLink {
+  color: #4f46e5;
+  font-size: 0.8rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.dismissButton {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #92400e;
+  line-height: 1;
+  padding: 0;
+}

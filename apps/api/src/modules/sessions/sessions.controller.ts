@@ -89,4 +89,60 @@ export class SessionsController {
     });
     return { data, error: null };
   }
+
+  // ─── Notes ────────────────────────────────────────────────────────────────
+
+  @Post(':bookingId/notes')
+  @ApiOperation({ summary: 'Creer ou mettre a jour une note post-session' })
+  @ApiResponse({ status: 200, description: 'Note sauvegardee' })
+  async createNote(
+    @CurrentUser() user: { id: string },
+    @Param('bookingId') bookingId: string,
+    @Body() body: { content: string },
+  ) {
+    const data = await this.sessionsService.createNote(user.id, bookingId, body);
+    return { data, error: null };
+  }
+
+  @Get(':bookingId/notes')
+  @ApiOperation({ summary: 'Obtenir les notes d une session' })
+  @ApiResponse({ status: 200, description: 'Notes recuperees' })
+  async getNotes(
+    @CurrentUser() user: { id: string },
+    @Param('bookingId') bookingId: string,
+  ) {
+    const data = await this.sessionsService.getNotes(user.id, bookingId);
+    return { data, error: null };
+  }
+
+  // ─── Feedback ─────────────────────────────────────────────────────────────
+
+  @Post(':bookingId/feedback')
+  @ApiOperation({ summary: 'Soumettre le feedback mentor post-session' })
+  @ApiResponse({ status: 200, description: 'Feedback soumis' })
+  async submitFeedback(
+    @CurrentUser() user: { id: string },
+    @Param('bookingId') bookingId: string,
+    @Body()
+    body: {
+      nextActions: string[];
+      objectivesMet: boolean;
+      linkedMilestoneId?: string;
+      notesForStudent?: string;
+    },
+  ) {
+    const data = await this.sessionsService.submitFeedback(user.id, bookingId, body);
+    return { data, error: null };
+  }
+
+  @Get(':bookingId/feedback')
+  @ApiOperation({ summary: 'Obtenir le feedback d une session' })
+  @ApiResponse({ status: 200, description: 'Feedback recupere' })
+  async getFeedback(
+    @CurrentUser() user: { id: string },
+    @Param('bookingId') bookingId: string,
+  ) {
+    const data = await this.sessionsService.getFeedback(user.id, bookingId);
+    return { data, error: null };
+  }
 }

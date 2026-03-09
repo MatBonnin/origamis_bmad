@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
   Button,
   Card,
@@ -71,6 +72,7 @@ export function BookingPanel({ accessToken, mentorId, mentorName }: Props) {
   const [selectedSlot, setSelectedSlot] = useState('');
   const [bookingDate, setBookingDate] = useState('');
   const [notes, setNotes] = useState('');
+  const [newBookingId, setNewBookingId] = useState<string | null>(null);
 
   const headers = { Authorization: `Bearer ${accessToken}` };
 
@@ -127,6 +129,8 @@ export function BookingPanel({ accessToken, mentorId, mentorName }: Props) {
         setError(result.error?.message || 'Erreur lors de la reservation');
         return;
       }
+      const createdBookingId = (result.data as { bookingId?: string })?.bookingId ?? null;
+      setNewBookingId(createdBookingId);
       setSuccess('Rendez-vous confirme !');
       setSelectedSlot('');
       setBookingDate('');
@@ -166,6 +170,17 @@ export function BookingPanel({ accessToken, mentorId, mentorName }: Props) {
       {success && (
         <div className={styles.success} role="status" aria-live="polite">
           {success}
+          {newBookingId && (
+            <div className={styles.payPrompt}>
+              <span>Finalisez votre reservation en payant maintenant.</span>
+              <Link
+                href={`/paiement?bookingId=${newBookingId}`}
+                className={styles.payLink}
+              >
+                Payer ma session &rarr;
+              </Link>
+            </div>
+          )}
         </div>
       )}
 

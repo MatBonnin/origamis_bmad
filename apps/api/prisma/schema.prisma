@@ -88,6 +88,8 @@ model users {
   deletion_requests deletion_requests[]
   deletion_actions deletion_actions[] @relation("deletion_actions_admin")
   audit_reports audit_reports[] @relation("audit_reports_requested_by")
+  subscription subscriptions?
+  session_notes session_notes[] @relation("session_notes_author")
 
   @@map("users")
 }
@@ -337,6 +339,9 @@ model bookings {
   session booking_sessions?
   mentor_review mentor_reviews?
   incidents incidents[]
+  payment payments?
+  session_notes session_notes[]
+  session_feedback session_feedback?
 
   @@index([student_id])
   @@index([mentor_id])
@@ -945,4 +950,113 @@ model deletion_actions {
   @@index([request_id, timestamp])
   @@index([admin_id, timestamp])
   @@map("deletion_actions")
+}
+
+// ─── Paiements & Abonnements ───────────────────────────────────────────────
+
+enum payment_status {
+  pending
+  succeeded
+  failed
+  refunded
+}
+
+enum subscription_plan {
+  free
+  premium
+}
+
+enum subscription_status {
+  active
+  canceled
+  past_due
+  trialing
+}
+
+model payments {
+  id                     String         @id @default(uuid())
+  booking_id             String         @unique
+  stripe_payment_intent  String?
+  amount_cents           Int
+  platform_fee_cents     Int
+  mentor_payout_cents    Int
+  status                 payment_status @default(pending)
+  created_at             DateTime       @default(now())
+  updated_at             DateTime       @updatedAt
+
+  booking bookings @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@map("payments")
+}
+
+model subscriptions {
+  id                     String              @id @default(uuid())
+  user_id                String              @unique
+  stripe_customer_id     String?
+  stripe_subscription_id String?
+  plan                   subscription_plan   @default(free)
+  status                 subscription_status @default(active)
+  created_at             DateTime            @default(now())
+  updated_at             DateTime            @updatedAt
+
+  user     users      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  invoices invoices[]
+
+  @@map("subscriptions")
+}
+
+model invoices {
+  id                String   @id @default(uuid())
+  subscription_id   String
+  stripe_invoice_id String?
+  amount_cents      Int
+  invoice_pdf_url   String?
+  created_at        DateTime @default(now())
+
+  subscription subscriptions @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
+
+  @@index([subscription_id, created_at])
+  @@map("invoices")
+}
+
+// ─── Notes & Feedback post-session ────────────────────────────────────────
+
+enum note_role {
+  student
+  mentor
+}
+
+model session_notes {
+  id         String    @id @default(uuid())
+  booking_id String
+  author_id  String
+  role       note_role
+  content    String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+
+  booking bookings @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  author  users    @relation("session_notes_author", fields: [author_id], references: [id], onDelete: Cascade)
+
+  @@unique([booking_id, author_id])
+  @@index([booking_id])
+  @@map("session_notes")
+}
+
+model session_feedback {
+  id                  String   @id @default(uuid())
+  booking_id          String   @unique
+  submitted_by        String
+  next_actions        String[]
+  objectives_met      Boolean
+  linked_milestone_id String?
+  notes_for_student   String?
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  booking bookings @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+
+  @@index([booking_id])
+  @@map("session_feedback")
 }
