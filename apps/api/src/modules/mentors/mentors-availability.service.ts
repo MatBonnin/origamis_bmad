@@ -22,6 +22,15 @@ export interface UpdateSlotDto {
   status?: string;
 }
 
+const ALLOWED_SLOT_STATUSES = new Set(['published', 'draft', 'blocked']);
+const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
+const VALID_TIMEZONES = new Set([
+  'Europe/Paris',
+  'Europe/London',
+  'America/New_York',
+  'UTC',
+]);
+
 @Injectable()
 export class MentorsAvailabilityService {
   constructor(private readonly prisma: PrismaService) {}
@@ -71,6 +80,8 @@ export class MentorsAvailabilityService {
   }
 
   async createSlot(userId: string, dto: CreateSlotDto) {
+    this.validateDayOfWeek(dto.dayOfWeek);
+    this.validateSlotStatus(dto.status);
     this.validateSlotTimes(dto.startTime, dto.endTime);
 
     const availability = await this.findOrCreateAvailability(userId);
@@ -104,6 +115,8 @@ export class MentorsAvailabilityService {
     const startTime = dto.startTime ?? existing.start_time;
     const endTime = dto.endTime ?? existing.end_time;
 
+    this.validateDayOfWeek(dayOfWeek);
+    this.validateSlotStatus(dto.status);
     this.validateSlotTimes(startTime, endTime);
     await this.checkOverlap(
       availability.id,
@@ -131,6 +144,19 @@ export class MentorsAvailabilityService {
     const availability = await this.findOrCreateAvailability(userId);
     await this.assertSlotOwnership(slotId, availability.id);
 
+    const hasBookings = await this.prisma.bookings.findFirst({
+      where: { slot_id: slotId },
+      select: { id: true },
+    });
+
+    if (hasBookings) {
+      throw new BadRequestException({
+        code: 'SLOT_HAS_BOOKINGS',
+        message:
+          'Ce creneau est lie a des rendez-vous et ne peut pas etre supprime',
+      });
+    }
+
     await this.prisma.mentor_availability_slots.delete({
       where: { id: slotId },
     });
@@ -147,6 +173,7 @@ export class MentorsAvailabilityService {
     },
   ) {
     const availability = await this.findOrCreateAvailability(userId);
+    this.validateTimezone(data.timezone);
 
     const updated = await this.prisma.mentor_availability.update({
       where: { id: availability.id },
@@ -207,10 +234,44 @@ export class MentorsAvailabilityService {
   }
 
   private validateSlotTimes(startTime: string, endTime: string) {
+    if (!TIME_REGEX.test(startTime) || !TIME_REGEX.test(endTime)) {
+      throw new BadRequestException({
+        code: 'INVALID_TIME_FORMAT',
+        message: "Le format d'heure doit etre HH:mm",
+      });
+    }
+
     if (startTime >= endTime) {
       throw new BadRequestException({
         code: 'INVALID_SLOT_TIMES',
         message: "L'heure de debut doit etre anterieure a l'heure de fin",
+      });
+    }
+  }
+
+  private validateDayOfWeek(dayOfWeek: number) {
+    if (!Number.isInteger(dayOfWeek) || dayOfWeek < 0 || dayOfWeek > 6) {
+      throw new BadRequestException({
+        code: 'INVALID_DAY_OF_WEEK',
+        message: 'Le jour doit etre compris entre 0 (dimanche) et 6 (samedi)',
+      });
+    }
+  }
+
+  private validateSlotStatus(status?: string) {
+    if (status && !ALLOWED_SLOT_STATUSES.has(status)) {
+      throw new BadRequestException({
+        code: 'INVALID_SLOT_STATUS',
+        message: 'Statut de creneau invalide',
+      });
+    }
+  }
+
+  private validateTimezone(timezone?: string) {
+    if (timezone && !VALID_TIMEZONES.has(timezone)) {
+      throw new BadRequestException({
+        code: 'INVALID_TIMEZONE',
+        message: 'Fuseau horaire invalide',
       });
     }
   }

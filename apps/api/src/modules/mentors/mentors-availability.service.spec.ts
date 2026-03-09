@@ -24,6 +24,9 @@ describe('MentorsAvailabilityService', () => {
       update: jest.fn(),
       delete: jest.fn(),
     },
+    bookings: {
+      findFirst: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -113,6 +116,43 @@ describe('MentorsAvailabilityService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
+    it('rejects invalid dayOfWeek', async () => {
+      setupMentorProfile();
+
+      await expect(
+        service.createSlot('mentor-1', {
+          dayOfWeek: 7,
+          startTime: '09:00',
+          endTime: '12:00',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('rejects invalid status', async () => {
+      setupMentorProfile();
+
+      await expect(
+        service.createSlot('mentor-1', {
+          dayOfWeek: 2,
+          startTime: '09:00',
+          endTime: '12:00',
+          status: 'invalid-status',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('rejects invalid time format', async () => {
+      setupMentorProfile();
+
+      await expect(
+        service.createSlot('mentor-1', {
+          dayOfWeek: 2,
+          startTime: '9:00',
+          endTime: '12:00',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
     it('rejects overlapping slots', async () => {
       setupMentorProfile();
       mockPrisma.mentor_availability_slots.findMany.mockResolvedValue([
@@ -181,6 +221,7 @@ describe('MentorsAvailabilityService', () => {
         id: 'slot-1',
         availability_id: 'avail-1',
       });
+      mockPrisma.bookings.findFirst.mockResolvedValue(null);
       mockPrisma.mentor_availability_slots.delete.mockResolvedValue({});
 
       const result = await service.deleteSlot('mentor-1', 'slot-1');
@@ -195,6 +236,31 @@ describe('MentorsAvailabilityService', () => {
       await expect(
         service.deleteSlot('mentor-1', 'slot-unknown'),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('rejects deletion when slot has bookings', async () => {
+      setupMentorProfile();
+      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue({
+        id: 'slot-1',
+        availability_id: 'avail-1',
+      });
+      mockPrisma.bookings.findFirst.mockResolvedValue({ id: 'booking-1' });
+
+      await expect(service.deleteSlot('mentor-1', 'slot-1')).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+  });
+
+  describe('updateGeneralAvailability', () => {
+    it('rejects invalid timezone', async () => {
+      setupMentorProfile();
+
+      await expect(
+        service.updateGeneralAvailability('mentor-1', {
+          timezone: 'Mars/Olympus',
+        }),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 

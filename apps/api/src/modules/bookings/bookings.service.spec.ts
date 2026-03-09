@@ -25,6 +25,7 @@ describe('BookingsService', () => {
       create: jest.fn(),
       update: jest.fn(),
     },
+    $transaction: jest.fn(),
   };
 
   const mockNotifications = {
@@ -42,6 +43,9 @@ describe('BookingsService', () => {
 
     service = module.get<BookingsService>(BookingsService);
     jest.clearAllMocks();
+    mockPrisma.$transaction.mockImplementation(
+      async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma),
+    );
   });
 
   const validSlot = {
@@ -187,6 +191,20 @@ describe('BookingsService', () => {
           mentorId: 'mentor-1',
           slotId: 'slot-1',
           bookingDate: thursdayDate,
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('rejects invalid date format', async () => {
+      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(
+        validSlot,
+      );
+
+      await expect(
+        service.createBooking('student-1', {
+          mentorId: 'mentor-1',
+          slotId: 'slot-1',
+          bookingDate: '2026-2-1',
         }),
       ).rejects.toThrow(BadRequestException);
     });
@@ -361,6 +379,44 @@ describe('BookingsService', () => {
           newBookingDate: newDate,
         }),
       ).rejects.toThrow(ConflictException);
+    });
+
+    it('rejects reschedule when new slot belongs to another mentor', async () => {
+      const newDate = getNextThursday();
+      mockPrisma.bookings.findUnique.mockResolvedValue(makeFutureBooking());
+      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue({
+        ...newSlot,
+        availability: {
+          ...newSlot.availability,
+          mentor_user_id: 'mentor-2',
+        },
+      });
+
+      await expect(
+        service.rescheduleBooking('student-1', 'booking-1', {
+          newSlotId: 'slot-2',
+          newBookingDate: newDate,
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('rejects reschedule when mentor is unavailable', async () => {
+      const newDate = getNextThursday();
+      mockPrisma.bookings.findUnique.mockResolvedValue(makeFutureBooking());
+      mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue({
+        ...newSlot,
+        availability: {
+          ...newSlot.availability,
+          is_available: false,
+        },
+      });
+
+      await expect(
+        service.rescheduleBooking('student-1', 'booking-1', {
+          newSlotId: 'slot-2',
+          newBookingDate: newDate,
+        }),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 

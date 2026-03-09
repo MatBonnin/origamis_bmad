@@ -70,7 +70,7 @@ export function AvailabilityManager({ accessToken }: Props) {
     void loadAvailability();
   }, [loadAvailability]);
 
-  const updateGeneral = async (available: boolean) => {
+  const updateGeneral = async (payload: { isAvailable?: boolean; timezone?: string }) => {
     setSaving(true);
     setError('');
     setSuccess('');
@@ -78,14 +78,16 @@ export function AvailabilityManager({ accessToken }: Props) {
       const res = await fetch(`${API_URL}/mentors/me/availability/general`, {
         method: 'PATCH',
         headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isAvailable: available, timezone }),
+        body: JSON.stringify(payload),
       });
       const result = await res.json();
       if (!res.ok || result.error) {
         setError(result.error?.message || 'Erreur de mise a jour');
         return;
       }
-      setIsAvailable(available);
+      const data = result.data as { isAvailable: boolean; timezone: string };
+      setIsAvailable(data.isAvailable);
+      setTimezone(data.timezone);
       setSuccess('Disponibilite mise a jour');
     } catch {
       setError('Erreur de connexion');
@@ -178,7 +180,7 @@ export function AvailabilityManager({ accessToken }: Props) {
                   <input
                     type="checkbox"
                     checked={isAvailable}
-                    onChange={(e) => void updateGeneral(e.target.checked)}
+                    onChange={(e) => void updateGeneral({ isAvailable: e.target.checked, timezone })}
                     disabled={saving}
                     className={styles.checkbox}
                   />
@@ -195,7 +197,11 @@ export function AvailabilityManager({ accessToken }: Props) {
                       { value: 'America/New_York', label: 'America/New_York (UTC-5)' },
                       { value: 'UTC', label: 'UTC' },
                     ]}
-                    onChange={(e) => setTimezone(e.target.value)}
+                    onChange={(e) => {
+                      const newTimezone = e.target.value;
+                      setTimezone(newTimezone);
+                      void updateGeneral({ isAvailable, timezone: newTimezone });
+                    }}
                   />
                 </div>
               </div>

@@ -335,7 +335,7 @@ model bookings {
 
   student users @relation("bookings_student", fields: [student_id], references: [id], onDelete: Cascade)
   mentor  users @relation("bookings_mentor", fields: [mentor_id], references: [id], onDelete: Cascade)
-  slot    mentor_availability_slots @relation(fields: [slot_id], references: [id], onDelete: Cascade)
+  slot    mentor_availability_slots @relation(fields: [slot_id], references: [id], onDelete: Restrict)
   session booking_sessions?
   mentor_review mentor_reviews?
   incidents incidents[]

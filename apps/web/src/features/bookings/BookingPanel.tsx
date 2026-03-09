@@ -104,10 +104,21 @@ export function BookingPanel({ accessToken, mentorId, mentorName }: Props) {
     void loadAvailability();
   }, [loadAvailability]);
 
+  const todayIso = new Date().toISOString().split('T')[0];
+
   const submitBooking = async () => {
     if (!selectedSlot || !bookingDate) {
       setError('Veuillez selectionner un creneau et une date');
       return;
+    }
+
+    const selected = availability?.slots.find((s) => s.slotId === selectedSlot);
+    if (selected) {
+      const selectedDate = new Date(`${bookingDate}T00:00:00`);
+      if (selectedDate.getDay() !== selected.dayOfWeek) {
+        setError('La date doit correspondre au jour du creneau selectionne');
+        return;
+      }
     }
 
     setSaving(true);
@@ -160,6 +171,9 @@ export function BookingPanel({ accessToken, mentorId, mentorName }: Props) {
         <p className={styles.subtitle}>
           Choisissez un creneau disponible pour planifier votre session.
         </p>
+        {availability?.timezone ? (
+          <p className={styles.subtitle}>Fuseau mentor: {availability.timezone}</p>
+        ) : null}
       </header>
 
       {error && (
@@ -264,6 +278,7 @@ export function BookingPanel({ accessToken, mentorId, mentorName }: Props) {
                   label="Date"
                   type="date"
                   value={bookingDate}
+                  min={todayIso}
                   onChange={(e) => setBookingDate(e.target.value)}
                 />
                 <Input

@@ -74,16 +74,15 @@ export class BookingsService {
     }
 
     // 5. Validate booking date
-    const bookingDate = new Date(dto.bookingDate);
-    if (isNaN(bookingDate.getTime())) {
+    const bookingDate = this.parseIsoDateOnly(dto.bookingDate);
+    if (!bookingDate) {
       throw new BadRequestException({
         code: 'INVALID_DATE',
         message: 'Date de reservation invalide',
       });
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = this.getStartOfTodayUtc();
     if (bookingDate < today) {
       throw new BadRequestException({
         code: 'DATE_IN_PAST',
@@ -92,26 +91,10 @@ export class BookingsService {
     }
 
     // 6. Validate day of week matches the slot
-    if (bookingDate.getDay() !== slot.day_of_week) {
+    if (bookingDate.getUTCDay() !== slot.day_of_week) {
       throw new BadRequestException({
         code: 'DAY_MISMATCH',
         message: 'La date ne correspond pas au jour du creneau',
-      });
-    }
-
-    // 7. Check for conflicts (same slot + same date, not cancelled)
-    const existingBooking = await this.prisma.bookings.findFirst({
-      where: {
-        slot_id: dto.slotId,
-        booking_date: bookingDate,
-        status: { notIn: ['cancelled'] },
-      },
-    });
-
-    if (existingBooking) {
-      throw new ConflictException({
-        code: 'SLOT_ALREADY_BOOKED',
-        message: 'Ce creneau est deja reserve pour cette date',
       });
     }
 
@@ -122,19 +105,40 @@ export class BookingsService {
       slot.end_time,
     );
 
-    // 8. Create booking (payment-gated flow: pending until payment succeeds)
-    const booking = await this.prisma.bookings.create({
-      data: {
-        student_id: studentId,
-        mentor_id: dto.mentorId,
-        slot_id: dto.slotId,
-        booking_date: bookingDate,
-        start_time: slot.start_time,
-        end_time: slot.end_time,
-        status: 'pending',
-        notes: dto.notes ?? null,
+    const booking = await this.prisma.$transaction(
+      async (tx) => {
+        // Check for conflicts (same slot + same date, not cancelled)
+        const existingBooking = await tx.bookings.findFirst({
+          where: {
+            slot_id: dto.slotId,
+            booking_date: bookingDate,
+            status: { notIn: ['cancelled'] },
+          },
+        });
+
+        if (existingBooking) {
+          throw new ConflictException({
+            code: 'SLOT_ALREADY_BOOKED',
+            message: 'Ce creneau est deja reserve pour cette date',
+          });
+        }
+
+        // Create booking (payment-gated flow: pending until payment succeeds)
+        return tx.bookings.create({
+          data: {
+            student_id: studentId,
+            mentor_id: dto.mentorId,
+            slot_id: dto.slotId,
+            booking_date: bookingDate,
+            start_time: slot.start_time,
+            end_time: slot.end_time,
+            status: 'pending',
+            notes: dto.notes ?? null,
+          },
+        });
       },
-    });
+      { isolationLevel: 'Serializable' },
+    );
 
     // 9. Notify mentor
     await this.emitBookingNotification(
@@ -356,16 +360,15 @@ export class BookingsService {
     }
 
     // Validate new date
-    const newBookingDate = new Date(dto.newBookingDate);
-    if (isNaN(newBookingDate.getTime())) {
+    const newBookingDate = this.parseIsoDateOnly(dto.newBookingDate);
+    if (!newBookingDate) {
       throw new BadRequestException({
         code: 'INVALID_DATE',
         message: 'Date de reservation invalide',
       });
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = this.getStartOfTodayUtc();
     if (newBookingDate < today) {
       throw new BadRequestException({
         code: 'DATE_IN_PAST',
@@ -373,27 +376,24 @@ export class BookingsService {
       });
     }
 
-    if (newBookingDate.getDay() !== newSlot.day_of_week) {
+    if (newBookingDate.getUTCDay() !== newSlot.day_of_week) {
       throw new BadRequestException({
         code: 'DAY_MISMATCH',
         message: 'La date ne correspond pas au jour du creneau',
       });
     }
 
-    // Check conflict on new slot+date
-    const existingBooking = await this.prisma.bookings.findFirst({
-      where: {
-        slot_id: dto.newSlotId,
-        booking_date: newBookingDate,
-        status: { notIn: ['cancelled'] },
-        id: { not: bookingId },
-      },
-    });
+    if (newSlot.availability.mentor_user_id !== booking.mentor_id) {
+      throw new BadRequestException({
+        code: 'SLOT_MENTOR_MISMATCH',
+        message: "Ce creneau n'appartient pas au mentor du rendez-vous",
+      });
+    }
 
-    if (existingBooking) {
-      throw new ConflictException({
-        code: 'SLOT_ALREADY_BOOKED',
-        message: 'Le nouveau creneau est deja reserve pour cette date',
+    if (!newSlot.availability.is_available) {
+      throw new BadRequestException({
+        code: 'MENTOR_UNAVAILABLE',
+        message: "Ce mentor n'est pas disponible actuellement",
       });
     }
 
@@ -404,17 +404,39 @@ export class BookingsService {
       newSlot.end_time,
     );
 
-    // Update booking with new slot and date
-    const updated = await this.prisma.bookings.update({
-      where: { id: bookingId },
-      data: {
-        slot_id: dto.newSlotId,
-        booking_date: newBookingDate,
-        start_time: newSlot.start_time,
-        end_time: newSlot.end_time,
-        cancellation_reason: dto.reason ?? null,
+    const updated = await this.prisma.$transaction(
+      async (tx) => {
+        // Check conflict on new slot+date
+        const existingBooking = await tx.bookings.findFirst({
+          where: {
+            slot_id: dto.newSlotId,
+            booking_date: newBookingDate,
+            status: { notIn: ['cancelled'] },
+            id: { not: bookingId },
+          },
+        });
+
+        if (existingBooking) {
+          throw new ConflictException({
+            code: 'SLOT_ALREADY_BOOKED',
+            message: 'Le nouveau creneau est deja reserve pour cette date',
+          });
+        }
+
+        // Update booking with new slot and date
+        return tx.bookings.update({
+          where: { id: bookingId },
+          data: {
+            slot_id: dto.newSlotId,
+            booking_date: newBookingDate,
+            start_time: newSlot.start_time,
+            end_time: newSlot.end_time,
+            cancellation_reason: dto.reason ?? null,
+          },
+        });
       },
-    });
+      { isolationLevel: 'Serializable' },
+    );
 
     // Notify the other participant
     const otherUserId =
@@ -617,5 +639,33 @@ export class BookingsService {
           'Ce creneau est deja occupe dans le calendrier externe du mentor',
       });
     }
+  }
+
+  private parseIsoDateOnly(value: string): Date | null {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    if (!match) return null;
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    const parsed = new Date(Date.UTC(year, month - 1, day));
+
+    // Reject invalid dates (e.g. 2026-02-30)
+    if (
+      parsed.getUTCFullYear() !== year ||
+      parsed.getUTCMonth() !== month - 1 ||
+      parsed.getUTCDate() !== day
+    ) {
+      return null;
+    }
+
+    return parsed;
+  }
+
+  private getStartOfTodayUtc(): Date {
+    const now = new Date();
+    return new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+    );
   }
 }
