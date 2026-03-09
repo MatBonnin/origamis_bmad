@@ -7,9 +7,9 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { randomUUID } from 'crypto';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
 import { JwtAuthGuard } from '../../common/guards';
 import { UploadService, UploadedFile as UploadResult } from './upload.service';
 
@@ -20,7 +20,7 @@ const createStorage = (category: 'images' | 'documents') =>
     destination: join(process.cwd(), 'uploads', category),
     filename: (_req, file, cb) => {
       const ext = extname(file.originalname).toLowerCase();
-      const filename = `${uuidv4()}${ext}`;
+      const filename = `${randomUUID()}${ext}`;
       cb(null, filename);
     },
   });

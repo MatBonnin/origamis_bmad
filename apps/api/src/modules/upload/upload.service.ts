@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { existsSync, mkdirSync, unlinkSync } from 'fs';
 import { extname, join } from 'path';
-import { v4 as uuidv4 } from 'uuid';
 
 export interface UploadedFile {
   url: string;
@@ -74,7 +74,7 @@ export class UploadService {
   ): UploadedFile {
     // diskStorage sets file.filename; keep it to avoid returning a URL to a non-existent file
     const ext = extname(file.originalname).toLowerCase();
-    const filename = file.filename || `${uuidv4()}${ext}`;
+    const filename = file.filename || `${randomUUID()}${ext}`;
     const relativePath = `uploads/${category}/${filename}`;
 
     return {
