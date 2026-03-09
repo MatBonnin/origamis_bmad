@@ -159,16 +159,6 @@ const Icons = {
   ),
 };
 
-const DAY_OPTIONS = [
-  { value: '1', label: 'Lundi' },
-  { value: '2', label: 'Mardi' },
-  { value: '3', label: 'Mercredi' },
-  { value: '4', label: 'Jeudi' },
-  { value: '5', label: 'Vendredi' },
-  { value: '6', label: 'Samedi' },
-  { value: '0', label: 'Dimanche' },
-];
-
 const LEVEL_OPTIONS = [
   { value: 'debutant', label: 'Débutant', description: 'Étudiants en début de parcours' },
   { value: 'intermediaire', label: 'Intermédiaire', description: 'Étudiants avec bases solides' },
@@ -226,14 +216,13 @@ function translateRequirement(key: string): string {
   return REQUIREMENT_LABELS[key] || key;
 }
 
-type SectionId = 'account' | 'identity' | 'expertise' | 'pricing' | 'availability' | 'documents';
+type SectionId = 'account' | 'identity' | 'expertise' | 'pricing' | 'documents';
 
 const SECTIONS: Array<{ id: SectionId; label: string; icon: () => JSX.Element }> = [
   { id: 'account', label: 'Compte', icon: Icons.Settings },
   { id: 'identity', label: 'Profil Mentor', icon: Icons.User },
   { id: 'expertise', label: 'Expertise', icon: Icons.Briefcase },
   { id: 'pricing', label: 'Tarifs', icon: Icons.DollarSign },
-  { id: 'availability', label: 'Disponibilités', icon: Icons.Calendar },
   { id: 'documents', label: 'Documents', icon: Icons.FileText },
 ];
 
@@ -285,7 +274,6 @@ export function MentorSettings({ accessToken }: Props) {
   const [documents, setDocuments] = useState<MentorDocument[]>([]);
   const [docType, setDocType] = useState<'diploma' | 'certificate'>('diploma');
   const [docUrl, setDocUrl] = useState('');
-  const [calendarConnected, setCalendarConnected] = useState(false);
   const [missingRequirements, setMissingRequirements] = useState<string[]>([]);
 
   const loadProfile = useCallback(async () => {
@@ -694,36 +682,6 @@ export function MentorSettings({ accessToken }: Props) {
     await loadProfile();
   };
 
-  const connectGoogleCalendar = async () => {
-    const response = await fetch(`${API_URL}/mentors/me/calendar/google/connect`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({}),
-    });
-    const result = await response.json();
-    if (!response.ok || result.error) {
-      setError(result.error?.message || 'Connexion Google impossible');
-      return;
-    }
-    setCalendarConnected(true);
-  };
-
-  const disconnectGoogleCalendar = async () => {
-    const response = await fetch(`${API_URL}/mentors/me/calendar/google/disconnect`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${accessToken}` },
-    });
-    const result = await response.json();
-    if (!response.ok || result.error) {
-      setError(result.error?.message || 'Déconnexion Google impossible');
-      return;
-    }
-    setCalendarConnected(false);
-  };
-
   if (loading) {
     return (
       <div className={styles.pageContainer}>
@@ -834,6 +792,9 @@ export function MentorSettings({ accessToken }: Props) {
             >
               {hasExistingProfile ? 'Enregistrer' : 'Publier mon profil'}
             </Button>
+            <Link href="/mentor/availability" className={styles.manageAvailabilityLink}>
+              Gérer les disponibilités
+            </Link>
           </div>
         </nav>
 
@@ -1249,137 +1210,6 @@ export function MentorSettings({ accessToken }: Props) {
                     <option value="USD">USD - Dollar</option>
                     <option value="GBP">GBP - Livre</option>
                   </select>
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* Availability Section */}
-          {activeSection === 'availability' && (
-            <section className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <div className={styles.sectionIcon}><Icons.Calendar /></div>
-                <div>
-                  <h2>Disponibilités</h2>
-                  <p>Gérez vos créneaux de disponibilité</p>
-                </div>
-              </div>
-
-              <div className={styles.availabilityToggle}>
-                <label className={styles.toggleLabel}>
-                  <div className={styles.toggleSwitch}>
-                    <input
-                      type="checkbox"
-                      checked={isAvailable}
-                      onChange={(e) => setIsAvailable(e.target.checked)}
-                    />
-                    <span className={styles.toggleSlider} />
-                  </div>
-                  <div className={styles.toggleContent}>
-                    <span className={styles.toggleTitle}>Disponible immédiatement</span>
-                    <span className={styles.toggleDesc}>
-                      Activez si vous pouvez prendre de nouveaux étudiants dès maintenant
-                    </span>
-                  </div>
-                </label>
-              </div>
-
-              {!isAvailable && (
-                <div className={styles.formGroup}>
-                  <Input
-                    name="next-available"
-                    label="Prochaine disponibilité"
-                    type="datetime-local"
-                    value={nextAvailableAt}
-                    onChange={(e) => setNextAvailableAt(e.target.value)}
-                  />
-                </div>
-              )}
-
-              <div className={styles.slotsSection}>
-                <div className={styles.slotsHeader}>
-                  <h3>Plages horaires hebdomadaires</h3>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    leftIcon={<Icons.Plus />}
-                    onClick={() => setSlots((prev) => [...prev, { ...EMPTY_SLOT }])}
-                  >
-                    Ajouter un créneau
-                  </Button>
-                </div>
-
-                <div className={styles.slotsList}>
-                  {slots.map((slot, index) => (
-                    <div key={`slot-${index}`} className={styles.slotCard}>
-                      <div className={styles.slotFields}>
-                        <Select
-                          label="Jour"
-                          name={`slot-day-${index}`}
-                          value={String(slot.dayOfWeek)}
-                          options={DAY_OPTIONS}
-                          onChange={(e) => {
-                            const day = Number(e.target.value);
-                            setSlots((prev) =>
-                              prev.map((item, i) => (i === index ? { ...item, dayOfWeek: day } : item)),
-                            );
-                          }}
-                        />
-                        <Input
-                          name={`slot-start-${index}`}
-                          label="Début"
-                          type="time"
-                          value={slot.startTime}
-                          onChange={(e) => {
-                            setSlots((prev) =>
-                              prev.map((item, i) => (i === index ? { ...item, startTime: e.target.value } : item)),
-                            );
-                          }}
-                        />
-                        <Input
-                          name={`slot-end-${index}`}
-                          label="Fin"
-                          type="time"
-                          value={slot.endTime}
-                          onChange={(e) => {
-                            setSlots((prev) =>
-                              prev.map((item, i) => (i === index ? { ...item, endTime: e.target.value } : item)),
-                            );
-                          }}
-                        />
-                      </div>
-                      {slots.length > 1 && (
-                        <button
-                          className={styles.slotDelete}
-                          onClick={() => setSlots((prev) => prev.filter((_, i) => i !== index))}
-                          title="Supprimer ce créneau"
-                        >
-                          <Icons.Trash />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className={styles.googleCalendar}>
-                <div className={styles.googleCalendarInfo}>
-                  <h3>Synchronisation Google Calendar</h3>
-                  <p>Synchronisez vos disponibilités avec votre agenda Google</p>
-                </div>
-                <div className={styles.googleCalendarStatus}>
-                  <span className={calendarConnected ? styles.connected : styles.disconnected}>
-                    {calendarConnected ? 'Connecté' : 'Non connecté'}
-                  </span>
-                  {!calendarConnected ? (
-                    <Button variant="outline" size="sm" onClick={() => void connectGoogleCalendar()}>
-                      Connecter
-                    </Button>
-                  ) : (
-                    <Button variant="ghost" size="sm" onClick={() => void disconnectGoogleCalendar()}>
-                      Déconnecter
-                    </Button>
-                  )}
                 </div>
               </div>
             </section>
