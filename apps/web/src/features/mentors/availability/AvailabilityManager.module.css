@@ -30,124 +30,370 @@
   color: #2e7d32;
 }
 
-.generalRow {
-  display: grid;
-  gap: var(--spacing-4);
+/* ─── Global Card ─────────────────────────────────────────────────────────── */
+
+.globalCard {
+  background: linear-gradient(135deg, var(--color-accent-50), var(--color-primary-50));
+  border: 2px solid var(--color-accent-200);
 }
 
 .toggleLabel {
   display: flex;
   align-items: center;
-  gap: var(--spacing-2);
+  gap: var(--spacing-3);
   color: var(--color-primary-900);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
   min-height: var(--min-touch-target);
 }
 
+.toggleText {
+  font-size: var(--font-size-lg);
+}
+
 .checkbox {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   accent-color: var(--color-accent-500);
 }
 
-.timezoneRow { max-width: 320px; }
+/* ─── Tabs ────────────────────────────────────────────────────────────────── */
 
-.addSlotForm {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
-  gap: var(--spacing-3);
-  align-items: end;
+.tabs {
+  display: flex;
+  gap: var(--spacing-1);
+  border-bottom: 2px solid var(--color-neutral-200);
+  padding-bottom: var(--spacing-1);
+  overflow-x: auto;
 }
 
-.slotsGrid {
+.tab {
+  padding: var(--spacing-3) var(--spacing-4);
+  background: none;
+  border: none;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  color: var(--color-neutral-600);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  background: var(--color-neutral-100);
+  color: var(--color-primary-700);
+}
+
+.tabActive {
+  background: var(--color-accent-100);
+  color: var(--color-accent-700);
+  border-bottom: 3px solid var(--color-accent-500);
+  margin-bottom: -2px;
+}
+
+.tabContent {
+  min-height: 200px;
+}
+
+/* ─── Settings Grid ───────────────────────────────────────────────────────── */
+
+.settingsGrid {
   display: grid;
   gap: var(--spacing-4);
 }
 
-.dayGroup {
+.hint {
+  margin: var(--spacing-2) 0 0;
+  color: var(--color-neutral-600);
+  font-size: var(--font-size-sm);
+}
+
+.bufferRow,
+.limitsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3);
+}
+
+.rulesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-3);
+}
+
+/* ─── Schedule Grid ───────────────────────────────────────────────────────── */
+
+.scheduleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.dayCard {
+  transition: all 0.2s ease;
+}
+
+.dayActive {
+  border-left: 4px solid var(--color-accent-500);
+}
+
+.dayInactive {
+  opacity: 0.7;
+  border-left: 4px solid var(--color-neutral-300);
+}
+
+.dayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dayToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+}
+
+.dayName {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-800);
+  font-size: var(--font-size-lg);
+}
+
+.windowsContainer {
   display: grid;
   gap: var(--spacing-2);
 }
 
-.dayTitle {
-  margin: 0;
-  color: var(--color-primary-700);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
+.noWindows {
+  color: var(--color-neutral-500);
+  font-size: var(--font-size-sm);
+  font-style: italic;
 }
 
-.slotList {
+.windowRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2);
+  background: var(--color-neutral-50);
+  border-radius: var(--radius-md);
+}
+
+.timeInput {
+  padding: var(--spacing-2);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  width: 110px;
+}
+
+.timeInput:focus {
+  outline: none;
+  border-color: var(--color-accent-500);
+  box-shadow: 0 0 0 3px var(--color-accent-100);
+}
+
+.timeSeparator {
+  color: var(--color-neutral-500);
+}
+
+.removeWindowBtn {
+  background: none;
+  border: none;
+  color: var(--color-neutral-400);
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  padding: var(--spacing-1);
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.removeWindowBtn:hover {
+  color: var(--color-error);
+}
+
+.addWindowBtn {
+  background: none;
+  border: 1px dashed var(--color-neutral-300);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-2);
+  color: var(--color-accent-600);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  transition: all 0.2s;
+}
+
+.addWindowBtn:hover {
+  border-color: var(--color-accent-400);
+  background: var(--color-accent-50);
+}
+
+.closedText {
+  color: var(--color-neutral-500);
+  font-style: italic;
+  margin: 0;
+}
+
+.saveBtn {
+  margin-top: var(--spacing-3);
+}
+
+/* ─── Overrides Section ───────────────────────────────────────────────────── */
+
+.overridesSection {
+  display: grid;
+  gap: var(--spacing-4);
+}
+
+.overrideForm {
+  display: grid;
+  gap: var(--spacing-3);
+}
+
+.overrideWindows {
+  display: grid;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+  background: var(--color-neutral-50);
+  border-radius: var(--radius-lg);
+}
+
+.windowsLabel {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary-800);
+  font-size: var(--font-size-sm);
+}
+
+.overridesList {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  gap: var(--spacing-1);
+  gap: var(--spacing-2);
 }
 
-.slotItem {
+.overrideItem {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--spacing-3);
-  padding: var(--spacing-2) var(--spacing-3);
+  padding: var(--spacing-3);
   background: var(--color-neutral-50);
   border: 1px solid var(--color-neutral-200);
   border-radius: var(--radius-lg);
 }
 
-.slotTime {
-  color: var(--color-primary-900);
-  font-weight: var(--font-weight-semibold);
+.overrideInfo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-2);
 }
 
-.slotStatus {
+.overrideDate {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-900);
+  text-transform: capitalize;
+}
+
+.overrideType {
   font-size: var(--font-size-xs);
   padding: 2px var(--spacing-2);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-full);
 }
 
-.slotStatus[data-status='published'] {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-
-.slotStatus[data-status='draft'] {
-  background: #fff3e0;
-  color: #e65100;
-}
-
-.slotStatus[data-status='blocked'] {
+.unavailable {
   background: #ffebee;
   color: #c62828;
 }
 
+.custom_hours {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.overrideReason {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-600);
+  font-style: italic;
+}
+
 .deleteButton {
-  margin-left: auto;
   background: none;
   border: none;
   color: var(--color-neutral-500);
   cursor: pointer;
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl);
   min-height: var(--min-touch-target);
   min-width: var(--min-touch-target);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.2s;
 }
 
 .deleteButton:hover { color: var(--color-error); }
 .deleteButton:focus-visible { outline: 3px solid var(--color-accent-500); }
 
-.empty { margin: 0; color: var(--color-neutral-700); }
+/* ─── Empty & Skeleton ────────────────────────────────────────────────────── */
+
+.empty { margin: 0; color: var(--color-neutral-600); }
 
 .skeletonList { display: grid; gap: var(--spacing-2); }
 .skeletonItem {
   height: 72px;
   border-radius: var(--radius-lg);
   background: linear-gradient(90deg, var(--color-neutral-100) 0%, var(--color-neutral-50) 45%, var(--color-neutral-100) 100%);
+  animation: shimmer 1.5s infinite;
 }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 767px) {
   .container { padding: var(--spacing-4); }
-  .addSlotForm { grid-template-columns: 1fr; }
+
+  .tabs {
+    gap: 0;
+  }
+
+  .tab {
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-sm);
+  }
+
+  .bufferRow,
+  .limitsRow,
+  .rulesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .scheduleGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .windowRow {
+    flex-wrap: wrap;
+  }
+
+  .timeInput {
+    width: 100%;
+    flex: 1;
+    min-width: 90px;
+  }
+
+  .overrideItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .deleteButton {
+    align-self: flex-end;
+  }
 }

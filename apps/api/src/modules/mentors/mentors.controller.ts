@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -22,11 +23,18 @@ import { JwtAuthGuard, RolesGuard } from '../../common/guards';
 import { UserResponseDto } from '../auth/dto';
 import { MatchingService } from '../matching';
 import {
+  CreateDateOverrideDto,
   CreateMentorSelfProfileDto,
+  GetAvailableSlotsQueryDto,
   GetMentorReviewsQueryDto,
   GetMentorsSearchQueryDto,
   GetRecommendationsQueryDto,
+  TimeWindowDto,
+  UpdateDateOverrideDto,
+  UpdateGeneralAvailabilityDto,
   UpdateMentorSelfProfileDto,
+  UpdateSchedulingSettingsDto,
+  UpdateWeeklyScheduleDto,
 } from './dto';
 import { MentorsAvailabilityService } from './mentors-availability.service';
 import {
@@ -258,13 +266,15 @@ export class MentorsController {
     return { data, error: null };
   }
 
-  // ── Availability endpoints ──
+  // ══════════════════════════════════════════════════════════════════════════
+  // AVAILABILITY ENDPOINTS (V2 - New system)
+  // ══════════════════════════════════════════════════════════════════════════
 
   @Get('me/availability')
   @UseGuards(RolesGuard)
   @Roles('mentor')
-  @ApiOperation({ summary: 'Recuperer les disponibilites du mentor connecte' })
-  @ApiResponse({ status: 200, description: 'Disponibilites recuperees' })
+  @ApiOperation({ summary: 'Recuperer toutes les disponibilites du mentor' })
+  @ApiResponse({ status: 200, description: 'Disponibilites completes' })
   async getMyAvailability(
     @CurrentUser() user: UserResponseDto,
   ): Promise<ApiEnvelope<unknown>> {
@@ -274,35 +284,14 @@ export class MentorsController {
     return { data, error: null };
   }
 
-  @Post('me/availability')
-  @UseGuards(RolesGuard)
-  @Roles('mentor')
-  @ApiOperation({ summary: 'Ajouter un creneau de disponibilite' })
-  @ApiResponse({ status: 201, description: 'Creneau cree' })
-  async createAvailabilitySlot(
-    @CurrentUser() user: UserResponseDto,
-    @Body()
-    dto: {
-      dayOfWeek: number;
-      startTime: string;
-      endTime: string;
-      isRecurring?: boolean;
-      status?: string;
-    },
-  ): Promise<ApiEnvelope<unknown>> {
-    const data = await this.mentorsAvailabilityService.createSlot(user.id, dto);
-    return { data, error: null };
-  }
-
   @Patch('me/availability/general')
   @UseGuards(RolesGuard)
   @Roles('mentor')
-  @ApiOperation({ summary: 'Mettre a jour la disponibilite generale' })
-  @ApiResponse({ status: 200, description: 'Disponibilite mise a jour' })
+  @ApiOperation({ summary: 'Activer/desactiver les reservations' })
+  @ApiResponse({ status: 200, description: 'Statut mis a jour' })
   async updateGeneralAvailability(
     @CurrentUser() user: UserResponseDto,
-    @Body()
-    dto: { isAvailable?: boolean; nextAvailableAt?: string; timezone?: string },
+    @Body() dto: UpdateGeneralAvailabilityDto,
   ): Promise<ApiEnvelope<unknown>> {
     const data =
       await this.mentorsAvailabilityService.updateGeneralAvailability(
@@ -312,50 +301,143 @@ export class MentorsController {
     return { data, error: null };
   }
 
-  @Patch('me/availability/:slotId')
+  @Patch('me/availability/settings')
   @UseGuards(RolesGuard)
   @Roles('mentor')
-  @ApiOperation({ summary: 'Modifier un creneau de disponibilite' })
-  @ApiResponse({ status: 200, description: 'Creneau modifie' })
-  async updateAvailabilitySlot(
+  @ApiOperation({ summary: 'Mettre a jour les parametres de scheduling' })
+  @ApiResponse({ status: 200, description: 'Parametres mis a jour' })
+  async updateSchedulingSettings(
     @CurrentUser() user: UserResponseDto,
-    @Param('slotId') slotId: string,
-    @Body()
-    dto: {
-      dayOfWeek?: number;
-      startTime?: string;
-      endTime?: string;
-      isRecurring?: boolean;
-      status?: string;
-    },
+    @Body() dto: UpdateSchedulingSettingsDto,
   ): Promise<ApiEnvelope<unknown>> {
-    const data = await this.mentorsAvailabilityService.updateSlot(
+    const data = await this.mentorsAvailabilityService.updateSchedulingSettings(
       user.id,
-      slotId,
       dto,
     );
     return { data, error: null };
   }
 
-  @Delete('me/availability/:slotId')
+  @Put('me/availability/schedule')
   @UseGuards(RolesGuard)
   @Roles('mentor')
-  @ApiOperation({ summary: 'Supprimer un creneau de disponibilite' })
-  @ApiResponse({ status: 200, description: 'Creneau supprime' })
-  async deleteAvailabilitySlot(
+  @ApiOperation({ summary: 'Definir le planning hebdomadaire complet' })
+  @ApiResponse({ status: 200, description: 'Planning mis a jour' })
+  async updateWeeklySchedule(
     @CurrentUser() user: UserResponseDto,
-    @Param('slotId') slotId: string,
+    @Body() dto: UpdateWeeklyScheduleDto,
   ): Promise<ApiEnvelope<unknown>> {
-    const data = await this.mentorsAvailabilityService.deleteSlot(
+    const data = await this.mentorsAvailabilityService.updateWeeklySchedule(
       user.id,
-      slotId,
+      dto.schedule,
+    );
+    return { data, error: null };
+  }
+
+  @Patch('me/availability/schedule/:dayOfWeek')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Modifier le planning d\'un jour specifique' })
+  @ApiResponse({ status: 200, description: 'Jour mis a jour' })
+  async updateSingleDaySchedule(
+    @CurrentUser() user: UserResponseDto,
+    @Param('dayOfWeek') dayOfWeek: string,
+    @Body() dto: { isAvailable: boolean; timeWindows: TimeWindowDto[] },
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsAvailabilityService.updateSingleDaySchedule(
+      user.id,
+      parseInt(dayOfWeek, 10),
+      dto.isAvailable,
+      dto.timeWindows,
+    );
+    return { data, error: null };
+  }
+
+  // ── Date Overrides (Exceptions) ──
+
+  @Get('me/availability/overrides')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Lister les exceptions de dates' })
+  @ApiResponse({ status: 200, description: 'Liste des exceptions' })
+  async listDateOverrides(
+    @CurrentUser() user: UserResponseDto,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsAvailabilityService.listDateOverrides(
+      user.id,
+    );
+    return { data, error: null };
+  }
+
+  @Post('me/availability/overrides')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Creer une exception de date' })
+  @ApiResponse({ status: 201, description: 'Exception creee' })
+  async createDateOverride(
+    @CurrentUser() user: UserResponseDto,
+    @Body() dto: CreateDateOverrideDto,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsAvailabilityService.createDateOverride(
+      user.id,
+      dto,
+    );
+    return { data, error: null };
+  }
+
+  @Patch('me/availability/overrides/:overrideId')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Modifier une exception de date' })
+  @ApiResponse({ status: 200, description: 'Exception modifiee' })
+  async updateDateOverride(
+    @CurrentUser() user: UserResponseDto,
+    @Param('overrideId') overrideId: string,
+    @Body() dto: UpdateDateOverrideDto,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsAvailabilityService.updateDateOverride(
+      user.id,
+      overrideId,
+      dto,
+    );
+    return { data, error: null };
+  }
+
+  @Delete('me/availability/overrides/:overrideId')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Supprimer une exception de date' })
+  @ApiResponse({ status: 200, description: 'Exception supprimee' })
+  async deleteDateOverride(
+    @CurrentUser() user: UserResponseDto,
+    @Param('overrideId') overrideId: string,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsAvailabilityService.deleteDateOverride(
+      user.id,
+      overrideId,
+    );
+    return { data, error: null };
+  }
+
+  // ── Public Availability (for students) ──
+
+  @Get(':id/slots')
+  @ApiOperation({ summary: 'Obtenir les creneaux disponibles d\'un mentor' })
+  @ApiResponse({ status: 200, description: 'Creneaux disponibles' })
+  async getMentorAvailableSlots(
+    @Param('id') mentorId: string,
+    @Query() query: GetAvailableSlotsQueryDto,
+  ): Promise<ApiEnvelope<unknown>> {
+    const data = await this.mentorsAvailabilityService.getAvailableSlots(
+      mentorId,
+      query.startDate,
+      query.endDate,
     );
     return { data, error: null };
   }
 
   @Get(':id/availability')
   @ApiOperation({
-    summary: 'Recuperer les disponibilites d un mentor (etudiant)',
+    summary: 'Recuperer les disponibilites d un mentor (legacy)',
   })
   @ApiResponse({ status: 200, description: 'Disponibilites recuperees' })
   async getMentorAvailability(

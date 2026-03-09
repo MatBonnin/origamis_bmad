@@ -19,6 +19,7 @@ import { JwtAuthGuard } from '../../common/guards';
 import { BookingsService } from './bookings.service';
 import type {
   CreateBookingDto,
+  CreateBookingV2Dto,
   RescheduleBookingDto,
 } from './bookings.service';
 
@@ -30,13 +31,24 @@ export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Creer une reservation' })
+  @ApiOperation({ summary: 'Creer une reservation (legacy - avec slotId)' })
   @ApiResponse({ status: 201, description: 'Reservation creee' })
   async createBooking(
     @CurrentUser() user: { id: string },
     @Body() dto: CreateBookingDto,
   ) {
     const data = await this.bookingsService.createBooking(user.id, dto);
+    return { data, error: null };
+  }
+
+  @Post('v2')
+  @ApiOperation({ summary: 'Creer une reservation (V2 - avec date/heure)' })
+  @ApiResponse({ status: 201, description: 'Reservation creee' })
+  async createBookingV2(
+    @CurrentUser() user: { id: string },
+    @Body() dto: CreateBookingV2Dto,
+  ) {
+    const data = await this.bookingsService.createBookingV2(user.id, dto);
     return { data, error: null };
   }
 

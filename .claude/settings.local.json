@@ -51,7 +51,8 @@
       "Bash(xargs ls:*)",
       "WebFetch(domain:blog.adplist.org)",
       "Bash(python3:*)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "Skill(frontend-design)"
     ]
   }
 }

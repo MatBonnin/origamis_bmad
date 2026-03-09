@@ -14,6 +14,19 @@
 
 .subtitle { margin: 0; color: var(--color-neutral-700); }
 
+.sessionInfo {
+  display: flex;
+  gap: var(--spacing-4);
+  color: var(--color-neutral-600);
+  font-size: var(--font-size-sm);
+}
+
+.sessionInfo span {
+  padding: var(--spacing-1) var(--spacing-2);
+  background: var(--color-neutral-100);
+  border-radius: var(--radius-md);
+}
+
 .error {
   border: 1px solid var(--color-error);
   background: var(--color-error-light);
@@ -29,6 +42,160 @@
   padding: var(--spacing-3);
   color: #2e7d32;
 }
+
+/* ─── Date Grid ───────────────────────────────────────────────────────────── */
+
+.dateGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--spacing-3);
+}
+
+.dateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-3);
+  background: var(--color-neutral-50);
+  border: 2px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dateCard:hover {
+  border-color: var(--color-accent-400);
+  background: var(--color-accent-50);
+}
+
+.dateSelected {
+  border-color: var(--color-accent-500);
+  background: var(--color-accent-100);
+  box-shadow: 0 0 0 3px var(--color-accent-200);
+}
+
+.dateDayName {
+  font-size: var(--font-size-xs);
+  color: var(--color-neutral-600);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dateDay {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary-900);
+  line-height: 1.2;
+}
+
+.dateMonth {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-700);
+}
+
+.dateSlots {
+  margin-top: var(--spacing-1);
+  font-size: var(--font-size-xs);
+  color: var(--color-accent-600);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ─── Time Grid ───────────────────────────────────────────────────────────── */
+
+.hint {
+  color: var(--color-neutral-600);
+  font-style: italic;
+}
+
+.timeSlotsTitle {
+  margin: 0 0 var(--spacing-3);
+  color: var(--color-primary-800);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.timeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--spacing-2);
+}
+
+.timeSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-3);
+  background: white;
+  border: 2px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timeSlot:hover:not(:disabled) {
+  border-color: var(--color-accent-400);
+  background: var(--color-accent-50);
+}
+
+.timeSelected {
+  border-color: var(--color-accent-500);
+  background: var(--color-accent-100);
+  box-shadow: 0 0 0 3px var(--color-accent-200);
+}
+
+.timeDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-neutral-100);
+}
+
+.timeRange {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-900);
+}
+
+.timeBooked {
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+  margin-top: var(--spacing-1);
+}
+
+/* ─── Confirmation Card ───────────────────────────────────────────────────── */
+
+.confirmCard {
+  border: 2px solid var(--color-accent-300);
+  background: linear-gradient(135deg, var(--color-accent-50), white);
+}
+
+.summary {
+  display: grid;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3);
+  background: white;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-4);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summaryLabel {
+  color: var(--color-neutral-600);
+}
+
+.summaryValue {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary-900);
+}
+
+.confirmBtn {
+  margin-top: var(--spacing-3);
+}
+
+/* ─── Legacy styles ───────────────────────────────────────────────────────── */
 
 .slotsGrid {
   display: grid;
@@ -76,17 +243,19 @@
   max-width: 480px;
 }
 
-.empty { margin: 0; color: var(--color-neutral-700); }
+.empty { margin: 0; color: var(--color-neutral-600); }
 
 .skeletonList { display: grid; gap: var(--spacing-2); }
 .skeletonItem {
   height: 72px;
   border-radius: var(--radius-lg);
   background: linear-gradient(90deg, var(--color-neutral-100) 0%, var(--color-neutral-50) 45%, var(--color-neutral-100) 100%);
+  animation: shimmer 1.5s infinite;
 }
 
-@media (max-width: 767px) {
-  .container { padding: var(--spacing-4); }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .payPrompt {
@@ -108,4 +277,31 @@
 
 .payLink:hover {
   text-decoration: underline;
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .container { padding: var(--spacing-4); }
+
+  .dateGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .dateCard {
+    padding: var(--spacing-2);
+  }
+
+  .dateDay {
+    font-size: var(--font-size-xl);
+  }
+
+  .timeGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sessionInfo {
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
 }

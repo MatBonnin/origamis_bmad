@@ -284,10 +284,27 @@ model mentor_availability {
   is_available      Boolean  @default(false)
   next_available_at DateTime?
   timezone          String   @default("Europe/Paris")
+
+  // Session settings
+  session_duration      Int     @default(60)     // Duration in minutes: 30, 45, 60, 90, 120
+  buffer_before         Int     @default(0)      // Buffer before session in minutes: 0-60
+  buffer_after          Int     @default(0)      // Buffer after session in minutes: 0-60
+
+  // Scheduling rules
+  min_notice_hours      Int     @default(24)     // Minimum hours before booking: 1-168
+  max_days_ahead        Int     @default(60)     // Max days in advance to book: 7-365
+  start_time_increment  Int     @default(30)     // Start time intervals: 15, 30, 60
+
+  // Limits
+  daily_limit           Int?                     // Max sessions per day (null = unlimited)
+  weekly_limit          Int?                     // Max sessions per week (null = unlimited)
+
   updated_at        DateTime @updatedAt
 
   mentor mentor_profiles          @relation(fields: [mentor_user_id], references: [user_id], onDelete: Cascade)
   slots  mentor_availability_slots[]
+  weekly_schedules mentor_weekly_schedule[]
+  date_overrides mentor_date_overrides[]
 
   @@index([is_available])
   @@map("mentor_availability")
@@ -309,6 +326,46 @@ model mentor_availability_slots {
 
   @@index([availability_id])
   @@map("mentor_availability_slots")
+}
+
+// Weekly schedule - defines availability windows per day of week
+model mentor_weekly_schedule {
+  id              String   @id @default(uuid())
+  availability_id String
+  day_of_week     Int      // 0 = dimanche, 6 = samedi
+  is_available    Boolean  @default(true)  // Is this day open for bookings?
+  time_windows    Json     @default("[]")  // Array of {start: "HH:mm", end: "HH:mm"}
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  availability mentor_availability @relation(fields: [availability_id], references: [id], onDelete: Cascade)
+
+  @@unique([availability_id, day_of_week])
+  @@index([availability_id])
+  @@map("mentor_weekly_schedule")
+}
+
+// Date overrides - exceptions to regular weekly schedule
+enum date_override_type {
+  unavailable    // Completely unavailable this day
+  custom_hours   // Available but with different hours
+}
+
+model mentor_date_overrides {
+  id              String              @id @default(uuid())
+  availability_id String
+  date            DateTime            @db.Date  // Specific date (YYYY-MM-DD)
+  override_type   date_override_type
+  time_windows    Json?               // If custom_hours: [{start: "HH:mm", end: "HH:mm"}]
+  reason          String?             // Optional reason (e.g., "Vacances", "RDV médical")
+  created_at      DateTime            @default(now())
+  updated_at      DateTime            @updatedAt
+
+  availability mentor_availability @relation(fields: [availability_id], references: [id], onDelete: Cascade)
+
+  @@unique([availability_id, date])
+  @@index([availability_id, date])
+  @@map("mentor_date_overrides")
 }
 
 enum booking_status {

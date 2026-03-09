@@ -19,6 +19,15 @@ export interface CreateBookingDto {
   notes?: string;
 }
 
+// New DTO for dynamic slot booking (V2)
+export interface CreateBookingV2Dto {
+  mentorId: string;
+  date: string;       // ISO date string YYYY-MM-DD
+  startTime: string;  // HH:mm
+  endTime: string;    // HH:mm
+  notes?: string;
+}
+
 export interface RescheduleBookingDto {
   newSlotId: string;
   newBookingDate: string; // ISO date string YYYY-MM-DD
@@ -162,6 +171,297 @@ export class BookingsService {
       bookingId: mapped.bookingId,
       paymentRequired: true,
     };
+  }
+
+  /**
+   * V2 Booking - Uses dynamic slot calculation instead of fixed slots
+   */
+  async createBookingV2(studentId: string, dto: CreateBookingV2Dto) {
+    // 1. Validate time format
+    const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
+    if (!TIME_REGEX.test(dto.startTime) || !TIME_REGEX.test(dto.endTime)) {
+      throw new BadRequestException({
+        code: 'INVALID_TIME_FORMAT',
+        message: "Le format d'heure doit etre HH:mm",
+      });
+    }
+
+    // 2. Validate date
+    const bookingDate = this.parseIsoDateOnly(dto.date);
+    if (!bookingDate) {
+      throw new BadRequestException({
+        code: 'INVALID_DATE',
+        message: 'Date de reservation invalide',
+      });
+    }
+
+    // 3. Cannot book yourself
+    if (studentId === dto.mentorId) {
+      throw new BadRequestException({
+        code: 'SELF_BOOKING',
+        message: 'Vous ne pouvez pas reserver un creneau avec vous-meme',
+      });
+    }
+
+    // 4. Get mentor availability settings
+    const availability = await this.prisma.mentor_availability.findUnique({
+      where: { mentor_user_id: dto.mentorId },
+      include: {
+        weekly_schedules: true,
+        date_overrides: true,
+      },
+    });
+
+    if (!availability) {
+      throw new NotFoundException({
+        code: 'MENTOR_NOT_FOUND',
+        message: 'Mentor introuvable',
+      });
+    }
+
+    if (!availability.is_available) {
+      throw new BadRequestException({
+        code: 'MENTOR_UNAVAILABLE',
+        message: "Ce mentor n'est pas disponible actuellement",
+      });
+    }
+
+    // 5. Check min notice
+    const now = new Date();
+    const slotDateTime = new Date(`${dto.date}T${dto.startTime}:00.000Z`);
+    const hoursUntilSlot = (slotDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+    if (hoursUntilSlot < availability.min_notice_hours) {
+      throw new BadRequestException({
+        code: 'MIN_NOTICE_VIOLATION',
+        message: `Le preavis minimum est de ${availability.min_notice_hours} heures`,
+      });
+    }
+
+    // 6. Check max days ahead
+    const today = this.getStartOfTodayUtc();
+    const maxDate = new Date(today);
+    maxDate.setDate(maxDate.getDate() + availability.max_days_ahead);
+
+    if (bookingDate > maxDate) {
+      throw new BadRequestException({
+        code: 'TOO_FAR_AHEAD',
+        message: `Les reservations sont limitees a ${availability.max_days_ahead} jours a l'avance`,
+      });
+    }
+
+    // 7. Validate session duration matches
+    const requestedDuration = this.calculateDurationMinutes(dto.startTime, dto.endTime);
+    if (requestedDuration !== availability.session_duration) {
+      throw new BadRequestException({
+        code: 'INVALID_DURATION',
+        message: `La duree de session doit etre de ${availability.session_duration} minutes`,
+      });
+    }
+
+    // 8. Check date override
+    const dateStr = dto.date;
+    const override = availability.date_overrides.find(
+      (o) => o.date.toISOString().split('T')[0] === dateStr,
+    );
+
+    if (override && override.override_type === 'unavailable') {
+      throw new BadRequestException({
+        code: 'DATE_UNAVAILABLE',
+        message: 'Le mentor n\'est pas disponible ce jour-la',
+      });
+    }
+
+    // 9. Validate slot fits within schedule
+    const dayOfWeek = bookingDate.getUTCDay();
+    let timeWindows: Array<{ start: string; end: string }>;
+
+    if (override && override.override_type === 'custom_hours') {
+      timeWindows = override.time_windows as Array<{ start: string; end: string }>;
+    } else {
+      const weeklySchedule = availability.weekly_schedules.find(
+        (ws) => ws.day_of_week === dayOfWeek,
+      );
+
+      if (!weeklySchedule || !weeklySchedule.is_available) {
+        throw new BadRequestException({
+          code: 'DAY_NOT_AVAILABLE',
+          message: 'Le mentor n\'est pas disponible ce jour de la semaine',
+        });
+      }
+
+      timeWindows = weeklySchedule.time_windows as Array<{ start: string; end: string }>;
+    }
+
+    // Check if requested slot fits within any time window (including buffers)
+    const slotFits = timeWindows.some((window) => {
+      const windowStartMinutes = this.timeToMinutes(window.start);
+      const windowEndMinutes = this.timeToMinutes(window.end);
+      const slotStartMinutes = this.timeToMinutes(dto.startTime);
+      const slotEndMinutes = this.timeToMinutes(dto.endTime);
+
+      // Account for buffers
+      const effectiveSlotStart = slotStartMinutes - availability.buffer_before;
+      const effectiveSlotEnd = slotEndMinutes + availability.buffer_after;
+
+      return effectiveSlotStart >= windowStartMinutes && effectiveSlotEnd <= windowEndMinutes;
+    });
+
+    if (!slotFits) {
+      throw new BadRequestException({
+        code: 'SLOT_OUTSIDE_SCHEDULE',
+        message: 'Ce creneau ne correspond pas aux disponibilites du mentor',
+      });
+    }
+
+    // 10. Check external calendar
+    await this.assertExternalCalendarAvailability(
+      dto.mentorId,
+      bookingDate,
+      dto.startTime,
+      dto.endTime,
+    );
+
+    // 11. Check daily/weekly limits
+    const existingBookingsToday = await this.prisma.bookings.count({
+      where: {
+        mentor_id: dto.mentorId,
+        booking_date: bookingDate,
+        status: { notIn: ['cancelled'] },
+      },
+    });
+
+    if (availability.daily_limit && existingBookingsToday >= availability.daily_limit) {
+      throw new BadRequestException({
+        code: 'DAILY_LIMIT_REACHED',
+        message: 'Le mentor a atteint sa limite de sessions pour ce jour',
+      });
+    }
+
+    const weekStart = this.getWeekStart(bookingDate);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+
+    const existingBookingsThisWeek = await this.prisma.bookings.count({
+      where: {
+        mentor_id: dto.mentorId,
+        booking_date: { gte: weekStart, lt: weekEnd },
+        status: { notIn: ['cancelled'] },
+      },
+    });
+
+    if (availability.weekly_limit && existingBookingsThisWeek >= availability.weekly_limit) {
+      throw new BadRequestException({
+        code: 'WEEKLY_LIMIT_REACHED',
+        message: 'Le mentor a atteint sa limite de sessions pour cette semaine',
+      });
+    }
+
+    // 12. Create or find a slot for backward compatibility
+    let slot = await this.prisma.mentor_availability_slots.findFirst({
+      where: {
+        availability_id: availability.id,
+        day_of_week: dayOfWeek,
+        start_time: dto.startTime,
+        end_time: dto.endTime,
+      },
+    });
+
+    if (!slot) {
+      // Create a dynamic slot for this specific booking
+      slot = await this.prisma.mentor_availability_slots.create({
+        data: {
+          availability_id: availability.id,
+          day_of_week: dayOfWeek,
+          start_time: dto.startTime,
+          end_time: dto.endTime,
+          is_recurring: false,
+          status: 'published',
+        },
+      });
+    }
+
+    // 13. Create the booking with transaction
+    const booking = await this.prisma.$transaction(
+      async (tx) => {
+        // Check for time conflicts
+        const existingBooking = await tx.bookings.findFirst({
+          where: {
+            mentor_id: dto.mentorId,
+            booking_date: bookingDate,
+            status: { notIn: ['cancelled'] },
+            OR: [
+              {
+                start_time: { lt: dto.endTime },
+                end_time: { gt: dto.startTime },
+              },
+            ],
+          },
+        });
+
+        if (existingBooking) {
+          throw new ConflictException({
+            code: 'TIME_CONFLICT',
+            message: 'Ce creneau horaire est deja reserve',
+          });
+        }
+
+        return tx.bookings.create({
+          data: {
+            student_id: studentId,
+            mentor_id: dto.mentorId,
+            slot_id: slot!.id,
+            booking_date: bookingDate,
+            start_time: dto.startTime,
+            end_time: dto.endTime,
+            status: 'pending',
+            notes: dto.notes ?? null,
+          },
+        });
+      },
+      { isolationLevel: 'Serializable' },
+    );
+
+    // 14. Notify mentor
+    await this.emitBookingNotification(
+      dto.mentorId,
+      'Nouvelle reservation en attente',
+      `Un etudiant a reserve un creneau le ${this.formatDate(bookingDate)} de ${dto.startTime} a ${dto.endTime} (en attente de paiement)`,
+      { bookingId: booking.id },
+    );
+
+    // 15. Notify student
+    await this.emitBookingNotification(
+      studentId,
+      'Reservation en attente de paiement',
+      `Finalisez le paiement pour confirmer votre rendez-vous du ${this.formatDate(bookingDate)} de ${dto.startTime} a ${dto.endTime}`,
+      { bookingId: booking.id },
+    );
+
+    const mapped = this.mapBooking(booking);
+    return {
+      booking: mapped,
+      bookingId: mapped.bookingId,
+      paymentRequired: true,
+    };
+  }
+
+  private calculateDurationMinutes(startTime: string, endTime: string): number {
+    const startMinutes = this.timeToMinutes(startTime);
+    const endMinutes = this.timeToMinutes(endTime);
+    return endMinutes - startMinutes;
+  }
+
+  private timeToMinutes(time: string): number {
+    const [h, m] = time.split(':').map(Number);
+    return h * 60 + m;
+  }
+
+  private getWeekStart(date: Date): Date {
+    const d = new Date(date);
+    const day = d.getUTCDay();
+    const diff = d.getUTCDate() - day;
+    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), diff));
   }
 
   async getBooking(userId: string, bookingId: string) {
