@@ -1,208 +1,1046 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Zen Scheduling - My Bookings
+   Design system: Warm minimalism with intentional accents
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap');
+
+/* ─── Design Tokens ─────────────────────────────────────────────────────────── */
+
 .container {
-  padding: var(--spacing-6);
-  display: grid;
-  gap: var(--spacing-5);
+  --zen-cream: #FAF8F5;
+  --zen-cream-dark: #F0EDE8;
+  --zen-charcoal: #1A1A1A;
+  --zen-charcoal-soft: #2D2D2D;
+  --zen-gray: #6B6B6B;
+  --zen-gray-light: #A0A0A0;
+  --zen-border: #E5E2DD;
+  --zen-indigo: #4F46E5;
+  --zen-indigo-soft: #6366F1;
+  --zen-indigo-bg: #EEF2FF;
+  --zen-coral: #F97316;
+  --zen-coral-soft: #FB923C;
+  --zen-coral-bg: #FFF7ED;
+  --zen-success: #059669;
+  --zen-success-bg: #ECFDF5;
+  --zen-error: #DC2626;
+  --zen-error-bg: #FEF2F2;
+  --zen-warning: #D97706;
+  --zen-warning-bg: #FFFBEB;
+  --zen-blue: #0284C7;
+  --zen-blue-bg: #E0F2FE;
+
+  --font-primary: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 0 3px var(--zen-indigo-bg);
+
+  font-family: var(--font-primary);
+  background: var(--zen-cream);
+  min-height: 100vh;
+  padding: 0;
 }
 
-.header { display: grid; gap: var(--spacing-2); }
+/* ─── Animations ────────────────────────────────────────────────────────────── */
 
-.title {
-  margin: 0;
-  color: var(--color-primary-900);
-  font-size: var(--font-size-3xl);
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.subtitle { margin: 0; color: var(--color-neutral-700); }
-
-.error {
-  border: 1px solid var(--color-error);
-  background: var(--color-error-light);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-3);
-  color: var(--color-error);
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.success {
-  border: 1px solid #4caf50;
-  background: #e8f5e9;
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-3);
-  color: #2e7d32;
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-.bookingsList {
-  display: grid;
-  gap: var(--spacing-4);
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
-.bookingDetails {
-  display: grid;
-  gap: var(--spacing-3);
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-.bookingInfo {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--spacing-3);
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-.time {
-  color: var(--color-primary-900);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-lg);
-}
+/* ─── Toast ─────────────────────────────────────────────────────────────────── */
 
-.participant {
-  color: var(--color-neutral-700);
-}
-
-.status {
-  font-size: var(--font-size-xs);
-  padding: 2px var(--spacing-2);
-  border-radius: var(--radius-lg);
-}
-
-.status[data-status='confirmed'] {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-
-.status[data-status='pending'] {
-  background: #fff3e0;
-  color: #e65100;
-}
-
-.status[data-status='cancelled'] {
-  background: #ffebee;
-  color: #c62828;
-}
-
-.status[data-status='completed'] {
-  background: #e3f2fd;
-  color: #1565c0;
-}
-
-.notes {
-  margin: 0;
-  color: var(--color-neutral-700);
-  font-size: var(--font-size-sm);
-  font-style: italic;
-}
-
-.actions {
-  display: flex;
-  gap: var(--spacing-2);
-}
-
-.empty { margin: 0; color: var(--color-neutral-700); }
-
-/* Dialog overlay */
-.overlay {
+.toast {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  z-index: 1000;
+  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: var(--shadow-lg);
+}
+
+.toast.success {
+  background: var(--zen-success-bg);
+  color: var(--zen-success);
+  border: 1px solid rgba(5, 150, 105, 0.2);
+}
+
+.toast.error {
+  background: var(--zen-error-bg);
+  color: var(--zen-error);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.toastIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
-  padding: var(--spacing-4);
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
-.dialog {
-  background: var(--color-white);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-5);
-  max-width: 480px;
-  width: 100%;
-  display: grid;
-  gap: var(--spacing-4);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+.toast.success .toastIcon {
+  background: var(--zen-success);
+  color: white;
 }
 
-.dialogTitle {
-  margin: 0;
-  color: var(--color-primary-900);
-  font-size: var(--font-size-xl);
+.toast.error .toastIcon {
+  background: var(--zen-error);
+  color: white;
 }
 
-.dialogText {
-  margin: 0;
-  color: var(--color-neutral-700);
-  font-size: var(--font-size-sm);
+/* ─── Header ────────────────────────────────────────────────────────────────── */
+
+.header {
+  background: white;
+  border-bottom: 1px solid var(--zen-border);
+  padding: 2rem;
+  animation: slideUp 0.4s ease;
 }
 
-.dialogActions {
+.headerTop {
   display: flex;
-  gap: var(--spacing-2);
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.rescheduleForm {
-  display: grid;
-  gap: var(--spacing-3);
+.headerText {
+  flex: 1;
 }
 
-.skeletonList { display: grid; gap: var(--spacing-2); }
-.skeletonItem {
-  height: 120px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(90deg, var(--color-neutral-100) 0%, var(--color-neutral-50) 45%, var(--color-neutral-100) 100%);
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--zen-charcoal);
+  margin: 0 0 0.375rem;
+  letter-spacing: -0.03em;
 }
 
-@media (max-width: 767px) {
-  .container { padding: var(--spacing-4); }
+.subtitle {
+  font-size: 0.9375rem;
+  color: var(--zen-gray);
+  margin: 0;
 }
 
-.payButton {
+.newBookingBtn {
   display: inline-flex;
   align-items: center;
-  padding: 0.35rem 0.75rem;
-  border-radius: 6px;
-  background: #4f46e5;
-  color: #fff;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font-primary);
+  color: white;
+  background: linear-gradient(135deg, var(--zen-indigo) 0%, var(--zen-indigo-soft) 100%);
+  border: none;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+}
+
+.newBookingBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.35);
+}
+
+.newBookingIcon {
+  font-size: 1.125rem;
+  font-weight: 300;
+}
+
+/* ─── Stats ─────────────────────────────────────────────────────────────────── */
+
+.stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1.5rem;
+  background: var(--zen-cream);
+  border-radius: 12px;
+  min-width: 100px;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--zen-charcoal);
+  line-height: 1.2;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--zen-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.125rem;
+}
+
+/* ─── Filters ───────────────────────────────────────────────────────────────── */
+
+.filters {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  background: var(--zen-cream);
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.filterBtn {
+  padding: 0.625rem 1rem;
   font-size: 0.8125rem;
   font-weight: 500;
+  font-family: var(--font-primary);
+  color: var(--zen-gray);
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterBtn:hover {
+  color: var(--zen-charcoal);
+}
+
+.filterActive {
+  color: var(--zen-charcoal);
+  background: white;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─── Main ──────────────────────────────────────────────────────────────────── */
+
+.main {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ─── Loading State ─────────────────────────────────────────────────────────── */
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.loadingPulse {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--zen-indigo) 0%, var(--zen-indigo-soft) 100%);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.loadingText {
+  font-size: 0.9375rem;
+  color: var(--zen-gray);
+  font-weight: 500;
+}
+
+/* ─── Empty State ───────────────────────────────────────────────────────────── */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  animation: fadeIn 0.4s ease;
+}
+
+.emptyIcon {
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+}
+
+.emptyTitle {
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--zen-charcoal);
+  margin: 0 0 0.625rem;
+  letter-spacing: -0.02em;
+}
+
+.emptyText {
+  font-size: 0.9375rem;
+  color: var(--zen-gray);
+  margin: 0 0 1.5rem;
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+.emptyAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--zen-indigo);
   text-decoration: none;
-  transition: background 0.15s;
+  padding: 0.75rem 1.25rem;
+  background: var(--zen-indigo-bg);
+  border-radius: 10px;
+  transition: all 0.2s ease;
 }
 
-.payButton:hover {
-  background: #4338ca;
+.emptyAction:hover {
+  background: var(--zen-indigo);
+  color: white;
 }
 
-.notesBanner {
+/* ─── Bookings List ─────────────────────────────────────────────────────────── */
+
+.bookingsList {
+  display: grid;
+  gap: 1rem;
+}
+
+/* ─── Booking Card ──────────────────────────────────────────────────────────── */
+
+.bookingCard {
+  display: flex;
+  gap: 1.25rem;
+  background: white;
+  border: 1px solid var(--zen-border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  transition: all 0.25s ease;
+  animation: slideUp 0.4s ease both;
+}
+
+.bookingCard:hover {
+  box-shadow: var(--shadow-md);
+  border-color: transparent;
+}
+
+.bookingCard[data-status="cancelled"] {
+  opacity: 0.6;
+}
+
+/* Staggered animation */
+.bookingCard:nth-child(1) { animation-delay: 0s; }
+.bookingCard:nth-child(2) { animation-delay: 0.05s; }
+.bookingCard:nth-child(3) { animation-delay: 0.1s; }
+.bookingCard:nth-child(4) { animation-delay: 0.15s; }
+.bookingCard:nth-child(5) { animation-delay: 0.2s; }
+
+/* ─── Date Badge ────────────────────────────────────────────────────────────── */
+
+.dateBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, var(--zen-indigo) 0%, var(--zen-indigo-soft) 100%);
+  border-radius: 14px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.dateDay {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.dateMonth {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 0.125rem;
+  opacity: 0.9;
+}
+
+.dateDayName {
+  font-size: 0.625rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.375rem;
+  opacity: 0.75;
+}
+
+/* ─── Booking Content ───────────────────────────────────────────────────────── */
+
+.bookingContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  min-width: 0;
+}
+
+.bookingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+/* ─── Participant Info ──────────────────────────────────────────────────────── */
+
+.participantInfo {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0.75rem;
-  margin-bottom: 0.5rem;
-  border-radius: 6px;
-  background: #fffbeb;
-  border: 1px solid #fde68a;
-  font-size: 0.85rem;
-  color: #92400e;
+  gap: 0.75rem;
 }
 
-.notesBannerActions {
+.participantAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--zen-coral-bg);
+  color: var(--zen-coral);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.participantDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.participantName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--zen-charcoal);
+  letter-spacing: -0.01em;
+}
+
+.participantRole {
+  font-size: 0.75rem;
+  color: var(--zen-gray);
+}
+
+/* ─── Status Badge ──────────────────────────────────────────────────────────── */
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.statusIcon {
+  font-size: 0.625rem;
+}
+
+.statuspending {
+  background: var(--zen-warning-bg);
+  color: var(--zen-warning);
+}
+
+.statusconfirmed {
+  background: var(--zen-success-bg);
+  color: var(--zen-success);
+}
+
+.statuscancelled {
+  background: var(--zen-error-bg);
+  color: var(--zen-error);
+}
+
+.statuscompleted {
+  background: var(--zen-blue-bg);
+  color: var(--zen-blue);
+}
+
+/* ─── Time Info ─────────────────────────────────────────────────────────────── */
+
+.timeInfo {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.notesLink {
-  color: #4f46e5;
-  font-size: 0.8rem;
-  text-decoration: none;
+.timeIcon {
+  font-size: 0.875rem;
+}
+
+.timeRange {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--zen-charcoal-soft);
+}
+
+/* ─── Notes Preview ─────────────────────────────────────────────────────────── */
+
+.notesPreview {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--zen-cream);
+  border-radius: 10px;
+}
+
+.notesIcon {
+  font-size: 0.8125rem;
+  flex-shrink: 0;
+}
+
+.notesText {
+  font-size: 0.8125rem;
+  color: var(--zen-gray);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ─── Feedback Banner ───────────────────────────────────────────────────────── */
+
+.feedbackBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--zen-warning-bg);
+  border: 1px solid rgba(217, 119, 6, 0.2);
+  border-radius: 10px;
+}
+
+.feedbackText {
+  font-size: 0.8125rem;
+  color: var(--zen-warning);
   font-weight: 500;
 }
 
-.dismissButton {
-  border: none;
+.feedbackActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.feedbackLink {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--zen-indigo);
+  text-decoration: none;
+  padding: 0.375rem 0.75rem;
+  background: white;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.feedbackLink:hover {
+  background: var(--zen-indigo-bg);
+}
+
+.feedbackDismiss {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 0.875rem;
+  color: var(--zen-warning);
   background: none;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 1rem;
-  color: #92400e;
-  line-height: 1;
-  padding: 0;
+  transition: background 0.2s ease;
+}
+
+.feedbackDismiss:hover {
+  background: rgba(217, 119, 6, 0.1);
+}
+
+/* ─── Actions ───────────────────────────────────────────────────────────────── */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--zen-border);
+}
+
+.actionPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: var(--font-primary);
+  color: white;
+  background: linear-gradient(135deg, var(--zen-indigo) 0%, var(--zen-indigo-soft) 100%);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2);
+}
+
+.actionPrimary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.actionPrimary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.actionIcon {
+  font-size: 0.875rem;
+}
+
+.actionSecondary {
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: var(--font-primary);
+  color: var(--zen-charcoal);
+  background: var(--zen-cream);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionSecondary:hover {
+  background: var(--zen-cream-dark);
+}
+
+.actionDanger {
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: var(--font-primary);
+  color: var(--zen-error);
+  background: var(--zen-error-bg);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionDanger:hover {
+  background: #FECACA;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ─── Dialog Overlay ────────────────────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1.5rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.dialog {
+  background: white;
+  border-radius: 20px;
+  padding: 1.75rem;
+  max-width: 440px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: var(--shadow-lg);
+  animation: scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dialogHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.dialogIcon {
+  font-size: 1.5rem;
+}
+
+.dialogTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--zen-charcoal);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.dialogInfo {
+  display: grid;
+  gap: 0.625rem;
+  padding: 1rem;
+  background: var(--zen-cream);
+  border-radius: 12px;
+}
+
+.dialogInfoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dialogInfoLabel {
+  font-size: 0.8125rem;
+  color: var(--zen-gray);
+}
+
+.dialogInfoValue {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--zen-charcoal);
+}
+
+.dialogWarning {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  background: var(--zen-error-bg);
+  border: 1px solid rgba(220, 38, 38, 0.15);
+  border-radius: 10px;
+  font-size: 0.8125rem;
+  color: var(--zen-error);
+  line-height: 1.5;
+}
+
+/* ─── Form Inputs ───────────────────────────────────────────────────────────── */
+
+.rescheduleForm {
+  display: grid;
+  gap: 1rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputLabel {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--zen-charcoal);
+}
+
+.inputTextarea,
+.inputSelect,
+.inputDate {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-family: var(--font-primary);
+  color: var(--zen-charcoal);
+  background: var(--zen-cream);
+  border: 2px solid var(--zen-border);
+  border-radius: 10px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inputTextarea::placeholder {
+  color: var(--zen-gray-light);
+}
+
+.inputTextarea:focus,
+.inputSelect:focus,
+.inputDate:focus {
+  outline: none;
+  border-color: var(--zen-indigo);
+  box-shadow: var(--shadow-glow);
+}
+
+.inputTextarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.inputSelect {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+.inputDate {
+  cursor: pointer;
+}
+
+/* ─── Dialog Actions ────────────────────────────────────────────────────────── */
+
+.dialogActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+}
+
+.dialogCancel {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: var(--font-primary);
+  color: var(--zen-gray);
+  background: var(--zen-cream);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dialogCancel:hover {
+  background: var(--zen-cream-dark);
+  color: var(--zen-charcoal);
+}
+
+.dialogConfirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font-primary);
+  color: white;
+  background: linear-gradient(135deg, var(--zen-indigo) 0%, var(--zen-indigo-soft) 100%);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+}
+
+.dialogConfirm:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+}
+
+.dialogConfirm:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.dialogConfirmDanger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font-primary);
+  color: white;
+  background: linear-gradient(135deg, var(--zen-error) 0%, #EF4444 100%);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+}
+
+.dialogConfirmDanger:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+}
+
+.dialogConfirmDanger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .header {
+    padding: 1.25rem;
+  }
+
+  .headerTop {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .newBookingBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .statCard {
+    padding: 0.875rem 1rem;
+    min-width: unset;
+  }
+
+  .filters {
+    width: 100%;
+  }
+
+  .filterBtn {
+    flex: 1;
+    text-align: center;
+  }
+
+  .main {
+    padding: 1.25rem;
+  }
+
+  .bookingCard {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .dateBadge {
+    flex-direction: row;
+    gap: 0.75rem;
+    width: fit-content;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+  }
+
+  .dateDay {
+    font-size: 1.5rem;
+  }
+
+  .dateMonth {
+    margin-top: 0;
+  }
+
+  .dateDayName {
+    margin-top: 0;
+  }
+
+  .bookingHeader {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .statusBadge {
+    align-self: flex-start;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actionPrimary,
+  .actionSecondary,
+  .actionDanger {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dialog {
+    padding: 1.25rem;
+    border-radius: 16px;
+  }
+
+  .dialogActions {
+    flex-direction: column;
+  }
+
+  .dialogCancel,
+  .dialogConfirm,
+  .dialogConfirmDanger {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .toast {
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    font-size: 0.875rem;
+  }
+
+  .feedbackBanner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
 }
