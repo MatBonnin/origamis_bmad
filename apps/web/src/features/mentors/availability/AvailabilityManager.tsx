@@ -1,55 +1,42 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from '@/components/ui';
 import styles from './AvailabilityManager.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
-const DAY_LABELS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-
-const SESSION_DURATIONS = [
-  { value: '30', label: '30 minutes' },
-  { value: '45', label: '45 minutes' },
-  { value: '60', label: '1 heure' },
-  { value: '90', label: '1h30' },
-  { value: '120', label: '2 heures' },
+const DAYS = [
+  { key: 0, short: 'Dim', full: 'Dimanche' },
+  { key: 1, short: 'Lun', full: 'Lundi' },
+  { key: 2, short: 'Mar', full: 'Mardi' },
+  { key: 3, short: 'Mer', full: 'Mercredi' },
+  { key: 4, short: 'Jeu', full: 'Jeudi' },
+  { key: 5, short: 'Ven', full: 'Vendredi' },
+  { key: 6, short: 'Sam', full: 'Samedi' },
 ];
 
-const BUFFER_OPTIONS = [
-  { value: '0', label: 'Aucun' },
-  { value: '5', label: '5 min' },
-  { value: '10', label: '10 min' },
-  { value: '15', label: '15 min' },
-  { value: '30', label: '30 min' },
-  { value: '60', label: '1 heure' },
+const DURATION_PRESETS = [
+  { value: 30, label: '30m', icon: '⚡' },
+  { value: 45, label: '45m', icon: '☕' },
+  { value: 60, label: '1h', icon: '💬' },
+  { value: 90, label: '1h30', icon: '🎯' },
+  { value: 120, label: '2h', icon: '🚀' },
 ];
 
-const NOTICE_OPTIONS = [
-  { value: '1', label: '1 heure' },
-  { value: '2', label: '2 heures' },
-  { value: '4', label: '4 heures' },
-  { value: '12', label: '12 heures' },
-  { value: '24', label: '24 heures' },
-  { value: '48', label: '48 heures' },
-  { value: '72', label: '3 jours' },
-  { value: '168', label: '1 semaine' },
+const BUFFER_PRESETS = [0, 5, 10, 15, 30];
+const NOTICE_PRESETS = [
+  { hours: 1, label: '1h' },
+  { hours: 4, label: '4h' },
+  { hours: 24, label: '24h' },
+  { hours: 48, label: '48h' },
+  { hours: 168, label: '1 sem' },
 ];
-
-const MAX_DAYS_OPTIONS = [
-  { value: '7', label: '1 semaine' },
-  { value: '14', label: '2 semaines' },
-  { value: '30', label: '1 mois' },
-  { value: '60', label: '2 mois' },
-  { value: '90', label: '3 mois' },
-  { value: '180', label: '6 mois' },
-  { value: '365', label: '1 an' },
-];
-
-const INCREMENT_OPTIONS = [
-  { value: '15', label: '15 min' },
-  { value: '30', label: '30 min' },
-  { value: '60', label: '1 heure' },
+const WINDOW_PRESETS = [
+  { days: 7, label: '1 sem' },
+  { days: 14, label: '2 sem' },
+  { days: 30, label: '1 mois' },
+  { days: 60, label: '2 mois' },
+  { days: 90, label: '3 mois' },
 ];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -98,19 +85,19 @@ interface Props {
   accessToken: string;
 }
 
-type TabType = 'settings' | 'schedule' | 'overrides';
+type ViewType = 'schedule' | 'settings' | 'exceptions';
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AvailabilityManager({ accessToken }: Props) {
-  const [activeTab, setActiveTab] = useState<TabType>('schedule');
+  const [activeView, setActiveView] = useState<ViewType>('schedule');
   const [availability, setAvailability] = useState<FullAvailability | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
-  // Override form state
+  // Override form
   const [newOverrideDate, setNewOverrideDate] = useState('');
   const [newOverrideType, setNewOverrideType] = useState<'unavailable' | 'custom_hours'>('unavailable');
   const [newOverrideReason, setNewOverrideReason] = useState('');
@@ -118,24 +105,25 @@ export function AvailabilityManager({ accessToken }: Props) {
 
   const headers = { Authorization: `Bearer ${accessToken}` };
 
+  const showToast = (type: 'success' | 'error', message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3000);
+  };
+
   // ─── Load Data ────────────────────────────────────────────────────────────
 
   const loadAvailability = useCallback(async () => {
     setLoading(true);
-    setError('');
     try {
-      const res = await fetch(`${API_URL}/mentors/me/availability`, {
-        headers,
-        cache: 'no-store',
-      });
+      const res = await fetch(`${API_URL}/mentors/me/availability`, { headers, cache: 'no-store' });
       const result = await res.json();
       if (!res.ok || result.error) {
-        setError(result.error?.message || 'Impossible de charger les disponibilites');
+        showToast('error', result.error?.message || 'Erreur de chargement');
         return;
       }
       setAvailability(result.data as FullAvailability);
     } catch {
-      setError('Erreur de connexion au serveur');
+      showToast('error', 'Connexion impossible');
     } finally {
       setLoading(false);
     }
@@ -148,25 +136,23 @@ export function AvailabilityManager({ accessToken }: Props) {
 
   // ─── API Calls ────────────────────────────────────────────────────────────
 
-  const updateGeneral = async (payload: { isAvailable?: boolean; nextAvailableAt?: string }) => {
+  const updateGeneral = async (isAvailable: boolean) => {
     setSaving(true);
-    setError('');
-    setSuccess('');
     try {
       const res = await fetch(`${API_URL}/mentors/me/availability/general`, {
         method: 'PATCH',
         headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ isAvailable }),
       });
       const result = await res.json();
       if (!res.ok || result.error) {
-        setError(result.error?.message || 'Erreur de mise a jour');
+        showToast('error', result.error?.message || 'Erreur');
         return;
       }
       setAvailability((prev) => prev ? { ...prev, isAvailable: result.data.isAvailable } : prev);
-      setSuccess('Statut mis a jour');
+      showToast('success', isAvailable ? 'Vous êtes maintenant disponible' : 'Réservations désactivées');
     } catch {
-      setError('Erreur de connexion');
+      showToast('error', 'Erreur de connexion');
     } finally {
       setSaving(false);
     }
@@ -174,8 +160,6 @@ export function AvailabilityManager({ accessToken }: Props) {
 
   const updateSettings = async (settings: Partial<SchedulingSettings>) => {
     setSaving(true);
-    setError('');
-    setSuccess('');
     try {
       const res = await fetch(`${API_URL}/mentors/me/availability/settings`, {
         method: 'PATCH',
@@ -184,13 +168,13 @@ export function AvailabilityManager({ accessToken }: Props) {
       });
       const result = await res.json();
       if (!res.ok || result.error) {
-        setError(result.error?.message || 'Erreur de mise a jour');
+        showToast('error', result.error?.message || 'Erreur');
         return;
       }
       setAvailability((prev) => prev ? { ...prev, settings: result.data } : prev);
-      setSuccess('Parametres mis a jour');
+      showToast('success', 'Paramètres enregistrés');
     } catch {
-      setError('Erreur de connexion');
+      showToast('error', 'Erreur de connexion');
     } finally {
       setSaving(false);
     }
@@ -198,8 +182,6 @@ export function AvailabilityManager({ accessToken }: Props) {
 
   const updateDaySchedule = async (dayOfWeek: number, isAvailable: boolean, timeWindows: TimeWindow[]) => {
     setSaving(true);
-    setError('');
-    setSuccess('');
     try {
       const res = await fetch(`${API_URL}/mentors/me/availability/schedule/${dayOfWeek}`, {
         method: 'PATCH',
@@ -208,21 +190,19 @@ export function AvailabilityManager({ accessToken }: Props) {
       });
       const result = await res.json();
       if (!res.ok || result.error) {
-        setError(result.error?.message || 'Erreur de mise a jour');
+        showToast('error', result.error?.message || 'Erreur');
         return;
       }
       setAvailability((prev) => {
         if (!prev) return prev;
         const newSchedule = [...prev.weeklySchedule];
         const idx = newSchedule.findIndex((d) => d.dayOfWeek === dayOfWeek);
-        if (idx >= 0) {
-          newSchedule[idx] = result.data;
-        }
+        if (idx >= 0) newSchedule[idx] = result.data;
         return { ...prev, weeklySchedule: newSchedule };
       });
-      setSuccess(`${DAY_LABELS[dayOfWeek]} mis a jour`);
+      showToast('success', `${DAYS[dayOfWeek].full} mis à jour`);
     } catch {
-      setError('Erreur de connexion');
+      showToast('error', 'Erreur de connexion');
     } finally {
       setSaving(false);
     }
@@ -230,17 +210,10 @@ export function AvailabilityManager({ accessToken }: Props) {
 
   const createOverride = async () => {
     if (!newOverrideDate) {
-      setError('Veuillez selectionner une date');
+      showToast('error', 'Sélectionnez une date');
       return;
     }
-    if (newOverrideType === 'custom_hours' && newOverrideWindows.length === 0) {
-      setError('Veuillez ajouter au moins une fenetre horaire');
-      return;
-    }
-
     setSaving(true);
-    setError('');
-    setSuccess('');
     try {
       const res = await fetch(`${API_URL}/mentors/me/availability/overrides`, {
         method: 'POST',
@@ -254,7 +227,7 @@ export function AvailabilityManager({ accessToken }: Props) {
       });
       const result = await res.json();
       if (!res.ok || result.error) {
-        setError(result.error?.message || 'Erreur lors de la creation');
+        showToast('error', result.error?.message || 'Erreur');
         return;
       }
       setAvailability((prev) => prev ? {
@@ -265,530 +238,645 @@ export function AvailabilityManager({ accessToken }: Props) {
       setNewOverrideReason('');
       setNewOverrideType('unavailable');
       setNewOverrideWindows([{ start: '09:00', end: '12:00' }]);
-      setSuccess('Exception ajoutee');
+      showToast('success', 'Exception ajoutée');
     } catch {
-      setError('Erreur de connexion');
+      showToast('error', 'Erreur de connexion');
     } finally {
       setSaving(false);
     }
   };
 
-  const deleteOverride = async (overrideId: string) => {
-    setError('');
-    setSuccess('');
+  const deleteOverride = async (id: string) => {
     try {
-      const res = await fetch(`${API_URL}/mentors/me/availability/overrides/${overrideId}`, {
+      const res = await fetch(`${API_URL}/mentors/me/availability/overrides/${id}`, {
         method: 'DELETE',
         headers,
       });
-      const result = await res.json();
-      if (!res.ok || result.error) {
-        setError(result.error?.message || 'Erreur de suppression');
-        return;
+      if (res.ok) {
+        setAvailability((prev) => prev ? {
+          ...prev,
+          dateOverrides: prev.dateOverrides.filter((o) => o.id !== id),
+        } : prev);
+        showToast('success', 'Exception supprimée');
       }
-      setAvailability((prev) => prev ? {
-        ...prev,
-        dateOverrides: prev.dateOverrides.filter((o) => o.id !== overrideId),
-      } : prev);
-      setSuccess('Exception supprimee');
     } catch {
-      setError('Erreur de connexion');
+      showToast('error', 'Erreur');
     }
   };
 
-  // ─── Render Helpers ───────────────────────────────────────────────────────
+  // ─── Helpers ──────────────────────────────────────────────────────────────
 
-  const renderTabs = () => (
-    <div className={styles.tabs} role="tablist">
-      <button
-        type="button"
-        role="tab"
-        aria-selected={activeTab === 'schedule'}
-        className={`${styles.tab} ${activeTab === 'schedule' ? styles.tabActive : ''}`}
-        onClick={() => setActiveTab('schedule')}
-      >
-        Planning hebdomadaire
-      </button>
-      <button
-        type="button"
-        role="tab"
-        aria-selected={activeTab === 'settings'}
-        className={`${styles.tab} ${activeTab === 'settings' ? styles.tabActive : ''}`}
-        onClick={() => setActiveTab('settings')}
-      >
-        Parametres
-      </button>
-      <button
-        type="button"
-        role="tab"
-        aria-selected={activeTab === 'overrides'}
-        className={`${styles.tab} ${activeTab === 'overrides' ? styles.tabActive : ''}`}
-        onClick={() => setActiveTab('overrides')}
-      >
-        Exceptions ({availability?.dateOverrides.length || 0})
-      </button>
-    </div>
-  );
-
-  const renderSettingsTab = () => {
-    if (!availability) return null;
-    const { settings } = availability;
-
-    return (
-      <div className={styles.settingsGrid}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Duree des sessions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Select
-              name="session-duration"
-              label="Duree"
-              value={String(settings.sessionDuration)}
-              options={SESSION_DURATIONS}
-              onChange={(e) => void updateSettings({ sessionDuration: Number(e.target.value) })}
-            />
-            <p className={styles.hint}>Duree standard de chaque session de mentorat.</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Temps tampon</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={styles.bufferRow}>
-              <Select
-                name="buffer-before"
-                label="Avant la session"
-                value={String(settings.bufferBefore)}
-                options={BUFFER_OPTIONS}
-                onChange={(e) => void updateSettings({ bufferBefore: Number(e.target.value) })}
-              />
-              <Select
-                name="buffer-after"
-                label="Apres la session"
-                value={String(settings.bufferAfter)}
-                options={BUFFER_OPTIONS}
-                onChange={(e) => void updateSettings({ bufferAfter: Number(e.target.value) })}
-              />
-            </div>
-            <p className={styles.hint}>Temps de pause entre les sessions pour vous preparer.</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Regles de reservation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={styles.rulesGrid}>
-              <Select
-                name="min-notice"
-                label="Preavis minimum"
-                value={String(settings.minNoticeHours)}
-                options={NOTICE_OPTIONS}
-                onChange={(e) => void updateSettings({ minNoticeHours: Number(e.target.value) })}
-              />
-              <Select
-                name="max-days"
-                label="Reservable jusqu'a"
-                value={String(settings.maxDaysAhead)}
-                options={MAX_DAYS_OPTIONS}
-                onChange={(e) => void updateSettings({ maxDaysAhead: Number(e.target.value) })}
-              />
-              <Select
-                name="increment"
-                label="Intervalles de debut"
-                value={String(settings.startTimeIncrement)}
-                options={INCREMENT_OPTIONS}
-                onChange={(e) => void updateSettings({ startTimeIncrement: Number(e.target.value) })}
-              />
-            </div>
-            <p className={styles.hint}>
-              Les etudiants pourront reserver au minimum {settings.minNoticeHours}h a l'avance,
-              jusqu'a {settings.maxDaysAhead} jours dans le futur.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Limites (optionnel)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={styles.limitsRow}>
-              <Input
-                name="daily-limit"
-                label="Max sessions/jour"
-                type="number"
-                min={1}
-                max={20}
-                value={settings.dailyLimit?.toString() || ''}
-                placeholder="Illimite"
-                onChange={(e) => {
-                  const val = e.target.value ? Number(e.target.value) : null;
-                  void updateSettings({ dailyLimit: val });
-                }}
-              />
-              <Input
-                name="weekly-limit"
-                label="Max sessions/semaine"
-                type="number"
-                min={1}
-                max={50}
-                value={settings.weeklyLimit?.toString() || ''}
-                placeholder="Illimite"
-                onChange={(e) => {
-                  const val = e.target.value ? Number(e.target.value) : null;
-                  void updateSettings({ weeklyLimit: val });
-                }}
-              />
-            </div>
-            <p className={styles.hint}>Laissez vide pour ne pas limiter le nombre de sessions.</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Fuseau horaire</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Input
-              name="timezone"
-              label="Timezone"
-              value={settings.timezone}
-              onChange={(e) => void updateSettings({ timezone: e.target.value })}
-              placeholder="Europe/Paris"
-            />
-            <p className={styles.hint}>Utilisez un fuseau horaire IANA (ex: Europe/Paris, America/New_York).</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
+  const timeToPercent = (time: string) => {
+    const [h, m] = time.split(':').map(Number);
+    return ((h * 60 + m) / (24 * 60)) * 100;
   };
 
-  const renderScheduleTab = () => {
-    if (!availability) return null;
-
-    return (
-      <div className={styles.scheduleGrid}>
-        {availability.weeklySchedule.map((day) => (
-          <DayScheduleCard
-            key={day.dayOfWeek}
-            day={day}
-            saving={saving}
-            onUpdate={(isAvailable, timeWindows) => updateDaySchedule(day.dayOfWeek, isAvailable, timeWindows)}
-          />
-        ))}
-      </div>
-    );
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr + 'T00:00:00').toLocaleDateString('fr-FR', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    });
   };
 
-  const renderOverridesTab = () => {
-    if (!availability) return null;
+  // ─── Render ───────────────────────────────────────────────────────────────
 
-    const today = new Date().toISOString().split('T')[0];
-
+  if (loading) {
     return (
-      <div className={styles.overridesSection}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Ajouter une exception</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={styles.overrideForm}>
-              <Input
-                name="override-date"
-                label="Date"
-                type="date"
-                min={today}
-                value={newOverrideDate}
-                onChange={(e) => setNewOverrideDate(e.target.value)}
-              />
-              <Select
-                name="override-type"
-                label="Type"
-                value={newOverrideType}
-                options={[
-                  { value: 'unavailable', label: 'Indisponible toute la journee' },
-                  { value: 'custom_hours', label: 'Horaires modifies' },
-                ]}
-                onChange={(e) => setNewOverrideType(e.target.value as 'unavailable' | 'custom_hours')}
-              />
-              <Input
-                name="override-reason"
-                label="Raison (optionnel)"
-                value={newOverrideReason}
-                placeholder="Ex: Vacances, RDV medical..."
-                onChange={(e) => setNewOverrideReason(e.target.value)}
-              />
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingPulse} />
+        <span className={styles.loadingText}>Chargement de vos disponibilités...</span>
+      </div>
+    );
+  }
 
-              {newOverrideType === 'custom_hours' && (
-                <div className={styles.overrideWindows}>
-                  <label className={styles.windowsLabel}>Horaires disponibles ce jour-la :</label>
-                  {newOverrideWindows.map((window, idx) => (
-                    <div key={idx} className={styles.windowRow}>
-                      <Input
-                        name={`window-start-${idx}`}
-                        type="time"
-                        value={window.start}
-                        onChange={(e) => {
-                          const updated = [...newOverrideWindows];
-                          updated[idx] = { ...updated[idx], start: e.target.value };
-                          setNewOverrideWindows(updated);
-                        }}
-                      />
-                      <span>a</span>
-                      <Input
-                        name={`window-end-${idx}`}
-                        type="time"
-                        value={window.end}
-                        onChange={(e) => {
-                          const updated = [...newOverrideWindows];
-                          updated[idx] = { ...updated[idx], end: e.target.value };
-                          setNewOverrideWindows(updated);
-                        }}
-                      />
-                      {newOverrideWindows.length > 1 && (
-                        <button
-                          type="button"
-                          className={styles.removeWindowBtn}
-                          onClick={() => setNewOverrideWindows(newOverrideWindows.filter((_, i) => i !== idx))}
-                        >
-                          &times;
-                        </button>
-                      )}
+  if (!availability) {
+    return (
+      <div className={styles.errorContainer}>
+        <span className={styles.errorIcon}>⚠️</span>
+        <p>Impossible de charger vos disponibilités</p>
+        <button onClick={() => void loadAvailability()} className={styles.retryBtn}>
+          Réessayer
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      {/* Toast */}
+      {toast && (
+        <div className={`${styles.toast} ${styles[toast.type]}`} role="alert">
+          <span className={styles.toastIcon}>{toast.type === 'success' ? '✓' : '!'}</span>
+          {toast.message}
+        </div>
+      )}
+
+      {/* Header */}
+      <header className={styles.header}>
+        <div className={styles.headerContent}>
+          <div className={styles.titleArea}>
+            <h1 className={styles.title}>Disponibilités</h1>
+            <p className={styles.subtitle}>Définissez quand vos étudiants peuvent réserver</p>
+          </div>
+
+          {/* Master Toggle */}
+          <button
+            type="button"
+            className={`${styles.masterToggle} ${availability.isAvailable ? styles.toggleOn : styles.toggleOff}`}
+            onClick={() => void updateGeneral(!availability.isAvailable)}
+            disabled={saving}
+            aria-pressed={availability.isAvailable}
+          >
+            <span className={styles.toggleTrack}>
+              <span className={styles.toggleThumb} />
+            </span>
+            <span className={styles.toggleLabel}>
+              {availability.isAvailable ? 'Disponible' : 'Indisponible'}
+            </span>
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className={styles.nav}>
+          <button
+            type="button"
+            className={`${styles.navItem} ${activeView === 'schedule' ? styles.navActive : ''}`}
+            onClick={() => setActiveView('schedule')}
+          >
+            <span className={styles.navIcon}>📅</span>
+            <span className={styles.navLabel}>Planning</span>
+          </button>
+          <button
+            type="button"
+            className={`${styles.navItem} ${activeView === 'settings' ? styles.navActive : ''}`}
+            onClick={() => setActiveView('settings')}
+          >
+            <span className={styles.navIcon}>⚙️</span>
+            <span className={styles.navLabel}>Paramètres</span>
+          </button>
+          <button
+            type="button"
+            className={`${styles.navItem} ${activeView === 'exceptions' ? styles.navActive : ''}`}
+            onClick={() => setActiveView('exceptions')}
+          >
+            <span className={styles.navIcon}>🚫</span>
+            <span className={styles.navLabel}>Exceptions</span>
+            {availability.dateOverrides.length > 0 && (
+              <span className={styles.navBadge}>{availability.dateOverrides.length}</span>
+            )}
+          </button>
+        </nav>
+      </header>
+
+      {/* Content */}
+      <main className={styles.main}>
+        {/* Schedule View */}
+        {activeView === 'schedule' && (
+          <div className={styles.scheduleView}>
+            <div className={styles.scheduleHeader}>
+              <h2 className={styles.sectionTitle}>Planning hebdomadaire</h2>
+              <p className={styles.sectionDesc}>Cliquez sur un jour pour le configurer</p>
+            </div>
+
+            {/* Timeline Grid */}
+            <div className={styles.timelineContainer}>
+              {/* Time markers */}
+              <div className={styles.timeMarkers}>
+                {[0, 6, 12, 18, 24].map((h) => (
+                  <span key={h} className={styles.timeMarker}>{h}h</span>
+                ))}
+              </div>
+
+              {/* Days */}
+              <div className={styles.daysGrid}>
+                {DAYS.map((day) => {
+                  const schedule = availability.weeklySchedule.find((d) => d.dayOfWeek === day.key);
+                  const isActive = schedule?.isAvailable ?? false;
+                  const windows = schedule?.timeWindows ?? [];
+                  const isSelected = selectedDay === day.key;
+
+                  return (
+                    <div
+                      key={day.key}
+                      className={`${styles.dayRow} ${isActive ? styles.dayActive : styles.dayInactive} ${isSelected ? styles.daySelected : ''}`}
+                      onClick={() => setSelectedDay(isSelected ? null : day.key)}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={isSelected}
+                    >
+                      <div className={styles.dayLabel}>
+                        <span className={styles.dayShort}>{day.short}</span>
+                        <span className={styles.dayStatus}>
+                          {isActive ? `${windows.length} plage${windows.length > 1 ? 's' : ''}` : 'Fermé'}
+                        </span>
+                      </div>
+
+                      <div className={styles.dayTimeline}>
+                        <div className={styles.timelineTrack} />
+                        {windows.map((w, i) => (
+                          <div
+                            key={i}
+                            className={styles.timeBlock}
+                            style={{
+                              left: `${timeToPercent(w.start)}%`,
+                              width: `${timeToPercent(w.end) - timeToPercent(w.start)}%`,
+                            }}
+                            title={`${w.start} - ${w.end}`}
+                          />
+                        ))}
+                      </div>
                     </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => setNewOverrideWindows([...newOverrideWindows, { start: '14:00', end: '17:00' }])}
-                  >
-                    + Ajouter une plage
-                  </Button>
-                </div>
-              )}
-
-              <Button type="button" onClick={() => void createOverride()} isLoading={saving}>
-                Ajouter l'exception
-              </Button>
+                  );
+                })}
+              </div>
             </div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Exceptions planifiees ({availability.dateOverrides.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {availability.dateOverrides.length === 0 ? (
-              <p className={styles.empty}>Aucune exception configuree.</p>
-            ) : (
-              <ul className={styles.overridesList}>
-                {availability.dateOverrides.map((override) => (
-                  <li key={override.id} className={styles.overrideItem}>
-                    <div className={styles.overrideInfo}>
-                      <span className={styles.overrideDate}>
-                        {new Date(override.date + 'T00:00:00').toLocaleDateString('fr-FR', {
-                          weekday: 'long',
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        })}
-                      </span>
-                      <span className={`${styles.overrideType} ${styles[override.overrideType]}`}>
-                        {override.overrideType === 'unavailable' ? 'Indisponible' : 'Horaires modifies'}
-                      </span>
-                      {override.reason && <span className={styles.overrideReason}>{override.reason}</span>}
+            {/* Day Editor */}
+            {selectedDay !== null && (
+              <DayEditor
+                day={DAYS[selectedDay]}
+                schedule={availability.weeklySchedule.find((d) => d.dayOfWeek === selectedDay)!}
+                saving={saving}
+                onSave={(isAvailable, windows) => {
+                  void updateDaySchedule(selectedDay, isAvailable, windows);
+                }}
+                onClose={() => setSelectedDay(null)}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Settings View */}
+        {activeView === 'settings' && (
+          <div className={styles.settingsView}>
+            {/* Session Duration */}
+            <section className={styles.settingSection}>
+              <div className={styles.settingHeader}>
+                <span className={styles.settingIcon}>⏱️</span>
+                <div>
+                  <h3 className={styles.settingTitle}>Durée des sessions</h3>
+                  <p className={styles.settingDesc}>Combien de temps dure une session de mentorat ?</p>
+                </div>
+              </div>
+              <div className={styles.durationGrid}>
+                {DURATION_PRESETS.map((d) => (
+                  <button
+                    key={d.value}
+                    type="button"
+                    className={`${styles.durationBtn} ${availability.settings.sessionDuration === d.value ? styles.durationActive : ''}`}
+                    onClick={() => void updateSettings({ sessionDuration: d.value })}
+                  >
+                    <span className={styles.durationIcon}>{d.icon}</span>
+                    <span className={styles.durationLabel}>{d.label}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {/* Buffer Time */}
+            <section className={styles.settingSection}>
+              <div className={styles.settingHeader}>
+                <span className={styles.settingIcon}>☕</span>
+                <div>
+                  <h3 className={styles.settingTitle}>Temps de pause</h3>
+                  <p className={styles.settingDesc}>Pause entre les sessions pour vous préparer</p>
+                </div>
+              </div>
+              <div className={styles.bufferGrid}>
+                <div className={styles.bufferGroup}>
+                  <label className={styles.bufferLabel}>Avant</label>
+                  <div className={styles.bufferOptions}>
+                    {BUFFER_PRESETS.map((b) => (
+                      <button
+                        key={b}
+                        type="button"
+                        className={`${styles.bufferBtn} ${availability.settings.bufferBefore === b ? styles.bufferActive : ''}`}
+                        onClick={() => void updateSettings({ bufferBefore: b })}
+                      >
+                        {b === 0 ? '0' : `${b}m`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className={styles.bufferGroup}>
+                  <label className={styles.bufferLabel}>Après</label>
+                  <div className={styles.bufferOptions}>
+                    {BUFFER_PRESETS.map((b) => (
+                      <button
+                        key={b}
+                        type="button"
+                        className={`${styles.bufferBtn} ${availability.settings.bufferAfter === b ? styles.bufferActive : ''}`}
+                        onClick={() => void updateSettings({ bufferAfter: b })}
+                      >
+                        {b === 0 ? '0' : `${b}m`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Booking Rules */}
+            <section className={styles.settingSection}>
+              <div className={styles.settingHeader}>
+                <span className={styles.settingIcon}>📋</span>
+                <div>
+                  <h3 className={styles.settingTitle}>Règles de réservation</h3>
+                  <p className={styles.settingDesc}>Contrôlez quand les étudiants peuvent réserver</p>
+                </div>
+              </div>
+              <div className={styles.rulesGrid}>
+                <div className={styles.ruleGroup}>
+                  <label className={styles.ruleLabel}>Préavis minimum</label>
+                  <div className={styles.ruleOptions}>
+                    {NOTICE_PRESETS.map((n) => (
+                      <button
+                        key={n.hours}
+                        type="button"
+                        className={`${styles.ruleBtn} ${availability.settings.minNoticeHours === n.hours ? styles.ruleActive : ''}`}
+                        onClick={() => void updateSettings({ minNoticeHours: n.hours })}
+                      >
+                        {n.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className={styles.ruleGroup}>
+                  <label className={styles.ruleLabel}>Fenêtre de réservation</label>
+                  <div className={styles.ruleOptions}>
+                    {WINDOW_PRESETS.map((w) => (
+                      <button
+                        key={w.days}
+                        type="button"
+                        className={`${styles.ruleBtn} ${availability.settings.maxDaysAhead === w.days ? styles.ruleActive : ''}`}
+                        onClick={() => void updateSettings({ maxDaysAhead: w.days })}
+                      >
+                        {w.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Limits */}
+            <section className={styles.settingSection}>
+              <div className={styles.settingHeader}>
+                <span className={styles.settingIcon}>🎯</span>
+                <div>
+                  <h3 className={styles.settingTitle}>Limites</h3>
+                  <p className={styles.settingDesc}>Évitez le surmenage en limitant vos sessions</p>
+                </div>
+              </div>
+              <div className={styles.limitsGrid}>
+                <div className={styles.limitGroup}>
+                  <label className={styles.limitLabel}>Max par jour</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={20}
+                    placeholder="∞"
+                    value={availability.settings.dailyLimit ?? ''}
+                    onChange={(e) => void updateSettings({ dailyLimit: e.target.value ? Number(e.target.value) : null })}
+                    className={styles.limitInput}
+                  />
+                </div>
+                <div className={styles.limitGroup}>
+                  <label className={styles.limitLabel}>Max par semaine</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={50}
+                    placeholder="∞"
+                    value={availability.settings.weeklyLimit ?? ''}
+                    onChange={(e) => void updateSettings({ weeklyLimit: e.target.value ? Number(e.target.value) : null })}
+                    className={styles.limitInput}
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* Timezone */}
+            <section className={styles.settingSection}>
+              <div className={styles.settingHeader}>
+                <span className={styles.settingIcon}>🌍</span>
+                <div>
+                  <h3 className={styles.settingTitle}>Fuseau horaire</h3>
+                  <p className={styles.settingDesc}>Tous les horaires sont affichés dans ce fuseau</p>
+                </div>
+              </div>
+              <input
+                type="text"
+                value={availability.settings.timezone}
+                onChange={(e) => void updateSettings({ timezone: e.target.value })}
+                className={styles.timezoneInput}
+                placeholder="Europe/Paris"
+              />
+            </section>
+          </div>
+        )}
+
+        {/* Exceptions View */}
+        {activeView === 'exceptions' && (
+          <div className={styles.exceptionsView}>
+            {/* Add Exception */}
+            <section className={styles.addException}>
+              <h2 className={styles.sectionTitle}>Ajouter une exception</h2>
+              <p className={styles.sectionDesc}>Bloquez un jour ou modifiez vos horaires ponctuellement</p>
+
+              <div className={styles.exceptionForm}>
+                <div className={styles.exceptionRow}>
+                  <input
+                    type="date"
+                    value={newOverrideDate}
+                    min={new Date().toISOString().split('T')[0]}
+                    onChange={(e) => setNewOverrideDate(e.target.value)}
+                    className={styles.dateInput}
+                  />
+                  <div className={styles.typeToggle}>
+                    <button
+                      type="button"
+                      className={`${styles.typeBtn} ${newOverrideType === 'unavailable' ? styles.typeActive : ''}`}
+                      onClick={() => setNewOverrideType('unavailable')}
+                    >
+                      🚫 Indisponible
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.typeBtn} ${newOverrideType === 'custom_hours' ? styles.typeActive : ''}`}
+                      onClick={() => setNewOverrideType('custom_hours')}
+                    >
+                      🕐 Horaires modifiés
+                    </button>
+                  </div>
+                </div>
+
+                {newOverrideType === 'custom_hours' && (
+                  <div className={styles.customHours}>
+                    {newOverrideWindows.map((w, i) => (
+                      <div key={i} className={styles.windowRow}>
+                        <input
+                          type="time"
+                          value={w.start}
+                          onChange={(e) => {
+                            const updated = [...newOverrideWindows];
+                            updated[i] = { ...updated[i], start: e.target.value };
+                            setNewOverrideWindows(updated);
+                          }}
+                          className={styles.timeInput}
+                        />
+                        <span className={styles.timeSep}>→</span>
+                        <input
+                          type="time"
+                          value={w.end}
+                          onChange={(e) => {
+                            const updated = [...newOverrideWindows];
+                            updated[i] = { ...updated[i], end: e.target.value };
+                            setNewOverrideWindows(updated);
+                          }}
+                          className={styles.timeInput}
+                        />
+                        {newOverrideWindows.length > 1 && (
+                          <button
+                            type="button"
+                            className={styles.removeBtn}
+                            onClick={() => setNewOverrideWindows(newOverrideWindows.filter((_, j) => j !== i))}
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      className={styles.addWindowBtn}
+                      onClick={() => setNewOverrideWindows([...newOverrideWindows, { start: '14:00', end: '18:00' }])}
+                    >
+                      + Ajouter une plage
+                    </button>
+                  </div>
+                )}
+
+                <input
+                  type="text"
+                  value={newOverrideReason}
+                  onChange={(e) => setNewOverrideReason(e.target.value)}
+                  placeholder="Raison (optionnel) : Vacances, RDV médical..."
+                  className={styles.reasonInput}
+                />
+
+                <button
+                  type="button"
+                  className={styles.submitBtn}
+                  onClick={() => void createOverride()}
+                  disabled={saving || !newOverrideDate}
+                >
+                  {saving ? 'Enregistrement...' : 'Ajouter l\'exception'}
+                </button>
+              </div>
+            </section>
+
+            {/* Exceptions List */}
+            <section className={styles.exceptionsList}>
+              <h3 className={styles.listTitle}>
+                Exceptions planifiées
+                <span className={styles.listCount}>{availability.dateOverrides.length}</span>
+              </h3>
+
+              {availability.dateOverrides.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <span className={styles.emptyIcon}>📭</span>
+                  <p>Aucune exception configurée</p>
+                </div>
+              ) : (
+                <ul className={styles.exceptionItems}>
+                  {availability.dateOverrides.map((override) => (
+                    <li key={override.id} className={styles.exceptionItem}>
+                      <div className={styles.exceptionDate}>
+                        <span className={styles.dateText}>{formatDate(override.date)}</span>
+                        <span className={`${styles.exceptionType} ${styles[override.overrideType]}`}>
+                          {override.overrideType === 'unavailable' ? '🚫 Indisponible' : '🕐 Modifié'}
+                        </span>
+                      </div>
+                      {override.reason && <span className={styles.exceptionReason}>{override.reason}</span>}
                       {override.timeWindows && (
-                        <span className={styles.overrideWindows}>
+                        <span className={styles.exceptionHours}>
                           {override.timeWindows.map((w) => `${w.start}-${w.end}`).join(', ')}
                         </span>
                       )}
-                    </div>
-                    <button
-                      type="button"
-                      className={styles.deleteButton}
-                      onClick={() => void deleteOverride(override.id)}
-                      aria-label="Supprimer cette exception"
-                    >
-                      &times;
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    );
-  };
-
-  // ─── Main Render ──────────────────────────────────────────────────────────
-
-  return (
-    <section className={styles.container} aria-labelledby="availability-title">
-      <header className={styles.header}>
-        <h1 id="availability-title" className={styles.title}>Disponibilites</h1>
-        <p className={styles.subtitle}>Configurez vos horaires et parametres de reservation.</p>
-      </header>
-
-      {error && (
-        <div className={styles.error} role="alert" aria-live="assertive">{error}</div>
-      )}
-      {success && (
-        <div className={styles.success} role="status" aria-live="polite">{success}</div>
-      )}
-
-      {loading ? (
-        <div className={styles.skeletonList} aria-busy="true">
-          <div className={styles.skeletonItem} />
-          <div className={styles.skeletonItem} />
-          <div className={styles.skeletonItem} />
-        </div>
-      ) : availability && (
-        <>
-          {/* Global toggle */}
-          <Card className={styles.globalCard}>
-            <CardContent>
-              <label className={styles.toggleLabel}>
-                <input
-                  type="checkbox"
-                  checked={availability.isAvailable}
-                  onChange={(e) => void updateGeneral({ isAvailable: e.target.checked })}
-                  disabled={saving}
-                  className={styles.checkbox}
-                />
-                <span className={styles.toggleText}>
-                  {availability.isAvailable ? 'Disponible pour les reservations' : 'Reservations desactivees'}
-                </span>
-              </label>
-            </CardContent>
-          </Card>
-
-          {renderTabs()}
-
-          <div className={styles.tabContent} role="tabpanel">
-            {activeTab === 'settings' && renderSettingsTab()}
-            {activeTab === 'schedule' && renderScheduleTab()}
-            {activeTab === 'overrides' && renderOverridesTab()}
+                      <button
+                        type="button"
+                        className={styles.deleteBtn}
+                        onClick={() => void deleteOverride(override.id)}
+                        aria-label="Supprimer"
+                      >
+                        ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
           </div>
-        </>
-      )}
-    </section>
+        )}
+      </main>
+    </div>
   );
 }
 
-// ─── Sub-component: Day Schedule Card ───────────────────────────────────────
+// ─── Day Editor Component ───────────────────────────────────────────────────
 
-interface DayScheduleCardProps {
-  day: DaySchedule;
+interface DayEditorProps {
+  day: { key: number; short: string; full: string };
+  schedule: DaySchedule;
   saving: boolean;
-  onUpdate: (isAvailable: boolean, timeWindows: TimeWindow[]) => void;
+  onSave: (isAvailable: boolean, windows: TimeWindow[]) => void;
+  onClose: () => void;
 }
 
-function DayScheduleCard({ day, saving, onUpdate }: DayScheduleCardProps) {
-  const [isAvailable, setIsAvailable] = useState(day.isAvailable);
-  const [timeWindows, setTimeWindows] = useState<TimeWindow[]>(day.timeWindows.length > 0 ? day.timeWindows : []);
+function DayEditor({ day, schedule, saving, onSave, onClose }: DayEditorProps) {
+  const [isAvailable, setIsAvailable] = useState(schedule.isAvailable);
+  const [windows, setWindows] = useState<TimeWindow[]>(
+    schedule.timeWindows.length > 0 ? [...schedule.timeWindows] : [{ start: '09:00', end: '17:00' }]
+  );
   const [isDirty, setIsDirty] = useState(false);
 
-  const handleToggle = (checked: boolean) => {
-    setIsAvailable(checked);
-    setIsDirty(true);
-  };
-
-  const handleWindowChange = (idx: number, field: 'start' | 'end', value: string) => {
-    const updated = [...timeWindows];
-    updated[idx] = { ...updated[idx], [field]: value };
-    setTimeWindows(updated);
-    setIsDirty(true);
-  };
-
-  const addWindow = () => {
-    setTimeWindows([...timeWindows, { start: '14:00', end: '18:00' }]);
-    setIsDirty(true);
-  };
-
-  const removeWindow = (idx: number) => {
-    setTimeWindows(timeWindows.filter((_, i) => i !== idx));
-    setIsDirty(true);
-  };
-
   const handleSave = () => {
-    onUpdate(isAvailable, timeWindows);
+    onSave(isAvailable, isAvailable ? windows : []);
     setIsDirty(false);
   };
 
   return (
-    <Card className={`${styles.dayCard} ${isAvailable ? styles.dayActive : styles.dayInactive}`}>
-      <CardHeader>
-        <div className={styles.dayHeader}>
-          <label className={styles.dayToggle}>
-            <input
-              type="checkbox"
-              checked={isAvailable}
-              onChange={(e) => handleToggle(e.target.checked)}
-              className={styles.checkbox}
-            />
-            <span className={styles.dayName}>{day.dayName}</span>
-          </label>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {isAvailable ? (
-          <div className={styles.windowsContainer}>
-            {timeWindows.length === 0 ? (
-              <p className={styles.noWindows}>Aucune plage configuree</p>
-            ) : (
-              timeWindows.map((window, idx) => (
-                <div key={idx} className={styles.windowRow}>
-                  <input
-                    type="time"
-                    value={window.start}
-                    onChange={(e) => handleWindowChange(idx, 'start', e.target.value)}
-                    className={styles.timeInput}
-                  />
-                  <span className={styles.timeSeparator}>a</span>
-                  <input
-                    type="time"
-                    value={window.end}
-                    onChange={(e) => handleWindowChange(idx, 'end', e.target.value)}
-                    className={styles.timeInput}
-                  />
+    <div className={styles.dayEditor}>
+      <div className={styles.editorHeader}>
+        <h3 className={styles.editorTitle}>{day.full}</h3>
+        <button type="button" className={styles.closeBtn} onClick={onClose}>×</button>
+      </div>
+
+      <div className={styles.editorContent}>
+        <label className={styles.availableToggle}>
+          <input
+            type="checkbox"
+            checked={isAvailable}
+            onChange={(e) => {
+              setIsAvailable(e.target.checked);
+              setIsDirty(true);
+            }}
+            className={styles.toggleCheckbox}
+          />
+          <span className={styles.toggleSwitch} />
+          <span>{isAvailable ? 'Disponible' : 'Fermé'}</span>
+        </label>
+
+        {isAvailable && (
+          <div className={styles.windowsEditor}>
+            {windows.map((w, i) => (
+              <div key={i} className={styles.windowEdit}>
+                <input
+                  type="time"
+                  value={w.start}
+                  onChange={(e) => {
+                    const updated = [...windows];
+                    updated[i] = { ...updated[i], start: e.target.value };
+                    setWindows(updated);
+                    setIsDirty(true);
+                  }}
+                  className={styles.timeEditInput}
+                />
+                <span className={styles.timeTo}>à</span>
+                <input
+                  type="time"
+                  value={w.end}
+                  onChange={(e) => {
+                    const updated = [...windows];
+                    updated[i] = { ...updated[i], end: e.target.value };
+                    setWindows(updated);
+                    setIsDirty(true);
+                  }}
+                  className={styles.timeEditInput}
+                />
+                {windows.length > 1 && (
                   <button
                     type="button"
                     className={styles.removeWindowBtn}
-                    onClick={() => removeWindow(idx)}
-                    aria-label="Supprimer cette plage"
+                    onClick={() => {
+                      setWindows(windows.filter((_, j) => j !== i));
+                      setIsDirty(true);
+                    }}
                   >
-                    &times;
+                    ×
                   </button>
-                </div>
-              ))
-            )}
-            <button type="button" className={styles.addWindowBtn} onClick={addWindow}>
-              + Ajouter une plage
+                )}
+              </div>
+            ))}
+            <button
+              type="button"
+              className={styles.addSlotBtn}
+              onClick={() => {
+                setWindows([...windows, { start: '14:00', end: '18:00' }]);
+                setIsDirty(true);
+              }}
+            >
+              + Ajouter une plage horaire
             </button>
           </div>
-        ) : (
-          <p className={styles.closedText}>Ferme</p>
         )}
+      </div>
 
-        {isDirty && (
-          <Button
-            type="button"
-            size="sm"
-            onClick={handleSave}
-            isLoading={saving}
-            className={styles.saveBtn}
-          >
-            Enregistrer
-          </Button>
-        )}
-      </CardContent>
-    </Card>
+      <div className={styles.editorFooter}>
+        <button type="button" className={styles.cancelBtn} onClick={onClose}>
+          Annuler
+        </button>
+        <button
+          type="button"
+          className={styles.saveBtn}
+          onClick={handleSave}
+          disabled={saving || !isDirty}
+        >
+          {saving ? 'Enregistrement...' : 'Enregistrer'}
+        </button>
+      </div>
+    </div>
   );
 }
