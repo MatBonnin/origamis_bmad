@@ -358,6 +358,15 @@ export function MyBookings({ accessToken, userId }: Props) {
                   )}
                   {isActive(booking.status) && (
                     <div className={styles.actions}>
+                      {booking.status === 'pending' && (
+                        <Link
+                          href={`/paiement?bookingId=${booking.bookingId}`}
+                          className={styles.payButton}
+                          aria-label={`Payer la session du ${formatDate(booking.bookingDate)}`}
+                        >
+                          Payer
+                        </Link>
+                      )}
                       {booking.status === 'confirmed' && (
                         <>
                           <Button
@@ -371,13 +380,6 @@ export function MyBookings({ accessToken, userId }: Props) {
                               ? 'Chargement...'
                               : 'Rejoindre visio'}
                           </Button>
-                          <Link
-                            href={`/paiement?bookingId=${booking.bookingId}`}
-                            className={styles.payButton}
-                            aria-label={`Payer la session du ${formatDate(booking.bookingDate)}`}
-                          >
-                            Payer
-                          </Link>
                         </>
                       )}
                       <Button

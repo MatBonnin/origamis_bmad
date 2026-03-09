@@ -1,0 +1,53 @@
+.container {
+  display: grid;
+  gap: var(--spacing-4);
+}
+
+.header {
+  display: grid;
+  gap: var(--spacing-2);
+}
+
+.title {
+  color: var(--color-primary-900);
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+}
+
+.subtitle {
+  color: var(--color-neutral-700);
+}
+
+.list {
+  display: grid;
+  gap: var(--spacing-4);
+}
+
+.meta {
+  color: var(--color-neutral-700);
+  margin-bottom: var(--spacing-2);
+}
+
+.message {
+  margin-bottom: var(--spacing-3);
+}
+
+.actions {
+  display: grid;
+  gap: var(--spacing-3);
+}
+
+.buttonRow {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.error {
+  color: var(--color-danger-600);
+}
+
+.empty,
+.loading {
+  color: var(--color-neutral-700);
+}
+

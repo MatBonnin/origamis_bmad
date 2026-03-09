@@ -22,7 +22,7 @@ import { MilestonesService } from './milestones.service';
 @ApiTags('milestones')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-@Controller()
+@Controller('milestones')
 export class MilestonesController {
   constructor(private readonly milestonesService: MilestonesService) {}
 
@@ -74,7 +74,7 @@ export class MilestonesController {
     return { data, error: null };
   }
 
-  @Get('milestones/:id')
+  @Get(':id')
   @ApiOperation({ summary: 'Recuperer un jalon' })
   async getMilestone(
     @CurrentUser() user: { id: string; roles: string[] },
@@ -84,14 +84,14 @@ export class MilestonesController {
     return { data, error: null };
   }
 
-  @Patch('milestones/:id/status')
+  @Patch(':id/status')
   @ApiOperation({ summary: 'Mettre a jour le statut d un jalon' })
   async updateStatus(
     @CurrentUser() user: { id: string; roles: string[] },
     @Param('id') milestoneId: string,
     @Body()
     body: {
-      status: 'planned' | 'in-progress' | 'review' | 'done' | 'blocked';
+      status: 'planned' | 'in_progress' | 'review' | 'done' | 'blocked';
       comment?: string;
     },
   ) {
@@ -103,7 +103,7 @@ export class MilestonesController {
     return { data, error: null };
   }
 
-  @Post('milestones/:id/review')
+  @Post(':id/review')
   @ApiOperation({ summary: 'Valider ou refuser un jalon (mentor)' })
   async reviewMilestone(
     @CurrentUser() user: { id: string; roles: string[] },
@@ -117,4 +117,5 @@ export class MilestonesController {
     );
     return { data, error: null };
   }
+
 }

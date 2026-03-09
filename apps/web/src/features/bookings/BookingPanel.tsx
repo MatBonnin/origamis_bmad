@@ -131,7 +131,7 @@ export function BookingPanel({ accessToken, mentorId, mentorName }: Props) {
       }
       const createdBookingId = (result.data as { bookingId?: string })?.bookingId ?? null;
       setNewBookingId(createdBookingId);
-      setSuccess('Rendez-vous confirme !');
+      setSuccess('Reservation creee. Paiement requis pour confirmation.');
       setSelectedSlot('');
       setBookingDate('');
       setNotes('');

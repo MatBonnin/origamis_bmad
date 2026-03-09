@@ -21,7 +21,7 @@ describe('StudentProgression', () => {
             {
               id: 'booking:b-1',
               type: 'rdv',
-              status: 'in-progress',
+              status: 'in_progress',
               title: 'Rendez-vous mentorat',
               dueAt: '2026-02-10T10:00:00.000Z',
               notes: null,
@@ -77,7 +77,7 @@ describe('StudentProgression', () => {
               {
                 id: 'booking:b-1',
                 type: 'rdv',
-                status: 'in-progress',
+                status: 'in_progress',
                 title: 'Rendez-vous mentorat',
                 dueAt: '2026-02-10T10:00:00.000Z',
                 notes: null,

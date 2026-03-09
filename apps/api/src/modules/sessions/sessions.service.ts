@@ -433,6 +433,38 @@ startxref
       throw new BadRequestException({ code: 'SESSION_NOT_COMPLETED', message: 'La session doit etre terminee' });
     }
 
+    if (input.linkedMilestoneId) {
+      const linkedMilestone = await this.prisma.student_program_milestones.findUnique({
+        where: { id: input.linkedMilestoneId },
+        include: {
+          program: {
+            select: {
+              mentor_id: true,
+              student_id: true,
+              status: true,
+            },
+          },
+        },
+      });
+
+      if (!linkedMilestone) {
+        throw new BadRequestException({
+          code: 'LINKED_MILESTONE_NOT_FOUND',
+          message: 'Le jalon lie est introuvable',
+        });
+      }
+
+      const samePair =
+        linkedMilestone.program.mentor_id === booking.mentor_id &&
+        linkedMilestone.program.student_id === booking.student_id;
+      if (!samePair || linkedMilestone.program.status !== 'active') {
+        throw new BadRequestException({
+          code: 'LINKED_MILESTONE_INVALID',
+          message: 'Le jalon lie doit appartenir au parcours actif de cet etudiant',
+        });
+      }
+    }
+
     const feedback = await this.prisma.session_feedback.upsert({
       where: { booking_id: bookingId },
       create: {

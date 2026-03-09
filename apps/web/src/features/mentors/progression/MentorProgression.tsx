@@ -10,7 +10,7 @@ type Milestone = {
   id: string;
   title: string;
   type: 'message' | 'rdv' | 'visio';
-  status: 'planned' | 'in-progress' | 'review' | 'done' | 'blocked';
+  status: 'planned' | 'in_progress' | 'review' | 'done' | 'blocked';
   dueAt: string;
 };
 
@@ -30,7 +30,7 @@ interface Props {
 
 const STATUS_LABELS: Record<Milestone['status'], string> = {
   planned: 'Planifie',
-  'in-progress': 'En cours',
+  in_progress: 'En cours',
   review: 'En validation',
   done: 'Termine',
   blocked: 'Bloque',
@@ -55,8 +55,8 @@ export function MentorProgression({ accessToken, studentId }: Props) {
 
       try {
         const [progressionResponse, insightsResponse] = await Promise.all([
-          fetch(`${API_URL}/students/${studentId}/progression`, { headers, cache: 'no-store' }),
-          fetch(`${API_URL}/students/${studentId}/milestone-insights`, { headers, cache: 'no-store' }),
+          fetch(`${API_URL}/milestones/students/${studentId}/progression`, { headers, cache: 'no-store' }),
+          fetch(`${API_URL}/milestones/students/${studentId}/milestone-insights`, { headers, cache: 'no-store' }),
         ]);
 
         const progressionResult = await progressionResponse.json();

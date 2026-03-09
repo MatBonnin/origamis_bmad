@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
@@ -34,6 +35,12 @@ export class PaymentsService {
 
     if (booking.student_id !== studentId) {
       throw new BadRequestException({ code: 'NOT_YOUR_BOOKING', message: 'Ce rendez-vous ne vous appartient pas' });
+    }
+    if (booking.status !== 'pending') {
+      throw new ConflictException({
+        code: 'BOOKING_NOT_PENDING',
+        message: 'Le paiement est autorise uniquement pour une reservation en attente',
+      });
     }
 
     const existingPayment = await this.prisma.payments.findUnique({
@@ -88,7 +95,7 @@ export class PaymentsService {
       },
     });
 
-    return { checkoutUrl: session.url };
+    return { checkoutUrl: session.url, bookingStatus: booking.status };
   }
 
   async handleWebhook(rawBody: Buffer, signature: string) {
@@ -130,6 +137,9 @@ export class PaymentsService {
       });
 
       if (booking) {
+        await this.ensureConversation(booking.student_id, booking.mentor_id);
+        await this.ensureActiveProgram(booking.student_id, booking.mentor_id, booking.booking_date);
+
         await this.notifications.emitNotification({
           userId: booking.student_id,
           category: 'rdv',
@@ -263,5 +273,125 @@ export class PaymentsService {
     }
 
     return subscription;
+  }
+
+  private async ensureConversation(studentId: string, mentorId: string) {
+    const existing = await this.prisma.conversations.findUnique({
+      where: {
+        mentor_id_student_id: {
+          mentor_id: mentorId,
+          student_id: studentId,
+        },
+      },
+      select: { id: true },
+    });
+
+    if (existing) {
+      return existing.id;
+    }
+
+    const created = await this.prisma.conversations.create({
+      data: {
+        mentor_id: mentorId,
+        student_id: studentId,
+      },
+      select: { id: true },
+    });
+
+    return created.id;
+  }
+
+  private async ensureActiveProgram(
+    studentId: string,
+    mentorId: string,
+    startDate: Date,
+  ) {
+    const active = await this.prisma.student_programs.findFirst({
+      where: {
+        student_id: studentId,
+        mentor_id: mentorId,
+        status: 'active',
+      },
+      select: { id: true },
+    });
+
+    if (active) {
+      return active.id;
+    }
+
+    const template = await this.prisma.program_templates.findFirst({
+      where: { mentor_id: mentorId },
+      include: {
+        milestones: { orderBy: { milestone_order: 'asc' } },
+      },
+      orderBy: { updated_at: 'desc' },
+    });
+
+    const program = await this.prisma.student_programs.create({
+      data: {
+        template_id: template?.id ?? null,
+        mentor_id: mentorId,
+        student_id: studentId,
+        title: template?.title ?? 'Parcours de mentorat',
+        status: 'active',
+        start_at: startDate,
+      },
+    });
+
+    if (template && template.milestones.length > 0) {
+      for (const milestone of template.milestones) {
+        const deadline = new Date(startDate);
+        deadline.setDate(deadline.getDate() + milestone.due_days_from_start);
+
+        await this.prisma.student_program_milestones.create({
+          data: {
+            program_id: program.id,
+            title: milestone.title,
+            description: milestone.description,
+            milestone_order: milestone.milestone_order,
+            deadline_at: deadline,
+            status: 'planned',
+          },
+        });
+      }
+      return program.id;
+    }
+
+    const defaultMilestones = [
+      {
+        title: 'Cadrer le projet',
+        description: 'Clarifier le besoin, le sujet et les objectifs.',
+        dueDaysFromStart: 7,
+      },
+      {
+        title: 'Produire un premier livrable',
+        description: 'Realiser une version initiale puis recueillir un retour mentor.',
+        dueDaysFromStart: 21,
+      },
+      {
+        title: 'Finaliser et preparer la soutenance',
+        description: 'Finaliser le rendu et preparer la presentation.',
+        dueDaysFromStart: 35,
+      },
+    ];
+
+    for (let index = 0; index < defaultMilestones.length; index += 1) {
+      const item = defaultMilestones[index];
+      const deadline = new Date(startDate);
+      deadline.setDate(deadline.getDate() + item.dueDaysFromStart);
+
+      await this.prisma.student_program_milestones.create({
+        data: {
+          program_id: program.id,
+          title: item.title,
+          description: item.description,
+          milestone_order: index + 1,
+          deadline_at: deadline,
+          status: 'planned',
+        },
+      });
+    }
+
+    return program.id;
   }
 }

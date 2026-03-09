@@ -105,7 +105,7 @@ describe('BookingPanel', () => {
     );
 
     expect(
-      await screen.findByText('Rendez-vous confirme !'),
+      await screen.findByText('Reservation creee. Paiement requis pour confirmation.'),
     ).toBeInTheDocument();
   });
 

@@ -326,6 +326,14 @@ export class MentorsEpic8Service {
   async listMentorRequests(mentorId: string) {
     const rows = await this.prisma.mentor_requests.findMany({
       where: { mentor_id: mentorId },
+      include: {
+        student: {
+          select: {
+            first_name: true,
+            last_name: true,
+          },
+        },
+      },
       orderBy: { created_at: 'desc' },
     });
 
@@ -337,6 +345,7 @@ export class MentorsEpic8Service {
         status: row.status,
         message: row.message,
         decisionReason: row.decision_reason,
+        studentName: `${row.student.first_name} ${row.student.last_name}`.trim(),
         createdAt: row.created_at.toISOString(),
         updatedAt: row.updated_at.toISOString(),
       })),
@@ -573,6 +582,12 @@ export class MentorsEpic8Service {
         ...(studentId ? { student_id: studentId } : {}),
       },
       include: {
+        student: {
+          select: {
+            first_name: true,
+            last_name: true,
+          },
+        },
         milestones: { orderBy: { milestone_order: 'asc' } },
       },
       orderBy: { updated_at: 'desc' },
@@ -584,6 +599,7 @@ export class MentorsEpic8Service {
         templateId: program.template_id,
         mentorId: program.mentor_id,
         studentId: program.student_id,
+        studentName: `${program.student.first_name} ${program.student.last_name}`.trim(),
         title: program.title,
         status: program.status,
         startAt: program.start_at.toISOString(),

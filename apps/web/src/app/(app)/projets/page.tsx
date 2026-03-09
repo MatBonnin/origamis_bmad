@@ -2,7 +2,6 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { StudentProgression } from '@/features/milestones';
-import { MentorProgression } from '@/features/mentors/progression';
 
 export default async function ProjetsPage() {
   const session = await getServerSession(authOptions);
@@ -12,7 +11,7 @@ export default async function ProjetsPage() {
   }
 
   if (session.user.roles.includes('mentor') && !session.user.roles.includes('etudiant')) {
-    return <MentorProgression accessToken={session.accessToken} studentId={session.user.id} />;
+    redirect('/mentor/programs');
   }
 
   return (

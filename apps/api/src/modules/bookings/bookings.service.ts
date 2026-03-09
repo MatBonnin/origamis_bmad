@@ -122,7 +122,7 @@ export class BookingsService {
       slot.end_time,
     );
 
-    // 8. Create booking
+    // 8. Create booking (payment-gated flow: pending until payment succeeds)
     const booking = await this.prisma.bookings.create({
       data: {
         student_id: studentId,
@@ -131,7 +131,7 @@ export class BookingsService {
         booking_date: bookingDate,
         start_time: slot.start_time,
         end_time: slot.end_time,
-        status: 'confirmed',
+        status: 'pending',
         notes: dto.notes ?? null,
       },
     });
@@ -139,20 +139,25 @@ export class BookingsService {
     // 9. Notify mentor
     await this.emitBookingNotification(
       dto.mentorId,
-      'Nouveau rendez-vous',
-      `Un etudiant a reserve un creneau le ${this.formatDate(bookingDate)} de ${slot.start_time} a ${slot.end_time}`,
+      'Nouvelle reservation en attente',
+      `Un etudiant a reserve un creneau le ${this.formatDate(bookingDate)} de ${slot.start_time} a ${slot.end_time} (en attente de paiement)`,
       { bookingId: booking.id },
     );
 
     // 10. Notify student (confirmation)
     await this.emitBookingNotification(
       studentId,
-      'Rendez-vous confirme',
-      `Votre rendez-vous du ${this.formatDate(bookingDate)} de ${slot.start_time} a ${slot.end_time} est confirme`,
+      'Reservation en attente de paiement',
+      `Finalisez le paiement pour confirmer votre rendez-vous du ${this.formatDate(bookingDate)} de ${slot.start_time} a ${slot.end_time}`,
       { bookingId: booking.id },
     );
 
-    return { booking: this.mapBooking(booking) };
+    const mapped = this.mapBooking(booking);
+    return {
+      booking: mapped,
+      bookingId: mapped.bookingId,
+      paymentRequired: true,
+    };
   }
 
   async getBooking(userId: string, bookingId: string) {
@@ -269,6 +274,13 @@ export class BookingsService {
       throw new BadRequestException({
         code: 'ALREADY_COMPLETED',
         message: 'Un rendez-vous termine ne peut pas etre annule',
+      });
+    }
+
+    if (booking.status !== 'pending' && booking.status !== 'confirmed') {
+      throw new BadRequestException({
+        code: 'CANNOT_CANCEL_STATUS',
+        message: "Ce statut de rendez-vous ne permet pas l'annulation",
       });
     }
 

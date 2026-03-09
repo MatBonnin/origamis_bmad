@@ -119,12 +119,35 @@ function normalizeStudentProgression(
   data: StudentProgression | null,
 ): StudentProgression {
   const milestones = Array.isArray(data?.milestones) ? data.milestones : [];
+  const metadataLike = data as unknown as {
+    metadata?: {
+      total?: number;
+      totalCompleted?: number;
+      totalPending?: number;
+      completionRate?: number;
+    };
+  };
+  const metadata = metadataLike?.metadata;
+
+  const totalMilestones =
+    Math.max(0, toSafeNumber(data?.totalMilestones)) ||
+    Math.max(0, toSafeNumber(metadata?.total));
+  const completedMilestones =
+    Math.max(0, toSafeNumber(data?.completedMilestones)) ||
+    Math.max(0, toSafeNumber(metadata?.totalCompleted));
+  const inferredInProgress = Math.max(0, totalMilestones - completedMilestones);
+  const inProgressMilestones =
+    Math.max(0, toSafeNumber(data?.inProgressMilestones)) ||
+    Math.max(0, toSafeNumber(metadata?.totalPending)) ||
+    inferredInProgress;
 
   return {
-    completionRate: Math.max(0, toSafeNumber(data?.completionRate)),
-    totalMilestones: Math.max(0, toSafeNumber(data?.totalMilestones)),
-    completedMilestones: Math.max(0, toSafeNumber(data?.completedMilestones)),
-    inProgressMilestones: Math.max(0, toSafeNumber(data?.inProgressMilestones)),
+    completionRate:
+      Math.max(0, toSafeNumber(data?.completionRate)) ||
+      Math.max(0, toSafeNumber(metadata?.completionRate)),
+    totalMilestones,
+    completedMilestones,
+    inProgressMilestones,
     milestones,
   };
 }
@@ -437,7 +460,7 @@ export default async function DashboardPage() {
 
   // Fetch student-specific data
   const [progressionData, mentorData] = await Promise.all([
-    fetchJson<StudentProgression>(`${API_URL}/progression?user_id=${user.id}`, accessToken),
+    fetchJson<StudentProgression>(`${API_URL}/milestones/progression?user_id=${user.id}`, accessToken),
     fetchJson<StudentMentor>(`${API_URL}/students/me/mentor`, accessToken),
   ]);
 
@@ -573,17 +596,17 @@ export default async function DashboardPage() {
                   const statusClass =
                     m.status === 'done'
                       ? styles.done
-                      : m.status === 'in-progress'
+                      : m.status === 'in_progress'
                         ? styles.inProgress
                         : styles.pending;
                   const statusLabel =
                     m.status === 'done'
                       ? 'Termine'
-                      : m.status === 'in-progress'
+                      : m.status === 'in_progress'
                         ? 'En cours'
                         : 'A faire';
                   const icon =
-                    m.status === 'done' ? '✅' : m.status === 'in-progress' ? '🔄' : '⏳';
+                    m.status === 'done' ? '✅' : m.status === 'in_progress' ? '🔄' : '⏳';
                   return (
                     <li key={m.id} className={styles.milestoneItem}>
                       <div className={`${styles.milestoneIcon} ${statusClass}`}>{icon}</div>

@@ -97,7 +97,7 @@ describe('BookingsService', () => {
   };
 
   describe('createBooking', () => {
-    it('creates a confirmed booking', async () => {
+    it('creates a pending booking with payment required', async () => {
       const bookingDate = getNextWednesday();
       mockPrisma.mentor_availability_slots.findUnique.mockResolvedValue(
         validSlot,
@@ -111,7 +111,7 @@ describe('BookingsService', () => {
         booking_date: new Date(bookingDate),
         start_time: '14:00',
         end_time: '16:00',
-        status: 'confirmed',
+        status: 'pending',
         notes: null,
         cancelled_by: null,
         cancellation_reason: null,
@@ -126,7 +126,9 @@ describe('BookingsService', () => {
       });
 
       expect(result.booking.bookingId).toBe('booking-1');
-      expect(result.booking.status).toBe('confirmed');
+      expect(result.booking.status).toBe('pending');
+      expect(result.paymentRequired).toBe(true);
+      expect(result.bookingId).toBe('booking-1');
       expect(mockNotifications.emitNotification).toHaveBeenCalledTimes(2);
     });
 

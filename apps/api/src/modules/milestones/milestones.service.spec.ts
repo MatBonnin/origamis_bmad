@@ -8,19 +8,33 @@ describe('MilestonesService', () => {
   let service: MilestonesService;
 
   const mockPrisma = {
-    bookings: {
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
+    student_programs: {
       findFirst: jest.fn(),
     },
-    conversations: {
+    student_program_milestones: {
       findMany: jest.fn(),
       findUnique: jest.fn(),
+      update: jest.fn(),
     },
   };
 
   const mockNotifications = {
     emitNotification: jest.fn(),
+  };
+
+  const baseMilestoneRow = {
+    id: 'm-1',
+    title: 'Cadrer le projet',
+    description: 'Description',
+    status: 'in_progress',
+    deadline_at: new Date('2026-02-10T10:00:00.000Z'),
+    updated_at: new Date('2026-02-01T10:00:00.000Z'),
+    program: {
+      id: 'p-1',
+      student_id: 'student-1',
+      mentor_id: 'mentor-1',
+      title: 'Parcours',
+    },
   };
 
   beforeEach(async () => {
@@ -33,47 +47,27 @@ describe('MilestonesService', () => {
     }).compile();
 
     service = module.get<MilestonesService>(MilestonesService);
-
     jest.clearAllMocks();
 
-    mockPrisma.bookings.findMany.mockResolvedValue([
-      {
-        id: 'b-1',
-        student_id: 'student-1',
-        mentor_id: 'mentor-1',
-        booking_date: new Date('2026-02-01T10:00:00.000Z'),
-        status: 'confirmed',
-        notes: 'Point weekly',
-        session: null,
-      },
+    let currentStatus = baseMilestoneRow.status;
+
+    mockPrisma.student_programs.findFirst.mockResolvedValue({ id: 'p-1' });
+    mockPrisma.student_program_milestones.findMany.mockResolvedValue([
+      { ...baseMilestoneRow, status: currentStatus },
     ]);
-
-    mockPrisma.conversations.findMany.mockResolvedValue([
-      {
-        id: 'c-1',
-        student_id: 'student-1',
-        mentor_id: 'mentor-1',
-        last_message_at: new Date('2026-02-02T10:00:00.000Z'),
+    mockPrisma.student_program_milestones.findUnique.mockImplementation(async () => ({
+      ...baseMilestoneRow,
+      status: currentStatus,
+    }));
+    mockPrisma.student_program_milestones.update.mockImplementation(
+      async ({ data }: { data: { status?: string } }) => {
+        currentStatus = data.status ?? currentStatus;
+        return {
+          ...baseMilestoneRow,
+          status: currentStatus,
+        };
       },
-    ]);
-
-    mockPrisma.bookings.findUnique.mockResolvedValue({
-      id: 'b-1',
-      student_id: 'student-1',
-      mentor_id: 'mentor-1',
-      booking_date: new Date('2026-02-01T10:00:00.000Z'),
-      status: 'confirmed',
-      notes: 'Point weekly',
-      session: null,
-    });
-
-    mockPrisma.bookings.findFirst.mockResolvedValue({ id: 'rel-1' });
-    mockPrisma.conversations.findUnique.mockResolvedValue({
-      id: 'c-1',
-      student_id: 'student-1',
-      mentor_id: 'mentor-1',
-      last_message_at: new Date('2026-02-02T10:00:00.000Z'),
-    });
+    );
   });
 
   it('returns progression with metadata', async () => {
@@ -82,8 +76,8 @@ describe('MilestonesService', () => {
       {},
     );
 
-    expect(result.milestones.length).toBeGreaterThan(0);
-    expect(result.metadata.total).toBe(result.milestones.length);
+    expect(result.milestones).toHaveLength(1);
+    expect(result.metadata.total).toBe(1);
   });
 
   it('forbids student accessing another student progression', async () => {
@@ -96,23 +90,19 @@ describe('MilestonesService', () => {
   });
 
   it('requires mentor review before done for student action', async () => {
-    await expect(
-      service.updateMilestoneStatus(
-        { id: 'student-1', roles: ['etudiant'] },
-        'booking:b-1',
-        { status: 'done' },
-      ),
-    ).resolves.toEqual(
-      expect.objectContaining({
-        milestone: expect.objectContaining({ status: 'review' }),
-      }),
+    const result = await service.updateMilestoneStatus(
+      { id: 'student-1', roles: ['etudiant'] },
+      'm-1',
+      { status: 'done' },
     );
+
+    expect(result.milestone.status).toBe('review');
   });
 
   it('allows mentor to approve milestone review', async () => {
     const result = await service.reviewMilestone(
       { id: 'mentor-1', roles: ['mentor'] },
-      'booking:b-1',
+      'm-1',
       { approved: true, comments: 'OK' },
     );
 
@@ -125,42 +115,28 @@ describe('MilestonesService', () => {
     await expect(
       service.reviewMilestone(
         { id: 'student-1', roles: ['etudiant'] },
-        'booking:b-1',
+        'm-1',
         { approved: true },
       ),
     ).rejects.toThrow(ForbiddenException);
   });
 
   it('rejects direct done transition when not owner and not mentor', async () => {
-    mockPrisma.bookings.findUnique.mockResolvedValue({
-      id: 'b-1',
-      student_id: 'student-1',
-      mentor_id: 'mentor-1',
-      booking_date: new Date('2026-02-01T10:00:00.000Z'),
-      status: 'confirmed',
-      notes: 'Point weekly',
-      session: null,
-    });
-
     await expect(
       service.updateMilestoneStatus(
         { id: 'outsider-1', roles: ['etudiant'] },
-        'booking:b-1',
+        'm-1',
         { status: 'done' },
       ),
     ).rejects.toThrow(ForbiddenException);
   });
 
   it('returns mentor insights with risk level', async () => {
-    mockPrisma.bookings.findMany.mockResolvedValue([
+    mockPrisma.student_program_milestones.findMany.mockResolvedValue([
       {
-        id: 'b-1',
-        student_id: 'student-1',
-        mentor_id: 'mentor-1',
-        booking_date: new Date('2025-01-01T10:00:00.000Z'),
-        status: 'confirmed',
-        notes: null,
-        session: null,
+        ...baseMilestoneRow,
+        status: 'in_progress',
+        deadline_at: new Date('2025-01-01T10:00:00.000Z'),
       },
     ]);
 
@@ -173,7 +149,7 @@ describe('MilestonesService', () => {
   });
 
   it('throws when mentor is not linked to student', async () => {
-    mockPrisma.bookings.findFirst.mockResolvedValue(null);
+    mockPrisma.student_programs.findFirst.mockResolvedValue(null);
 
     await expect(
       service.getStudentProgression(
@@ -192,11 +168,11 @@ describe('MilestonesService', () => {
     ).rejects.toThrow(ForbiddenException);
   });
 
-  it('throws for invalid transition to done without review for support user', async () => {
+  it('throws for invalid transition to done without mentor validation for support user', async () => {
     await expect(
       service.updateMilestoneStatus(
         { id: 'support-1', roles: ['support'] },
-        'booking:b-1',
+        'm-1',
         { status: 'done' },
       ),
     ).rejects.toThrow(BadRequestException);

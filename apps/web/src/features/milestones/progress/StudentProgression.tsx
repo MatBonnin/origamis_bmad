@@ -80,7 +80,7 @@ export function StudentProgression({ accessToken, userId }: Props) {
         params.set('type', filter);
       }
 
-      const response = await fetch(`${API_URL}/progression?${params.toString()}`, {
+      const response = await fetch(`${API_URL}/milestones/progression?${params.toString()}`, {
         headers,
         cache: 'no-store',
       });

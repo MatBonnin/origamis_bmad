@@ -8,15 +8,8 @@ import { NotificationsService } from '../notifications';
 import { PrismaService } from '../prisma';
 
 type Role = 'etudiant' | 'mentor' | 'admin' | 'support';
-
 type MilestoneType = 'message' | 'rdv' | 'visio';
-
-type MilestoneStatus =
-  | 'planned'
-  | 'in-progress'
-  | 'review'
-  | 'done'
-  | 'blocked';
+type MilestoneStatus = 'planned' | 'in_progress' | 'review' | 'done' | 'blocked';
 
 interface CurrentUser {
   id: string;
@@ -26,7 +19,7 @@ interface CurrentUser {
 export interface Milestone {
   id: string;
   sourceId: string;
-  source: 'booking' | 'conversation';
+  source: 'program';
   userId: string;
   mentorId: string;
   type: MilestoneType;
@@ -36,6 +29,7 @@ export interface Milestone {
   title: string;
   notes: string | null;
   overdue: boolean;
+  programId: string;
 }
 
 interface GetProgressionQuery {
@@ -53,22 +47,16 @@ interface ReviewInput {
   comments?: string;
 }
 
-interface OverrideState {
-  status: MilestoneStatus;
-  completedAt: string | null;
-  updatedBy: string;
-}
-
-const REVIEW_REQUIRED_FOR_DONE: MilestoneStatus[] = [
+const VALID_STATUSES: MilestoneStatus[] = [
   'planned',
-  'in-progress',
+  'in_progress',
+  'review',
+  'done',
   'blocked',
 ];
 
 @Injectable()
 export class MilestonesService {
-  private readonly statusOverrides = new Map<string, OverrideState>();
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly notifications: NotificationsService,
@@ -79,7 +67,7 @@ export class MilestonesService {
       currentUser,
       query.userId,
     );
-    const milestones = await this.buildMilestonesForStudent(targetUserId);
+    const milestones = await this.buildProgramMilestonesForStudent(targetUserId);
 
     const filtered = query.type
       ? milestones.filter((item) => item.type === query.type)
@@ -99,7 +87,7 @@ export class MilestonesService {
       currentUser.roles,
     );
 
-    const milestones = await this.buildMilestonesForStudent(studentId);
+    const milestones = await this.buildProgramMilestonesForStudent(studentId);
     return {
       milestones,
       metadata: this.buildProgressionMetadata(milestones),
@@ -114,7 +102,7 @@ export class MilestonesService {
       currentUser.roles,
     );
 
-    const milestones = await this.buildMilestonesForStudent(studentId);
+    const milestones = await this.buildProgramMilestonesForStudent(studentId);
     const done = milestones.filter((item) => item.status === 'done').length;
     const overdue = milestones.filter((item) => item.overdue).length;
     const reviewPending = milestones.filter(
@@ -145,9 +133,8 @@ export class MilestonesService {
   }
 
   async getMilestone(currentUser: CurrentUser, milestoneId: string) {
-    const milestone = await this.findMilestoneById(milestoneId);
+    const milestone = await this.findProgramMilestoneById(milestoneId);
     this.assertCanAccessMilestone(currentUser, milestone);
-
     return { milestone };
   }
 
@@ -156,20 +143,27 @@ export class MilestonesService {
     milestoneId: string,
     input: UpdateStatusInput,
   ) {
-    const milestone = await this.findMilestoneById(milestoneId);
+    if (!VALID_STATUSES.includes(input.status)) {
+      throw new BadRequestException({
+        code: 'MILESTONE_STATUS_INVALID',
+        message: 'Statut de jalon invalide',
+      });
+    }
+
+    const milestone = await this.findProgramMilestoneById(milestoneId);
     this.assertCanAccessMilestone(currentUser, milestone);
 
     let nextStatus = input.status;
-
     const isStudentAction = milestone.userId === currentUser.id;
+
     if (isStudentAction && nextStatus === 'done') {
       nextStatus = 'review';
     }
 
     if (
       nextStatus === 'done' &&
-      REVIEW_REQUIRED_FOR_DONE.includes(milestone.status) &&
-      !currentUser.roles.includes('mentor')
+      !currentUser.roles.includes('mentor') &&
+      !currentUser.roles.includes('admin')
     ) {
       throw new BadRequestException({
         code: 'MILESTONE_REVIEW_REQUIRED',
@@ -177,33 +171,40 @@ export class MilestonesService {
       });
     }
 
-    const completedAt = nextStatus === 'done' ? new Date().toISOString() : null;
-
-    this.statusOverrides.set(milestone.id, {
-      status: nextStatus,
-      completedAt,
-      updatedBy: currentUser.id,
+    const updated = await this.prisma.student_program_milestones.update({
+      where: { id: milestoneId },
+      data: {
+        status: nextStatus,
+      },
+      include: {
+        program: {
+          select: {
+            id: true,
+            mentor_id: true,
+            student_id: true,
+          },
+        },
+      },
     });
 
     if (nextStatus === 'review') {
-      await this.safeNotify(milestone.mentorId, {
+      await this.safeNotify(updated.program.mentor_id, {
         channel: 'in_app',
         category: 'rdv',
         title: 'Jalon en attente de validation',
-        message: 'Un etudiant a demande la validation d un jalon.',
-        payload: { milestoneId: milestone.id, studentId: milestone.userId },
+        message: "Un etudiant a demande la validation d'un jalon.",
+        payload: { milestoneId: updated.id, studentId: updated.program.student_id },
       });
     }
 
-    const refreshed = await this.findMilestoneById(milestone.id);
+    const refreshed = await this.findProgramMilestoneById(updated.id);
+    const progression = this.buildProgressionMetadata(
+      await this.buildProgramMilestonesForStudent(refreshed.userId),
+    );
 
     return {
       milestone: refreshed,
-      progression: this.buildProgressionMetadata(
-        (await this.buildMilestonesForStudent(milestone.userId)).filter(
-          (item) => item.userId === milestone.userId,
-        ),
-      ),
+      progression,
     };
   }
 
@@ -213,12 +214,12 @@ export class MilestonesService {
     input: ReviewInput,
   ) {
     this.assertRole(currentUser, ['mentor', 'admin', 'support']);
-
-    const milestone = await this.findMilestoneById(milestoneId);
+    const milestone = await this.findProgramMilestoneById(milestoneId);
 
     if (
       milestone.mentorId !== currentUser.id &&
-      !currentUser.roles.includes('admin')
+      !currentUser.roles.includes('admin') &&
+      !currentUser.roles.includes('support')
     ) {
       throw new ForbiddenException({
         code: 'MILESTONE_REVIEW_FORBIDDEN',
@@ -226,15 +227,21 @@ export class MilestonesService {
       });
     }
 
-    const nextStatus: MilestoneStatus = input.approved ? 'done' : 'in-progress';
+    const nextStatus: MilestoneStatus = input.approved ? 'done' : 'in_progress';
 
-    this.statusOverrides.set(milestone.id, {
-      status: nextStatus,
-      completedAt: input.approved ? new Date().toISOString() : null,
-      updatedBy: currentUser.id,
+    const updated = await this.prisma.student_program_milestones.update({
+      where: { id: milestoneId },
+      data: { status: nextStatus },
+      include: {
+        program: {
+          select: {
+            student_id: true,
+          },
+        },
+      },
     });
 
-    await this.safeNotify(milestone.userId, {
+    await this.safeNotify(updated.program.student_id, {
       channel: 'in_app',
       category: 'rdv',
       title: input.approved ? 'Jalon valide' : 'Jalon a reprendre',
@@ -242,17 +249,17 @@ export class MilestonesService {
         ? 'Votre jalon a ete valide par votre mentor.'
         : 'Votre jalon doit etre ajuste avant validation.',
       payload: {
-        milestoneId: milestone.id,
+        milestoneId: updated.id,
         approved: input.approved,
         comments: input.comments ?? '',
       },
     });
 
-    const refreshed = await this.findMilestoneById(milestone.id);
+    const refreshed = await this.findProgramMilestoneById(updated.id);
 
     return {
       review: {
-        milestoneId: milestone.id,
+        milestoneId: updated.id,
         approved: input.approved,
         comments: input.comments ?? null,
         reviewedBy: currentUser.id,
@@ -296,7 +303,7 @@ export class MilestonesService {
       return;
     }
 
-    const relation = await this.prisma.bookings.findFirst({
+    const relation = await this.prisma.student_programs.findFirst({
       where: { mentor_id: mentorId, student_id: studentId },
       select: { id: true },
     });
@@ -338,153 +345,93 @@ export class MilestonesService {
     });
   }
 
-  private async findMilestoneById(milestoneId: string) {
-    const [source, sourceId] = milestoneId.split(':');
-
-    if (source === 'booking') {
-      const booking = await this.prisma.bookings.findUnique({
-        where: { id: sourceId },
-        include: { session: true },
-      });
-
-      if (!booking) {
-        throw new NotFoundException({
-          code: 'MILESTONE_NOT_FOUND',
-          message: 'Jalon introuvable',
-        });
-      }
-
-      return this.mapBookingMilestone(booking);
-    }
-
-    if (source === 'conversation') {
-      const conversation = await this.prisma.conversations.findUnique({
-        where: { id: sourceId },
-      });
-
-      if (!conversation) {
-        throw new NotFoundException({
-          code: 'MILESTONE_NOT_FOUND',
-          message: 'Jalon introuvable',
-        });
-      }
-
-      return this.mapConversationMilestone(conversation);
-    }
-
-    throw new NotFoundException({
-      code: 'MILESTONE_NOT_FOUND',
-      message: 'Jalon introuvable',
+  private async buildProgramMilestonesForStudent(studentId: string) {
+    const rows = await this.prisma.student_program_milestones.findMany({
+      where: {
+        program: { student_id: studentId },
+      },
+      include: {
+        program: {
+          select: {
+            id: true,
+            student_id: true,
+            mentor_id: true,
+            title: true,
+          },
+        },
+      },
+      orderBy: [{ deadline_at: 'asc' }, { milestone_order: 'asc' }],
+      take: 300,
     });
+
+    return rows.map((row) => this.mapProgramMilestone(row));
   }
 
-  private async buildMilestonesForStudent(studentId: string) {
-    const [bookings, conversations] = await Promise.all([
-      this.prisma.bookings.findMany({
-        where: {
-          OR: [{ student_id: studentId }, { mentor_id: studentId }],
+  private async findProgramMilestoneById(milestoneId: string) {
+    if (milestoneId.includes(':')) {
+      throw new NotFoundException({
+        code: 'MILESTONE_NOT_FOUND',
+        message: 'Ce jalon provient de l ancien modele de progression',
+      });
+    }
+
+    const row = await this.prisma.student_program_milestones.findUnique({
+      where: { id: milestoneId },
+      include: {
+        program: {
+          select: {
+            id: true,
+            student_id: true,
+            mentor_id: true,
+            title: true,
+          },
         },
-        include: { session: true },
-        orderBy: { booking_date: 'desc' },
-        take: 100,
-      }),
-      this.prisma.conversations.findMany({
-        where: {
-          OR: [{ student_id: studentId }, { mentor_id: studentId }],
-        },
-        orderBy: { last_message_at: 'desc' },
-        take: 50,
-      }),
-    ]);
+      },
+    });
 
-    const bookingMilestones = bookings
-      .filter((row) => row.student_id === studentId)
-      .map((row) => this.mapBookingMilestone(row));
+    if (!row) {
+      throw new NotFoundException({
+        code: 'MILESTONE_NOT_FOUND',
+        message: 'Jalon introuvable',
+      });
+    }
 
-    const messageMilestones = conversations
-      .filter((row) => row.student_id === studentId)
-      .map((row) => this.mapConversationMilestone(row));
-
-    return [...bookingMilestones, ...messageMilestones].sort(
-      (a, b) => new Date(b.dueAt).getTime() - new Date(a.dueAt).getTime(),
-    );
+    return this.mapProgramMilestone(row);
   }
 
-  private mapBookingMilestone(booking: {
+  private mapProgramMilestone(row: {
     id: string;
-    student_id: string;
-    mentor_id: string;
-    booking_date: Date;
+    title: string;
+    description: string | null;
     status: string;
-    notes: string | null;
-    session?: { id: string } | null;
+    deadline_at: Date;
+    updated_at: Date;
+    program: {
+      id: string;
+      student_id: string;
+      mentor_id: string;
+      title: string;
+    };
   }): Milestone {
-    const isVisio = Boolean(booking.session);
-    const defaultStatus = this.mapBookingStatus(booking.status);
-
-    return this.applyOverride({
-      id: `booking:${booking.id}`,
-      sourceId: booking.id,
-      source: 'booking',
-      userId: booking.student_id,
-      mentorId: booking.mentor_id,
-      type: isVisio ? 'visio' : 'rdv',
-      status: defaultStatus,
-      dueAt: booking.booking_date.toISOString(),
-      completedAt:
-        defaultStatus === 'done' ? booking.booking_date.toISOString() : null,
-      title: isVisio ? 'Session visio' : 'Rendez-vous mentorat',
-      notes: booking.notes,
-      overdue: defaultStatus !== 'done' && booking.booking_date < new Date(),
-    });
-  }
-
-  private mapConversationMilestone(conversation: {
-    id: string;
-    student_id: string;
-    mentor_id: string;
-    last_message_at: Date;
-  }): Milestone {
-    return this.applyOverride({
-      id: `conversation:${conversation.id}`,
-      sourceId: conversation.id,
-      source: 'conversation',
-      userId: conversation.student_id,
-      mentorId: conversation.mentor_id,
-      type: 'message',
-      status: 'done',
-      dueAt: conversation.last_message_at.toISOString(),
-      completedAt: conversation.last_message_at.toISOString(),
-      title: 'Interaction messagerie',
-      notes: null,
-      overdue: false,
-    });
-  }
-
-  private applyOverride(milestone: Milestone): Milestone {
-    const override = this.statusOverrides.get(milestone.id);
-    if (!override) {
-      return milestone;
-    }
+    const status = row.status as MilestoneStatus;
+    const dueAt = row.deadline_at.toISOString();
+    const completedAt = status === 'done' ? row.updated_at.toISOString() : null;
 
     return {
-      ...milestone,
-      status: override.status,
-      completedAt: override.completedAt,
+      id: row.id,
+      sourceId: row.id,
+      source: 'program',
+      userId: row.program.student_id,
+      mentorId: row.program.mentor_id,
+      type: 'rdv',
+      status,
+      dueAt,
+      completedAt,
+      title: row.title,
+      notes: row.description,
+      overdue: status !== 'done' && row.deadline_at < new Date(),
+      programId: row.program.id,
     };
-  }
-
-  private mapBookingStatus(status: string): MilestoneStatus {
-    if (status === 'completed') {
-      return 'done';
-    }
-    if (status === 'confirmed') {
-      return 'in-progress';
-    }
-    if (status === 'cancelled') {
-      return 'blocked';
-    }
-    return 'planned';
   }
 
   private buildProgressionMetadata(milestones: Milestone[]) {
