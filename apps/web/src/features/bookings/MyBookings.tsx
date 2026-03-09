@@ -30,6 +30,7 @@ interface Booking {
   bookingDate: string;
   startTime: string;
   endTime: string;
+  priceCents?: number | null;
   status: string;
   notes: string | null;
   student: { id: string; firstName: string; lastName: string };
@@ -64,6 +65,7 @@ export function MyBookings({ accessToken, userId }: Props) {
 
   // Session link state
   const [sessionLoading, setSessionLoading] = useState<string | null>(null);
+  const [paymentLoading, setPaymentLoading] = useState<string | null>(null);
 
   // Dismissed notes banners
   const [dismissedNotes, setDismissedNotes] = useState<Set<string>>(() => {
@@ -237,6 +239,29 @@ export function MyBookings({ accessToken, userId }: Props) {
     }
   };
 
+  const startCheckout = async (bookingId: string) => {
+    setPaymentLoading(bookingId);
+    try {
+      const res = await fetch(`${API_URL}/payments/bookings/${bookingId}/checkout`, {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+      });
+      const result = await res.json();
+      if (!res.ok || result.error) {
+        showToast('error', result.error?.message || 'Impossible de creer la session de paiement');
+        return;
+      }
+      const checkoutUrl = result.data?.checkoutUrl as string | undefined;
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      }
+    } catch {
+      showToast('error', 'Erreur de connexion');
+    } finally {
+      setPaymentLoading(null);
+    }
+  };
+
   // ─── Notes Banner ───────────────────────────────────────────────────────────
 
   const dismissNotesBanner = (bookingId: string) => {
@@ -264,6 +289,11 @@ export function MyBookings({ accessToken, userId }: Props) {
       year: date.getFullYear(),
       full: `${DAY_LABELS_FULL[date.getDay()]} ${date.getDate()} ${MONTH_LABELS[date.getMonth()]} ${date.getFullYear()}`,
     };
+  };
+
+  const formatAmount = (amountCents: number | null | undefined) => {
+    if (typeof amountCents !== 'number') return 'Prix non défini';
+    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amountCents / 100);
   };
 
   const getOtherParticipant = (booking: Booking) => {
@@ -418,6 +448,10 @@ export function MyBookings({ accessToken, userId }: Props) {
                         {booking.startTime} — {booking.endTime}
                       </span>
                     </div>
+                    <div className={styles.timeInfo}>
+                      <span className={styles.timeIcon}>💶</span>
+                      <span className={styles.timeRange}>{formatAmount(booking.priceCents)}</span>
+                    </div>
 
                     {booking.notes && (
                       <div className={styles.notesPreview}>
@@ -450,10 +484,24 @@ export function MyBookings({ accessToken, userId }: Props) {
                     {isActive(booking.status) && (
                       <div className={styles.actions}>
                         {booking.status === 'pending' && (
-                          <Link href={`/paiement?bookingId=${booking.bookingId}`} className={styles.actionPrimary}>
-                            <span className={styles.actionIcon}>💳</span>
-                            Payer maintenant
-                          </Link>
+                          <button
+                            type="button"
+                            className={styles.actionPrimary}
+                            onClick={() => void startCheckout(booking.bookingId)}
+                            disabled={paymentLoading === booking.bookingId}
+                          >
+                            {paymentLoading === booking.bookingId ? (
+                              <>
+                                <span className={styles.spinner} />
+                                Redirection...
+                              </>
+                            ) : (
+                              <>
+                                <span className={styles.actionIcon}>💳</span>
+                                Payer maintenant
+                              </>
+                            )}
+                          </button>
                         )}
                         {booking.status === 'confirmed' && (
                           <button

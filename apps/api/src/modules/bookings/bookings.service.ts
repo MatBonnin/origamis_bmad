@@ -468,8 +468,16 @@ export class BookingsService {
     const booking = await this.prisma.bookings.findUnique({
       where: { id: bookingId },
       include: {
+        payment: { select: { amount_cents: true } },
         student: { select: { id: true, first_name: true, last_name: true } },
-        mentor: { select: { id: true, first_name: true, last_name: true } },
+        mentor: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            mentor_profile: { select: { hourly_rate: true } },
+          },
+        },
       },
     });
 
@@ -490,6 +498,7 @@ export class BookingsService {
     return {
       booking: {
         ...this.mapBooking(booking),
+        priceCents: this.resolveBookingPriceCents(booking),
         student: {
           id: booking.student.id,
           firstName: booking.student.first_name,
@@ -525,8 +534,16 @@ export class BookingsService {
     const bookings = await this.prisma.bookings.findMany({
       where,
       include: {
+        payment: { select: { amount_cents: true } },
         student: { select: { id: true, first_name: true, last_name: true } },
-        mentor: { select: { id: true, first_name: true, last_name: true } },
+        mentor: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            mentor_profile: { select: { hourly_rate: true } },
+          },
+        },
       },
       orderBy: { booking_date: 'asc' },
     });
@@ -534,6 +551,7 @@ export class BookingsService {
     return {
       bookings: bookings.map((b) => ({
         ...this.mapBooking(b),
+        priceCents: this.resolveBookingPriceCents(b),
         student: {
           id: b.student.id,
           firstName: b.student.first_name,
@@ -872,6 +890,17 @@ export class BookingsService {
       month: 'long',
       day: 'numeric',
     });
+  }
+
+  private resolveBookingPriceCents(booking: {
+    payment?: { amount_cents: number } | null;
+    mentor?: { mentor_profile?: { hourly_rate: number | null } | null } | null;
+  }) {
+    if (booking.payment?.amount_cents !== undefined) {
+      return booking.payment.amount_cents;
+    }
+    const hourlyRate = booking.mentor?.mentor_profile?.hourly_rate;
+    return typeof hourlyRate === 'number' ? Math.round(hourlyRate * 100) : null;
   }
 
   private mapBooking(booking: {

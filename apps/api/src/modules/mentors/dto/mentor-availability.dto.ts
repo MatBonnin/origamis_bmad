@@ -328,6 +328,7 @@ export interface AvailableSlotsResponse {
   mentorId: string;
   timezone: string;
   sessionDuration: number;
+  hourlyRate: number | null;
   slots: AvailableSlot[];
   dateRange: {
     start: string;

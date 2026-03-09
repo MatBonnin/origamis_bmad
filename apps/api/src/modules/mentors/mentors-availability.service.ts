@@ -476,6 +476,11 @@ export class MentorsAvailabilityService {
     const availability = await this.prisma.mentor_availability.findUnique({
       where: { mentor_user_id: mentorUserId },
       include: {
+        mentor: {
+          select: {
+            hourly_rate: true,
+          },
+        },
         weekly_schedules: true,
         date_overrides: true,
       },
@@ -486,6 +491,7 @@ export class MentorsAvailabilityService {
         mentorId: mentorUserId,
         timezone: availability?.timezone ?? 'Europe/Paris',
         sessionDuration: availability?.session_duration ?? 60,
+        hourlyRate: availability?.mentor?.hourly_rate ?? null,
         slots: [],
         dateRange: { start: '', end: '' },
       };
@@ -701,6 +707,7 @@ export class MentorsAvailabilityService {
       mentorId: mentorUserId,
       timezone: availability.timezone,
       sessionDuration: availability.session_duration,
+      hourlyRate: availability.mentor.hourly_rate ?? null,
       slots,
       dateRange: {
         start: rangeStart.toISOString().split('T')[0],

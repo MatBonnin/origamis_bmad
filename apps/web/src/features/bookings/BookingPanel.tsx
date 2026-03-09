@@ -24,6 +24,7 @@ interface AvailableSlotsResponse {
   mentorId: string;
   timezone: string;
   sessionDuration: number;
+  hourlyRate?: number | null;
   slots: AvailableSlot[];
   dateRange: {
     start: string;
@@ -50,6 +51,7 @@ export function BookingPanel({ accessToken, mentorId, mentorName }: Props) {
   const [selectedSlot, setSelectedSlot] = useState<AvailableSlot | null>(null);
   const [notes, setNotes] = useState('');
   const [newBookingId, setNewBookingId] = useState<string | null>(null);
+  const [paymentLoading, setPaymentLoading] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
   const headers = { Authorization: `Bearer ${accessToken}` };
@@ -167,6 +169,32 @@ export function BookingPanel({ accessToken, mentorId, mentorName }: Props) {
     }
   };
 
+  const startCheckout = useCallback(async (bookingId: string) => {
+    setPaymentLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/payments/bookings/${bookingId}/checkout`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const result = await res.json();
+      if (!res.ok || result.error) {
+        showToast('error', result.error?.message || 'Impossible de creer la session de paiement');
+        return;
+      }
+      const checkoutUrl = result.data?.checkoutUrl as string | undefined;
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      }
+    } catch {
+      showToast('error', 'Erreur de connexion');
+    } finally {
+      setPaymentLoading(false);
+    }
+  }, [accessToken]);
+
   // ─── Helpers ────────────────────────────────────────────────────────────────
 
   const formatDate = (dateStr: string) => {
@@ -186,6 +214,9 @@ export function BookingPanel({ accessToken, mentorId, mentorName }: Props) {
     const m = minutes % 60;
     return m > 0 ? `${h}h${m}` : `${h}h`;
   };
+
+  const formatAmount = (amountCents: number) =>
+    new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(amountCents / 100);
 
   // ─── Render ─────────────────────────────────────────────────────────────────
 
@@ -228,9 +259,21 @@ export function BookingPanel({ accessToken, mentorId, mentorName }: Props) {
             Votre session avec {mentorName} est en attente de paiement.
           </p>
           <div className={styles.successActions}>
-            <Link href={`/paiement?bookingId=${newBookingId}`} className={styles.payButton}>
-              Payer maintenant →
-            </Link>
+            <button
+              type="button"
+              className={styles.payButton}
+              onClick={() => void startCheckout(newBookingId)}
+              disabled={paymentLoading}
+            >
+              {paymentLoading ? (
+                <>
+                  <span className={styles.spinner} />
+                  Redirection...
+                </>
+              ) : (
+                'Payer maintenant →'
+              )}
+            </button>
             <Link href="/bookings" className={styles.secondaryLink}>
               Voir mes réservations
             </Link>
@@ -399,6 +442,14 @@ export function BookingPanel({ accessToken, mentorId, mentorName }: Props) {
                 <div className={styles.confirmRow}>
                   <span className={styles.confirmLabel}>Durée</span>
                   <span className={styles.confirmValue}>{getDurationLabel(slotsData.sessionDuration)}</span>
+                </div>
+                <div className={styles.confirmRow}>
+                  <span className={styles.confirmLabel}>Prix</span>
+                  <span className={styles.confirmValue}>
+                    {typeof slotsData.hourlyRate === 'number'
+                      ? formatAmount(Math.round(slotsData.hourlyRate * 100))
+                      : 'Non défini'}
+                  </span>
                 </div>
               </div>
 

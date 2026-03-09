@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { PaymentCheckout } from '@/features/bookings/PaymentCheckout';
 
 interface Props {
-  searchParams: { bookingId?: string };
+  searchParams: Promise<{ bookingId?: string }>;
 }
 
 export default async function PaiementPage({ searchParams }: Props) {
@@ -14,7 +14,7 @@ export default async function PaiementPage({ searchParams }: Props) {
     redirect('/connexion?callbackUrl=/paiement');
   }
 
-  const bookingId = searchParams.bookingId;
+  const { bookingId } = await searchParams;
   if (!bookingId) {
     redirect('/bookings');
   }

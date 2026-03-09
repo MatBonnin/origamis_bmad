@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import styles from './PaymentCheckout.module.css';
 
@@ -15,7 +15,7 @@ export function PaymentCheckout({ accessToken, bookingId }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleCheckout = async () => {
+  const handleCheckout = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -40,12 +40,16 @@ export function PaymentCheckout({ accessToken, bookingId }: Props) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [accessToken, bookingId]);
+
+  useEffect(() => {
+    void handleCheckout();
+  }, [handleCheckout]);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Payer votre session</CardTitle>
+        <CardTitle>Redirection vers le paiement</CardTitle>
       </CardHeader>
       <CardContent>
         <p className={styles.info}>
@@ -62,7 +66,7 @@ export function PaymentCheckout({ accessToken, bookingId }: Props) {
           isLoading={loading}
           aria-busy={loading}
         >
-          Payer maintenant
+          {loading ? 'Redirection...' : 'Reessayer'}
         </Button>
       </CardContent>
     </Card>

@@ -52,9 +52,16 @@ export class PaymentsService {
     }
 
     const mentor = booking.slot.availability.mentor;
-    const hourlyRate = mentor.hourly_rate ?? 5000; // cents
-    const platformFeeCents = Math.round(hourlyRate * 0.15);
-    const mentorPayoutCents = hourlyRate - platformFeeCents;
+    const hourlyRateEuro = mentor.hourly_rate ?? 30;
+    const amountCents = Math.round(hourlyRateEuro * 100);
+    if (amountCents < 50) {
+      throw new BadRequestException({
+        code: 'INVALID_BOOKING_AMOUNT',
+        message: 'Le montant de la session doit etre d au moins 0,50 EUR',
+      });
+    }
+    const platformFeeCents = Math.round(amountCents * 0.15);
+    const mentorPayoutCents = amountCents - platformFeeCents;
 
     const frontendUrl = this.config.get<string>('FRONTEND_URL') ?? 'http://localhost:3000';
 
@@ -68,7 +75,7 @@ export class PaymentsService {
               name: `Session de mentorat — ${booking.booking_date.toLocaleDateString('fr-FR')}`,
               description: `${booking.start_time} - ${booking.end_time}`,
             },
-            unit_amount: hourlyRate,
+            unit_amount: amountCents,
           },
           quantity: 1,
         },
@@ -84,13 +91,16 @@ export class PaymentsService {
       create: {
         booking_id: bookingId,
         stripe_payment_intent: session.payment_intent as string | null,
-        amount_cents: hourlyRate,
+        amount_cents: amountCents,
         platform_fee_cents: platformFeeCents,
         mentor_payout_cents: mentorPayoutCents,
         status: 'pending',
       },
       update: {
         stripe_payment_intent: session.payment_intent as string | null,
+        amount_cents: amountCents,
+        platform_fee_cents: platformFeeCents,
+        mentor_payout_cents: mentorPayoutCents,
         status: 'pending',
       },
     });
