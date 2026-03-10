@@ -258,3 +258,10 @@ npm run dev
 | API         | http://localhost:4000      |
 | Prisma Studio | http://localhost:5555    |
 | PostgreSQL  | localhost:5432             |
+
+
+## Commande webhook stripe
+
+```bash
+stripe listen --events checkout.session.completed,payment_intent.payment_failed --forward-to localhost:4000/payments/webhook
+```

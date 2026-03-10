@@ -38,8 +38,12 @@ export class PaymentsController {
     @Req() req: RawBodyRequest<Request>,
     @Headers('stripe-signature') signature: string,
   ) {
+    console.log('>>> CONTROLLER WEBHOOK APPELE');
+    console.log('>>> rawBody existe?', !!req.rawBody);
+    console.log('>>> signature:', signature?.substring(0, 30) + '...');
     const raw = req.rawBody;
     if (!raw) {
+      console.log('>>> ERREUR: rawBody est null/undefined!');
       return { received: false };
     }
     const data = await this.paymentsService.handleWebhook(raw, signature);

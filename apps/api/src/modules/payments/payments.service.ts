@@ -119,28 +119,46 @@ export class PaymentsService {
       throw new BadRequestException({ code: 'INVALID_WEBHOOK', message: 'Signature invalide' });
     }
 
+    console.log('>>> WEBHOOK RECU - event.type:', event.type);
+
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
+      console.log('>>> METADATA:', JSON.stringify(session.metadata));
       const bookingId = session.metadata?.bookingId;
-      if (!bookingId) return { received: true };
+      if (!bookingId) {
+        console.log('>>> ERREUR: bookingId manquant dans metadata!');
+        return { received: true };
+      }
+      console.log('>>> bookingId trouvé:', bookingId);
 
       const paymentIntentId =
         typeof session.payment_intent === 'string'
           ? session.payment_intent
           : session.payment_intent?.id ?? null;
 
-      await this.prisma.payments.update({
-        where: { booking_id: bookingId },
-        data: {
-          status: 'succeeded',
-          stripe_payment_intent: paymentIntentId,
-        },
-      });
+      this.logger.log(`Webhook: Mise à jour paiement pour booking ${bookingId}`);
+      try {
+        await this.prisma.payments.update({
+          where: { booking_id: bookingId },
+          data: {
+            status: 'succeeded',
+            stripe_payment_intent: paymentIntentId,
+          },
+        });
+        this.logger.log(`Webhook: Paiement mis à jour avec succès`);
+      } catch (err) {
+        this.logger.error(`Webhook: Erreur mise à jour paiement: ${String(err)}`);
+      }
 
-      await this.prisma.bookings.update({
-        where: { id: bookingId },
-        data: { status: 'confirmed' },
-      });
+      try {
+        await this.prisma.bookings.update({
+          where: { id: bookingId },
+          data: { status: 'confirmed' },
+        });
+        this.logger.log(`Webhook: Réservation ${bookingId} confirmée`);
+      } catch (err) {
+        this.logger.error(`Webhook: Erreur mise à jour réservation: ${String(err)}`);
+      }
 
       const booking = await this.prisma.bookings.findUnique({
         where: { id: bookingId },
