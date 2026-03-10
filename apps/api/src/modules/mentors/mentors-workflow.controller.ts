@@ -91,6 +91,15 @@ export class MentorsWorkflowController {
     return { data, error: null };
   }
 
+  @Get('mentor/students')
+  @UseGuards(RolesGuard)
+  @Roles('mentor')
+  @ApiOperation({ summary: 'Lister les etudiants actuels du mentor' })
+  async listMentorStudents(@CurrentUser() user: { id: string }) {
+    const data = await this.epic8.listMentorStudents(user.id);
+    return { data, error: null };
+  }
+
   @Patch('mentor/program-milestones/:id')
   @UseGuards(RolesGuard)
   @Roles('mentor')

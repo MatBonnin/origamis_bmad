@@ -425,6 +425,85 @@ export class MentorsEpic8Service {
     };
   }
 
+  async listMentorStudents(mentorId: string) {
+    await this.assertMentorProfile(mentorId);
+
+    const [acceptedRequests, bookings] = await Promise.all([
+      this.prisma.mentor_requests.findMany({
+        where: {
+          mentor_id: mentorId,
+          status: mentor_request_status.accepted,
+        },
+        include: {
+          student: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              avatar_url: true,
+            },
+          },
+        },
+        orderBy: { updated_at: 'desc' },
+      }),
+      this.prisma.bookings.findMany({
+        where: {
+          mentor_id: mentorId,
+          status: {
+            in: [booking_status.confirmed, booking_status.completed],
+          },
+        },
+        include: {
+          student: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              avatar_url: true,
+            },
+          },
+        },
+        orderBy: [{ booking_date: 'desc' }, { created_at: 'desc' }],
+      }),
+    ]);
+
+    const students = new Map<
+      string,
+      {
+        studentId: string;
+        fullName: string;
+        avatarUrl: string | null;
+        relationSource: 'request' | 'booking';
+      }
+    >();
+
+    for (const request of acceptedRequests) {
+      students.set(request.student.id, {
+        studentId: request.student.id,
+        fullName: `${request.student.first_name} ${request.student.last_name}`.trim(),
+        avatarUrl: request.student.avatar_url ?? null,
+        relationSource: 'request',
+      });
+    }
+
+    for (const booking of bookings) {
+      if (students.has(booking.student.id)) {
+        continue;
+      }
+
+      students.set(booking.student.id, {
+        studentId: booking.student.id,
+        fullName: `${booking.student.first_name} ${booking.student.last_name}`.trim(),
+        avatarUrl: booking.student.avatar_url ?? null,
+        relationSource: 'booking',
+      });
+    }
+
+    return {
+      students: [...students.values()],
+    };
+  }
+
   async updateMentorRequest(
     mentorId: string,
     requestId: string,

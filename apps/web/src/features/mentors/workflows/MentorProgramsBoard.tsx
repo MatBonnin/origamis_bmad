@@ -45,6 +45,13 @@ interface TemplateItem {
   title: string;
 }
 
+interface MentorStudentOption {
+  studentId: string;
+  fullName: string;
+  avatarUrl?: string | null;
+  relationSource: 'request' | 'booking';
+}
+
 interface ProgramDocument {
   documentId: string;
   type: string;
@@ -76,6 +83,7 @@ const STATUS_META: Record<MilestoneStatus, { label: string; tone: string }> = {
 export function MentorProgramsBoard({ accessToken }: Props) {
   const [programs, setPrograms] = useState<ProgramItem[]>([]);
   const [templates, setTemplates] = useState<TemplateItem[]>([]);
+  const [students, setStudents] = useState<MentorStudentOption[]>([]);
   const [selectedProgramId, setSelectedProgramId] = useState<string>('');
   const [documents, setDocuments] = useState<ProgramDocument[]>([]);
   const [loading, setLoading] = useState(true);
@@ -114,7 +122,7 @@ export function MentorProgramsBoard({ accessToken }: Props) {
     setLoading(true);
     setError('');
     try {
-      const [programRes, templateRes] = await Promise.all([
+      const [programRes, templateRes, studentRes] = await Promise.all([
         fetch(`${API_URL}/mentor/programs`, {
           headers: { Authorization: `Bearer ${accessToken}` },
           cache: 'no-store',
@@ -123,10 +131,15 @@ export function MentorProgramsBoard({ accessToken }: Props) {
           headers: { Authorization: `Bearer ${accessToken}` },
           cache: 'no-store',
         }),
+        fetch(`${API_URL}/mentor/students`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          cache: 'no-store',
+        }),
       ]);
 
       const programResult = await programRes.json();
       const templateResult = await templateRes.json();
+      const studentsResult = await studentRes.json();
 
       if (!programRes.ok || programResult.error) {
         setError(programResult.error?.message || 'Impossible de charger les parcours');
@@ -136,14 +149,25 @@ export function MentorProgramsBoard({ accessToken }: Props) {
         setError(templateResult.error?.message || 'Impossible de charger les templates');
         return;
       }
+      if (!studentRes.ok || studentsResult.error) {
+        setError(studentsResult.error?.message || 'Impossible de charger les etudiants');
+        return;
+      }
 
       const nextPrograms = (programResult.data?.programs ?? []) as ProgramItem[];
       const nextTemplates = (templateResult.data?.templates ?? []) as TemplateItem[];
+      const nextStudents = (studentsResult.data?.students ?? []) as MentorStudentOption[];
       setPrograms(nextPrograms);
       setTemplates(nextTemplates);
+      setStudents(nextStudents);
 
       if (nextTemplates.length > 0 && !assignTemplateId) {
         setAssignTemplateId(nextTemplates[0].templateId);
+      }
+      if (nextStudents.length === 0) {
+        setAssignStudentId('');
+      } else if (!nextStudents.some((student) => student.studentId === assignStudentId)) {
+        setAssignStudentId(nextStudents[0].studentId);
       }
 
       if (nextPrograms.length === 0) {
@@ -156,7 +180,7 @@ export function MentorProgramsBoard({ accessToken }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [accessToken, assignTemplateId, selectedProgramId]);
+  }, [accessToken, assignStudentId, assignTemplateId, selectedProgramId]);
 
   useEffect(() => {
     void loadPrograms();
@@ -210,7 +234,7 @@ export function MentorProgramsBoard({ accessToken }: Props) {
 
   const assignProgram = async () => {
     if (!assignStudentId || !assignTemplateId) {
-      setError('Renseignez studentId et template');
+      setError('Selectionnez un etudiant et un template');
       return;
     }
     setError('');
@@ -239,6 +263,13 @@ export function MentorProgramsBoard({ accessToken }: Props) {
   const templateOptions = templates.map((template) => ({
     value: template.templateId,
     label: template.title,
+  }));
+
+  const studentOptions = students.map((student) => ({
+    value: student.studentId,
+    label:
+      student.fullName +
+      (programs.some((program) => program.studentId === student.studentId) ? ' · deja actif' : ''),
   }));
 
   const programsSummary = useMemo(() => {
@@ -350,19 +381,35 @@ export function MentorProgramsBoard({ accessToken }: Props) {
           </div>
 
           <div className={styles.assignGrid}>
-            <Input
-              name="studentId"
-              label="Student ID"
-              value={assignStudentId}
-              onChange={(e) => setAssignStudentId(e.target.value)}
-            />
-            <Select
-              name="templateId"
-              label="Template"
-              value={assignTemplateId}
-              options={templateOptions}
-              onChange={(e) => setAssignTemplateId(e.target.value)}
-            />
+            <div className={styles.assignField}>
+              <Select
+                name="studentId"
+                label="Etudiant"
+                value={assignStudentId}
+                options={studentOptions}
+                placeholder={
+                  students.length > 0
+                    ? 'Selectionnez un etudiant'
+                    : 'Aucun etudiant disponible'
+                }
+                disabled={students.length === 0}
+                onChange={(e) => setAssignStudentId(e.target.value)}
+              />
+              <p className={styles.assignFieldHint}>
+                {students.length > 0
+                  ? 'Liste limitee a vos etudiants actuellement relies a votre mentorat.'
+                  : 'Acceptez une demande ou finalisez un booking pour voir un etudiant ici.'}
+              </p>
+            </div>
+            <div className={styles.assignField}>
+              <Select
+                name="templateId"
+                label="Template"
+                value={assignTemplateId}
+                options={templateOptions}
+                onChange={(e) => setAssignTemplateId(e.target.value)}
+              />
+            </div>
             <Input
               name="title"
               label="Titre personnalise"
@@ -370,7 +417,12 @@ export function MentorProgramsBoard({ accessToken }: Props) {
               onChange={(e) => setAssignTitle(e.target.value)}
             />
             <div className={styles.assignAction}>
-              <Button type="button" size="lg" onClick={() => void assignProgram()}>
+              <Button
+                type="button"
+                size="lg"
+                disabled={students.length === 0 || !assignTemplateId}
+                onClick={() => void assignProgram()}
+              >
                 Assigner le parcours
               </Button>
               <p className={styles.assignHint}>Les jalons seront crees a partir du template choisi.</p>

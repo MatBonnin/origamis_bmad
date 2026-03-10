@@ -1,6 +1,16 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  AlertCircle,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  KanbanSquare,
+  Layers3,
+  ListTodo,
+  Sparkles,
+} from 'lucide-react';
 import { Button, Card, CardContent, CardHeader, CardTitle, ProgressBar } from '@/components/ui';
 import { KanbanBoard } from '../kanban/KanbanBoard';
 import { CalendarView } from '../calendar/CalendarView';
@@ -46,6 +56,12 @@ const STATUS_LABELS: Record<MilestoneStatus, string> = {
   review: 'En validation',
   done: 'Termine',
   blocked: 'Bloque',
+};
+
+const VIEW_META: Record<ViewMode, { label: string; icon: typeof ListTodo }> = {
+  list: { label: 'Liste', icon: ListTodo },
+  kanban: { label: 'Kanban', icon: KanbanSquare },
+  calendar: { label: 'Calendrier', icon: CalendarDays },
 };
 
 export function StudentProgression({ accessToken, userId }: Props) {
@@ -164,66 +180,194 @@ export function StudentProgression({ accessToken, userId }: Props) {
       minute: '2-digit',
     });
 
+  const insights = useMemo(() => {
+    const reviewCount = milestones.filter((milestone) => milestone.status === 'review').length;
+    const inFlightCount = milestones.filter(
+      (milestone) => milestone.status === 'planned' || milestone.status === 'in_progress',
+    ).length;
+    const blockedCount = milestones.filter((milestone) => milestone.status === 'blocked').length;
+    const nextMilestone = [...milestones]
+      .filter((milestone) => milestone.status !== 'done')
+      .sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())[0];
+
+    return {
+      reviewCount,
+      inFlightCount,
+      blockedCount,
+      nextMilestone,
+    };
+  }, [milestones]);
+
   return (
-    <section className={styles.container} aria-labelledby="progression-title">
-      <header className={styles.header}>
-        <h1 id="progression-title" className={styles.title}>Parcours de progression</h1>
-        <p className={styles.subtitle}>Suivez vos jalons, demandez une validation et gardez une vue claire sur votre avancement.</p>
-      </header>
+    <section className={styles.page} aria-labelledby="progression-title">
+      <div className={styles.hero}>
+        <div className={styles.heroCopy}>
+          <span className={styles.eyebrow}>
+            <Sparkles size={16} aria-hidden="true" />
+            Vue projets
+          </span>
+          <h1 id="progression-title" className={styles.title}>
+            Parcours de progression
+          </h1>
+          <p className={styles.subtitle}>
+            Suivez vos jalons, demandez une validation et gardez une vue claire sur votre
+            avancement avec une lecture plus directe de vos prochaines etapes.
+          </p>
+        </div>
+
+        <div className={styles.metricsGrid}>
+          <article className={styles.metricCard}>
+            <span className={styles.metricLabel}>Progression globale</span>
+            <strong className={styles.metricValue}>
+              {metadata.completionRate}
+              <span className={styles.metricUnit}>%</span>
+            </strong>
+            <span className={styles.metricHint}>
+              {metadata.totalCompleted} finalises sur {metadata.total}
+            </span>
+          </article>
+          <article className={styles.metricCard}>
+            <span className={styles.metricLabel}>A traiter</span>
+            <strong className={styles.metricValue}>{insights.inFlightCount}</strong>
+            <span className={styles.metricHint}>jalons encore en cours ou planifies</span>
+          </article>
+          <article className={styles.metricCard}>
+            <span className={styles.metricLabel}>En validation</span>
+            <strong className={styles.metricValue}>{insights.reviewCount}</strong>
+            <span className={styles.metricHint}>elements envoyes au mentor</span>
+          </article>
+          <article className={styles.metricCard}>
+            <span className={styles.metricLabel}>Blocages</span>
+            <strong className={styles.metricValue}>{insights.blockedCount}</strong>
+            <span className={styles.metricHint}>points qui demandent une relance</span>
+          </article>
+        </div>
+      </div>
 
       <p className={styles.srOnly} aria-live="polite">{liveMessage}</p>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Progression globale</CardTitle>
+      <div className={styles.overviewGrid}>
+        <Card className={styles.progressCard} variant="elevated">
+          <CardHeader className={styles.cardHeader}>
+            <div>
+              <p className={styles.cardEyebrow}>Tableau de bord</p>
+              <CardTitle>Progression globale</CardTitle>
+              <p className={styles.cardSubtitle}>
+                Une lecture immediate de votre cadence actuelle sur l&apos;ensemble du parcours.
+              </p>
+            </div>
+            <span className={styles.cardIcon}>
+              <Layers3 size={18} aria-hidden="true" />
+            </span>
+          </CardHeader>
+          <CardContent className={styles.progressCardContent}>
+            <ProgressBar value={metadata.completionRate} max={100} labels={['0%', '50%', '100%']} />
+            <p className={styles.summary}>
+              {metadata.totalCompleted}/{metadata.total} jalons termines
+            </p>
+            <div className={styles.progressMetaRow}>
+              <span className={styles.progressMetaPill}>
+                <CheckCircle2 size={15} aria-hidden="true" />
+                {metadata.totalCompleted} finalises
+              </span>
+              <span className={styles.progressMetaPill}>
+                <Clock3 size={15} aria-hidden="true" />
+                {metadata.totalPending} restants
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className={styles.nextCard} variant="elevated">
+          <CardHeader className={styles.cardHeader}>
+            <div>
+              <p className={styles.cardEyebrow}>Point de focus</p>
+              <CardTitle>Prochain jalon cle</CardTitle>
+            </div>
+            <span className={styles.cardIcon}>
+              <CalendarDays size={18} aria-hidden="true" />
+            </span>
+          </CardHeader>
+          <CardContent className={styles.nextCardContent}>
+            {insights.nextMilestone ? (
+              <>
+                <strong className={styles.nextTitle}>A venir: {insights.nextMilestone.title}</strong>
+                <p className={styles.nextMeta}>
+                  Echeance {formatDate(insights.nextMilestone.dueAt)}
+                </p>
+                <span className={styles.inlineStatus} data-status={insights.nextMilestone.status}>
+                  {STATUS_LABELS[insights.nextMilestone.status]}
+                </span>
+              </>
+            ) : (
+              <p className={styles.nextEmpty}>Aucun jalon ouvert pour le moment.</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className={styles.controlsCard} variant="elevated">
+        <CardHeader className={styles.cardHeader}>
+          <div>
+            <p className={styles.cardEyebrow}>Navigation</p>
+            <CardTitle>Choisissez votre angle de lecture</CardTitle>
+          </div>
         </CardHeader>
-        <CardContent>
-          <ProgressBar value={metadata.completionRate} max={100} labels={['0%', '50%', '100%']} />
-          <p className={styles.summary}>
-            {metadata.totalCompleted}/{metadata.total} jalons termines
-          </p>
+        <CardContent className={styles.controlsContent}>
+          <nav className={styles.viewToggle} aria-label="Changer la vue">
+            {(['list', 'kanban', 'calendar'] as ViewMode[]).map((mode) => {
+              const Icon = VIEW_META[mode].icon;
+
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  className={viewMode === mode ? styles.viewToggleActive : styles.viewToggleButton}
+                  onClick={() => setViewMode(mode)}
+                  aria-pressed={viewMode === mode}
+                >
+                  <Icon size={16} aria-hidden="true" />
+                  {VIEW_META[mode].label}
+                </button>
+              );
+            })}
+          </nav>
+
+          <nav className={styles.filters} aria-label="Filtrer les jalons">
+            {(Object.keys(TYPE_LABELS) as MilestoneType[]).map((type) => (
+              <button
+                key={type}
+                type="button"
+                className={filter === type ? styles.filterActive : styles.filterButton}
+                onClick={() => setFilter(type)}
+              >
+                {TYPE_LABELS[type]}
+              </button>
+            ))}
+          </nav>
         </CardContent>
       </Card>
 
-      <nav className={styles.viewToggle} aria-label="Changer la vue">
-        {(['list', 'kanban', 'calendar'] as ViewMode[]).map((mode) => (
-          <button
-            key={mode}
-            type="button"
-            className={viewMode === mode ? styles.viewToggleActive : styles.viewToggleButton}
-            onClick={() => setViewMode(mode)}
-            aria-pressed={viewMode === mode}
-          >
-            {mode === 'list' ? 'Liste' : mode === 'kanban' ? 'Kanban' : 'Calendrier'}
-          </button>
-        ))}
-      </nav>
-
-      <nav className={styles.filters} aria-label="Filtrer les jalons">
-        {(Object.keys(TYPE_LABELS) as MilestoneType[]).map((type) => (
-          <button
-            key={type}
-            type="button"
-            className={filter === type ? styles.filterActive : styles.filterButton}
-            onClick={() => setFilter(type)}
-          >
-            {TYPE_LABELS[type]}
-          </button>
-        ))}
-      </nav>
-
       {error && (
         <div className={styles.error} role="alert" aria-live="assertive">
-          {error}
+          <AlertCircle size={18} aria-hidden="true" />
+          <span>{error}</span>
         </div>
       )}
 
       {loading ? (
-        <div className={styles.loading} aria-busy="true">Chargement des jalons...</div>
+        <div className={styles.loadingPanel} aria-busy="true">
+          <div className={styles.loadingPulse} />
+          <p className={styles.loadingText}>Chargement des jalons...</p>
+        </div>
       ) : milestones.length === 0 ? (
-        <Card>
-          <CardContent>
-            <p className={styles.empty}>Aucun jalon pour ce filtre.</p>
+        <Card className={styles.emptyCard} variant="elevated">
+          <CardContent className={styles.emptyContent}>
+            <div className={styles.emptyBadge}>
+              <Sparkles size={18} aria-hidden="true" />
+            </div>
+            <h2 className={styles.emptyTitle}>Aucun jalon pour ce filtre.</h2>
+            <p className={styles.emptyText}>Essayez une autre vue ou elargissez le type selectionne.</p>
           </CardContent>
         </Card>
       ) : viewMode === 'kanban' ? (
@@ -238,22 +382,34 @@ export function StudentProgression({ accessToken, userId }: Props) {
         <ol className={styles.timeline}>
           {milestones.map((milestone) => (
             <li key={milestone.id} className={styles.timelineItem}>
-              <Card variant="outlined">
-                <CardHeader className={styles.cardHeader}>
-                  <CardTitle>{milestone.title}</CardTitle>
+              <Card className={styles.timelineCard} variant="elevated">
+                <CardHeader className={styles.timelineHeader}>
+                  <div className={styles.timelineTitleBlock}>
+                    <span className={styles.timelineType}>{TYPE_LABELS[milestone.type]}</span>
+                    <CardTitle>{milestone.title}</CardTitle>
+                  </div>
                   <span className={styles.status} data-status={milestone.status}>
                     {STATUS_LABELS[milestone.status]}
                   </span>
                 </CardHeader>
-                <CardContent>
-                  <p className={styles.meta}>Type: {TYPE_LABELS[milestone.type]}</p>
-                  <p className={styles.meta}>Echeance: {formatDate(milestone.dueAt)}</p>
+                <CardContent className={styles.timelineContent}>
+                  <div className={styles.metaRow}>
+                    <p className={styles.meta}>
+                      <CalendarDays size={15} aria-hidden="true" />
+                      Echeance: {formatDate(milestone.dueAt)}
+                    </p>
+                    <p className={styles.meta}>
+                      <Clock3 size={15} aria-hidden="true" />
+                      Statut actuel: {STATUS_LABELS[milestone.status]}
+                    </p>
+                  </div>
                   {milestone.notes && <p className={styles.notes}>{milestone.notes}</p>}
 
                   {(milestone.status === 'in_progress' || milestone.status === 'planned') && (
                     <Button
                       type="button"
                       size="sm"
+                      className={styles.timelineAction}
                       onClick={() => void markMilestoneDone(milestone.id)}
                     >
                       Marquer termine
