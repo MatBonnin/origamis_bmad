@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui';
+import { Button, Input } from '@/components/ui';
 import styles from './MentorMessagingPanel.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -41,6 +41,22 @@ interface Props {
   currentUserId: string;
 }
 
+function formatMessageTime(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatConversationTime(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const now = new Date();
+  if (date.toDateString() === now.toDateString()) {
+    return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  }
+  return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+}
+
 export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [selectedConversationId, setSelectedConversationId] = useState('');
@@ -67,6 +83,11 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
     [conversations, selectedConversationId],
   );
 
+  const totalUnread = useMemo(
+    () => conversations.reduce((sum, item) => sum + item.unreadCount, 0),
+    [conversations],
+  );
+
   // WebSocket connection
   useEffect(() => {
     const socket = io(`${API_URL}/messages`, {
@@ -80,7 +101,7 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
         if (data.conversationId !== selectedConversationIdRef.current) return prev;
         return [...prev, data.message];
       });
-      setConversations([]); // trigger reload
+      setConversations([]);
       void loadConversations();
     });
 
@@ -96,7 +117,6 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUserId]);
 
-  // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -154,7 +174,6 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
         setMessages((prev) => (cursor ? [...next, ...prev] : next));
         setNextCursor(data.metadata.next_cursor);
 
-        // Mark conversation as read
         if (!cursor && next.length > 0) {
           socketRef.current?.emit('message.read', {
             conversationId,
@@ -216,13 +235,6 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
     emitTyping(false);
 
     try {
-      const metadata: Record<string, string> = {};
-      if (attachment) {
-        metadata.attachmentName = attachment.name;
-        metadata.attachmentSize = String(attachment.size);
-        metadata.attachmentType = attachment.type;
-      }
-
       const res = await fetch(`${MESSAGING_API_URL}/messages`, {
         method: 'POST',
         headers: {
@@ -267,8 +279,11 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
   return (
     <section className={styles.container} aria-labelledby="mentor-messaging-title">
       <header className={styles.header}>
-        <h1 id="mentor-messaging-title" className={styles.title}>Messages</h1>
-        <p className={styles.subtitle}>Echangez avec vos etudiants.</p>
+        <h1 id="mentor-messaging-title" className={styles.title}>Correspondance</h1>
+        <p className={styles.subtitle}>
+          Echangez avec vos etudiants - {conversations.length} conversation{conversations.length > 1 ? 's' : ''}
+          {totalUnread > 0 && ` · ${totalUnread} non lu${totalUnread > 1 ? 's' : ''}`}
+        </p>
       </header>
 
       {error && (
@@ -279,11 +294,11 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
 
       <div className={styles.layout}>
         {/* Student list sidebar */}
-        <Card className={styles.sidebar}>
-          <CardHeader>
-            <CardTitle>Etudiants</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <aside className={styles.sidebar}>
+          <div>
+            <h2>Etudiants</h2>
+          </div>
+          <div>
             {loadingConversations ? (
               <div className={styles.skeletonList} aria-busy="true" aria-live="polite">
                 <div className={styles.skeletonItem} />
@@ -321,12 +336,7 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
                       </span>
                       {conv.lastMessage && (
                         <time className={styles.conversationTime} dateTime={conv.lastMessage.createdAt}>
-                          {new Date(conv.lastMessage.createdAt).toLocaleString('fr-FR', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
+                          {formatConversationTime(conv.lastMessage.createdAt)}
                         </time>
                       )}
                     </button>
@@ -334,20 +344,20 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
                 ))}
               </ul>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </aside>
 
         {/* Chat area */}
-        <Card className={styles.chatCard}>
-          <CardHeader>
+        <article className={styles.chatCard}>
+          <div>
             <div className={styles.chatHeader}>
-              <CardTitle>{selectedConversation?.peer.fullName || 'Conversation'}</CardTitle>
+              <h3>{selectedConversation?.peer.fullName || 'Conversation'}</h3>
               {selectedConversation && (
                 <span className={styles.peerRole}>Etudiant</span>
               )}
             </div>
-          </CardHeader>
-          <CardContent>
+          </div>
+          <div>
             <div className={styles.chatBody} role="log" aria-live="polite" aria-label="Messages de la conversation">
               {nextCursor && (
                 <div className={styles.loadMoreRow}>
@@ -381,7 +391,7 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
                         <article className={mine ? styles.bubbleMine : styles.bubblePeer}>
                           <p>{msg.body}</p>
                           <time dateTime={msg.createdAt}>
-                            {new Date(msg.createdAt).toLocaleString('fr-FR')}
+                            {formatMessageTime(msg.createdAt)}
                           </time>
                         </article>
                       </li>
@@ -392,8 +402,8 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
 
               {peerTyping && (
                 <div className={styles.typingIndicator} aria-live="polite">
-                  <span>{selectedConversation?.peer.fullName} est en train d&apos;ecrire</span>
-                  <span className={styles.typingDots}>...</span>
+                  <span>{selectedConversation?.peer.fullName} ecrit</span>
+                  <span className={styles.typingDots} />
                 </div>
               )}
 
@@ -448,8 +458,8 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
                 </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </article>
       </div>
     </section>
   );
