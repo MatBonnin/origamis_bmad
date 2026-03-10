@@ -1,4 +1,5 @@
 import { MessagingController } from './messaging.controller';
+import { MessagingGateway } from './messaging.gateway';
 import { MessagingService } from './messaging.service';
 
 describe('MessagingController', () => {
@@ -7,12 +8,16 @@ describe('MessagingController', () => {
     getConversationMessages: jest.fn(),
     sendMessage: jest.fn(),
   };
+  const mockMessagingGateway = {
+    emitConversationMessageCreated: jest.fn(),
+  };
 
   let controller: MessagingController;
 
   beforeEach(() => {
     controller = new MessagingController(
       mockMessagingService as unknown as MessagingService,
+      mockMessagingGateway as unknown as MessagingGateway,
     );
     jest.clearAllMocks();
   });
@@ -83,6 +88,10 @@ describe('MessagingController', () => {
     expect(mockMessagingService.sendMessage).toHaveBeenCalledWith('student-1', {
       receiverId: 'mentor-1',
       body: 'Salut mentor',
+    });
+    expect(mockMessagingGateway.emitConversationMessageCreated).toHaveBeenCalledWith({
+      conversationId: 'conv-1',
+      message: { messageId: 'msg-1' },
     });
   });
 });

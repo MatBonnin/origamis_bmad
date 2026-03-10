@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { io } from 'socket.io-client';
 import { Button, Input } from '@/components/ui';
 import styles from './MessagingPanel.module.css';
 
@@ -32,6 +33,11 @@ interface MessageItem {
   receiverId: string;
   body: string;
   createdAt: string;
+}
+
+interface MessageEventPayload {
+  conversationId: string;
+  message: MessageItem;
 }
 
 interface Props {
@@ -101,6 +107,8 @@ export function MessagingPanel({ accessToken, currentUserId }: Props) {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const initialRecipientHandledRef = useRef(false);
+  const selectedConversationIdRef = useRef(selectedConversationId);
+  selectedConversationIdRef.current = selectedConversationId;
 
   const selectedConversation = useMemo(
     () => conversations.find((item) => item.conversationId === selectedConversationId) ?? null,
@@ -220,9 +228,42 @@ export function MessagingPanel({ accessToken, currentUserId }: Props) {
     [accessToken],
   );
 
+  const handleRealtimeMessage = useCallback(
+    (payload: MessageEventPayload) => {
+      setMessages((previous) => {
+        if (payload.conversationId !== selectedConversationIdRef.current) {
+          return previous;
+        }
+
+        if (previous.some((item) => item.messageId === payload.message.messageId)) {
+          return previous;
+        }
+
+        return [...previous, payload.message];
+      });
+
+      void loadConversations();
+    },
+    [loadConversations],
+  );
+
   useEffect(() => {
     void loadConversations();
   }, [loadConversations]);
+
+  useEffect(() => {
+    const socket = io(`${API_URL}/messages`, {
+      auth: { userId: currentUserId },
+      transports: ['websocket', 'polling'],
+    });
+
+    socket.on('message.received', handleRealtimeMessage);
+    socket.on('message.new', handleRealtimeMessage);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [currentUserId, handleRealtimeMessage]);
 
   useEffect(() => {
     if (selectedConversationId) {
@@ -299,7 +340,13 @@ export function MessagingPanel({ accessToken, currentUserId }: Props) {
       }
 
       const data = result.data as { message: MessageItem; conversationId: string };
-      setMessages((previous) => [...previous, data.message]);
+      setMessages((previous) => {
+        if (previous.some((item) => item.messageId === data.message.messageId)) {
+          return previous;
+        }
+
+        return [...previous, data.message];
+      });
       setSelectedConversationId(data.conversationId);
       setDraftRecipient(null);
       setBody('');

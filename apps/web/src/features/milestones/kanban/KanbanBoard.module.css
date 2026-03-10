@@ -1,13 +1,55 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Zen Kanban - Board Container
+   Design system: Warm minimalism with intentional accents
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap');
+
 .board {
+  --zen-cream: #FAF8F5;
+  --zen-cream-dark: #F0EDE8;
+  --zen-border: #E5E2DD;
+  --zen-indigo: #4F46E5;
+  --zen-indigo-bg: #EEF2FF;
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
   display: flex;
   gap: 1rem;
   overflow-x: auto;
-  padding-bottom: 1rem;
+  padding: 0.5rem 0 1.5rem;
   align-items: flex-start;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--zen-border) transparent;
 }
 
-@media (max-width: 768px) {
+.board::-webkit-scrollbar {
+  height: 8px;
+}
+
+.board::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.board::-webkit-scrollbar-thumb {
+  background: var(--zen-border);
+  border-radius: 4px;
+}
+
+.board::-webkit-scrollbar-thumb:hover {
+  background: var(--zen-cream-dark);
+}
+
+@media (max-width: 900px) {
+  .board {
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
   .board {
     flex-direction: column;
+    overflow-x: visible;
   }
 }

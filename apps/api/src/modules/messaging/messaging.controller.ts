@@ -17,6 +17,7 @@ import { CurrentUser } from '../../common/decorators';
 import { JwtAuthGuard } from '../../common/guards';
 import { UserResponseDto } from '../auth/dto';
 import { GetConversationMessagesQueryDto, SendMessageDto } from './dto';
+import { MessagingGateway } from './messaging.gateway';
 import { MessagingService } from './messaging.service';
 
 @ApiTags('messaging')
@@ -24,7 +25,10 @@ import { MessagingService } from './messaging.service';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class MessagingController {
-  constructor(private readonly messagingService: MessagingService) {}
+  constructor(
+    private readonly messagingService: MessagingService,
+    private readonly messagingGateway: MessagingGateway,
+  ) {}
 
   @Get('conversations')
   @ApiOperation({
@@ -66,6 +70,7 @@ export class MessagingController {
     @Body() dto: SendMessageDto,
   ) {
     const data = await this.messagingService.sendMessage(user.id, dto);
+    this.messagingGateway.emitConversationMessageCreated(data);
     return { data, error: null };
   }
 }

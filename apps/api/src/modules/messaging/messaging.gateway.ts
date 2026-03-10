@@ -23,6 +23,21 @@ export class MessagingGateway implements OnGatewayConnection {
 
   constructor(private readonly messagingService: MessagingService) {}
 
+  emitConversationMessageCreated(result: {
+    conversationId: string;
+    message: {
+      senderId: string;
+      receiverId: string;
+    };
+  }) {
+    this.server
+      .to(`user:${result.message.receiverId}`)
+      .emit('message.received', result);
+    this.server
+      .to(`user:${result.message.senderId}`)
+      .emit('message.new', result);
+  }
+
   handleConnection(client: AuthenticatedSocket) {
     const handshakeUserId =
       (client.handshake.auth?.userId as string | undefined) ??
@@ -48,13 +63,7 @@ export class MessagingGateway implements OnGatewayConnection {
     }
 
     const result = await this.messagingService.sendMessage(userId, payload);
-
-    this.server
-      .to(`user:${result.message.receiverId}`)
-      .emit('message.received', result);
-    this.server
-      .to(`user:${result.message.senderId}`)
-      .emit('message.new', result);
+    this.emitConversationMessageCreated(result);
 
     return result;
   }

@@ -1,6 +1,20 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const mockOn = vi.fn();
+const mockDisconnect = vi.fn();
+const socketHandlers = new Map<string, (payload: unknown) => void>();
+
+vi.mock('socket.io-client', () => ({
+  io: vi.fn(() => ({
+    on: mockOn.mockImplementation((event: string, handler: (payload: unknown) => void) => {
+      socketHandlers.set(event, handler);
+    }),
+    disconnect: mockDisconnect,
+  })),
+}));
+
 import { MessagingPanel } from '../MessagingPanel';
 
 describe('MessagingPanel', () => {
@@ -9,6 +23,7 @@ describe('MessagingPanel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubGlobal('fetch', fetchMock);
+    socketHandlers.clear();
   });
 
   it('loads conversation list and current messages', async () => {
@@ -168,5 +183,4 @@ describe('MessagingPanel', () => {
       expect(body.notifyChannel).toBe('in_app');
     });
   });
-
 });

@@ -77,6 +77,22 @@ describe('MessagingGateway', () => {
         receiverId: 'mentor-1',
       },
     });
+    expect(gateway.server.to).toHaveBeenCalledWith('user:mentor-1');
+    expect(gateway.server.to).toHaveBeenCalledWith('user:student-1');
+  });
+
+  it('emits realtime events for HTTP-originated messages', () => {
+    gateway.emitConversationMessageCreated({
+      conversationId: 'conv-1',
+      message: {
+        messageId: 'msg-1',
+        senderId: 'student-1',
+        receiverId: 'mentor-1',
+      } as never,
+    });
+
+    expect(gateway.server.to).toHaveBeenCalledWith('user:mentor-1');
+    expect(gateway.server.to).toHaveBeenCalledWith('user:student-1');
   });
 
   it('handles message.read and delegates to service', async () => {

@@ -1,29 +1,84 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Zen Kanban - Card
+   Design system: Warm minimalism with intentional accents
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap');
+
 .card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 0.75rem;
+  --zen-cream: #FAF8F5;
+  --zen-cream-dark: #F0EDE8;
+  --zen-charcoal: #1A1A1A;
+  --zen-gray: #6B6B6B;
+  --zen-gray-light: #A0A0A0;
+  --zen-border: #E5E2DD;
+  --zen-indigo: #4F46E5;
+  --zen-indigo-soft: #6366F1;
+  --zen-indigo-bg: #EEF2FF;
+  --zen-coral: #F97316;
+  --zen-coral-bg: #FFF7ED;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--zen-cream);
+  border: 2px solid var(--zen-border);
+  border-radius: 12px;
+  padding: 0.875rem;
   cursor: grab;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  transition: box-shadow 0.15s;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  border-radius: 12px 12px 0 0;
+  transition: background 0.2s ease;
 }
 
 .card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-color: var(--zen-indigo);
+  background: white;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.card:hover::before {
+  background: linear-gradient(90deg, var(--zen-indigo) 0%, var(--zen-indigo-soft) 100%);
 }
 
 .card:active {
   cursor: grabbing;
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
+/* Dragging State */
+.card[data-dragging="true"] {
+  opacity: 0.5;
+  transform: rotate(3deg);
+}
+
+/* Title */
 .title {
   font-size: 0.875rem;
-  font-weight: 500;
-  color: #111827;
-  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+  color: var(--zen-charcoal);
+  margin: 0 0 0.625rem 0;
   line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
+/* Meta Row */
 .meta {
   display: flex;
   align-items: center;
@@ -31,16 +86,54 @@
   flex-wrap: wrap;
 }
 
+/* Type Badge */
 .type {
-  font-size: 0.7rem;
-  padding: 0.15rem 0.4rem;
-  border-radius: 4px;
-  background: #ede9fe;
-  color: #4f46e5;
-  font-weight: 500;
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
+.type[data-type='message'] {
+  background: var(--zen-indigo-bg);
+  color: var(--zen-indigo);
+}
+
+.type[data-type='rdv'] {
+  background: var(--zen-coral-bg);
+  color: var(--zen-coral);
+}
+
+.type[data-type='visio'] {
+  background: #F0FDF4;
+  color: #059669;
+}
+
+/* Date */
 .date {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--zen-gray);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.date::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  background: var(--zen-gray-light);
+  border-radius: 50%;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 0.75rem;
+  }
+
+  .title {
+    font-size: 0.8125rem;
+  }
 }

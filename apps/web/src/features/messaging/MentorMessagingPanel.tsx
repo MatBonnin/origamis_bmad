@@ -36,6 +36,11 @@ interface MessageItem {
   createdAt: string;
 }
 
+interface MessageEventPayload {
+  conversationId: string;
+  message: MessageItem;
+}
+
 interface Props {
   accessToken: string;
   currentUserId: string;
@@ -87,35 +92,6 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
     () => conversations.reduce((sum, item) => sum + item.unreadCount, 0),
     [conversations],
   );
-
-  // WebSocket connection
-  useEffect(() => {
-    const socket = io(`${API_URL}/messages`, {
-      auth: { userId: currentUserId },
-      transports: ['websocket', 'polling'],
-    });
-
-    socket.on('message.received', (data: { message: MessageItem; conversationId: string }) => {
-      setMessages((prev) => {
-        if (prev.some((m) => m.messageId === data.message.messageId)) return prev;
-        if (data.conversationId !== selectedConversationIdRef.current) return prev;
-        return [...prev, data.message];
-      });
-      setConversations([]);
-      void loadConversations();
-    });
-
-    socket.on('message.typing', (data: { conversationId: string; fromUserId: string; isTyping: boolean }) => {
-      setTypingUsers((prev) => ({ ...prev, [data.fromUserId]: data.isTyping }));
-    });
-
-    socketRef.current = socket;
-
-    return () => {
-      socket.disconnect();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUserId]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -190,9 +166,48 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
     [accessToken],
   );
 
+  const handleRealtimeMessage = useCallback(
+    (payload: MessageEventPayload) => {
+      setMessages((prev) => {
+        if (payload.conversationId !== selectedConversationIdRef.current) {
+          return prev;
+        }
+
+        if (prev.some((message) => message.messageId === payload.message.messageId)) {
+          return prev;
+        }
+
+        return [...prev, payload.message];
+      });
+
+      void loadConversations();
+    },
+    [loadConversations],
+  );
+
   useEffect(() => {
     void loadConversations();
   }, [loadConversations]);
+
+  useEffect(() => {
+    const socket = io(`${API_URL}/messages`, {
+      auth: { userId: currentUserId },
+      transports: ['websocket', 'polling'],
+    });
+
+    socket.on('message.received', handleRealtimeMessage);
+    socket.on('message.new', handleRealtimeMessage);
+    socket.on('message.typing', (data: { conversationId: string; fromUserId: string; isTyping: boolean }) => {
+      setTypingUsers((prev) => ({ ...prev, [data.fromUserId]: data.isTyping }));
+    });
+
+    socketRef.current = socket;
+
+    return () => {
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [currentUserId, handleRealtimeMessage]);
 
   useEffect(() => {
     if (selectedConversationId) {
@@ -254,7 +269,13 @@ export function MentorMessagingPanel({ accessToken, currentUserId }: Props) {
         return;
       }
       const data = result.data as { message: MessageItem; conversationId: string };
-      setMessages((prev) => [...prev, data.message]);
+      setMessages((prev) => {
+        if (prev.some((message) => message.messageId === data.message.messageId)) {
+          return prev;
+        }
+
+        return [...prev, data.message];
+      });
       setBody('');
       removeAttachment();
       void loadConversations();

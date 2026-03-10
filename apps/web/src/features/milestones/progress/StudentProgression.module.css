@@ -1,110 +1,321 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Zen Progress - Student Progression Panel
+   Design system: Warm minimalism with intentional accents
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap');
+
+/* ─── Design Tokens ─────────────────────────────────────────────────────────── */
+
 .container {
-  display: grid;
-  gap: var(--spacing-4);
-  padding: var(--spacing-4);
+  --zen-cream: #FAF8F5;
+  --zen-cream-dark: #F0EDE8;
+  --zen-charcoal: #1A1A1A;
+  --zen-charcoal-soft: #2D2D2D;
+  --zen-gray: #6B6B6B;
+  --zen-gray-light: #A0A0A0;
+  --zen-border: #E5E2DD;
+  --zen-indigo: #4F46E5;
+  --zen-indigo-soft: #6366F1;
+  --zen-indigo-bg: #EEF2FF;
+  --zen-coral: #F97316;
+  --zen-coral-soft: #FB923C;
+  --zen-coral-bg: #FFF7ED;
+  --zen-success: #059669;
+  --zen-success-bg: #ECFDF5;
+  --zen-warning: #D97706;
+  --zen-warning-bg: #FFFBEB;
+  --zen-error: #DC2626;
+  --zen-error-bg: #FEF2F2;
+
+  --font-primary: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 0 3px var(--zen-indigo-bg);
+
+  font-family: var(--font-primary);
+  background: var(--zen-cream);
+  min-height: calc(100vh - 90px);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
+/* ─── Animations ────────────────────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ─── Header ───────────────────────────────────────────────────────────────── */
+
 .header {
-  display: grid;
-  gap: var(--spacing-1);
+  animation: slideUp 0.4s ease;
 }
 
 .title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--zen-charcoal);
   margin: 0;
-  color: var(--color-primary-900);
-  font-size: var(--font-size-2xl);
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
-  margin: 0;
-  color: var(--color-neutral-700);
+  font-size: 0.9375rem;
+  color: var(--zen-gray);
+  margin: 0.5rem 0 0;
+  line-height: 1.5;
 }
 
+/* ─── Progress Summary Card ────────────────────────────────────────────────── */
+
 .summary {
-  margin-top: var(--spacing-2);
-  color: var(--color-primary-900);
-  font-weight: var(--font-weight-semibold);
+  margin-top: 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--zen-charcoal);
 }
+
+/* ─── View Toggle ──────────────────────────────────────────────────────────── */
+
+.viewToggle {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.375rem;
+  background: white;
+  border: 2px solid var(--zen-border);
+  border-radius: 12px;
+  width: fit-content;
+  animation: slideUp 0.4s ease 0.1s both;
+}
+
+.viewToggleButton,
+.viewToggleActive {
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: var(--font-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.viewToggleButton {
+  background: transparent;
+  color: var(--zen-gray);
+}
+
+.viewToggleButton:hover {
+  background: var(--zen-cream);
+  color: var(--zen-charcoal);
+}
+
+.viewToggleActive {
+  background: linear-gradient(135deg, var(--zen-indigo) 0%, var(--zen-indigo-soft) 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+}
+
+/* ─── Filters ──────────────────────────────────────────────────────────────── */
 
 .filters {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-2);
+  gap: 0.5rem;
+  animation: slideUp 0.4s ease 0.15s both;
 }
 
 .filterButton,
 .filterActive {
-  border: 1px solid var(--color-neutral-500);
-  border-radius: var(--radius-full);
-  min-height: var(--min-touch-target);
-  padding: 0 var(--spacing-3);
-  background: var(--color-white);
-  color: var(--color-primary-900);
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: var(--font-primary);
+  border: 2px solid var(--zen-border);
+  border-radius: 100px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 40px;
+}
+
+.filterButton {
+  background: white;
+  color: var(--zen-gray);
+}
+
+.filterButton:hover {
+  border-color: var(--zen-indigo);
+  color: var(--zen-indigo);
+  background: var(--zen-indigo-bg);
 }
 
 .filterActive {
-  border-color: var(--color-primary-700);
-  background: var(--color-neutral-50);
-  color: var(--color-primary-700);
-  font-weight: var(--font-weight-semibold);
+  background: var(--zen-indigo);
+  border-color: var(--zen-indigo);
+  color: white;
 }
+
+/* ─── Error Banner ─────────────────────────────────────────────────────────── */
+
+.error {
+  padding: 1rem 1.25rem;
+  background: var(--zen-error-bg);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 12px;
+  color: var(--zen-error);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: slideUp 0.3s ease;
+}
+
+.error::before {
+  content: '!';
+  width: 24px;
+  height: 24px;
+  background: var(--zen-error);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ─── Loading & Empty States ───────────────────────────────────────────────── */
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  color: var(--zen-gray);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  gap: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.loading::before {
+  content: '';
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--zen-indigo) 0%, var(--zen-indigo-soft) 100%);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--zen-gray);
+  font-size: 0.9375rem;
+}
+
+/* ─── Timeline (List View) ─────────────────────────────────────────────────── */
 
 .timeline {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: var(--spacing-3);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: fadeIn 0.4s ease;
 }
+
+.timelineItem {
+  animation: slideUp 0.4s ease;
+}
+
+/* ─── Milestone Card ───────────────────────────────────────────────────────── */
 
 .cardHeader {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 1rem;
 }
+
+/* ─── Status Badges ────────────────────────────────────────────────────────── */
 
 .status {
-  border-radius: var(--radius-full);
-  padding: var(--spacing-1) var(--spacing-2);
-  font-size: var(--font-size-sm);
-  background: var(--color-neutral-200);
-  color: var(--color-neutral-700);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-family: var(--font-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: 100px;
+  background: var(--zen-cream-dark);
+  color: var(--zen-gray);
+  white-space: nowrap;
 }
 
-.status[data-status='done'] {
-  background: var(--color-neutral-50);
-  color: var(--color-primary-900);
+.status[data-status='planned'] {
+  background: var(--zen-cream-dark);
+  color: var(--zen-gray);
+}
+
+.status[data-status='in_progress'] {
+  background: var(--zen-indigo-bg);
+  color: var(--zen-indigo);
 }
 
 .status[data-status='review'] {
-  background: var(--color-accent-300);
-  color: var(--color-primary-900);
+  background: var(--zen-warning-bg);
+  color: var(--zen-warning);
+}
+
+.status[data-status='done'] {
+  background: var(--zen-success-bg);
+  color: var(--zen-success);
 }
 
 .status[data-status='blocked'] {
-  background: var(--color-error-light);
-  color: var(--color-primary-900);
+  background: var(--zen-error-bg);
+  color: var(--zen-error);
 }
 
-.meta,
+/* ─── Meta & Notes ─────────────────────────────────────────────────────────── */
+
+.meta {
+  margin: 0.375rem 0;
+  font-size: 0.8125rem;
+  color: var(--zen-gray);
+}
+
 .notes {
-  margin: var(--spacing-1) 0;
-  color: var(--color-neutral-700);
+  margin: 0.75rem 0 0;
+  padding: 0.75rem;
+  background: var(--zen-cream);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--zen-charcoal-soft);
+  line-height: 1.5;
 }
 
-.error {
-  border: 1px solid var(--color-error);
-  background: var(--color-error-light);
-  color: var(--color-primary-900);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-3);
-}
-
-.loading,
-.empty {
-  color: var(--color-neutral-700);
-}
+/* ─── Screen Reader Only ───────────────────────────────────────────────────── */
 
 .srOnly {
   position: absolute;
@@ -118,34 +329,59 @@
   border: 0;
 }
 
-.viewToggle {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+/* ─── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1.25rem;
+    gap: 1.25rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .viewToggle {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .viewToggleButton,
+  .viewToggleActive {
+    flex: 1;
+    text-align: center;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .filters {
+    gap: 0.375rem;
+  }
+
+  .filterButton,
+  .filterActive {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    min-height: 36px;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
 }
 
-.viewToggleButton {
-  padding: 0.4rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: #fff;
-  cursor: pointer;
-  font-size: 0.875rem;
-  color: #374151;
-  transition: all 0.15s;
-}
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem;
+  }
 
-.viewToggleButton:hover {
-  background: #f3f4f6;
-}
+  .title {
+    font-size: 1.375rem;
+  }
 
-.viewToggleActive {
-  padding: 0.4rem 1rem;
-  border: 1px solid #4f46e5;
-  border-radius: 6px;
-  background: #4f46e5;
-  cursor: pointer;
-  font-size: 0.875rem;
-  color: #fff;
-  font-weight: 500;
+  .subtitle {
+    font-size: 0.875rem;
+  }
 }

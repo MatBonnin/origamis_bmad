@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -6,10 +6,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mockEmit = vi.fn();
 const mockOn = vi.fn();
 const mockDisconnect = vi.fn();
+const socketHandlers = new Map<string, (payload: unknown) => void>();
 
 vi.mock('socket.io-client', () => ({
   io: vi.fn(() => ({
-    on: mockOn,
+    on: mockOn.mockImplementation((event: string, handler: (payload: unknown) => void) => {
+      socketHandlers.set(event, handler);
+    }),
     emit: mockEmit,
     disconnect: mockDisconnect,
   })),
@@ -23,6 +26,7 @@ describe('MentorMessagingPanel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubGlobal('fetch', fetchMock);
+    socketHandlers.clear();
   });
 
   const mockConversations = (conversations: unknown[]) => ({
@@ -156,7 +160,7 @@ describe('MentorMessagingPanel', () => {
 
     render(<MentorMessagingPanel accessToken="token-mentor" currentUserId="mentor-1" />);
 
-    expect(await screen.findByText('Echangez avec vos etudiants.')).toBeInTheDocument();
+    expect(await screen.findByText(/Echangez avec vos etudiants/)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Etudiants' })).toBeInTheDocument();
   });
 
@@ -176,5 +180,73 @@ describe('MentorMessagingPanel', () => {
     expect(
       await screen.findByText('Aucune conversation pour le moment.'),
     ).toBeInTheDocument();
+  });
+
+  it('handles realtime messages without duplicating them in the active thread', async () => {
+    fetchMock
+      .mockResolvedValueOnce(
+        mockConversations([
+          {
+            conversationId: 'conv-1',
+            peer: { userId: 'student-1', fullName: 'Nina Dupont', role: 'etudiant' },
+            lastMessage: null,
+            unreadCount: 0,
+            lastMessageAt: '2026-02-17T10:00:00.000Z',
+          },
+        ]),
+      )
+      .mockResolvedValueOnce(mockMessages([]))
+      .mockResolvedValue(
+        mockConversations([
+          {
+            conversationId: 'conv-1',
+            peer: { userId: 'student-1', fullName: 'Nina Dupont', role: 'etudiant' },
+            lastMessage: {
+              messageId: 'msg-live-1',
+              body: 'Live mentor unique',
+              senderId: 'student-1',
+              createdAt: '2026-02-17T10:06:00.000Z',
+            },
+            unreadCount: 1,
+            lastMessageAt: '2026-02-17T10:06:00.000Z',
+          },
+        ]),
+      );
+
+    render(<MentorMessagingPanel accessToken="token-mentor" currentUserId="mentor-1" />);
+
+    await screen.findAllByText('Nina Dupont');
+
+    const handler = socketHandlers.get('message.received');
+    expect(handler).toBeDefined();
+
+    await act(async () => {
+      handler?.({
+        conversationId: 'conv-1',
+        message: {
+          messageId: 'msg-live-1',
+          conversationId: 'conv-1',
+          senderId: 'student-1',
+          receiverId: 'mentor-1',
+          body: 'Live mentor unique',
+          createdAt: '2026-02-17T10:06:00.000Z',
+        },
+      });
+      handler?.({
+        conversationId: 'conv-1',
+        message: {
+          messageId: 'msg-live-1',
+          conversationId: 'conv-1',
+          senderId: 'student-1',
+          receiverId: 'mentor-1',
+          body: 'Live mentor unique',
+          createdAt: '2026-02-17T10:06:00.000Z',
+        },
+      });
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Live mentor unique')).toHaveLength(2);
+    });
   });
 });
