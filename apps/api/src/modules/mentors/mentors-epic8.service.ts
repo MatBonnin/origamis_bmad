@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import {
+  booking_status,
   calendar_provider,
   mentor_request_status,
   program_milestone_status,
@@ -349,6 +350,78 @@ export class MentorsEpic8Service {
         createdAt: row.created_at.toISOString(),
         updatedAt: row.updated_at.toISOString(),
       })),
+    };
+  }
+
+  async getMyMentor(studentId: string) {
+    const acceptedRequest = await this.prisma.mentor_requests.findFirst({
+      where: {
+        student_id: studentId,
+        status: mentor_request_status.accepted,
+      },
+      include: {
+        mentor: {
+          select: {
+            domain: true,
+            user: {
+              select: {
+                id: true,
+                first_name: true,
+                last_name: true,
+                avatar_url: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: { updated_at: 'desc' },
+    });
+
+    if (acceptedRequest?.mentor?.user) {
+      return {
+        mentorId: acceptedRequest.mentor.user.id,
+        fullName:
+          `${acceptedRequest.mentor.user.first_name} ${acceptedRequest.mentor.user.last_name}`.trim(),
+        avatarUrl: acceptedRequest.mentor.user.avatar_url ?? null,
+        domain: acceptedRequest.mentor.domain,
+      };
+    }
+
+    const recentBooking = await this.prisma.bookings.findFirst({
+      where: {
+        student_id: studentId,
+        status: {
+          in: [booking_status.confirmed, booking_status.completed],
+        },
+      },
+      include: {
+        mentor: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            avatar_url: true,
+            mentor_profile: {
+              select: {
+                domain: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: [{ booking_date: 'desc' }, { created_at: 'desc' }],
+    });
+
+    if (!recentBooking?.mentor) {
+      return null;
+    }
+
+    return {
+      mentorId: recentBooking.mentor.id,
+      fullName:
+        `${recentBooking.mentor.first_name} ${recentBooking.mentor.last_name}`.trim(),
+      avatarUrl: recentBooking.mentor.avatar_url ?? null,
+      domain: recentBooking.mentor.mentor_profile?.domain ?? 'Mentorat',
     };
   }
 

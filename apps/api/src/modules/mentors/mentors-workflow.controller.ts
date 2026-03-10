@@ -160,6 +160,13 @@ export class MentorsWorkflowController {
     return { data, error: null };
   }
 
+  @Get('students/me/mentor')
+  @ApiOperation({ summary: "Recuperer le mentor actuel de l'etudiant connecte" })
+  async getMyMentor(@CurrentUser() user: { id: string }) {
+    const data = await this.epic8.getMyMentor(user.id);
+    return { data, error: null };
+  }
+
   @Patch('mentor/requests/:id')
   @UseGuards(RolesGuard)
   @Roles('mentor')
