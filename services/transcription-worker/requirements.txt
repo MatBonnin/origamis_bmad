@@ -1,0 +1,4 @@
+faster-whisper==1.2.0
+minio==7.2.8
+redis==5.2.1
+requests==2.32.3

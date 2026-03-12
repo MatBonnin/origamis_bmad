@@ -40,6 +40,11 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: 'Annule',
   confirmed: 'Confirme',
   pending: 'En attente',
+  queued: 'En file',
+  processing: 'En cours',
+  failed: 'Echec',
+  declined: 'Refusee',
+  pending_consent: 'Consentement requis',
 };
 
 export function SessionHistory({ accessToken, userId, isMentor = false }: Props) {

@@ -3,11 +3,13 @@ import {
   Body,
   Controller,
   Headers,
+  UnauthorizedException,
   Post,
   Req,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
+import { ConfigService } from '@nestjs/config';
 import { SessionProviderService } from './session-provider.service';
 import { SessionsService } from './sessions.service';
 
@@ -17,6 +19,7 @@ export class SessionsWebhookController {
   constructor(
     private readonly sessionsService: SessionsService,
     private readonly sessionProvider: SessionProviderService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Post('video/livekit')
@@ -40,7 +43,7 @@ export class SessionsWebhookController {
 
     const data = await this.sessionsService.handleVideoWebhook({
       bookingId: this.extractBookingId(event.room?.metadata),
-      providerRoomId: event.room?.name,
+      providerRoomId: event.room?.name || event.egressInfo?.roomName,
       providerEventId: event.id,
       eventType: event.event,
       participantUserId: event.participant?.identity,
@@ -66,7 +69,16 @@ export class SessionsWebhookController {
       segments?: unknown[];
       payload?: Record<string, unknown>;
     },
+    @Headers('x-transcript-worker-secret') workerSecret?: string,
   ) {
+    const expectedSecret = this.configService.get<string>('TRANSCRIPT_WORKER_SECRET');
+    if (expectedSecret && workerSecret !== expectedSecret) {
+      throw new UnauthorizedException({
+        code: 'TRANSCRIPT_WORKER_UNAUTHORIZED',
+        message: 'Secret worker invalide',
+      });
+    }
+
     const data = await this.sessionsService.handleTranscriptWebhook(body);
     return { data, error: null };
   }

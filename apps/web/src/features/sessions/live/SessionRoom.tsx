@@ -67,6 +67,8 @@ interface RoomData {
   participants: Participant[];
   transcript: TranscriptData;
   transcriptConsentRequired: boolean;
+  transcriptConsentStatus?: 'pending' | 'accepted' | 'declined';
+  transcriptCaptureStatus?: 'not_started' | 'recording' | 'uploaded' | 'failed';
 }
 
 interface Props {
@@ -361,34 +363,24 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
     }
   }, [accessToken, headers, room]);
 
-  const consentToTranscript = useCallback(async () => {
+  const updateTranscriptConsent = useCallback(async (decision: 'accept' | 'decline') => {
     if (!room) return;
     setConsenting(true);
     try {
       const response = await fetch(`${API_URL}/sessions/${room.bookingId}/transcription/consent`, {
         method: 'POST',
         headers,
+        body: JSON.stringify({ decision }),
       });
       const result = await response.json();
       if (!response.ok || result.error) return;
-      setRoom((previous) =>
-        previous
-          ? {
-              ...previous,
-              transcriptConsentRequired: false,
-              transcript: {
-                ...previous.transcript,
-                status: (result.data as { transcriptStatus: string }).transcriptStatus,
-              },
-            }
-          : previous,
-      );
+      await loadRoom();
     } catch {
       // Silently fail
     } finally {
       setConsenting(false);
     }
-  }, [headers, room]);
+  }, [headers, room, loadRoom]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -445,19 +437,19 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
             </div>
             <h2>Transcription de la session</h2>
             <p>
-              Cette session peut être transcrite automatiquement pour générer un résumé.
-              Votre consentement est requis pour activer cette fonctionnalité.
+              Cette session peut etre retranscrite apres l'appel. La decision doit etre prise avant l'entree en salle.
             </p>
             <div className={styles.consentActions}>
               <button
                 className={styles.consentDecline}
-                onClick={() => setRoom(prev => prev ? { ...prev, transcriptConsentRequired: false } : prev)}
+                onClick={() => void updateTranscriptConsent('decline')}
+                disabled={consenting}
               >
                 Refuser
               </button>
               <button
                 className={styles.consentAccept}
-                onClick={() => void consentToTranscript()}
+                onClick={() => void updateTranscriptConsent('accept')}
                 disabled={consenting}
               >
                 {consenting ? 'Activation...' : 'Autoriser'}
@@ -525,7 +517,11 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
                 <div className={styles.placeholderAvatar}>
                   {getInitials(counterpart?.fullName || 'P')}
                 </div>
-                <p>En attente de connexion...</p>
+                <p>
+                  {room.transcriptConsentRequired
+                    ? 'Choisissez d abord si la session peut etre transcrite.'
+                    : 'En attente de connexion...'}
+                </p>
               </div>
             </div>
           )}

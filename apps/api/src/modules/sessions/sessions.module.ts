@@ -6,11 +6,17 @@ import { SessionProviderService } from './session-provider.service';
 import { SessionsGateway } from './sessions.gateway';
 import { SessionsService } from './sessions.service';
 import { SessionsWebhookController } from './sessions.webhook.controller';
+import { TranscriptQueueService } from './transcript-queue.service';
 
 @Module({
   imports: [PrismaModule, NotificationsModule],
   controllers: [SessionsController, SessionsWebhookController],
-  providers: [SessionsService, SessionProviderService, SessionsGateway],
+  providers: [
+    SessionsService,
+    SessionProviderService,
+    SessionsGateway,
+    TranscriptQueueService,
+  ],
   exports: [SessionsService, SessionProviderService],
 })
 export class SessionsModule {}

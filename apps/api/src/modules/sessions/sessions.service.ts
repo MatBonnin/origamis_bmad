@@ -5,11 +5,20 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma, transcript_job_status } from '@prisma/client';
+import {
+  Prisma,
+  transcript_capture_status,
+  transcript_consent_status,
+  transcript_job_status,
+} from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { NotificationsService } from '../notifications';
 import { PrismaService } from '../prisma';
 import { SessionProviderService } from './session-provider.service';
+import {
+  TranscriptJobPayload,
+  TranscriptQueueService,
+} from './transcript-queue.service';
 
 export type SessionHistoryCategory = 'message' | 'rdv' | 'visio';
 export type SessionHistoryExportFormat = 'csv' | 'pdf';
@@ -34,6 +43,7 @@ export interface SessionHistoryItem {
   replayAvailable?: boolean;
   transcriptStatus?: string | null;
   transcriptSummary?: string | null;
+  transcriptConsentStatus?: string | null;
 }
 
 interface TranscriptWebhookPayload {
@@ -68,6 +78,7 @@ export class SessionsService {
     private readonly prisma: PrismaService,
     private readonly notifications: NotificationsService,
     private readonly sessionProvider: SessionProviderService,
+    private readonly transcriptQueue: TranscriptQueueService,
   ) {}
 
   async getHistory(currentUserId: string, query: GetSessionHistoryQuery) {
@@ -363,7 +374,7 @@ export class SessionsService {
       : {
           bookingId,
           provider: this.sessionProvider.getTranscriptProviderName(),
-          status: booking.session?.transcript_status ?? 'not_requested',
+          status: this.resolveTranscriptDisplayStatus(booking.session),
           language: null,
           fullText: null,
           summaryText: null,
@@ -372,24 +383,80 @@ export class SessionsService {
         };
   }
 
-  async recordTranscriptConsent(userId: string, bookingId: string) {
+  async recordTranscriptConsent(
+    userId: string,
+    bookingId: string,
+    input: { decision: 'accept' | 'decline' },
+  ) {
     const booking = await this.getBookingWithSession(userId, bookingId);
     const session = await this.ensureSessionRecord(booking);
+
+    if (input.decision === 'decline') {
+      const declined = await this.prisma.booking_sessions.update({
+        where: { id: session.id },
+        data: {
+          transcript_consent_status: 'declined',
+          transcript_status: 'not_requested',
+          transcript_consented_at: null,
+          transcript_error_message: null,
+        },
+      });
+
+      await this.logSessionEvent(session.id, bookingId, 'transcript_requested', userId, {
+        type: 'transcript.consent.declined',
+      });
+
+      return {
+        bookingId,
+        transcriptConsentStatus: declined.transcript_consent_status,
+        transcriptStatus: declined.transcript_status,
+        consentedAt: null,
+      };
+    }
+
+    let captureStatus = session.transcript_capture_status;
+    let captureProviderId = session.transcript_capture_provider_id;
+    let sourceUrl = session.transcript_source_url;
+
+    if (
+      session.transcript_capture_status === 'not_started' &&
+      session.provider_room_id
+    ) {
+      const objectKey = this.sessionProvider.buildTranscriptObjectKey(
+        bookingId,
+        session.session_token,
+      );
+      const capture = await this.sessionProvider.startAudioRecording(
+        session.provider_room_id,
+        objectKey,
+      );
+      captureStatus = 'recording';
+      captureProviderId = capture.egressId;
+      sourceUrl = `s3://${process.env.S3_BUCKET}/${objectKey}`;
+    }
 
     const consented = await this.prisma.booking_sessions.update({
       where: { id: session.id },
       data: {
         transcript_consented_at: new Date(),
-        transcript_status: 'queued',
+        transcript_consent_status: 'accepted',
+        transcript_status: 'not_requested',
+        transcript_capture_status: captureStatus,
+        transcript_capture_provider_id: captureProviderId,
+        transcript_source_url: sourceUrl,
+        transcript_error_message: null,
       },
     });
 
     await this.logSessionEvent(session.id, bookingId, 'transcript_requested', userId, {
-      type: 'transcript.consent.recorded',
+      type: 'transcript.consent.accepted',
+      captureStatus,
+      captureProviderId,
     });
 
     return {
       bookingId,
+      transcriptConsentStatus: consented.transcript_consent_status,
       transcriptStatus: consented.transcript_status,
       consentedAt: consented.transcript_consented_at?.toISOString() ?? null,
     };
@@ -403,11 +470,11 @@ export class SessionsService {
 
     const eventType = payload.eventType ?? 'unknown';
     const normalizedStatus =
-      eventType === 'room.started'
+      eventType === 'room_started'
         ? 'live'
-        : eventType === 'room.ended'
+        : eventType === 'room_finished'
           ? 'ended'
-          : eventType === 'participant.joined'
+          : eventType === 'participant_joined'
             ? 'waiting'
             : session.status;
 
@@ -415,14 +482,29 @@ export class SessionsService {
       status: normalizedStatus,
     };
 
-    if (eventType === 'room.started' && !session.started_at) {
+    if (eventType === 'room_started' && !session.started_at) {
       data.started_at = new Date();
     }
 
-    if (eventType === 'room.ended') {
+    if (eventType === 'room_finished') {
       data.ended_at = new Date();
-      if (session.transcript_consented_at && session.transcript_status !== 'completed') {
-        data.transcript_status = 'processing';
+    }
+
+    const egressInfo = this.extractEgressInfo(payload.payload);
+    if (eventType === 'egress_started' && egressInfo?.egressId) {
+      data.transcript_capture_status = 'recording';
+      data.transcript_capture_provider_id = egressInfo.egressId;
+    }
+
+    if (eventType === 'egress_ended') {
+      if (egressInfo?.fileResults?.[0]?.location) {
+        data.transcript_capture_status = 'uploaded';
+        data.transcript_source_url = egressInfo.fileResults[0].location;
+        data.transcript_error_message = null;
+      } else {
+        data.transcript_capture_status = 'failed';
+        data.transcript_status = 'failed';
+        data.transcript_error_message = 'Capture audio LiveKit indisponible';
       }
     }
 
@@ -431,11 +513,20 @@ export class SessionsService {
       data,
     });
 
-    if (eventType === 'room.ended') {
+    if (eventType === 'room_finished') {
       await this.prisma.bookings.update({
         where: { id: session.booking_id },
         data: { status: 'completed' },
       });
+    }
+
+    if (
+      eventType === 'egress_ended' &&
+      updated.transcript_consent_status === 'accepted' &&
+      updated.transcript_capture_status === 'uploaded' &&
+      updated.transcript_source_url
+    ) {
+      await this.queueTranscriptJob(updated);
     }
 
     await this.logSessionEvent(
@@ -493,6 +584,10 @@ export class SessionsService {
         transcript_status: status,
         transcript_provider_job_id:
           payload.providerJobId ?? session.transcript_provider_job_id ?? null,
+        transcript_error_message:
+          status === 'failed'
+            ? String(payload.payload?.error ?? 'La transcription a echoue')
+            : null,
       },
     });
 
@@ -798,8 +893,9 @@ export class SessionsService {
             category === 'visio'
               ? Boolean(row.session && row.session.expires_at > new Date())
               : undefined,
-          transcriptStatus: row.session?.transcript?.status ?? row.session?.transcript_status ?? null,
+          transcriptStatus: row.session?.transcript?.status ?? this.resolveTranscriptDisplayStatus(row.session),
           transcriptSummary: row.session?.transcript?.summary_text ?? null,
+          transcriptConsentStatus: row.session?.transcript_consent_status ?? null,
         }),
       ),
       metadata: {
@@ -951,8 +1047,13 @@ startxref
       provider_room_id: string | null;
       provider_join_url: string | null;
       status: string;
+      transcript_consent_status: string;
       transcript_status: string;
+      transcript_capture_status: string;
+      transcript_capture_provider_id: string | null;
       transcript_consented_at: Date | null;
+      transcript_source_url: string | null;
+      transcript_error_message: string | null;
       started_at: Date | null;
       ended_at: Date | null;
       expires_at: Date;
@@ -1013,7 +1114,9 @@ startxref
         provider_join_url: providerJoinUrl,
         expires_at: expiresAt,
         status: booking.status === 'completed' ? 'ended' : 'waiting',
-        transcript_status: 'pending_consent',
+        transcript_consent_status: 'pending',
+        transcript_status: 'not_requested',
+        transcript_capture_status: 'not_started',
       },
     });
 
@@ -1045,7 +1148,9 @@ startxref
       provider_room_id: string | null;
       provider_join_url: string | null;
       status: string;
+      transcript_consent_status: string;
       transcript_status: string;
+      transcript_capture_status: string;
       transcript_consented_at: Date | null;
       started_at: Date | null;
       ended_at: Date | null;
@@ -1077,7 +1182,7 @@ startxref
           };
 
     const liveKitToken =
-      session.provider_room_id === null
+      session.provider_room_id === null || session.transcript_consent_status === 'pending'
         ? null
         : await this.sessionProvider.buildParticipantToken({
             roomId: session.provider_room_id,
@@ -1122,14 +1227,16 @@ startxref
         : {
             bookingId: booking.id,
             provider: this.sessionProvider.getTranscriptProviderName(),
-            status: session.transcript_status,
+            status: this.resolveTranscriptDisplayStatus(session),
             language: null,
             fullText: null,
             summaryText: null,
             segments: [],
             updatedAt: null,
           },
-      transcriptConsentRequired: !session.transcript_consented_at,
+      transcriptConsentRequired: session.transcript_consent_status === 'pending',
+      transcriptConsentStatus: session.transcript_consent_status,
+      transcriptCaptureStatus: session.transcript_capture_status,
     };
   }
 
@@ -1261,13 +1368,13 @@ startxref
 
   private mapVideoEventType(eventType: string) {
     switch (eventType) {
-      case 'participant.joined':
+      case 'participant_joined':
         return 'participant_joined';
-      case 'participant.left':
+      case 'participant_left':
         return 'participant_left';
-      case 'room.started':
+      case 'room_started':
         return 'room_started';
-      case 'room.ended':
+      case 'room_finished':
         return 'room_ended';
       default:
         return 'webhook_received';
@@ -1325,17 +1432,74 @@ startxref
   }
 
   private resolveTranscriptStatusForUpdate(session: {
-    transcript_consented_at: Date | null;
+    transcript_consent_status?: string;
     transcript_status: string;
   }): transcript_job_status {
-    if (!session.transcript_consented_at) {
-      return 'pending_consent';
-    }
-
-    if (session.transcript_status === 'not_requested') {
-      return 'queued';
+    if (session.transcript_consent_status === 'pending') {
+      return 'not_requested';
     }
 
     return session.transcript_status as transcript_job_status;
+  }
+
+  private resolveTranscriptDisplayStatus(
+    session:
+      | {
+          transcript_consent_status?: string;
+          transcript_status: string;
+        }
+      | null
+      | undefined,
+  ) {
+    if (!session) {
+      return 'not_requested';
+    }
+    if (session.transcript_consent_status === 'declined') {
+      return 'declined';
+    }
+    if (session.transcript_consent_status === 'pending') {
+      return 'pending_consent';
+    }
+    return session.transcript_status;
+  }
+
+  private extractEgressInfo(payload?: Record<string, unknown>) {
+    const egressInfo = payload?.egressInfo;
+    if (!egressInfo || typeof egressInfo !== 'object') {
+      return null;
+    }
+    return egressInfo as {
+      egressId?: string;
+      fileResults?: Array<{ location?: string }>;
+    };
+  }
+
+  private async queueTranscriptJob(session: {
+    id: string;
+    booking_id: string;
+    provider_room_id: string | null;
+    transcript_source_url: string | null;
+  }) {
+    if (!session.provider_room_id || !session.transcript_source_url) {
+      return;
+    }
+
+    const jobId = randomUUID();
+    const payload: TranscriptJobPayload = {
+      jobId,
+      bookingId: session.booking_id,
+      bookingSessionId: session.id,
+      sourceUrl: session.transcript_source_url,
+      providerRoomId: session.provider_room_id,
+    };
+
+    await this.transcriptQueue.enqueue(payload);
+    await this.prisma.booking_sessions.update({
+      where: { id: session.id },
+      data: {
+        transcript_status: 'queued',
+        transcript_provider_job_id: jobId,
+      },
+    });
   }
 }

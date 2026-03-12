@@ -425,9 +425,14 @@ model booking_sessions {
   status                     session_room_status       @default(scheduled)
   started_at                 DateTime?
   ended_at                   DateTime?
+  transcript_consent_status  transcript_consent_status @default(pending)
   transcript_status          transcript_job_status     @default(not_requested)
+  transcript_capture_status  transcript_capture_status @default(not_started)
+  transcript_capture_provider_id String?
   transcript_provider_job_id String?
   transcript_consented_at    DateTime?
+  transcript_source_url      String?
+  transcript_error_message   String?
   expires_at                 DateTime
   created_at                 DateTime                  @default(now())
   updated_at                 DateTime                  @updatedAt
@@ -457,6 +462,19 @@ enum transcript_job_status {
   queued
   processing
   completed
+  failed
+}
+
+enum transcript_consent_status {
+  pending
+  accepted
+  declined
+}
+
+enum transcript_capture_status {
+  not_started
+  recording
+  uploaded
   failed
 }
 

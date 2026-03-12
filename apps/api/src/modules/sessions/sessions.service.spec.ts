@@ -4,6 +4,7 @@ import { NotificationsService } from '../notifications';
 import { PrismaService } from '../prisma';
 import { SessionProviderService } from './session-provider.service';
 import { SessionsService } from './sessions.service';
+import { TranscriptQueueService } from './transcript-queue.service';
 
 describe('SessionsService', () => {
   let service: SessionsService;
@@ -56,11 +57,18 @@ describe('SessionsService', () => {
   const mockNotifications = {
     emitNotification: jest.fn(),
   };
+  const mockTranscriptQueue = {
+    enqueue: jest.fn(),
+  };
   const mockProvider = {
-    getVideoProviderName: jest.fn(() => 'embedded-video'),
-    getTranscriptProviderName: jest.fn(() => 'async-transcript'),
+    getVideoProviderName: jest.fn(() => 'livekit'),
+    getTranscriptProviderName: jest.fn(() => 'faster-whisper'),
     buildRoomId: jest.fn((bookingId: string) => `booking-${bookingId}`),
-    buildJoinUrl: jest.fn(() => 'https://video.example.test/room'),
+    getLiveKitServerUrl: jest.fn(() => 'wss://origami.livekit.cloud'),
+    buildParticipantToken: jest.fn(() => 'lk-token'),
+    ensureRoom: jest.fn(),
+    buildTranscriptObjectKey: jest.fn(() => 'transcripts/booking-1/session.mp3'),
+    startAudioRecording: jest.fn().mockResolvedValue({ egressId: 'egress-1' }),
   };
 
   beforeEach(async () => {
@@ -70,6 +78,7 @@ describe('SessionsService', () => {
         { provide: PrismaService, useValue: mockPrisma },
         { provide: NotificationsService, useValue: mockNotifications },
         { provide: SessionProviderService, useValue: mockProvider },
+        { provide: TranscriptQueueService, useValue: mockTranscriptQueue },
       ],
     }).compile();
 

@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   AccessToken,
+  EgressClient,
+  EncodedFileOutput,
+  EncodedFileType,
   RoomServiceClient,
+  S3Upload,
   WebhookEvent,
   WebhookReceiver,
 } from 'livekit-server-sdk';
@@ -23,7 +27,7 @@ export class SessionProviderService {
   }
 
   getTranscriptProviderName() {
-    return this.configService.get<string>('SESSION_TRANSCRIPT_PROVIDER') || 'async-transcript';
+    return this.configService.get<string>('SESSION_TRANSCRIPT_PROVIDER') || 'faster-whisper';
   }
 
   buildRoomId(bookingId: string) {
@@ -32,6 +36,22 @@ export class SessionProviderService {
 
   getLiveKitServerUrl() {
     return this.requireConfig('LIVEKIT_URL');
+  }
+
+  getLiveKitApiUrl() {
+    const explicit = this.configService.get<string>('LIVEKIT_API_URL');
+    if (explicit) {
+      return explicit;
+    }
+
+    const serverUrl = this.getLiveKitServerUrl();
+    if (serverUrl.startsWith('wss://')) {
+      return `https://${serverUrl.slice('wss://'.length)}`;
+    }
+    if (serverUrl.startsWith('ws://')) {
+      return `http://${serverUrl.slice('ws://'.length)}`;
+    }
+    return serverUrl;
   }
 
   async ensureRoom(roomId: string, metadata?: Record<string, unknown>) {
@@ -70,6 +90,35 @@ export class SessionProviderService {
     return token.toJwt();
   }
 
+  buildTranscriptObjectKey(bookingId: string, sessionToken: string) {
+    return `transcripts/${bookingId}/${sessionToken}.mp3`;
+  }
+
+  async startAudioRecording(roomId: string, objectKey: string) {
+    const client = this.createEgressClient();
+    const fileOutput = new EncodedFileOutput({
+      filepath: objectKey,
+      fileType: EncodedFileType.MP3,
+      output: {
+        case: 's3',
+        value: new S3Upload({
+          accessKey: this.requireConfig('S3_ACCESS_KEY'),
+          secret: this.requireConfig('S3_SECRET_KEY'),
+          bucket: this.requireConfig('S3_BUCKET'),
+          endpoint: this.requireConfig('S3_ENDPOINT'),
+          region: this.configService.get<string>('S3_REGION') || 'us-east-1',
+          forcePathStyle: (this.configService.get<string>('S3_FORCE_PATH_STYLE') || 'true') === 'true',
+        }),
+      },
+    });
+
+    return client.startRoomCompositeEgress(
+      roomId,
+      { file: fileOutput },
+      { audioOnly: true },
+    );
+  }
+
   async verifyWebhook(rawBody: string, authHeader: string) {
     const receiver = new WebhookReceiver(
       this.requireConfig('LIVEKIT_API_KEY'),
@@ -80,7 +129,15 @@ export class SessionProviderService {
 
   private createRoomServiceClient() {
     return new RoomServiceClient(
-      this.requireConfig('LIVEKIT_URL'),
+      this.getLiveKitApiUrl(),
+      this.requireConfig('LIVEKIT_API_KEY'),
+      this.requireConfig('LIVEKIT_API_SECRET'),
+    );
+  }
+
+  private createEgressClient() {
+    return new EgressClient(
+      this.getLiveKitApiUrl(),
       this.requireConfig('LIVEKIT_API_KEY'),
       this.requireConfig('LIVEKIT_API_SECRET'),
     );

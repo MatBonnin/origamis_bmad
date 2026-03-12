@@ -131,4 +131,30 @@ describe('SessionsController', () => {
       format: 'csv',
     });
   });
+
+  it('passes transcript consent decision through to service', async () => {
+    mockService.recordTranscriptConsent.mockResolvedValue({
+      bookingId: 'booking-1',
+      transcriptConsentStatus: 'accepted',
+      transcriptStatus: 'not_requested',
+    });
+
+    const result = await controller.recordTranscriptConsent(
+      { id: 'user-1' } as { id: string },
+      'booking-1',
+      { decision: 'accept' },
+    );
+
+    expect(result).toEqual({
+      data: {
+        bookingId: 'booking-1',
+        transcriptConsentStatus: 'accepted',
+        transcriptStatus: 'not_requested',
+      },
+      error: null,
+    });
+    expect(mockService.recordTranscriptConsent).toHaveBeenCalledWith('user-1', 'booking-1', {
+      decision: 'accept',
+    });
+  });
 });

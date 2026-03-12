@@ -49,6 +49,9 @@ Le dépôt peut maintenant démarrer toute la stack avec Docker :
 - `postgres` pour la base
 - `api` pour NestJS + Prisma
 - `web` pour Next.js
+- `redis` pour la file de jobs
+- `minio` pour le stockage objet des captures audio
+- `transcription-worker` pour `faster-whisper`
 
 ### Préparer les variables
 
@@ -65,6 +68,21 @@ DATABASE_URL=postgresql://postgres:<MOT_DE_PASSE>@postgres:5432/origami
 JWT_SECRET=change_me_in_production
 JWT_EXPIRES_IN=24h
 APP_URL=http://<IP_DU_VPS>:3000
+SESSION_VIDEO_PROVIDER=livekit
+SESSION_TRANSCRIPT_PROVIDER=faster-whisper
+LIVEKIT_URL=wss://<PROJET>.livekit.cloud
+LIVEKIT_API_URL=https://<PROJET>.livekit.cloud
+LIVEKIT_API_KEY=<CLE_API>
+LIVEKIT_API_SECRET=<SECRET_API>
+REDIS_URL=redis://redis:6379
+S3_ENDPOINT=minio:9000
+S3_BUCKET=origami-transcripts
+S3_ACCESS_KEY=minioadmin
+S3_SECRET_KEY=minioadmin
+S3_REGION=us-east-1
+S3_FORCE_PATH_STYLE=true
+TRANSCRIPT_QUEUE_NAME=transcript_jobs
+TRANSCRIPT_WORKER_SECRET=change_me
 ```
 
 `apps/web/.env`
@@ -85,8 +103,10 @@ docker compose up -d --build
 Cela :
 - build l'API et le front
 - démarre PostgreSQL
+- démarre Redis et MinIO
 - applique `prisma db push` au démarrage de l'API
 - exécute le seed Prisma automatiquement par défaut
+- démarre le worker de transcription `faster-whisper`
 - démarre le site sur `http://<IP_DU_VPS>:3000`
 
 ### Commandes utiles
@@ -110,6 +130,7 @@ docker compose down -v
 - Le seed Prisma est lancé au démarrage de l'API via `RUN_DB_SEED=true`.
 - Pour désactiver le seed automatique : `RUN_DB_SEED=false docker compose up -d --build`
 - Les uploads de l'API sont persistés dans le volume Docker `api_uploads`.
+- Si vous utilisez LiveKit Cloud avec MinIO, l'endpoint S3 doit être accessible depuis LiveKit. En local pur, utilisez un tunnel ou un bucket S3/R2 accessible publiquement.
 
 ---
 

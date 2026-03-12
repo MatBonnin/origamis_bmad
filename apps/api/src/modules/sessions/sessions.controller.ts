@@ -154,8 +154,13 @@ export class SessionsController {
   async recordTranscriptConsent(
     @CurrentUser() user: { id: string },
     @Param('bookingId') bookingId: string,
+    @Body() body: { decision: 'accept' | 'decline' },
   ) {
-    const data = await this.sessionsService.recordTranscriptConsent(user.id, bookingId);
+    const data = await this.sessionsService.recordTranscriptConsent(
+      user.id,
+      bookingId,
+      body,
+    );
     return { data, error: null };
   }
 
