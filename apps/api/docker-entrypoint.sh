@@ -15,4 +15,4 @@ if [ "${RUN_DB_SEED:-true}" = "true" ]; then
   npm run prisma:seed
 fi
 
-exec node dist/main
+exec node dist/src/main.js
