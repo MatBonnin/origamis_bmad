@@ -43,6 +43,76 @@ docker compose down -v
 
 ---
 
+## Déploiement Docker complet
+
+Le dépôt peut maintenant démarrer toute la stack avec Docker :
+- `postgres` pour la base
+- `api` pour NestJS + Prisma
+- `web` pour Next.js
+
+### Préparer les variables
+
+Renseigner au minimum :
+
+`apps/api/.env`
+```env
+API_PORT=4000
+API_HOST=0.0.0.0
+CORS_ORIGIN=http://<IP_DU_VPS>:3000
+FRONTEND_URL=http://<IP_DU_VPS>:3000
+API_URL=http://<IP_DU_VPS>:4000
+DATABASE_URL=postgresql://postgres:<MOT_DE_PASSE>@postgres:5432/origami
+JWT_SECRET=change_me_in_production
+JWT_EXPIRES_IN=24h
+APP_URL=http://<IP_DU_VPS>:3000
+```
+
+`apps/web/.env`
+```env
+NEXTAUTH_URL=http://<IP_DU_VPS>:3000
+NEXTAUTH_SECRET=change_me_in_production
+NEXT_PUBLIC_API_URL=http://<IP_DU_VPS>:4000
+```
+
+Si tu veux changer le mot de passe PostgreSQL, exporte aussi `POSTGRES_PASSWORD` avant le lancement ou crée un fichier `.env` à la racine pour Docker Compose.
+
+### Lancer toute la stack
+
+```bash
+docker compose up -d --build
+```
+
+Cela :
+- build l'API et le front
+- démarre PostgreSQL
+- applique `prisma db push` au démarrage de l'API
+- exécute le seed Prisma automatiquement par défaut
+- démarre le site sur `http://<IP_DU_VPS>:3000`
+
+### Commandes utiles
+
+```bash
+# Voir les logs
+docker compose logs -f
+
+# Relancer après modification
+docker compose up -d --build
+
+# Arrêter
+docker compose down
+
+# Arrêter et supprimer aussi les données PostgreSQL
+docker compose down -v
+```
+
+### Notes
+
+- Le seed Prisma est lancé au démarrage de l'API via `RUN_DB_SEED=true`.
+- Pour désactiver le seed automatique : `RUN_DB_SEED=false docker compose up -d --build`
+- Les uploads de l'API sont persistés dans le volume Docker `api_uploads`.
+
+---
+
 ## Variables d'environnement
 
 Copier le fichier d'exemple et le remplir :

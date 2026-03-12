@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MentorSettings } from '@/features/mentors/settings';
 import { BillingSection } from '@/features/profile/billing/BillingSection';
@@ -37,10 +37,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 export default function ProfilPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<'profil' | 'facturation'>(
-    searchParams.get('tab') === 'facturation' ? 'facturation' : 'profil',
-  );
+  const [activeTab, setActiveTab] = useState<'profil' | 'facturation'>('profil');
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -62,6 +59,11 @@ export default function ProfilPage() {
       router.push('/connexion?callbackUrl=/profil');
     }
   }, [status, router]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setActiveTab(params.get('tab') === 'facturation' ? 'facturation' : 'profil');
+  }, []);
 
   useEffect(() => {
     async function loadProfile() {

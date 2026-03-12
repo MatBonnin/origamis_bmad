@@ -1,15 +1,58 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: origami-postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Eqlulfyk38
-      POSTGRES_DB: origami
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-Eqlulfyk38}
+      POSTGRES_DB: ${POSTGRES_DB:-origami}
     ports:
       - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-origami}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - apps/api/.env
+    environment:
+      NODE_ENV: production
+      API_PORT: 4000
+      API_HOST: 0.0.0.0
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-Eqlulfyk38}@postgres:5432/origami}
+      RUN_DB_SEED: ${RUN_DB_SEED:-true}
+    ports:
+      - "4000:4000"
+    volumes:
+      - api_uploads:/app/apps/api/uploads
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - api
+    env_file:
+      - apps/web/.env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+    ports:
+      - "3000:3000"
 
 volumes:
   postgres_data:
+  api_uploads:

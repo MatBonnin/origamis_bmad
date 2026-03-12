@@ -1,0 +1,14 @@
+node_modules
+apps/*/node_modules
+packages/*/node_modules
+.next
+apps/*/.next
+dist
+apps/*/dist
+.git
+.gitignore
+README.md
+docker-compose*.yml
+.env
+coverage
+npm-debug.log*

@@ -7,7 +7,6 @@ import {
   VideoConference,
 } from '@livekit/components-react';
 import { io, type Socket } from 'socket.io-client';
-import { Button } from '@/components/ui';
 import styles from './SessionRoom.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -76,16 +75,6 @@ interface Props {
   token: string;
 }
 
-function formatDateTime(value: string) {
-  return new Date(value).toLocaleString('fr-FR', {
-    weekday: 'short',
-    day: '2-digit',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
 function formatTime(value: string) {
   return new Date(value).toLocaleTimeString('fr-FR', {
     hour: '2-digit',
@@ -99,6 +88,58 @@ function formatBytes(size: number) {
   return `${(size / (1024 * 1024)).toFixed(1)} Mo`;
 }
 
+function mergeUniqueMessages(messages: SessionMessage[]) {
+  const uniqueMessages = new Map<string, SessionMessage>();
+  messages.forEach((message) => {
+    uniqueMessages.set(message.messageId, message);
+  });
+  return Array.from(uniqueMessages.values()).sort((left, right) =>
+    left.createdAt.localeCompare(right.createdAt),
+  );
+}
+
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+function useElapsedTime(startDate: string) {
+  const [elapsed, setElapsed] = useState('00:00');
+
+  useEffect(() => {
+    const start = new Date(startDate).getTime();
+    const now = Date.now();
+
+    if (now < start) {
+      setElapsed('00:00');
+      return;
+    }
+
+    const updateElapsed = () => {
+      const diff = Math.floor((Date.now() - start) / 1000);
+      const hours = Math.floor(diff / 3600);
+      const minutes = Math.floor((diff % 3600) / 60);
+      const seconds = diff % 60;
+
+      if (hours > 0) {
+        setElapsed(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+      } else {
+        setElapsed(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+      }
+    };
+
+    updateElapsed();
+    const interval = setInterval(updateElapsed, 1000);
+    return () => clearInterval(interval);
+  }, [startDate]);
+
+  return elapsed;
+}
+
 export function SessionRoom({ accessToken, currentUserId, token }: Props) {
   const [room, setRoom] = useState<RoomData | null>(null);
   const [messages, setMessages] = useState<SessionMessage[]>([]);
@@ -107,11 +148,12 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [consenting, setConsenting] = useState(false);
-  const [loadingTranscript, setLoadingTranscript] = useState(false);
   const [error, setError] = useState('');
   const socketRef = useRef<Socket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const elapsedTime = useElapsedTime(room?.startsAt || new Date().toISOString());
 
   const headers = useMemo(
     () => ({
@@ -166,29 +208,22 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
         cache: 'no-store',
       });
       const result = await response.json();
-      if (!response.ok || result.error) {
-        setError(result.error?.message || 'Impossible de charger le chat');
-        return;
-      }
+      if (!response.ok || result.error) return;
       const data = result.data as { messages: SessionMessage[] };
-      setMessages(data.messages ?? []);
+      setMessages(mergeUniqueMessages(data.messages ?? []));
     } catch {
-      setError('Erreur de connexion au serveur');
+      // Silently fail for messages
     }
   }, [accessToken]);
 
   const loadTranscript = useCallback(async (bookingId: string) => {
-    setLoadingTranscript(true);
     try {
       const response = await fetch(`${API_URL}/sessions/${bookingId}/transcript`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         cache: 'no-store',
       });
       const result = await response.json();
-      if (!response.ok || result.error) {
-        setError(result.error?.message || 'Impossible de charger la transcription');
-        return;
-      }
+      if (!response.ok || result.error) return;
       setRoom((previous) =>
         previous
           ? {
@@ -201,9 +236,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
           : previous,
       );
     } catch {
-      setError('Erreur de connexion au serveur');
-    } finally {
-      setLoadingTranscript(false);
+      // Silently fail for transcript
     }
   }, [accessToken]);
 
@@ -230,15 +263,8 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
     });
 
     socket.on('session.chat.created', (payload: { bookingId: string; message: SessionMessage }) => {
-      if (payload.bookingId !== room.bookingId) {
-        return;
-      }
-      setMessages((previous) => {
-        if (previous.some((message) => message.messageId === payload.message.messageId)) {
-          return previous;
-        }
-        return [...previous, payload.message];
-      });
+      if (payload.bookingId !== room.bookingId) return;
+      setMessages((previous) => mergeUniqueMessages([...previous, payload.message]));
     });
 
     socketRef.current = socket;
@@ -255,7 +281,6 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
     if (!body) return;
 
     setSending(true);
-    setError('');
     try {
       const response = await fetch(`${API_URL}/sessions/${room.bookingId}/chat/messages`, {
         method: 'POST',
@@ -263,14 +288,13 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
         body: JSON.stringify({ body }),
       });
       const result = await response.json();
-      if (!response.ok || result.error) {
-        setError(result.error?.message || 'Impossible d’envoyer le message');
-        return;
-      }
-      setMessages((previous) => [...previous, (result.data as { message: SessionMessage }).message]);
+      if (!response.ok || result.error) return;
+      setMessages((previous) =>
+        mergeUniqueMessages([...previous, (result.data as { message: SessionMessage }).message]),
+      );
       setDraft('');
     } catch {
-      setError('Erreur de connexion au serveur');
+      // Silently fail
     } finally {
       setSending(false);
     }
@@ -279,7 +303,6 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
   const uploadDocument = useCallback(async (file: File) => {
     if (!room) return;
     setUploading(true);
-    setError('');
 
     try {
       const formData = new FormData();
@@ -291,10 +314,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
         body: formData,
       });
       const uploadResult = await uploadResponse.json();
-      if (!uploadResponse.ok || uploadResult.error) {
-        setError(uploadResult.error?.message || 'Upload impossible');
-        return;
-      }
+      if (!uploadResponse.ok || uploadResult.error) return;
 
       const uploaded = uploadResult.data as {
         url: string;
@@ -316,50 +336,41 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
         }),
       });
       const documentResult = await documentResponse.json();
-      if (!documentResponse.ok || documentResult.error) {
-        setError(documentResult.error?.message || 'Impossible d’enregistrer le document');
-        return;
-      }
+      if (!documentResponse.ok || documentResult.error) return;
 
       const document = (documentResult.data as { document: SessionDocument }).document;
       const messageResponse = await fetch(`${API_URL}/sessions/${room.bookingId}/chat/messages`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          body: `Document partage: ${document.originalName}`,
+          body: `Document partagé: ${document.originalName}`,
           documentId: document.documentId,
         }),
       });
       const messageResult = await messageResponse.json();
-      if (!messageResponse.ok || messageResult.error) {
-        setError(messageResult.error?.message || 'Document partage mais message non cree');
-        return;
+      if (messageResponse.ok && !messageResult.error) {
+        setMessages((previous) =>
+          mergeUniqueMessages([...previous, (messageResult.data as { message: SessionMessage }).message]),
+        );
       }
-      setMessages((previous) => [...previous, (messageResult.data as { message: SessionMessage }).message]);
     } catch {
-      setError('Erreur de connexion au serveur');
+      // Silently fail
     } finally {
       setUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }, [accessToken, headers, room]);
 
   const consentToTranscript = useCallback(async () => {
     if (!room) return;
     setConsenting(true);
-    setError('');
     try {
       const response = await fetch(`${API_URL}/sessions/${room.bookingId}/transcription/consent`, {
         method: 'POST',
         headers,
       });
       const result = await response.json();
-      if (!response.ok || result.error) {
-        setError(result.error?.message || 'Impossible d’enregistrer le consentement');
-        return;
-      }
+      if (!response.ok || result.error) return;
       setRoom((previous) =>
         previous
           ? {
@@ -373,248 +384,305 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
           : previous,
       );
     } catch {
-      setError('Erreur de connexion au serveur');
+      // Silently fail
     } finally {
       setConsenting(false);
     }
   }, [headers, room]);
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      void sendMessage();
+    }
+  };
+
   if (loading) {
-    return <div className={styles.loading}>Chargement de la salle…</div>;
+    return (
+      <div className={styles.loadingScreen}>
+        <div className={styles.loadingContent}>
+          <div className={styles.loadingSpinner}>
+            <div className={styles.spinnerRing} />
+            <div className={styles.spinnerRing} />
+            <div className={styles.spinnerRing} />
+          </div>
+          <p className={styles.loadingText}>Connexion à la session...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!room) {
-    return <div className={styles.errorBox}>{error || 'Session introuvable.'}</div>;
+    return (
+      <div className={styles.errorScreen}>
+        <div className={styles.errorContent}>
+          <div className={styles.errorIcon}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v4M12 16h.01" />
+            </svg>
+          </div>
+          <h1>Session introuvable</h1>
+          <p>{error || 'Cette session n\'existe pas ou a expiré.'}</p>
+        </div>
+      </div>
+    );
   }
 
-  const counterpart = room.participants.find((participant) => participant.userId !== currentUserId);
+  const counterpart = room.participants.find((p) => p.userId !== currentUserId);
 
   return (
-    <section className={styles.shell}>
-      <header className={styles.header}>
-        <div>
-          <p className={styles.kicker}>Session mentorat en direct</p>
-          <h1 className={styles.title}>{counterpart?.fullName || 'Session privée'}</h1>
-          <p className={styles.subtitle}>
-            {formatDateTime(room.startsAt)} · {formatTime(room.startsAt)} à {formatTime(room.endsAt)}
+    <div className={styles.roomContainer}>
+      {/* Consent Modal */}
+      {room.transcriptConsentRequired && (
+        <div className={styles.consentOverlay}>
+          <div className={styles.consentModal}>
+            <div className={styles.consentIcon}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4" />
+                <path d="M12 15a3 3 0 110-6 3 3 0 010 6z" />
+              </svg>
+            </div>
+            <h2>Transcription de la session</h2>
+            <p>
+              Cette session peut être transcrite automatiquement pour générer un résumé.
+              Votre consentement est requis pour activer cette fonctionnalité.
+            </p>
+            <div className={styles.consentActions}>
+              <button
+                className={styles.consentDecline}
+                onClick={() => setRoom(prev => prev ? { ...prev, transcriptConsentRequired: false } : prev)}
+              >
+                Refuser
+              </button>
+              <button
+                className={styles.consentAccept}
+                onClick={() => void consentToTranscript()}
+                disabled={consenting}
+              >
+                {consenting ? 'Activation...' : 'Autoriser'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Top Bar */}
+      <header className={styles.topBar}>
+        <div className={styles.topBarLeft}>
+          <div className={styles.sessionInfo}>
+            <div className={styles.liveIndicator}>
+              <span className={styles.liveDot} />
+              EN DIRECT
+            </div>
+            <span className={styles.sessionTimer}>{elapsedTime}</span>
+          </div>
+        </div>
+
+        <div className={styles.topBarCenter}>
+          <h1 className={styles.sessionTitle}>
+            Session avec {counterpart?.fullName || 'Participant'}
+          </h1>
+          <p className={styles.sessionSchedule}>
+            {formatTime(room.startsAt)} - {formatTime(room.endsAt)}
           </p>
         </div>
-        <div className={styles.statusCluster}>
-          <span className={styles.statusPill}>{room.provider.name}</span>
-          <span className={styles.statusPill}>Salle {room.roomStatus}</span>
-          <span className={styles.statusPill}>Transcription {room.transcript.status}</span>
+
+        <div className={styles.topBarRight}>
+          <div className={styles.participantAvatars}>
+            {room.participants.map((p) => (
+              <div
+                key={p.userId}
+                className={`${styles.avatar} ${p.userId === currentUserId ? styles.avatarSelf : ''}`}
+                title={p.fullName}
+              >
+                {getInitials(p.fullName)}
+              </div>
+            ))}
+          </div>
         </div>
       </header>
 
-      {error && <div className={styles.errorBox}>{error}</div>}
-
-      <div className={styles.grid}>
-        <div className={styles.stage}>
-          <div className={styles.videoCard}>
-            <div className={styles.videoMeta}>
-              <div>
-                <p className={styles.videoEyebrow}>Provider vidéo tiers</p>
-                <strong>{room.provider.roomId || 'Room sécurisée'}</strong>
-              </div>
-              <div className={styles.participants}>
-                {room.participants.map((participant) => (
-                  <span key={participant.userId} className={styles.participantBadge}>
-                    {participant.fullName}
-                  </span>
-                ))}
+      {/* Main Content */}
+      <div className={styles.mainContent}>
+        {/* Video Stage */}
+        <main className={styles.videoStage}>
+          {room.provider.serverUrl && room.provider.token ? (
+            <LiveKitRoom
+              token={room.provider.token}
+              serverUrl={room.provider.serverUrl}
+              connect
+              audio
+              video
+              className={styles.liveKitContainer}
+            >
+              <VideoConference />
+              <RoomAudioRenderer />
+            </LiveKitRoom>
+          ) : (
+            <div className={styles.videoPlaceholder}>
+              <div className={styles.placeholderContent}>
+                <div className={styles.placeholderAvatar}>
+                  {getInitials(counterpart?.fullName || 'P')}
+                </div>
+                <p>En attente de connexion...</p>
               </div>
             </div>
+          )}
+        </main>
 
-            {room.provider.serverUrl && room.provider.token ? (
-              <div className={styles.videoFrame}>
-                <LiveKitRoom
-                  token={room.provider.token}
-                  serverUrl={room.provider.serverUrl}
-                  connect
-                  audio
-                  video
-                  className={styles.liveKitRoom}
-                >
-                  <VideoConference />
-                  <RoomAudioRenderer />
-                </LiveKitRoom>
-              </div>
-            ) : (
-              <div className={styles.videoFallback}>
-                Les informations de connexion LiveKit sont indisponibles.
-              </div>
-            )}
-          </div>
-
-          <div className={styles.infoBand}>
-            <div>
-              <span className={styles.infoLabel}>Accès valable jusqu’au</span>
-              <strong>{formatDateTime(room.expiresAt)}</strong>
-            </div>
-            <div>
-              <span className={styles.infoLabel}>Partage d’écran</span>
-              <strong>Géré par LiveKit</strong>
-            </div>
-            <div>
-              <span className={styles.infoLabel}>Transcription</span>
-              <strong>{room.transcript.provider}</strong>
-            </div>
-          </div>
-        </div>
-
+        {/* Sidebar */}
         <aside className={styles.sidebar}>
-          <section className={styles.panel}>
+          {/* Chat Panel */}
+          <section className={styles.chatPanel}>
             <div className={styles.panelHeader}>
-              <h2>Chat de session</h2>
-              <span>{messages.length} message(s)</span>
+              <h2>💬 Chat de session</h2>
             </div>
-            <div className={styles.chatList}>
+
+            <div className={styles.chatMessages}>
               {messages.length === 0 ? (
-                <p className={styles.emptyState}>Le fil de session est vide pour l’instant.</p>
+                <div className={styles.chatEmpty}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                    <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  <p>Démarrez la conversation</p>
+                </div>
               ) : (
                 messages.map((message) => (
-                  <article
+                  <div
                     key={message.messageId}
-                    className={`${styles.chatMessage} ${
-                      message.authorId === currentUserId ? styles.chatMine : ''
-                    }`}
+                    className={`${styles.chatBubble} ${message.authorId === currentUserId ? styles.chatBubbleSelf : ''}`}
                   >
-                    <div className={styles.chatMeta}>
-                      <strong>{message.authorName}</strong>
-                      <span>{formatTime(message.createdAt)}</span>
-                    </div>
-                    {message.body && <p>{message.body}</p>}
-                    {message.document && (
-                      <a
-                        className={styles.documentLink}
-                        href={message.document.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {message.document.originalName} · {formatBytes(message.document.sizeBytes)}
-                      </a>
+                    {message.authorId !== currentUserId && (
+                      <div className={styles.bubbleAvatar}>
+                        {getInitials(message.authorName)}
+                      </div>
                     )}
-                  </article>
+                    <div className={styles.bubbleContent}>
+                      {message.authorId !== currentUserId && (
+                        <span className={styles.bubbleAuthor}>{message.authorName}</span>
+                      )}
+                      {message.body && <p>{message.body}</p>}
+                      {message.document && (
+                        <a
+                          className={styles.bubbleDocument}
+                          href={message.document.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <span>{message.document.originalName}</span>
+                        </a>
+                      )}
+                      <span className={styles.bubbleTime}>{formatTime(message.createdAt)}</span>
+                    </div>
+                  </div>
                 ))
               )}
               <div ref={bottomRef} />
             </div>
-            <div className={styles.composer}>
-              <textarea
-                className={styles.composerInput}
-                value={draft}
-                onChange={(event) => setDraft(event.target.value)}
-                placeholder="Ecrire un message utile pour cette session…"
-                rows={3}
+
+            <div className={styles.chatComposer}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                className={styles.hiddenInput}
+                accept="application/pdf,image/png,image/jpeg"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) void uploadDocument(file);
+                }}
               />
-              <div className={styles.composerActions}>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className={styles.hiddenInput}
-                  accept="application/pdf,image/png,image/jpeg"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0];
-                    if (file) {
-                      void uploadDocument(file);
-                    }
-                  }}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  isLoading={uploading}
-                >
-                  Partager un document
-                </Button>
-                <Button type="button" onClick={() => void sendMessage()} isLoading={sending}>
-                  Envoyer
-                </Button>
-              </div>
+              <button
+                className={styles.attachButton}
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                title="Joindre un fichier"
+              >
+                {uploading ? (
+                  <div className={styles.miniSpinner} />
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                  </svg>
+                )}
+              </button>
+              <textarea
+                className={styles.chatInput}
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Tapez votre message..."
+                rows={1}
+              />
+              <button
+                className={styles.sendButton}
+                onClick={() => void sendMessage()}
+                disabled={sending || !draft.trim()}
+              >
+                {sending ? (
+                  <div className={styles.miniSpinner} />
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                )}
+              </button>
             </div>
           </section>
 
-          <section className={styles.panel}>
+          {/* Documents Panel */}
+          <section className={styles.docsPanel}>
             <div className={styles.panelHeader}>
-              <h2>Documents</h2>
-              <span>{documents.length}</span>
+              <h2>📎 Documents partagés</h2>
             </div>
-            <div className={styles.documentList}>
+
+            <div className={styles.documentsList}>
               {documents.length === 0 ? (
-                <p className={styles.emptyState}>Aucun document partagé dans cette session.</p>
+                <div className={styles.docsEmpty}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p>Aucun document partagé</p>
+                  <button
+                    className={styles.uploadButton}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Partager un fichier
+                  </button>
+                </div>
               ) : (
-                documents.map((document) => (
+                documents.map((doc) => (
                   <a
-                    key={document.documentId}
+                    key={doc.documentId}
                     className={styles.documentCard}
-                    href={document.url}
+                    href={doc.url}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <strong>{document.originalName}</strong>
-                    <span>{formatBytes(document.sizeBytes)}</span>
+                    <div className={styles.docIcon}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div className={styles.docInfo}>
+                      <span className={styles.docName}>{doc.originalName}</span>
+                      <span className={styles.docSize}>{formatBytes(doc.sizeBytes)}</span>
+                    </div>
+                    <div className={styles.docDownload}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                    </div>
                   </a>
                 ))
               )}
             </div>
           </section>
-
-          <section className={styles.panel}>
-            <div className={styles.panelHeader}>
-              <h2>Résumé & transcription</h2>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => void loadTranscript(room.bookingId)}
-                isLoading={loadingTranscript}
-              >
-                Actualiser
-              </Button>
-            </div>
-
-            {room.transcriptConsentRequired ? (
-              <div className={styles.consentBox}>
-                <p>
-                  Cette session peut être retranscrite après l’appel. Le consentement explicite est
-                  requis avant traitement.
-                </p>
-                <Button type="button" onClick={() => void consentToTranscript()} isLoading={consenting}>
-                  Autoriser la transcription
-                </Button>
-              </div>
-            ) : null}
-
-            <div className={styles.transcriptState}>
-              <span className={styles.statusPill}>Statut: {room.transcript.status}</span>
-              {room.transcript.updatedAt ? <span>Maj {formatDateTime(room.transcript.updatedAt)}</span> : null}
-            </div>
-
-            {room.transcript.summaryText ? (
-              <div className={styles.summaryCard}>
-                <p className={styles.infoLabel}>Résumé</p>
-                <p>{room.transcript.summaryText}</p>
-              </div>
-            ) : (
-              <p className={styles.emptyState}>
-                Le résumé apparaîtra une fois le traitement de transcription terminé.
-              </p>
-            )}
-
-            {room.transcript.fullText ? (
-              <div className={styles.transcriptBox}>
-                <p className={styles.infoLabel}>Verbatim</p>
-                <pre>{room.transcript.fullText}</pre>
-              </div>
-            ) : (
-              <p className={styles.emptyState}>
-                Aucun verbatim disponible pour l’instant.
-              </p>
-            )}
-          </section>
         </aside>
       </div>
-    </section>
+    </div>
   );
 }
