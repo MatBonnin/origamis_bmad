@@ -163,6 +163,7 @@ function useElapsedTime(startDate: string) {
 export function SessionRoom({ accessToken, currentUserId, token }: Props) {
   const searchParams = useSearchParams();
   const [room, setRoom] = useState<RoomData | null>(null);
+  const [joinedCall, setJoinedCall] = useState<CallData | null>(null);
   const [messages, setMessages] = useState<SessionMessage[]>([]);
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(true);
@@ -200,8 +201,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
   }, [messages]);
 
   const activeCall = room?.activeCall ?? null;
-  const joinedActiveCall =
-    activeCall && joinedCallToken === activeCall.callToken ? activeCall : null;
+  const joinedActiveCall = joinedCallToken ? joinedCall : null;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -259,14 +259,43 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
   }, [searchParams]);
 
   useEffect(() => {
+    if (!joinedCallToken) {
+      setJoinedCall(null);
+      return;
+    }
+
     if (!activeCall && joinedCallToken) {
       setJoinedCallToken(null);
+      setJoinedCall(null);
+      return;
+    }
+
+    if (activeCall && joinedCallToken === activeCall.callToken) {
+      setJoinedCall((previous) => {
+        if (
+          previous &&
+          previous.callSessionId === activeCall.callSessionId &&
+          previous.provider.token &&
+          previous.provider.serverUrl
+        ) {
+          return {
+            ...activeCall,
+            provider: {
+              ...activeCall.provider,
+              token: previous.provider.token,
+              serverUrl: previous.provider.serverUrl,
+            },
+          };
+        }
+        return activeCall;
+      });
     }
   }, [activeCall, joinedCallToken]);
 
   useEffect(() => {
     if (!room?.bookingId) return;
-    if (!activeCall && !joinedCallToken) return;
+    if (joinedCallToken) return;
+    if (!activeCall) return;
 
     const interval = setInterval(() => {
       void loadRoom();
@@ -402,6 +431,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
       }
       const data = result.data as CallData;
       setJoinedCallToken(data.callToken);
+      setJoinedCall(data);
       await loadRoom();
     } catch {
       setError('Erreur de connexion au serveur');
@@ -413,8 +443,14 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
   const joinCall = useCallback(async () => {
     if (!activeCall) return;
     setJoinedCallToken(activeCall.callToken);
-    await loadRoom();
-  }, [activeCall, loadRoom]);
+    setJoinedCall(activeCall);
+  }, [activeCall]);
+
+  const handleRoomDisconnected = useCallback(() => {
+    setJoinedCall(null);
+    setJoinedCallToken(null);
+    void loadRoom();
+  }, [loadRoom]);
 
   const updateTranscriptConsent = useCallback(async (decision: 'accept' | 'decline') => {
     if (!activeCall) return;
@@ -589,6 +625,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
               connect
               audio
               video
+              onDisconnected={handleRoomDisconnected}
               className={styles.liveKitContainer}
             >
               <VideoConference />

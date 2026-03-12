@@ -5,7 +5,7 @@ echo "Generating Prisma client..."
 npx prisma generate
 
 echo "Waiting for PostgreSQL..."
-until npx prisma db push --skip-generate; do
+until npx prisma migrate deploy; do
   echo "PostgreSQL not ready yet, retrying in 3s..."
   sleep 3
 done
