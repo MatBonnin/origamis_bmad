@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+echo "Generating Prisma client..."
+npx prisma generate
+
 echo "Waiting for PostgreSQL..."
 until npx prisma db push --skip-generate; do
   echo "PostgreSQL not ready yet, retrying in 3s..."
