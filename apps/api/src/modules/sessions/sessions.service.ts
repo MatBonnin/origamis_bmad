@@ -1753,7 +1753,7 @@ startxref
         },
       });
 
-      return updated as T;
+      return updated as unknown as T;
     } catch (error) {
       this.logger.warn(
         `Unable to sync call participants for ${call.id}: ${
