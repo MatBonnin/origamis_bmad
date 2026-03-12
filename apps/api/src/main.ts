@@ -18,7 +18,7 @@ async function bootstrap() {
     }
   };
 
-  app.use(json({ verify: captureRawBody }));
+  app.use(json({ verify: captureRawBody, type: ['application/json', 'application/webhook+json'] }));
   app.use(urlencoded({ extended: true, verify: captureRawBody }));
 
   // Serve static files from /uploads
