@@ -104,7 +104,7 @@ Cela :
 - build l'API et le front
 - démarre PostgreSQL
 - démarre Redis et MinIO
-- applique `prisma db push` au démarrage de l'API
+- applique `prisma migrate deploy` au démarrage de l'API
 - exécute le seed Prisma automatiquement par défaut
 - démarre le worker de transcription `faster-whisper`
 - démarre le site sur `http://<IP_DU_VPS>:3000`
@@ -129,6 +129,8 @@ docker compose down -v
 
 - Le seed Prisma est lancé au démarrage de l'API via `RUN_DB_SEED=true`.
 - Pour désactiver le seed automatique : `RUN_DB_SEED=false docker compose up -d --build`
+- Si votre base PostgreSQL existe déjà mais n'a pas de table `_prisma_migrations`, Prisma renverra `P3005`.
+- Dans ce cas, il faut faire un baselining Prisma une seule fois sur le VPS, sinon les futures migrations automatiques ne pourront pas être appliquées proprement.
 - Les uploads de l'API sont persistés dans le volume Docker `api_uploads`.
 - Si vous utilisez LiveKit Cloud avec MinIO, l'endpoint S3 doit être accessible depuis LiveKit. En local pur, utilisez un tunnel ou un bucket S3/R2 accessible publiquement.
 
