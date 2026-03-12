@@ -1,6 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  LiveKitRoom,
+  RoomAudioRenderer,
+  VideoConference,
+} from '@livekit/components-react';
 import { io, type Socket } from 'socket.io-client';
 import { Button } from '@/components/ui';
 import styles from './SessionRoom.module.css';
@@ -52,6 +57,8 @@ interface RoomData {
     name: string;
     roomId: string | null;
     joinUrl: string | null;
+    serverUrl?: string | null;
+    token?: string | null;
   };
   roomStatus: string;
   bookingStatus: string;
@@ -418,16 +425,23 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
               </div>
             </div>
 
-            {room.provider.joinUrl ? (
-              <iframe
-                className={styles.videoFrame}
-                src={room.provider.joinUrl}
-                title="Session vidéo mentorat"
-                allow="camera; microphone; display-capture; fullscreen"
-              />
+            {room.provider.serverUrl && room.provider.token ? (
+              <div className={styles.videoFrame}>
+                <LiveKitRoom
+                  token={room.provider.token}
+                  serverUrl={room.provider.serverUrl}
+                  connect
+                  audio
+                  video
+                  className={styles.liveKitRoom}
+                >
+                  <VideoConference />
+                  <RoomAudioRenderer />
+                </LiveKitRoom>
+              </div>
             ) : (
               <div className={styles.videoFallback}>
-                Le provider vidéo n’a pas renvoyé d’URL d’intégration.
+                Les informations de connexion LiveKit sont indisponibles.
               </div>
             )}
           </div>
@@ -439,7 +453,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
             </div>
             <div>
               <span className={styles.infoLabel}>Partage d’écran</span>
-              <strong>Géré par le provider vidéo</strong>
+              <strong>Géré par LiveKit</strong>
             </div>
             <div>
               <span className={styles.infoLabel}>Transcription</span>

@@ -135,6 +135,11 @@
   display: block;
 }
 
+.liveKitRoom {
+  width: 100%;
+  min-height: 64vh;
+}
+
 .videoFallback {
   display: grid;
   place-items: center;

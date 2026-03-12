@@ -208,7 +208,7 @@ export class SessionsService {
       where: { booking_id: bookingId },
     });
 
-    return this.mapSessionRoom(booking, session, transcript);
+    return this.mapSessionRoom(userId, booking, session, transcript);
   }
 
   async getSessionRoomByToken(userId: string, token: string) {
@@ -238,7 +238,7 @@ export class SessionsService {
 
     this.assertBookingParticipant(userId, session.booking);
 
-    return this.mapSessionRoom(session.booking, session, session.transcript);
+    return this.mapSessionRoom(userId, session.booking, session, session.transcript);
   }
 
   async assertSessionParticipant(userId: string, bookingId: string) {
@@ -971,17 +971,17 @@ startxref
     const providerRoomId =
       booking.session?.provider_room_id ?? this.sessionProvider.buildRoomId(booking.id);
     const sessionToken = booking.session?.session_token ?? randomUUID();
-    const displayName = `${booking.student.first_name} ${booking.student.last_name}`;
-    const providerJoinUrl = this.sessionProvider.buildJoinUrl({
-      roomId: providerRoomId,
-      sessionToken,
-      displayName,
-      bookingId: booking.id,
-    });
+    const providerJoinUrl = this.sessionProvider.getLiveKitServerUrl();
     const expiresAt = new Date(
       this.combineDateAndTime(booking.booking_date, booking.end_time).getTime() +
         this.accessGraceHours * 60 * 60 * 1000,
     );
+
+    await this.sessionProvider.ensureRoom(providerRoomId, {
+      bookingId: booking.id,
+      studentId: booking.student_id,
+      mentorId: booking.mentor_id,
+    });
 
     if (booking.session) {
       return this.prisma.booking_sessions.update({
@@ -1025,7 +1025,8 @@ startxref
     return created;
   }
 
-  private mapSessionRoom(
+  private async mapSessionRoom(
+    currentUserId: string,
     booking: {
       id: string;
       booking_date: Date;
@@ -1062,6 +1063,32 @@ startxref
         }
       | null,
   ) {
+    const currentParticipant =
+      booking.student.id === currentUserId
+        ? {
+            id: booking.student.id,
+            role: 'etudiant' as const,
+            fullName: `${booking.student.first_name} ${booking.student.last_name}`,
+          }
+        : {
+            id: booking.mentor.id,
+            role: 'mentor' as const,
+            fullName: `${booking.mentor.first_name} ${booking.mentor.last_name}`,
+          };
+
+    const liveKitToken =
+      session.provider_room_id === null
+        ? null
+        : await this.sessionProvider.buildParticipantToken({
+            roomId: session.provider_room_id,
+            identity: currentParticipant.id,
+            displayName: currentParticipant.fullName,
+            metadata: {
+              bookingId: booking.id,
+              role: currentParticipant.role,
+            },
+          });
+
     return {
       bookingId: booking.id,
       sessionToken: session.session_token,
@@ -1069,7 +1096,9 @@ startxref
       provider: {
         name: session.provider,
         roomId: session.provider_room_id,
-        joinUrl: session.provider_join_url,
+        joinUrl: null,
+        serverUrl: session.provider_join_url,
+        token: liveKitToken,
       },
       roomStatus: session.status,
       bookingStatus: booking.status,

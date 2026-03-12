@@ -59,6 +59,21 @@ NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=une_valeur_secrete
 ```
 
+Ajoutez aussi dans `apps/api/.env` pour LiveKit Cloud :
+
+```env
+SESSION_VIDEO_PROVIDER=livekit
+LIVEKIT_URL=wss://<your-project>.livekit.cloud
+LIVEKIT_API_KEY=<your_livekit_api_key>
+LIVEKIT_API_SECRET=<your_livekit_api_secret>
+```
+
+Puis configurez dans LiveKit Cloud un webhook vidéo vers :
+
+```text
+POST http://localhost:4000/sessions/provider/webhooks/video/livekit
+```
+
 ---
 
 ## API — NestJS (`apps/api`)
