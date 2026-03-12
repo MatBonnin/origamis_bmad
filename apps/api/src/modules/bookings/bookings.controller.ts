@@ -16,6 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { CurrentUser } from '../../common/decorators';
 import { JwtAuthGuard } from '../../common/guards';
+import { SessionsService } from '../sessions';
 import { BookingsService } from './bookings.service';
 import type {
   CreateBookingDto,
@@ -28,7 +29,10 @@ import type {
 @UseGuards(JwtAuthGuard)
 @Controller('bookings')
 export class BookingsController {
-  constructor(private readonly bookingsService: BookingsService) {}
+  constructor(
+    private readonly bookingsService: BookingsService,
+    private readonly sessionsService: SessionsService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Creer une reservation (legacy - avec slotId)' })
@@ -86,6 +90,17 @@ export class BookingsController {
     @Param('id') bookingId: string,
   ) {
     const data = await this.bookingsService.getSessionLink(user.id, bookingId);
+    return { data, error: null };
+  }
+
+  @Get(':id/session-room')
+  @ApiOperation({ summary: 'Obtenir la salle de session integree' })
+  @ApiResponse({ status: 200, description: 'Salle de session' })
+  async getSessionRoom(
+    @CurrentUser() user: { id: string },
+    @Param('id') bookingId: string,
+  ) {
+    const data = await this.sessionsService.getSessionRoom(user.id, bookingId);
     return { data, error: null };
   }
 

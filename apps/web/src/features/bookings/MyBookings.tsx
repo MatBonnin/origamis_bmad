@@ -221,7 +221,7 @@ export function MyBookings({ accessToken, userId }: Props) {
   const joinSession = async (bookingId: string) => {
     setSessionLoading(bookingId);
     try {
-      const res = await fetch(`${API_URL}/bookings/${bookingId}/session-link`, {
+      const res = await fetch(`${API_URL}/bookings/${bookingId}/session-room`, {
         headers,
         cache: 'no-store',
       });

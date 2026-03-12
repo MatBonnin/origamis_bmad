@@ -21,13 +21,17 @@ import {
   SessionHistoryExportFormat,
   SessionsService,
 } from './sessions.service';
+import { SessionsGateway } from './sessions.gateway';
 
 @ApiTags('sessions')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('sessions')
 export class SessionsController {
-  constructor(private readonly sessionsService: SessionsService) {}
+  constructor(
+    private readonly sessionsService: SessionsService,
+    private readonly sessionsGateway: SessionsGateway,
+  ) {}
 
   @Get('history')
   @ApiOperation({
@@ -87,6 +91,82 @@ export class SessionsController {
       category: body.category,
       format: body.format,
     });
+    return { data, error: null };
+  }
+
+  @Get('room/:token')
+  @ApiOperation({ summary: 'Recuperer la salle de session par token' })
+  @ApiResponse({ status: 200, description: 'Salle de session recuperee' })
+  async getRoomByToken(
+    @CurrentUser() user: { id: string },
+    @Param('token') token: string,
+  ) {
+    const data = await this.sessionsService.getSessionRoomByToken(user.id, token);
+    return { data, error: null };
+  }
+
+  @Get(':bookingId/chat/messages')
+  @ApiOperation({ summary: 'Lister les messages du chat de session' })
+  @ApiResponse({ status: 200, description: 'Messages recuperes' })
+  async getSessionChatMessages(
+    @CurrentUser() user: { id: string },
+    @Param('bookingId') bookingId: string,
+  ) {
+    const data = await this.sessionsService.listSessionChatMessages(user.id, bookingId);
+    return { data, error: null };
+  }
+
+  @Post(':bookingId/chat/messages')
+  @ApiOperation({ summary: 'Envoyer un message dans le chat de session' })
+  @ApiResponse({ status: 201, description: 'Message cree' })
+  async postSessionChatMessage(
+    @CurrentUser() user: { id: string },
+    @Param('bookingId') bookingId: string,
+    @Body() body: { body?: string; documentId?: string },
+  ) {
+    const data = await this.sessionsService.createSessionChatMessage(user.id, bookingId, body);
+    this.sessionsGateway.emitChatMessageCreated(data, bookingId);
+    return { data, error: null };
+  }
+
+  @Post(':bookingId/documents')
+  @ApiOperation({ summary: 'Enregistrer un document partage dans la session' })
+  @ApiResponse({ status: 201, description: 'Document enregistre' })
+  async createSessionDocument(
+    @CurrentUser() user: { id: string },
+    @Param('bookingId') bookingId: string,
+    @Body()
+    body: {
+      url: string;
+      originalName: string;
+      fileName: string;
+      mimeType: string;
+      sizeBytes: number;
+    },
+  ) {
+    const data = await this.sessionsService.createSessionDocument(user.id, bookingId, body);
+    return { data, error: null };
+  }
+
+  @Post(':bookingId/transcription/consent')
+  @ApiOperation({ summary: 'Enregistrer le consentement de transcription' })
+  @ApiResponse({ status: 200, description: 'Consentement enregistre' })
+  async recordTranscriptConsent(
+    @CurrentUser() user: { id: string },
+    @Param('bookingId') bookingId: string,
+  ) {
+    const data = await this.sessionsService.recordTranscriptConsent(user.id, bookingId);
+    return { data, error: null };
+  }
+
+  @Get(':bookingId/transcript')
+  @ApiOperation({ summary: 'Obtenir la transcription de session' })
+  @ApiResponse({ status: 200, description: 'Transcription recuperee' })
+  async getTranscript(
+    @CurrentUser() user: { id: string },
+    @Param('bookingId') bookingId: string,
+  ) {
+    const data = await this.sessionsService.getTranscript(user.id, bookingId);
     return { data, error: null };
   }
 

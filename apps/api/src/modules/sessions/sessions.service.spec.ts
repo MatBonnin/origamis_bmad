@@ -2,6 +2,7 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsService } from '../notifications';
 import { PrismaService } from '../prisma';
+import { SessionProviderService } from './session-provider.service';
 import { SessionsService } from './sessions.service';
 
 describe('SessionsService', () => {
@@ -11,6 +12,7 @@ describe('SessionsService', () => {
     bookings: {
       findMany: jest.fn(),
       findUnique: jest.fn(),
+      update: jest.fn(),
     },
     conversations: {
       findMany: jest.fn(),
@@ -18,9 +20,47 @@ describe('SessionsService', () => {
     consents: {
       findFirst: jest.fn(),
     },
+    booking_sessions: {
+      findUnique: jest.fn(),
+      findFirst: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+    session_transcripts: {
+      findUnique: jest.fn(),
+      upsert: jest.fn(),
+    },
+    session_chat_messages: {
+      findMany: jest.fn(),
+      create: jest.fn(),
+    },
+    session_documents: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+    },
+    session_events: {
+      create: jest.fn(),
+    },
+    session_notes: {
+      upsert: jest.fn(),
+      findMany: jest.fn(),
+    },
+    session_feedback: {
+      upsert: jest.fn(),
+      findUnique: jest.fn(),
+    },
+    student_program_milestones: {
+      findUnique: jest.fn(),
+    },
   };
   const mockNotifications = {
     emitNotification: jest.fn(),
+  };
+  const mockProvider = {
+    getVideoProviderName: jest.fn(() => 'embedded-video'),
+    getTranscriptProviderName: jest.fn(() => 'async-transcript'),
+    buildRoomId: jest.fn((bookingId: string) => `booking-${bookingId}`),
+    buildJoinUrl: jest.fn(() => 'https://video.example.test/room'),
   };
 
   beforeEach(async () => {
@@ -29,6 +69,7 @@ describe('SessionsService', () => {
         SessionsService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: NotificationsService, useValue: mockNotifications },
+        { provide: SessionProviderService, useValue: mockProvider },
       ],
     }).compile();
 

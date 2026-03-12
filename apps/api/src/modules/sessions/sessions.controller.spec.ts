@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SessionsController } from './sessions.controller';
+import { SessionsGateway } from './sessions.gateway';
 import { SessionsService } from './sessions.service';
 
 describe('SessionsController', () => {
@@ -9,12 +10,24 @@ describe('SessionsController', () => {
     getHistory: jest.fn(),
     getReplayLink: jest.fn(),
     exportHistory: jest.fn(),
+    getSessionRoomByToken: jest.fn(),
+    listSessionChatMessages: jest.fn(),
+    createSessionChatMessage: jest.fn(),
+    createSessionDocument: jest.fn(),
+    recordTranscriptConsent: jest.fn(),
+    getTranscript: jest.fn(),
+  };
+  const mockGateway = {
+    emitChatMessageCreated: jest.fn(),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SessionsController],
-      providers: [{ provide: SessionsService, useValue: mockService }],
+      providers: [
+        { provide: SessionsService, useValue: mockService },
+        { provide: SessionsGateway, useValue: mockGateway },
+      ],
     }).compile();
 
     controller = module.get<SessionsController>(SessionsController);

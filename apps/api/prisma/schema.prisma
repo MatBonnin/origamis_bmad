@@ -90,6 +90,9 @@ model users {
   audit_reports audit_reports[] @relation("audit_reports_requested_by")
   subscription subscriptions?
   session_notes session_notes[] @relation("session_notes_author")
+  session_chat_messages session_chat_messages[] @relation("session_chat_messages_author")
+  session_documents session_documents[] @relation("session_documents_uploader")
+  session_events session_events[] @relation("session_events_actor")
 
   @@map("users")
 }
@@ -399,6 +402,10 @@ model bookings {
   payment payments?
   session_notes session_notes[]
   session_feedback session_feedback?
+  session_chat_messages session_chat_messages[]
+  session_documents session_documents[]
+  session_transcript session_transcripts?
+  session_events session_events[]
 
   @@index([student_id])
   @@index([mentor_id])
@@ -408,17 +415,140 @@ model bookings {
 }
 
 model booking_sessions {
-  id            String   @id @default(uuid())
-  booking_id    String   @unique
-  session_token String   @unique
-  session_url   String
-  expires_at    DateTime
-  created_at    DateTime @default(now())
+  id                         String                    @id @default(uuid())
+  booking_id                 String                    @unique
+  session_token              String                    @unique
+  session_url                String
+  provider                   String                    @default("embedded-video")
+  provider_room_id           String?
+  provider_join_url          String?
+  status                     session_room_status       @default(scheduled)
+  started_at                 DateTime?
+  ended_at                   DateTime?
+  transcript_status          transcript_job_status     @default(not_requested)
+  transcript_provider_job_id String?
+  transcript_consented_at    DateTime?
+  expires_at                 DateTime
+  created_at                 DateTime                  @default(now())
+  updated_at                 DateTime                  @updatedAt
 
   booking bookings @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  transcript session_transcripts?
+  chat_messages session_chat_messages[]
+  documents session_documents[]
+  events session_events[]
 
   @@index([session_token])
+  @@index([provider_room_id])
   @@map("booking_sessions")
+}
+
+enum session_room_status {
+  scheduled
+  waiting
+  live
+  ended
+  cancelled
+}
+
+enum transcript_job_status {
+  not_requested
+  pending_consent
+  queued
+  processing
+  completed
+  failed
+}
+
+enum session_event_type {
+  room_created
+  participant_joined
+  participant_left
+  room_started
+  room_ended
+  transcript_requested
+  transcript_completed
+  transcript_failed
+  webhook_received
+  error
+}
+
+model session_chat_messages {
+  id                 String   @id @default(uuid())
+  booking_session_id String
+  booking_id         String
+  author_id          String
+  body               String
+  document_id        String?
+  created_at         DateTime @default(now())
+
+  session  booking_sessions @relation(fields: [booking_session_id], references: [id], onDelete: Cascade)
+  booking  bookings         @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  author   users            @relation("session_chat_messages_author", fields: [author_id], references: [id], onDelete: Cascade)
+  document session_documents? @relation(fields: [document_id], references: [id], onDelete: SetNull)
+
+  @@index([booking_id, created_at])
+  @@index([booking_session_id, created_at])
+  @@map("session_chat_messages")
+}
+
+model session_documents {
+  id                 String   @id @default(uuid())
+  booking_session_id String
+  booking_id         String
+  uploaded_by        String
+  url                String
+  original_name      String
+  file_name          String
+  mime_type          String
+  size_bytes         Int
+  created_at         DateTime @default(now())
+
+  session booking_sessions @relation(fields: [booking_session_id], references: [id], onDelete: Cascade)
+  booking bookings         @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  uploader users           @relation("session_documents_uploader", fields: [uploaded_by], references: [id], onDelete: Cascade)
+  messages session_chat_messages[]
+
+  @@index([booking_id, created_at])
+  @@map("session_documents")
+}
+
+model session_transcripts {
+  id                 String                @id @default(uuid())
+  booking_session_id String                @unique
+  booking_id         String                @unique
+  provider           String
+  status             transcript_job_status @default(queued)
+  language           String?
+  full_text          String?
+  summary_text       String?
+  segments_json      Json                  @default("[]")
+  created_at         DateTime              @default(now())
+  updated_at         DateTime              @updatedAt
+
+  session booking_sessions @relation(fields: [booking_session_id], references: [id], onDelete: Cascade)
+  booking bookings         @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+
+  @@index([booking_id, status])
+  @@map("session_transcripts")
+}
+
+model session_events {
+  id                 String             @id @default(uuid())
+  booking_session_id String
+  booking_id         String
+  actor_id           String?
+  event_type         session_event_type
+  provider_event_id  String?            @unique
+  payload            Json               @default("{}")
+  created_at         DateTime           @default(now())
+
+  session booking_sessions @relation(fields: [booking_session_id], references: [id], onDelete: Cascade)
+  booking bookings         @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  actor   users?           @relation("session_events_actor", fields: [actor_id], references: [id], onDelete: SetNull)
+
+  @@index([booking_id, created_at])
+  @@map("session_events")
 }
 
 model user_intents {

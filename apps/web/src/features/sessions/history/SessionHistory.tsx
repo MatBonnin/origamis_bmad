@@ -18,6 +18,8 @@ type HistoryEntry = {
   status: string;
   notes: string | null;
   replayAvailable?: boolean;
+  transcriptStatus?: string | null;
+  transcriptSummary?: string | null;
 };
 
 interface Props {
@@ -47,6 +49,7 @@ export function SessionHistory({ accessToken, userId, isMentor = false }: Props)
   const [error, setError] = useState('');
   const [announcement, setAnnouncement] = useState('');
   const [feedbackModalBookingId, setFeedbackModalBookingId] = useState<string | null>(null);
+  const [expandedTranscripts, setExpandedTranscripts] = useState<Record<string, string>>({});
 
   const headers = useMemo(
     () => ({
@@ -155,6 +158,24 @@ export function SessionHistory({ accessToken, userId, isMentor = false }: Props)
     window.open(result.data.url as string, '_blank', 'noopener,noreferrer');
   };
 
+  const loadTranscript = async (bookingId: string) => {
+    const response = await fetch(`${API_URL}/sessions/${bookingId}/transcript`, {
+      headers,
+      cache: 'no-store',
+    });
+    const result = await response.json();
+    if (!response.ok || result.error) {
+      setError(result.error?.message || 'Transcription indisponible');
+      return;
+    }
+
+    const fullText = (result.data.fullText as string | null) || 'Aucun verbatim disponible.';
+    setExpandedTranscripts((previous) => ({
+      ...previous,
+      [bookingId]: fullText,
+    }));
+  };
+
   return (
     <section className={styles.container} aria-labelledby="history-title">
       <header className={styles.header}>
@@ -218,6 +239,12 @@ export function SessionHistory({ accessToken, userId, isMentor = false }: Props)
                   <p className={styles.date}>{formatDate(entry.startedAt)}</p>
                   <p className={styles.meta}>Mentor: {entry.mentorId}</p>
                   {entry.notes && <p className={styles.notes}>{entry.notes}</p>}
+                  {entry.type === 'visio' && entry.transcriptStatus && (
+                    <p className={styles.meta}>
+                      Transcription: {entry.transcriptStatus}
+                      {entry.transcriptSummary ? ` · ${entry.transcriptSummary}` : ''}
+                    </p>
+                  )}
                   {entry.type === 'visio' && entry.replayAvailable && (
                     <Button
                       type="button"
@@ -227,6 +254,20 @@ export function SessionHistory({ accessToken, userId, isMentor = false }: Props)
                     >
                       Ouvrir replay
                     </Button>
+                  )}
+                  {entry.type === 'visio' && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => void loadTranscript(entry.id)}
+                      aria-label="Afficher la transcription"
+                    >
+                      Voir transcription
+                    </Button>
+                  )}
+                  {expandedTranscripts[entry.id] && (
+                    <p className={styles.notes}>{expandedTranscripts[entry.id]}</p>
                   )}
                   {entry.status === 'completed' && (
                     <Button

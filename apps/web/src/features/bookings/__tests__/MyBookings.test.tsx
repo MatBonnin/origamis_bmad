@@ -20,7 +20,7 @@ describe('MyBookings', () => {
   const confirmedBooking = {
     bookingId: 'b-1',
     mentorId: 'mentor-1',
-    bookingDate: '2026-03-04',
+    bookingDate: '2026-03-20',
     startTime: '14:00',
     endTime: '16:00',
     status: 'confirmed',
@@ -34,9 +34,9 @@ describe('MyBookings', () => {
 
     render(<MyBookings accessToken="token-1" userId="student-1" />);
 
-    expect(await screen.findByText('14:00 - 16:00')).toBeInTheDocument();
-    expect(screen.getByText('avec Marc Martin')).toBeInTheDocument();
-    expect(screen.getByText('Confirme')).toBeInTheDocument();
+    expect(await screen.findByText('14:00 — 16:00')).toBeInTheDocument();
+    expect(screen.getByText('Marc Martin')).toBeInTheDocument();
+    expect(screen.getByText('Confirmé')).toBeInTheDocument();
   });
 
   it('opens cancel dialog and confirms cancellation', async () => {
@@ -52,14 +52,14 @@ describe('MyBookings', () => {
 
     render(<MyBookings accessToken="token-1" userId="student-1" />);
 
-    await screen.findByText('Confirme');
+    await screen.findByText('Confirmé');
 
     // Click the Annuler button on the booking card
     await userEvent.click(screen.getByRole('button', { name: /Annuler/i }));
 
     // Dialog should appear
     expect(
-      await screen.findByRole('heading', { name: "Confirmer l'annulation" }),
+      await screen.findByRole('heading', { name: 'Annuler le rendez-vous ?' }),
     ).toBeInTheDocument();
 
     // Confirm cancellation
@@ -76,7 +76,7 @@ describe('MyBookings', () => {
       expect(cancelCall).toBeDefined();
     });
 
-    expect(await screen.findByText('Rendez-vous annule')).toBeInTheDocument();
+    expect(await screen.findByText('Rendez-vous annulé avec succès')).toBeInTheDocument();
   });
 
   it('opens reschedule dialog', async () => {
@@ -103,7 +103,7 @@ describe('MyBookings', () => {
 
     render(<MyBookings accessToken="token-1" userId="student-1" />);
 
-    await screen.findByText('Confirme');
+    await screen.findByText('Confirmé');
 
     // Click the Reporter button
     await userEvent.click(screen.getByRole('button', { name: /Reporter/i }));
@@ -112,7 +112,7 @@ describe('MyBookings', () => {
     expect(
       await screen.findByText('Reporter le rendez-vous'),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText('Nouveau creneau')).toBeInTheDocument();
+    expect(screen.getByLabelText('Nouveau créneau')).toBeInTheDocument();
     expect(screen.getByLabelText('Nouvelle date')).toBeInTheDocument();
   });
 
@@ -156,22 +156,22 @@ describe('MyBookings', () => {
 
     render(<MyBookings accessToken="token-1" userId="student-1" />);
 
-    await screen.findByText('Confirme');
+    await screen.findByText('Confirmé');
     await userEvent.click(screen.getByRole('button', { name: /Reporter/i }));
     await screen.findByText('Reporter le rendez-vous');
 
     // Select new slot and date
     await userEvent.selectOptions(
-      screen.getByLabelText('Nouveau creneau'),
+      screen.getByLabelText('Nouveau créneau'),
       'slot-2',
     );
-    await userEvent.type(screen.getByLabelText('Nouvelle date'), '2026-03-05');
+    await userEvent.type(screen.getByLabelText('Nouvelle date'), '2026-03-27');
 
     await userEvent.click(
       screen.getByRole('button', { name: 'Confirmer le report' }),
     );
 
-    expect(await screen.findByText('Rendez-vous reporte')).toBeInTheDocument();
+    expect(await screen.findByText('Rendez-vous reporté avec succès')).toBeInTheDocument();
   });
 
   it('shows Rejoindre visio button for confirmed bookings', async () => {
@@ -179,7 +179,7 @@ describe('MyBookings', () => {
 
     render(<MyBookings accessToken="token-1" userId="student-1" />);
 
-    await screen.findByText('Confirme');
+    await screen.findByText('Confirmé');
 
     expect(
       screen.getByRole('button', { name: /Rejoindre/i }),
@@ -193,7 +193,7 @@ describe('MyBookings', () => {
 
     render(<MyBookings accessToken="token-1" userId="student-1" />);
 
-    await screen.findByText('En attente');
+    await screen.findByText('En attente de paiement');
 
     expect(
       screen.queryByRole('button', { name: /Rejoindre/i }),
@@ -212,7 +212,7 @@ describe('MyBookings', () => {
           data: {
             sessionUrl: '/session/test-token',
             token: 'test-token',
-            expiresAt: '2026-03-04T16:30:00.000Z',
+            expiresAt: '2026-03-20T16:30:00.000Z',
           },
           error: null,
         }),
@@ -220,7 +220,7 @@ describe('MyBookings', () => {
 
     render(<MyBookings accessToken="token-1" userId="student-1" />);
 
-    await screen.findByText('Confirme');
+    await screen.findByText('Confirmé');
 
     await userEvent.click(
       screen.getByRole('button', { name: /Rejoindre/i }),
@@ -228,7 +228,7 @@ describe('MyBookings', () => {
 
     await waitFor(() => {
       const sessionCall = fetchMock.mock.calls.find((call) =>
-        String(call[0]).includes('/bookings/b-1/session-link'),
+        String(call[0]).includes('/bookings/b-1/session-room'),
       );
       expect(sessionCall).toBeDefined();
     });
@@ -253,7 +253,7 @@ describe('MyBookings', () => {
 
     render(<MyBookings accessToken="token-1" userId="student-1" />);
 
-    await screen.findByText('Confirme');
+    await screen.findByText('Confirmé');
 
     await userEvent.click(
       screen.getByRole('button', { name: /Rejoindre/i }),
@@ -270,7 +270,7 @@ describe('MyBookings', () => {
     render(<MyBookings accessToken="token-1" userId="student-1" />);
 
     expect(
-      await screen.findByText('Aucun rendez-vous pour le moment.'),
+      await screen.findByText('Aucun rendez-vous à venir'),
     ).toBeInTheDocument();
   });
 
