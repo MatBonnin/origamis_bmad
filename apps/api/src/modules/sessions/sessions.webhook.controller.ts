@@ -59,6 +59,7 @@ export class SessionsWebhookController {
     @Body()
     body: {
       bookingId?: string;
+      callSessionId?: string;
       providerJobId?: string;
       providerRoomId?: string;
       providerEventId?: string;

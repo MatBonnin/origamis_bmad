@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import {
   Prisma,
+  call_session_status,
   transcript_capture_status,
   transcript_consent_status,
   transcript_job_status,
@@ -33,6 +34,8 @@ export interface GetSessionHistoryQuery {
 export interface SessionHistoryItem {
   id: string;
   bookingId: string | null;
+  callSessionId?: string | null;
+  callToken?: string | null;
   userId: string;
   mentorId: string;
   type: SessionHistoryCategory;
@@ -48,6 +51,7 @@ export interface SessionHistoryItem {
 
 interface TranscriptWebhookPayload {
   bookingId?: string;
+  callSessionId?: string;
   providerJobId?: string;
   providerRoomId?: string;
   status?: 'completed' | 'failed' | 'processing';
@@ -73,6 +77,7 @@ export class SessionsService {
   private readonly logger = new Logger(SessionsService.name);
   private readonly accessLeadMinutes = 45;
   private readonly accessGraceHours = 12;
+  private readonly unansweredCallMinutes = 5;
 
   constructor(
     private readonly prisma: PrismaService,
@@ -111,12 +116,20 @@ export class SessionsService {
   }
 
   async getReplayLink(currentUserId: string, sessionId: string) {
-    const booking = await this.prisma.bookings.findUnique({
+    const callSession = await this.prisma.booking_call_sessions.findUnique({
       where: { id: sessionId },
-      include: { session: true },
+      include: {
+        booking: {
+          select: {
+            id: true,
+            student_id: true,
+            mentor_id: true,
+          },
+        },
+      },
     });
 
-    if (!booking) {
+    if (!callSession) {
       throw new NotFoundException({
         code: 'SESSION_NOT_FOUND',
         message: 'Session introuvable',
@@ -124,8 +137,8 @@ export class SessionsService {
     }
 
     if (
-      booking.student_id !== currentUserId &&
-      booking.mentor_id !== currentUserId
+      callSession.booking.student_id !== currentUserId &&
+      callSession.booking.mentor_id !== currentUserId
     ) {
       throw new ForbiddenException({
         code: 'REPLAY_ACCESS_FORBIDDEN',
@@ -133,7 +146,7 @@ export class SessionsService {
       });
     }
 
-    if (!booking.session || booking.session.expires_at <= new Date()) {
+    if (callSession.expires_at <= new Date()) {
       throw new NotFoundException({
         code: 'REPLAY_NOT_AVAILABLE',
         message: 'Replay indisponible ou expire',
@@ -145,7 +158,7 @@ export class SessionsService {
     });
 
     return {
-      url: booking.session.session_url,
+      url: callSession.session_url,
     };
   }
 
@@ -214,19 +227,14 @@ export class SessionsService {
     const booking = await this.getBookingWithSession(userId, bookingId);
     const session = await this.ensureSessionRecord(booking);
     this.assertSessionWindow(booking);
-
-    const transcript = await this.prisma.session_transcripts.findUnique({
-      where: { booking_id: bookingId },
-    });
-
-    return this.mapSessionRoom(userId, booking, session, transcript);
+    const activeCall = await this.getActiveCallForBooking(booking.id);
+    return this.mapSessionRoom(userId, booking, session, activeCall);
   }
 
   async getSessionRoomByToken(userId: string, token: string) {
     const session = await this.prisma.booking_sessions.findUnique({
       where: { session_token: token },
       include: {
-        transcript: true,
         booking: {
           include: {
             student: {
@@ -248,12 +256,101 @@ export class SessionsService {
     }
 
     this.assertBookingParticipant(userId, session.booking);
+    this.assertSessionWindow(session.booking);
+    const activeCall = await this.getActiveCallForBooking(session.booking.id);
 
-    return this.mapSessionRoom(userId, session.booking, session, session.transcript);
+    return this.mapSessionRoom(userId, session.booking, session, activeCall);
   }
 
   async assertSessionParticipant(userId: string, bookingId: string) {
     await this.getBookingWithSession(userId, bookingId);
+  }
+
+  async createCall(userId: string, bookingId: string) {
+    const booking = await this.getBookingWithSession(userId, bookingId);
+    const session = await this.ensureSessionRecord(booking);
+    this.assertSessionWindow(booking);
+
+    const activeCall = await this.getActiveCallForBooking(bookingId);
+    if (activeCall) {
+      throw new BadRequestException({
+        code: 'CALL_ALREADY_ACTIVE',
+        message: 'Un appel est deja actif pour cette reservation',
+      });
+    }
+
+    const callId = randomUUID();
+    const callToken = randomUUID();
+    const roomId = this.sessionProvider.buildCallRoomId(callId);
+
+    await this.sessionProvider.ensureRoom(roomId, {
+      bookingId: booking.id,
+      callSessionId: callId,
+      initiatedBy: userId,
+      studentId: booking.student_id,
+      mentorId: booking.mentor_id,
+    });
+
+    const call = await this.prisma.booking_call_sessions.create({
+      data: {
+        id: callId,
+        booking_id: booking.id,
+        call_token: callToken,
+        session_url: `/session/${session.session_token}?call=${callToken}`,
+        provider: this.sessionProvider.getVideoProviderName(),
+        provider_room_id: roomId,
+        provider_join_url: this.sessionProvider.getLiveKitServerUrl(),
+        initiated_by: userId,
+        status: 'initiated',
+        expires_at: session.expires_at,
+      },
+    });
+
+    await this.logSessionEvent(call.id, booking.id, 'room_created', userId, {
+      type: 'call.created',
+      roomId,
+    });
+
+    return this.mapCallSession(userId, booking, call);
+  }
+
+  async getActiveCall(userId: string, bookingId: string) {
+    const booking = await this.getBookingWithSession(userId, bookingId);
+    this.assertSessionWindow(booking);
+
+    const activeCall = await this.getActiveCallForBooking(bookingId);
+    return {
+      bookingId,
+      activeCall: activeCall ? await this.mapCallSession(userId, booking, activeCall) : null,
+    };
+  }
+
+  async getCallByToken(userId: string, callToken: string) {
+    const call = await this.prisma.booking_call_sessions.findUnique({
+      where: { call_token: callToken },
+      include: {
+        booking: {
+          include: {
+            student: { select: { id: true, first_name: true, last_name: true } },
+            mentor: { select: { id: true, first_name: true, last_name: true } },
+          },
+        },
+        transcript: true,
+      },
+    });
+
+    if (!call) {
+      throw new NotFoundException({
+        code: 'CALL_NOT_FOUND',
+        message: 'Appel introuvable',
+      });
+    }
+
+    this.assertBookingParticipant(userId, call.booking);
+    this.assertSessionWindow(call.booking);
+    const normalized = await this.ensureCallNotExpired(call);
+
+    return this.mapCallSession(userId, call.booking, normalized, call.transcript);
   }
 
   async listSessionChatMessages(userId: string, bookingId: string) {
@@ -364,22 +461,53 @@ export class SessionsService {
 
   async getTranscript(userId: string, bookingId: string) {
     const booking = await this.getBookingWithSession(userId, bookingId);
-
-    const transcript = await this.prisma.session_transcripts.findUnique({
+    const latestCall = await this.prisma.booking_call_sessions.findFirst({
       where: { booking_id: booking.id },
+      include: { transcript: true },
+      orderBy: { created_at: 'desc' },
     });
 
-    return transcript
-      ? this.mapTranscript(transcript)
+    return latestCall?.transcript
+      ? this.mapTranscript(latestCall.transcript)
       : {
           bookingId,
           provider: this.sessionProvider.getTranscriptProviderName(),
-          status: this.resolveTranscriptDisplayStatus(booking.session),
+          status: latestCall ? this.resolveTranscriptDisplayStatus(latestCall) : 'not_requested',
           language: null,
           fullText: null,
           summaryText: null,
           segments: [],
-          updatedAt: booking.session?.updated_at.toISOString() ?? null,
+          updatedAt: latestCall?.updated_at.toISOString() ?? null,
+        };
+  }
+
+  async getCallTranscript(userId: string, callId: string) {
+    const call = await this.prisma.booking_call_sessions.findUnique({
+      where: { id: callId },
+      include: { booking: true, transcript: true },
+    });
+
+    if (!call) {
+      throw new NotFoundException({
+        code: 'CALL_NOT_FOUND',
+        message: 'Appel introuvable',
+      });
+    }
+
+    this.assertBookingParticipant(userId, call.booking);
+
+    return call.transcript
+      ? this.mapTranscript(call.transcript)
+      : {
+          bookingId: call.booking_id,
+          callSessionId: call.id,
+          provider: this.sessionProvider.getTranscriptProviderName(),
+          status: this.resolveTranscriptDisplayStatus(call),
+          language: null,
+          fullText: null,
+          summaryText: null,
+          segments: [],
+          updatedAt: call.updated_at.toISOString(),
         };
   }
 
@@ -388,109 +516,130 @@ export class SessionsService {
     bookingId: string,
     input: { decision: 'accept' | 'decline' },
   ) {
-    const booking = await this.getBookingWithSession(userId, bookingId);
-    const session = await this.ensureSessionRecord(booking);
-
-    if (input.decision === 'decline') {
-      const declined = await this.prisma.booking_sessions.update({
-        where: { id: session.id },
-        data: {
-          transcript_consent_status: 'declined',
-          transcript_status: 'not_requested',
-          transcript_consented_at: null,
-          transcript_error_message: null,
-        },
+    const activeCall = await this.getActiveCall(userId, bookingId);
+    if (!activeCall.activeCall?.callSessionId) {
+      throw new BadRequestException({
+        code: 'CALL_NOT_ACTIVE',
+        message: 'Aucun appel actif pour cette reservation',
       });
+    }
+    return this.recordCallTranscriptConsent(userId, activeCall.activeCall.callSessionId, input);
+  }
 
-      await this.logSessionEvent(session.id, bookingId, 'transcript_requested', userId, {
-        type: 'transcript.consent.declined',
+  async recordCallTranscriptConsent(
+    userId: string,
+    callId: string,
+    input: { decision: 'accept' | 'decline' },
+  ) {
+    const call = await this.prisma.booking_call_sessions.findUnique({
+      where: { id: callId },
+      include: { booking: true },
+    });
+
+    if (!call) {
+      throw new NotFoundException({
+        code: 'CALL_NOT_FOUND',
+        message: 'Appel introuvable',
       });
-
-      return {
-        bookingId,
-        transcriptConsentStatus: declined.transcript_consent_status,
-        transcriptStatus: declined.transcript_status,
-        consentedAt: null,
-      };
     }
 
-    let captureStatus = session.transcript_capture_status;
-    let captureProviderId = session.transcript_capture_provider_id;
-    let sourceUrl = session.transcript_source_url;
+    this.assertBookingParticipant(userId, call.booking);
 
-    if (
-      session.transcript_capture_status === 'not_started' &&
-      session.provider_room_id
-    ) {
-      const objectKey = this.sessionProvider.buildTranscriptObjectKey(
-        bookingId,
-        session.session_token,
-      );
-      const capture = await this.sessionProvider.startAudioRecording(
-        session.provider_room_id,
-        objectKey,
-      );
-      captureStatus = 'recording';
-      captureProviderId = capture.egressId;
-      sourceUrl = `s3://${process.env.S3_BUCKET}/${objectKey}`;
-    }
-
-    const consented = await this.prisma.booking_sessions.update({
-      where: { id: session.id },
+    const updated = await this.prisma.booking_call_sessions.update({
+      where: { id: call.id },
       data: {
-        transcript_consented_at: new Date(),
-        transcript_consent_status: 'accepted',
+        transcript_consent_status: input.decision === 'accept' ? 'accepted' : 'declined',
         transcript_status: 'not_requested',
-        transcript_capture_status: captureStatus,
-        transcript_capture_provider_id: captureProviderId,
-        transcript_source_url: sourceUrl,
+        transcript_consented_at: input.decision === 'accept' ? new Date() : null,
         transcript_error_message: null,
       },
     });
 
-    await this.logSessionEvent(session.id, bookingId, 'transcript_requested', userId, {
-      type: 'transcript.consent.accepted',
-      captureStatus,
-      captureProviderId,
+    await this.logSessionEvent(call.id, call.booking_id, 'transcript_requested', userId, {
+      type:
+        input.decision === 'accept'
+          ? 'transcript.consent.accepted'
+          : 'transcript.consent.declined',
     });
 
+    if (input.decision === 'accept' && updated.status === 'live') {
+      await this.maybeStartCallRecording(updated);
+    }
+
     return {
-      bookingId,
-      transcriptConsentStatus: consented.transcript_consent_status,
-      transcriptStatus: consented.transcript_status,
-      consentedAt: consented.transcript_consented_at?.toISOString() ?? null,
+      bookingId: updated.booking_id,
+      callSessionId: updated.id,
+      transcriptConsentStatus: updated.transcript_consent_status,
+      transcriptStatus: updated.transcript_status,
+      consentedAt: updated.transcript_consented_at?.toISOString() ?? null,
     };
   }
 
   async handleVideoWebhook(payload: VideoWebhookPayload) {
-    const session = await this.findSessionFromWebhook(payload.bookingId, payload.providerRoomId);
-    if (!session) {
+    const existingCall = await this.findCallFromWebhook(payload.bookingId, payload.providerRoomId);
+    if (!existingCall) {
       return { ok: true, ignored: true };
     }
 
+    const call = await this.ensureCallNotExpired(existingCall);
     const eventType = payload.eventType ?? 'unknown';
-    const normalizedStatus =
-      eventType === 'room_started'
-        ? 'live'
-        : eventType === 'room_finished'
-          ? 'ended'
-          : eventType === 'participant_joined'
-            ? 'waiting'
-            : session.status;
 
-    const data: Record<string, unknown> = {
-      status: normalizedStatus,
-    };
-
-    if (eventType === 'room_started' && !session.started_at) {
-      data.started_at = new Date();
+    if (call.status === 'missed') {
+      await this.logSessionEvent(
+        call.id,
+        call.booking_id,
+        this.mapVideoEventType(eventType),
+        payload.participantUserId ?? null,
+        {
+          eventType,
+          ignored: true,
+          reason: 'call.missed',
+        },
+        payload.providerEventId,
+      );
+      return { ok: true, ignored: true };
     }
 
-    if (eventType === 'room_finished') {
-      data.ended_at = new Date();
-    }
+    const participantIds = this.getParticipantIdentities(call.participant_identities_json);
+    const participantUserId = payload.participantUserId ?? null;
+    const data: Record<string, unknown> = {};
 
     const egressInfo = this.extractEgressInfo(payload.payload);
+    switch (eventType) {
+      case 'participant_joined': {
+        if (participantUserId && !participantIds.includes(participantUserId)) {
+          participantIds.push(participantUserId);
+        }
+        data.participant_identities_json = this.toJsonValue(participantIds);
+        data.status = participantIds.length >= 2 ? 'live' : 'waiting';
+        if (participantIds.length >= 2 && !call.started_at) {
+          data.started_at = new Date();
+        }
+        break;
+      }
+      case 'participant_left': {
+        data.participant_identities_json = this.toJsonValue(
+          participantIds.filter((value) => value !== participantUserId),
+        );
+        data.status = 'ended';
+        data.ended_at = new Date();
+        break;
+      }
+      case 'room_started': {
+        if (call.status === 'initiated') {
+          data.status = 'waiting';
+        }
+        break;
+      }
+      case 'room_finished': {
+        data.status = 'ended';
+        data.ended_at = call.ended_at ?? new Date();
+        break;
+      }
+      default:
+        break;
+    }
+
     if (eventType === 'egress_started' && egressInfo?.egressId) {
       data.transcript_capture_status = 'recording';
       data.transcript_capture_provider_id = egressInfo.egressId;
@@ -508,16 +657,24 @@ export class SessionsService {
       }
     }
 
-    const updated = await this.prisma.booking_sessions.update({
-      where: { id: session.id },
+    const updated = await this.prisma.booking_call_sessions.update({
+      where: { id: call.id },
       data,
     });
 
-    if (eventType === 'room_finished') {
-      await this.prisma.bookings.update({
-        where: { id: session.booking_id },
-        data: { status: 'completed' },
-      });
+    if (
+      eventType === 'participant_joined' &&
+      updated.status === 'live' &&
+      updated.transcript_consent_status === 'accepted'
+    ) {
+      await this.maybeStartCallRecording(updated);
+    }
+
+    if (
+      eventType === 'participant_left' &&
+      updated.status === 'ended'
+    ) {
+      await this.terminateCallInfrastructure(updated);
     }
 
     if (
@@ -530,10 +687,10 @@ export class SessionsService {
     }
 
     await this.logSessionEvent(
-      session.id,
-      session.booking_id,
+      call.id,
+      call.booking_id,
       this.mapVideoEventType(eventType),
-      payload.participantUserId ?? null,
+      participantUserId,
       {
         eventType,
         payload: payload.payload ?? {},
@@ -549,18 +706,18 @@ export class SessionsService {
   }
 
   async handleTranscriptWebhook(payload: TranscriptWebhookPayload) {
-    const session = await this.findSessionForTranscriptWebhook(payload);
-    if (!session) {
+    const call = await this.findSessionForTranscriptWebhook(payload);
+    if (!call) {
       return { ok: true, ignored: true };
     }
 
     const status = payload.status ?? 'completed';
 
     await this.prisma.session_transcripts.upsert({
-      where: { booking_id: session.booking_id },
+      where: { booking_call_session_id: call.id },
       create: {
-        booking_id: session.booking_id,
-        booking_session_id: session.id,
+        booking_id: call.booking_id,
+        booking_call_session_id: call.id,
         provider: this.sessionProvider.getTranscriptProviderName(),
         status,
         language: payload.language ?? null,
@@ -578,12 +735,12 @@ export class SessionsService {
       },
     });
 
-    await this.prisma.booking_sessions.update({
-      where: { id: session.id },
+    await this.prisma.booking_call_sessions.update({
+      where: { id: call.id },
       data: {
         transcript_status: status,
         transcript_provider_job_id:
-          payload.providerJobId ?? session.transcript_provider_job_id ?? null,
+          payload.providerJobId ?? call.transcript_provider_job_id ?? null,
         transcript_error_message:
           status === 'failed'
             ? String(payload.payload?.error ?? 'La transcription a echoue')
@@ -592,8 +749,8 @@ export class SessionsService {
     });
 
     await this.logSessionEvent(
-      session.id,
-      session.booking_id,
+      call.id,
+      call.booking_id,
       status === 'failed' ? 'transcript_failed' : 'transcript_completed',
       null,
       {
@@ -604,7 +761,7 @@ export class SessionsService {
     );
 
     const booking = await this.prisma.bookings.findUnique({
-      where: { id: session.booking_id },
+      where: { id: call.booking_id },
       select: { student_id: true, mentor_id: true },
     });
 
@@ -616,7 +773,7 @@ export class SessionsService {
           channel: 'in_app',
           title: 'Transcription disponible',
           message: 'La retranscription de votre session est disponible.',
-          payload: { bookingId: session.booking_id },
+          payload: { bookingId: call.booking_id, callSessionId: call.id },
         }),
         this.notifications.emitNotification({
           userId: booking.mentor_id,
@@ -624,7 +781,7 @@ export class SessionsService {
           channel: 'in_app',
           title: 'Transcription disponible',
           message: 'La retranscription de votre session est disponible.',
-          payload: { bookingId: session.booking_id },
+          payload: { bookingId: call.booking_id, callSessionId: call.id },
         }),
       ]);
     }
@@ -857,18 +1014,61 @@ export class SessionsService {
       };
     }
 
-    const where: Record<string, unknown> = {
-      OR: [{ student_id: targetUserId }, { mentor_id: targetUserId }],
-      booking_date: { lte: new Date() },
-    };
-
     if (category === 'visio') {
-      where.session = { isNot: null };
+      const rows = await this.prisma.booking_call_sessions.findMany({
+        where: {
+          booking: {
+            OR: [{ student_id: targetUserId }, { mentor_id: targetUserId }],
+            booking_date: { lte: new Date() },
+          },
+        },
+        include: {
+          booking: true,
+          transcript: true,
+        },
+        orderBy: { created_at: 'desc' },
+        take: limit + 1,
+        ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+      });
+
+      const hasMore = rows.length > limit;
+      const pageRows = hasMore ? rows.slice(0, limit) : rows;
+
+      return {
+        sessions: pageRows.map(
+          (row): SessionHistoryItem => ({
+            id: row.id,
+            bookingId: row.booking_id,
+            callSessionId: row.id,
+            callToken: row.call_token,
+            userId: targetUserId,
+            mentorId: row.booking.mentor_id,
+            type: 'visio',
+            startedAt: (row.started_at ?? row.created_at).toISOString(),
+            endedAt: (row.ended_at ?? row.created_at).toISOString(),
+            notes: row.booking.notes,
+            status: row.status,
+            replayAvailable: row.expires_at > new Date(),
+            transcriptStatus:
+              row.transcript?.status ?? this.resolveTranscriptDisplayStatus(row),
+            transcriptSummary: row.transcript?.summary_text ?? null,
+            transcriptConsentStatus: row.transcript_consent_status,
+          }),
+        ),
+        metadata: {
+          nextCursor: hasMore ? pageRows[pageRows.length - 1].id : null,
+          hasMore,
+          limit,
+        },
+      };
     }
 
     const rows = await this.prisma.bookings.findMany({
-      where,
-      include: { session: { include: { transcript: true } } },
+      where: {
+        OR: [{ student_id: targetUserId }, { mentor_id: targetUserId }],
+        booking_date: { lte: new Date() },
+      },
+      include: { session: true },
       orderBy: { booking_date: 'desc' },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
@@ -889,13 +1089,6 @@ export class SessionsService {
           endedAt: row.booking_date.toISOString(),
           notes: row.notes,
           status: row.status,
-          replayAvailable:
-            category === 'visio'
-              ? Boolean(row.session && row.session.expires_at > new Date())
-              : undefined,
-          transcriptStatus: row.session?.transcript?.status ?? this.resolveTranscriptDisplayStatus(row.session),
-          transcriptSummary: row.session?.transcript?.summary_text ?? null,
-          transcriptConsentStatus: row.session?.transcript_consent_status ?? null,
         }),
       ),
       metadata: {
@@ -1068,29 +1261,16 @@ startxref
       });
     }
 
-    const provider = this.sessionProvider.getVideoProviderName();
-    const providerRoomId =
-      booking.session?.provider_room_id ?? this.sessionProvider.buildRoomId(booking.id);
     const sessionToken = booking.session?.session_token ?? randomUUID();
-    const providerJoinUrl = this.sessionProvider.getLiveKitServerUrl();
     const expiresAt = new Date(
       this.combineDateAndTime(booking.booking_date, booking.end_time).getTime() +
         this.accessGraceHours * 60 * 60 * 1000,
     );
 
-    await this.sessionProvider.ensureRoom(providerRoomId, {
-      bookingId: booking.id,
-      studentId: booking.student_id,
-      mentorId: booking.mentor_id,
-    });
-
     if (booking.session) {
       return this.prisma.booking_sessions.update({
         where: { id: booking.session.id },
         data: {
-          provider,
-          provider_room_id: providerRoomId,
-          provider_join_url: providerJoinUrl,
           session_url: `/session/${sessionToken}`,
           expires_at: expiresAt,
           status:
@@ -1098,8 +1278,7 @@ startxref
               ? 'ended'
               : booking.status === 'completed'
                 ? 'ended'
-                : 'waiting',
-          transcript_status: this.resolveTranscriptStatusForUpdate(booking.session),
+                : 'scheduled',
         },
       });
     }
@@ -1109,11 +1288,11 @@ startxref
         booking_id: booking.id,
         session_token: sessionToken,
         session_url: `/session/${sessionToken}`,
-        provider,
-        provider_room_id: providerRoomId,
-        provider_join_url: providerJoinUrl,
+        provider: 'booking-portal',
+        provider_room_id: null,
+        provider_join_url: null,
         expires_at: expiresAt,
-        status: booking.status === 'completed' ? 'ended' : 'waiting',
+        status: booking.status === 'completed' ? 'ended' : 'scheduled',
         transcript_consent_status: 'pending',
         transcript_status: 'not_requested',
         transcript_capture_status: 'not_started',
@@ -1121,8 +1300,7 @@ startxref
     });
 
     await this.logSessionEvent(created.id, booking.id, 'room_created', null, {
-      provider,
-      providerRoomId,
+      provider: 'booking-portal',
     });
 
     return created;
@@ -1144,20 +1322,91 @@ startxref
     session: {
       session_token: string;
       session_url: string;
+      status: string;
+      expires_at: Date;
+    },
+    activeCall:
+      | {
+          id: string;
+          booking_id: string;
+          call_token: string;
+          session_url: string;
+          provider: string;
+          provider_room_id: string | null;
+          provider_join_url: string | null;
+          status: string;
+          transcript_consent_status: string;
+          transcript_status: string;
+          transcript_capture_status: string;
+          transcript_consented_at: Date | null;
+          started_at: Date | null;
+          ended_at: Date | null;
+          expires_at: Date;
+          participant_identities_json: unknown;
+          created_at: Date;
+          updated_at: Date;
+        }
+      | null,
+  ) {
+    return {
+      bookingId: booking.id,
+      sessionToken: session.session_token,
+      sessionUrl: session.session_url,
+      roomStatus: session.status,
+      bookingStatus: booking.status,
+      startsAt: this.combineDateAndTime(booking.booking_date, booking.start_time).toISOString(),
+      endsAt: this.combineDateAndTime(booking.booking_date, booking.end_time).toISOString(),
+      expiresAt: session.expires_at.toISOString(),
+      participants: [
+        {
+          userId: booking.student.id,
+          fullName: `${booking.student.first_name} ${booking.student.last_name}`,
+          role: 'etudiant',
+        },
+        {
+          userId: booking.mentor.id,
+          fullName: `${booking.mentor.first_name} ${booking.mentor.last_name}`,
+          role: 'mentor',
+        },
+      ],
+      activeCall: activeCall
+        ? await this.mapCallSession(currentUserId, booking, activeCall)
+        : null,
+    };
+  }
+
+  private async mapCallSession(
+    currentUserId: string,
+    booking: {
+      id: string;
+      student_id: string;
+      mentor_id: string;
+      student: { id: string; first_name: string; last_name: string };
+      mentor: { id: string; first_name: string; last_name: string };
+    },
+    call: {
+      id: string;
+      booking_id: string;
+      call_token: string;
+      session_url: string;
       provider: string;
       provider_room_id: string | null;
       provider_join_url: string | null;
       status: string;
+      participant_identities_json: unknown;
+      started_at: Date | null;
+      ended_at: Date | null;
+      expires_at: Date;
       transcript_consent_status: string;
       transcript_status: string;
       transcript_capture_status: string;
       transcript_consented_at: Date | null;
-      started_at: Date | null;
-      ended_at: Date | null;
-      expires_at: Date;
+      created_at: Date;
+      updated_at: Date;
     },
-    transcript:
+    transcript?:
       | {
+          booking_id?: string;
           provider: string;
           status: string;
           language: string | null;
@@ -1182,61 +1431,53 @@ startxref
           };
 
     const liveKitToken =
-      session.provider_room_id === null || session.transcript_consent_status === 'pending'
+      call.provider_room_id === null || call.transcript_consent_status === 'pending'
         ? null
         : await this.sessionProvider.buildParticipantToken({
-            roomId: session.provider_room_id,
+            roomId: call.provider_room_id,
             identity: currentParticipant.id,
             displayName: currentParticipant.fullName,
             metadata: {
               bookingId: booking.id,
+              callSessionId: call.id,
               role: currentParticipant.role,
             },
           });
 
     return {
+      callSessionId: call.id,
       bookingId: booking.id,
-      sessionToken: session.session_token,
-      sessionUrl: session.session_url,
+      callToken: call.call_token,
+      sessionUrl: call.session_url,
       provider: {
-        name: session.provider,
-        roomId: session.provider_room_id,
+        name: call.provider,
+        roomId: call.provider_room_id,
         joinUrl: null,
-        serverUrl: session.provider_join_url,
+        serverUrl: call.provider_join_url,
         token: liveKitToken,
       },
-      roomStatus: session.status,
-      bookingStatus: booking.status,
-      startsAt: this.combineDateAndTime(booking.booking_date, booking.start_time).toISOString(),
-      endsAt: this.combineDateAndTime(booking.booking_date, booking.end_time).toISOString(),
-      expiresAt: session.expires_at.toISOString(),
-      participants: [
-        {
-          userId: booking.student.id,
-          fullName: `${booking.student.first_name} ${booking.student.last_name}`,
-          role: 'etudiant',
-        },
-        {
-          userId: booking.mentor.id,
-          fullName: `${booking.mentor.first_name} ${booking.mentor.last_name}`,
-          role: 'mentor',
-        },
-      ],
+      callStatus: call.status,
+      startedAt: call.started_at?.toISOString() ?? null,
+      endedAt: call.ended_at?.toISOString() ?? null,
+      expiresAt: call.expires_at.toISOString(),
+      participantIds: this.getParticipantIdentities(call.participant_identities_json),
       transcript: transcript
         ? this.mapTranscript(transcript)
         : {
             bookingId: booking.id,
+            callSessionId: call.id,
             provider: this.sessionProvider.getTranscriptProviderName(),
-            status: this.resolveTranscriptDisplayStatus(session),
+            status: this.resolveTranscriptDisplayStatus(call),
             language: null,
             fullText: null,
             summaryText: null,
             segments: [],
-            updatedAt: null,
+            updatedAt: call.updated_at.toISOString(),
           },
-      transcriptConsentRequired: session.transcript_consent_status === 'pending',
-      transcriptConsentStatus: session.transcript_consent_status,
-      transcriptCaptureStatus: session.transcript_capture_status,
+      transcriptConsentRequired: call.transcript_consent_status === 'pending',
+      transcriptConsentStatus: call.transcript_consent_status,
+      transcriptCaptureStatus: call.transcript_capture_status,
+      transcriptConsentedAt: call.transcript_consented_at?.toISOString() ?? null,
     };
   }
 
@@ -1290,6 +1531,7 @@ startxref
 
   private mapTranscript(transcript: {
     booking_id?: string;
+    booking_call_session_id?: string;
     provider: string;
     status: string;
     language: string | null;
@@ -1300,6 +1542,7 @@ startxref
   }) {
     return {
       bookingId: transcript.booking_id ?? null,
+      callSessionId: transcript.booking_call_session_id ?? null,
       provider: transcript.provider,
       status: transcript.status,
       language: transcript.language,
@@ -1319,19 +1562,23 @@ startxref
     return combined;
   }
 
-  private async findSessionFromWebhook(bookingId?: string, providerRoomId?: string) {
-    if (bookingId) {
-      const sessionByBooking = await this.prisma.booking_sessions.findUnique({
-        where: { booking_id: bookingId },
+  private async findCallFromWebhook(bookingId?: string, providerRoomId?: string) {
+    if (providerRoomId) {
+      const byRoom = await this.prisma.booking_call_sessions.findFirst({
+        where: { provider_room_id: providerRoomId },
       });
-      if (sessionByBooking) {
-        return sessionByBooking;
+      if (byRoom) {
+        return byRoom;
       }
     }
 
-    if (providerRoomId) {
-      return this.prisma.booking_sessions.findFirst({
-        where: { provider_room_id: providerRoomId },
+    if (bookingId) {
+      return this.prisma.booking_call_sessions.findFirst({
+        where: {
+          booking_id: bookingId,
+          status: { in: ['initiated', 'waiting', 'live'] },
+        },
+        orderBy: { created_at: 'desc' },
       });
     }
 
@@ -1339,17 +1586,17 @@ startxref
   }
 
   private async findSessionForTranscriptWebhook(payload: TranscriptWebhookPayload) {
-    if (payload.bookingId) {
-      const byBooking = await this.prisma.booking_sessions.findUnique({
-        where: { booking_id: payload.bookingId },
+    if (payload.callSessionId) {
+      const byCallId = await this.prisma.booking_call_sessions.findUnique({
+        where: { id: payload.callSessionId },
       });
-      if (byBooking) {
-        return byBooking;
+      if (byCallId) {
+        return byCallId;
       }
     }
 
     if (payload.providerJobId) {
-      const byJob = await this.prisma.booking_sessions.findFirst({
+      const byJob = await this.prisma.booking_call_sessions.findFirst({
         where: { transcript_provider_job_id: payload.providerJobId },
       });
       if (byJob) {
@@ -1358,8 +1605,18 @@ startxref
     }
 
     if (payload.providerRoomId) {
-      return this.prisma.booking_sessions.findFirst({
+      const byRoom = await this.prisma.booking_call_sessions.findFirst({
         where: { provider_room_id: payload.providerRoomId },
+      });
+      if (byRoom) {
+        return byRoom;
+      }
+    }
+
+    if (payload.bookingId) {
+      return this.prisma.booking_call_sessions.findFirst({
+        where: { booking_id: payload.bookingId },
+        orderBy: { created_at: 'desc' },
       });
     }
 
@@ -1381,8 +1638,126 @@ startxref
     }
   }
 
+  private async getActiveCallForBooking(bookingId: string) {
+    const candidates = await this.prisma.booking_call_sessions.findMany({
+      where: {
+        booking_id: bookingId,
+        status: { in: ['initiated', 'waiting', 'live'] },
+      },
+      orderBy: { created_at: 'desc' },
+      take: 5,
+    });
+
+    for (const candidate of candidates) {
+      const normalized = await this.ensureCallNotExpired(candidate);
+      if (['initiated', 'waiting', 'live'].includes(normalized.status)) {
+        return normalized;
+      }
+    }
+
+    return null;
+  }
+
+  private async ensureCallNotExpired<T extends {
+    id: string;
+    booking_id: string;
+    provider_room_id: string | null;
+    status: string;
+    created_at: Date;
+    ended_at: Date | null;
+  }>(call: T): Promise<T> {
+    if (!['initiated', 'waiting'].includes(call.status)) {
+      return call;
+    }
+
+    const deadline = new Date(
+      call.created_at.getTime() + this.unansweredCallMinutes * 60 * 1000,
+    );
+    if (deadline > new Date()) {
+      return call;
+    }
+
+    const updated = await this.prisma.booking_call_sessions.update({
+      where: { id: call.id },
+      data: {
+        status: 'missed',
+        ended_at: call.ended_at ?? new Date(),
+      },
+    });
+
+    await this.terminateCallInfrastructure(updated);
+    await this.logSessionEvent(call.id, call.booking_id, 'room_ended', null, {
+      type: 'call.missed',
+    });
+
+    return updated as unknown as T;
+  }
+
+  private getParticipantIdentities(value: unknown) {
+    return Array.isArray(value)
+      ? value.filter((entry): entry is string => typeof entry === 'string')
+      : [];
+  }
+
+  private async maybeStartCallRecording(call: {
+    id: string;
+    booking_id: string;
+    call_token: string;
+    provider_room_id: string | null;
+    transcript_capture_status: string;
+    transcript_consent_status: string;
+  }) {
+    if (
+      call.transcript_consent_status !== 'accepted' ||
+      call.transcript_capture_status !== 'not_started' ||
+      !call.provider_room_id
+    ) {
+      return;
+    }
+
+    const objectKey = this.sessionProvider.buildTranscriptObjectKey(
+      call.booking_id,
+      call.call_token,
+    );
+    const capture = await this.sessionProvider.startAudioRecording(
+      call.provider_room_id,
+      objectKey,
+    );
+
+    await this.prisma.booking_call_sessions.update({
+      where: { id: call.id },
+      data: {
+        transcript_capture_status: 'recording',
+        transcript_capture_provider_id: capture.egressId,
+        transcript_source_url: `s3://${process.env.S3_BUCKET}/${objectKey}`,
+        transcript_error_message: null,
+      },
+    });
+  }
+
+  private async terminateCallInfrastructure(call: {
+    provider_room_id: string | null;
+    transcript_capture_provider_id?: string | null;
+  }) {
+    if (call.transcript_capture_provider_id) {
+      try {
+        await this.sessionProvider.stopAudioRecording(call.transcript_capture_provider_id);
+      } catch (error) {
+        this.logger.warn(`Unable to stop egress: ${String(error)}`);
+      }
+    }
+
+    if (call.provider_room_id) {
+      try {
+        await this.sessionProvider.endRoom(call.provider_room_id);
+      } catch (error) {
+        this.logger.warn(`Unable to end room ${call.provider_room_id}: ${String(error)}`);
+      }
+    }
+  }
+
   private async logSessionEvent(
-    bookingSessionId: string,
+    callSessionId: string,
     bookingId: string,
     eventType:
       | 'room_created'
@@ -1402,7 +1777,7 @@ startxref
     try {
       await this.prisma.session_events.create({
         data: {
-          booking_session_id: bookingSessionId,
+          booking_call_session_id: callSessionId,
           booking_id: bookingId,
           actor_id: actorId,
           event_type: eventType,
@@ -1488,13 +1863,13 @@ startxref
     const payload: TranscriptJobPayload = {
       jobId,
       bookingId: session.booking_id,
-      bookingSessionId: session.id,
+      callSessionId: session.id,
       sourceUrl: session.transcript_source_url,
       providerRoomId: session.provider_room_id,
     };
 
     await this.transcriptQueue.enqueue(payload);
-    await this.prisma.booking_sessions.update({
+    await this.prisma.booking_call_sessions.update({
       where: { id: session.id },
       data: {
         transcript_status: 'queued',

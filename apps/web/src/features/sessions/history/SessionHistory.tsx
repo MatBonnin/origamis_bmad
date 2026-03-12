@@ -12,6 +12,8 @@ type CategoryFilter = 'all' | 'message' | 'rdv' | 'visio';
 type HistoryEntry = {
   id: string;
   type: 'message' | 'rdv' | 'visio';
+  bookingId?: string | null;
+  callSessionId?: string | null;
   startedAt: string;
   endedAt: string;
   mentorId: string;
@@ -45,6 +47,11 @@ const STATUS_LABELS: Record<string, string> = {
   failed: 'Echec',
   declined: 'Refusee',
   pending_consent: 'Consentement requis',
+  initiated: 'Lance',
+  waiting: 'En attente',
+  live: 'En direct',
+  missed: 'Sans reponse',
+  ended: 'Termine',
 };
 
 export function SessionHistory({ accessToken, userId, isMentor = false }: Props) {
@@ -163,8 +170,9 @@ export function SessionHistory({ accessToken, userId, isMentor = false }: Props)
     window.open(result.data.url as string, '_blank', 'noopener,noreferrer');
   };
 
-  const loadTranscript = async (bookingId: string) => {
-    const response = await fetch(`${API_URL}/sessions/${bookingId}/transcript`, {
+  const loadTranscript = async (entry: HistoryEntry) => {
+    const callId = entry.callSessionId || entry.id;
+    const response = await fetch(`${API_URL}/sessions/calls/${callId}/transcript`, {
       headers,
       cache: 'no-store',
     });
@@ -177,7 +185,7 @@ export function SessionHistory({ accessToken, userId, isMentor = false }: Props)
     const fullText = (result.data.fullText as string | null) || 'Aucun verbatim disponible.';
     setExpandedTranscripts((previous) => ({
       ...previous,
-      [bookingId]: fullText,
+      [entry.id]: fullText,
     }));
   };
 
@@ -265,7 +273,7 @@ export function SessionHistory({ accessToken, userId, isMentor = false }: Props)
                       type="button"
                       size="sm"
                       variant="outline"
-                      onClick={() => void loadTranscript(entry.id)}
+                      onClick={() => void loadTranscript(entry)}
                       aria-label="Afficher la transcription"
                     >
                       Voir transcription

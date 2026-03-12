@@ -105,6 +105,66 @@ export class SessionsController {
     return { data, error: null };
   }
 
+  @Post(':bookingId/calls')
+  @ApiOperation({ summary: 'Creer un nouvel appel pour une reservation' })
+  @ApiResponse({ status: 201, description: 'Appel cree' })
+  async createCall(
+    @CurrentUser() user: { id: string },
+    @Param('bookingId') bookingId: string,
+  ) {
+    const data = await this.sessionsService.createCall(user.id, bookingId);
+    return { data, error: null };
+  }
+
+  @Get(':bookingId/calls/active')
+  @ApiOperation({ summary: 'Recuperer l appel actif d une reservation' })
+  @ApiResponse({ status: 200, description: 'Appel actif recupere' })
+  async getActiveCall(
+    @CurrentUser() user: { id: string },
+    @Param('bookingId') bookingId: string,
+  ) {
+    const data = await this.sessionsService.getActiveCall(user.id, bookingId);
+    return { data, error: null };
+  }
+
+  @Get('calls/:callToken')
+  @ApiOperation({ summary: 'Recuperer un appel par token' })
+  @ApiResponse({ status: 200, description: 'Appel recupere' })
+  async getCallByToken(
+    @CurrentUser() user: { id: string },
+    @Param('callToken') callToken: string,
+  ) {
+    const data = await this.sessionsService.getCallByToken(user.id, callToken);
+    return { data, error: null };
+  }
+
+  @Post('calls/:callId/transcription/consent')
+  @ApiOperation({ summary: 'Enregistrer le consentement de transcription pour un appel' })
+  @ApiResponse({ status: 200, description: 'Consentement enregistre' })
+  async recordCallTranscriptConsent(
+    @CurrentUser() user: { id: string },
+    @Param('callId') callId: string,
+    @Body() body: { decision: 'accept' | 'decline' },
+  ) {
+    const data = await this.sessionsService.recordCallTranscriptConsent(
+      user.id,
+      callId,
+      body,
+    );
+    return { data, error: null };
+  }
+
+  @Get('calls/:callId/transcript')
+  @ApiOperation({ summary: 'Obtenir la transcription d un appel' })
+  @ApiResponse({ status: 200, description: 'Transcription recuperee' })
+  async getCallTranscript(
+    @CurrentUser() user: { id: string },
+    @Param('callId') callId: string,
+  ) {
+    const data = await this.sessionsService.getCallTranscript(user.id, callId);
+    return { data, error: null };
+  }
+
   @Get(':bookingId/chat/messages')
   @ApiOperation({ summary: 'Lister les messages du chat de session' })
   @ApiResponse({ status: 200, description: 'Messages recuperes' })

@@ -34,6 +34,10 @@ export class SessionProviderService {
     return `booking-${bookingId}`;
   }
 
+  buildCallRoomId(callId: string) {
+    return `call-${callId}`;
+  }
+
   getLiveKitServerUrl() {
     return this.requireConfig('LIVEKIT_URL');
   }
@@ -117,6 +121,16 @@ export class SessionProviderService {
       { file: fileOutput },
       { audioOnly: true },
     );
+  }
+
+  async stopAudioRecording(egressId: string) {
+    const client = this.createEgressClient();
+    return client.stopEgress(egressId);
+  }
+
+  async endRoom(roomId: string) {
+    const client = this.createRoomServiceClient();
+    return client.deleteRoom(roomId);
   }
 
   async verifyWebhook(rawBody: string, authHeader: string) {

@@ -27,6 +27,13 @@ describe('SessionsService', () => {
       create: jest.fn(),
       update: jest.fn(),
     },
+    booking_call_sessions: {
+      findUnique: jest.fn(),
+      findFirst: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
     session_transcripts: {
       findUnique: jest.fn(),
       upsert: jest.fn(),
@@ -170,18 +177,27 @@ describe('SessionsService', () => {
     expect(result.metadata.hasMore).toBe(false);
   });
 
-  it('supports visio category filter via booking session relation', async () => {
-    mockPrisma.bookings.findMany.mockResolvedValue([
+  it('supports visio category filter via call session relation', async () => {
+    mockPrisma.booking_call_sessions.findMany.mockResolvedValue([
       {
-        id: 'b-visio-1',
-        student_id: 'user-1',
-        mentor_id: 'mentor-1',
-        booking_date: new Date('2026-01-08T10:00:00.000Z'),
-        status: 'completed',
-        notes: null,
-        session: {
-          id: 'session-1',
-          expires_at: new Date('2099-01-01T00:00:00.000Z'),
+        id: 'call-1',
+        booking_id: 'b-visio-1',
+        call_token: 'call-token-1',
+        status: 'ended',
+        started_at: new Date('2026-01-08T10:00:00.000Z'),
+        ended_at: new Date('2026-01-08T10:30:00.000Z'),
+        created_at: new Date('2026-01-08T10:00:00.000Z'),
+        expires_at: new Date('2099-01-01T00:00:00.000Z'),
+        transcript_consent_status: 'accepted',
+        transcript_status: 'completed',
+        booking: {
+          id: 'b-visio-1',
+          mentor_id: 'mentor-1',
+          notes: null,
+        },
+        transcript: {
+          status: 'completed',
+          summary_text: 'Resume',
         },
       },
     ]);
@@ -191,15 +207,18 @@ describe('SessionsService', () => {
       limit: 10,
     });
 
-    expect(mockPrisma.bookings.findMany).toHaveBeenCalledWith(
+    expect(mockPrisma.booking_call_sessions.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
-          session: { isNot: null },
+          booking: expect.objectContaining({
+            OR: [{ student_id: 'user-1' }, { mentor_id: 'user-1' }],
+          }),
         }),
       }),
     );
     expect(result.sessions[0].type).toBe('visio');
     expect(result.sessions[0].replayAvailable).toBe(true);
+    expect(result.sessions[0].callSessionId).toBe('call-1');
   });
 
   it('uses rdv by default when category is omitted', async () => {
@@ -226,33 +245,35 @@ describe('SessionsService', () => {
   });
 
   it('returns replay link for participant when not expired', async () => {
-    mockPrisma.bookings.findUnique.mockResolvedValue({
-      id: 'booking-1',
-      student_id: 'user-1',
-      mentor_id: 'mentor-1',
-      session: {
-        session_url: '/replay/booking-1',
-        expires_at: new Date('2099-01-01T00:00:00.000Z'),
+    mockPrisma.booking_call_sessions.findUnique.mockResolvedValue({
+      id: 'call-1',
+      session_url: '/session/test-token?call=call-token-1',
+      expires_at: new Date('2099-01-01T00:00:00.000Z'),
+      booking: {
+        id: 'booking-1',
+        student_id: 'user-1',
+        mentor_id: 'mentor-1',
       },
     });
 
-    const result = await service.getReplayLink('user-1', 'booking-1');
+    const result = await service.getReplayLink('user-1', 'call-1');
 
-    expect(result).toEqual({ url: '/replay/booking-1' });
+    expect(result).toEqual({ url: '/session/test-token?call=call-token-1' });
   });
 
   it('throws when replay is expired', async () => {
-    mockPrisma.bookings.findUnique.mockResolvedValue({
-      id: 'booking-1',
-      student_id: 'user-1',
-      mentor_id: 'mentor-1',
-      session: {
-        session_url: '/replay/booking-1',
-        expires_at: new Date('2000-01-01T00:00:00.000Z'),
+    mockPrisma.booking_call_sessions.findUnique.mockResolvedValue({
+      id: 'call-1',
+      session_url: '/session/test-token?call=call-token-1',
+      expires_at: new Date('2000-01-01T00:00:00.000Z'),
+      booking: {
+        id: 'booking-1',
+        student_id: 'user-1',
+        mentor_id: 'mentor-1',
       },
     });
 
-    await expect(service.getReplayLink('user-1', 'booking-1')).rejects.toThrow(
+    await expect(service.getReplayLink('user-1', 'call-1')).rejects.toThrow(
       NotFoundException,
     );
   });

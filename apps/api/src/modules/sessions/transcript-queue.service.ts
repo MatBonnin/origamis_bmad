@@ -5,7 +5,7 @@ import Redis from 'ioredis';
 export interface TranscriptJobPayload {
   jobId: string;
   bookingId: string;
-  bookingSessionId: string;
+  callSessionId: string;
   sourceUrl: string;
   providerRoomId: string;
 }
