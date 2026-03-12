@@ -78,7 +78,7 @@ describe('MentorsAvailabilityService', () => {
       session_duration: 60,
       buffer_before: 0,
       buffer_after: 0,
-      min_notice_hours: 24,
+      min_notice_hours: 1,
       max_days_ahead: 60,
       start_time_increment: 30,
       daily_limit: null,

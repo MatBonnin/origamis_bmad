@@ -294,7 +294,7 @@ model mentor_availability {
   buffer_after          Int     @default(0)      // Buffer after session in minutes: 0-60
 
   // Scheduling rules
-  min_notice_hours      Int     @default(24)     // Minimum hours before booking: 1-168
+  min_notice_hours      Int     @default(1)      // Minimum hours before booking: 1-168
   max_days_ahead        Int     @default(60)     // Max days in advance to book: 7-365
   start_time_increment  Int     @default(30)     // Start time intervals: 15, 30, 60
 
