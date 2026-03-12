@@ -498,9 +498,9 @@ export class MentorsAvailabilityService {
     }
 
     // Calculate date range
-    const today = this.getStartOfTodayUtc();
-    const minNoticeDate = new Date(today);
-    minNoticeDate.setHours(minNoticeDate.getHours() + availability.min_notice_hours);
+    const now = new Date();
+    const today = this.getStartOfTodayUtc(now);
+    const minNoticeDate = new Date(now.getTime() + availability.min_notice_hours * 60 * 60 * 1000);
 
     const rangeStart = startDate
       ? new Date(startDate + 'T00:00:00.000Z')
@@ -584,7 +584,6 @@ export class MentorsAvailabilityService {
     }
 
     // Count bookings for limits
-    const now = new Date();
     const weekStart = this.getWeekStart(now);
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 7);
@@ -901,10 +900,13 @@ export class MentorsAvailabilityService {
     return start1 < end2 && end1 > start2;
   }
 
-  private getStartOfTodayUtc(): Date {
-    const now = new Date();
+  private getStartOfTodayUtc(referenceDate = new Date()): Date {
     return new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+      Date.UTC(
+        referenceDate.getUTCFullYear(),
+        referenceDate.getUTCMonth(),
+        referenceDate.getUTCDate(),
+      ),
     );
   }
 

@@ -61,6 +61,10 @@ describe('MentorsAvailabilityService', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   const setupMentorProfile = () => {
     mockPrisma.mentor_profiles.findUnique.mockResolvedValue({
       user_id: 'mentor-1',
@@ -422,6 +426,7 @@ describe('MentorsAvailabilityService', () => {
         start_time_increment: 60,
         daily_limit: null,
         weekly_limit: null,
+        mentor: { hourly_rate: 5000 },
         weekly_schedules: [
           {
             day_of_week: 1, // Monday
@@ -439,6 +444,53 @@ describe('MentorsAvailabilityService', () => {
       expect(result.timezone).toBe('Europe/Paris');
       expect(result.sessionDuration).toBe(60);
       // Slots should be generated for next Monday
+    });
+
+    it('keeps same-day slots that still satisfy min notice', async () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2026-03-12T08:00:00.000Z'));
+
+      mockPrisma.mentor_availability.findUnique.mockResolvedValue({
+        id: 'avail-1',
+        mentor_user_id: 'mentor-1',
+        is_available: true,
+        timezone: 'Europe/Paris',
+        session_duration: 60,
+        buffer_before: 0,
+        buffer_after: 0,
+        min_notice_hours: 4,
+        max_days_ahead: 7,
+        start_time_increment: 60,
+        daily_limit: null,
+        weekly_limit: null,
+        mentor: { hourly_rate: null },
+        weekly_schedules: [
+          {
+            day_of_week: 4, // Thursday
+            is_available: true,
+            time_windows: [{ start: '09:00', end: '17:00' }],
+          },
+        ],
+        date_overrides: [],
+      });
+      mockPrisma.bookings.findMany.mockResolvedValue([]);
+      mockPrisma.mentor_calendar_busy_slots.findMany.mockResolvedValue([]);
+
+      const result = await service.getAvailableSlots('mentor-1');
+      const sameDaySlots = result.slots.filter((slot) => slot.date === '2026-03-12');
+
+      expect(sameDaySlots).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ startTime: '12:00', isAvailable: true }),
+          expect.objectContaining({ startTime: '13:00', isAvailable: true }),
+        ]),
+      );
+      expect(sameDaySlots).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ startTime: '09:00', isAvailable: false }),
+          expect.objectContaining({ startTime: '11:00', isAvailable: false }),
+        ]),
+      );
     });
   });
 
