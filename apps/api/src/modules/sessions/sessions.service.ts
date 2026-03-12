@@ -227,7 +227,7 @@ export class SessionsService {
     const booking = await this.getBookingWithSession(userId, bookingId);
     const session = await this.ensureSessionRecord(booking);
     this.assertSessionWindow(booking);
-    const activeCall = await this.getActiveCallForBooking(booking.id);
+    const activeCall = await this.getSyncedActiveCallForBooking(booking.id);
     return this.mapSessionRoom(userId, booking, session, activeCall);
   }
 
@@ -257,7 +257,7 @@ export class SessionsService {
 
     this.assertBookingParticipant(userId, session.booking);
     this.assertSessionWindow(session.booking);
-    const activeCall = await this.getActiveCallForBooking(session.booking.id);
+    const activeCall = await this.getSyncedActiveCallForBooking(session.booking.id);
 
     return this.mapSessionRoom(userId, session.booking, session, activeCall);
   }
@@ -618,11 +618,10 @@ export class SessionsService {
         break;
       }
       case 'participant_left': {
-        data.participant_identities_json = this.toJsonValue(
-          participantIds.filter((value) => value !== participantUserId),
-        );
-        data.status = 'ended';
-        data.ended_at = new Date();
+        const remainingParticipantIds = participantIds.filter((value) => value !== participantUserId);
+        data.participant_identities_json = this.toJsonValue(remainingParticipantIds);
+        data.status = remainingParticipantIds.length > 0 ? 'waiting' : 'ended';
+        data.ended_at = remainingParticipantIds.length === 0 ? new Date() : null;
         break;
       }
       case 'room_started': {
@@ -1658,6 +1657,15 @@ startxref
     return null;
   }
 
+  private async getSyncedActiveCallForBooking(bookingId: string) {
+    const activeCall = await this.getActiveCallForBooking(bookingId);
+    if (!activeCall) {
+      return null;
+    }
+
+    return this.syncCallParticipantsWithProvider(activeCall);
+  }
+
   private async ensureCallNotExpired<T extends {
     id: string;
     booking_id: string;
@@ -1697,6 +1705,63 @@ startxref
     return Array.isArray(value)
       ? value.filter((entry): entry is string => typeof entry === 'string')
       : [];
+  }
+
+  private async syncCallParticipantsWithProvider<T extends {
+    id: string;
+    booking_id: string;
+    provider_room_id: string | null;
+    status: string;
+    started_at?: Date | null;
+    ended_at?: Date | null;
+    participant_identities_json: unknown;
+  }>(call: T): Promise<T> {
+    if (!call.provider_room_id || !['initiated', 'waiting', 'live'].includes(call.status)) {
+      return call;
+    }
+
+    try {
+      const providerParticipantIds = await this.sessionProvider.listParticipantIdentities(call.provider_room_id);
+      const storedParticipantIds = this.getParticipantIdentities(call.participant_identities_json);
+
+      const sameParticipants =
+        providerParticipantIds.length === storedParticipantIds.length &&
+        providerParticipantIds.every((participantId) => storedParticipantIds.includes(participantId));
+
+      const nextStatus =
+        providerParticipantIds.length >= 2
+          ? 'live'
+          : providerParticipantIds.length === 1
+            ? 'waiting'
+            : call.status === 'initiated'
+              ? 'initiated'
+              : 'waiting';
+
+      if (sameParticipants && nextStatus === call.status) {
+        return call;
+      }
+
+      const updated = await this.prisma.booking_call_sessions.update({
+        where: { id: call.id },
+        data: {
+          participant_identities_json: this.toJsonValue(providerParticipantIds),
+          status: nextStatus,
+          started_at:
+            providerParticipantIds.length >= 2 && !call.started_at
+              ? new Date()
+              : undefined,
+        },
+      });
+
+      return updated as T;
+    } catch (error) {
+      this.logger.warn(
+        `Unable to sync call participants for ${call.id}: ${
+          error instanceof Error ? error.message : 'unknown error'
+        }`,
+      );
+      return call;
+    }
   }
 
   private async maybeStartCallRecording(call: {

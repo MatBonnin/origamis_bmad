@@ -207,8 +207,10 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const loadRoom = useCallback(async () => {
-    setLoading(true);
+  const loadRoom = useCallback(async (options?: { background?: boolean }) => {
+    if (!options?.background) {
+      setLoading(true);
+    }
     setError('');
     try {
       const response = await fetch(`${API_URL}/sessions/room/${token}`, {
@@ -449,7 +451,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
   const handleRoomDisconnected = useCallback(() => {
     setJoinedCall(null);
     setJoinedCallToken(null);
-    void loadRoom();
+      void loadRoom({ background: true });
   }, [loadRoom]);
 
   const updateTranscriptConsent = useCallback(async (decision: 'accept' | 'decline') => {

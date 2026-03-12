@@ -133,6 +133,14 @@ export class SessionProviderService {
     return client.deleteRoom(roomId);
   }
 
+  async listParticipantIdentities(roomId: string) {
+    const client = this.createRoomServiceClient();
+    const participants = await client.listParticipants(roomId);
+    return participants
+      .map((participant) => participant.identity)
+      .filter((identity): identity is string => Boolean(identity));
+  }
+
   async verifyWebhook(rawBody: string, authHeader: string) {
     const receiver = new WebhookReceiver(
       this.requireConfig('LIVEKIT_API_KEY'),
