@@ -139,11 +139,6 @@ export class SessionProviderService {
     return client.stopEgress(egressId);
   }
 
-  async endRoom(roomId: string) {
-    const client = this.createRoomServiceClient();
-    return client.deleteRoom(roomId);
-  }
-
   async listParticipantIdentities(roomId: string) {
     const client = this.createRoomServiceClient();
     const participants = await client.listParticipants(roomId);
