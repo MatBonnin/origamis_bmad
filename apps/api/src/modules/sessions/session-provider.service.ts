@@ -68,6 +68,17 @@ export class SessionProviderService {
     }
   }
 
+  async endRoom(roomId: string) {
+    const client = this.createRoomServiceClient();
+    try {
+      await client.deleteRoom(roomId);
+    } catch (error) {
+      if (!this.isNotFoundError(error)) {
+        throw error;
+      }
+    }
+  }
+
   async buildParticipantToken(input: BuildParticipantTokenInput) {
     const token = new AccessToken(
       this.requireConfig('LIVEKIT_API_KEY'),
@@ -161,6 +172,19 @@ export class SessionProviderService {
       value.code === 'ALREADY_EXISTS' ||
       value.code === 6 ||
       value.message?.toLowerCase().includes('already exists') === true
+    );
+  }
+
+  private isNotFoundError(error: unknown) {
+    if (!error || typeof error !== 'object') {
+      return false;
+    }
+
+    const value = error as { code?: string | number; message?: string };
+    return (
+      value.code === 'NOT_FOUND' ||
+      value.code === 5 ||
+      value.message?.toLowerCase().includes('not found') === true
     );
   }
 }

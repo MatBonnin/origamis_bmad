@@ -164,6 +164,17 @@ export class SessionsController {
     return { data, error: null };
   }
 
+  @Post(':bookingId/terminate')
+  @ApiOperation({ summary: 'Terminer immediatement une session visio' })
+  @ApiResponse({ status: 200, description: 'Session terminee' })
+  async terminateRoom(
+    @CurrentUser() user: { id: string },
+    @Param('bookingId') bookingId: string,
+  ) {
+    const data = await this.sessionsService.terminateRoom(user.id, bookingId);
+    return { data, error: null };
+  }
+
   @Get(':bookingId/transcript')
   @ApiOperation({ summary: 'Obtenir la transcription de session' })
   @ApiResponse({ status: 200, description: 'Transcription recuperee' })

@@ -67,6 +67,7 @@ describe('SessionsService', () => {
     getLiveKitServerUrl: jest.fn(() => 'wss://origami.livekit.cloud'),
     buildParticipantToken: jest.fn(() => 'lk-token'),
     ensureRoom: jest.fn(),
+    endRoom: jest.fn(),
     buildTranscriptObjectKey: jest.fn(() => 'transcripts/booking-1/session.mp3'),
     startAudioRecording: jest.fn().mockResolvedValue({ egressId: 'egress-1' }),
   };
@@ -278,5 +279,146 @@ describe('SessionsService', () => {
 
     expect(result.exportUrl.startsWith('data:text/csv')).toBe(true);
     expect(result.export_url).toBe(result.exportUrl);
+  });
+
+  it('terminates a live room and marks the booking as completed', async () => {
+    mockPrisma.bookings.findUnique.mockResolvedValue({
+      id: 'booking-1',
+      student_id: 'user-1',
+      mentor_id: 'mentor-1',
+      booking_date: new Date('2026-01-09T10:00:00.000Z'),
+      start_time: '10:00',
+      end_time: '10:30',
+      status: 'confirmed',
+      student: { id: 'user-1', first_name: 'Ada', last_name: 'Lovelace' },
+      mentor: { id: 'mentor-1', first_name: 'Alan', last_name: 'Turing' },
+      session: {
+        id: 'session-1',
+        session_token: 'token-1',
+        session_url: '/session/token-1',
+        provider: 'livekit',
+        provider_room_id: 'booking-booking-1',
+        provider_join_url: 'wss://origami.livekit.cloud',
+        status: 'live',
+        transcript_consent_status: 'accepted',
+        transcript_status: 'not_requested',
+        transcript_capture_status: 'recording',
+        transcript_capture_provider_id: 'egress-1',
+        transcript_consented_at: new Date('2026-01-09T09:59:00.000Z'),
+        transcript_source_url: 's3://bucket/transcripts/booking-1/session.mp3',
+        transcript_error_message: null,
+        started_at: new Date('2026-01-09T10:00:00.000Z'),
+        ended_at: null,
+        expires_at: new Date('2026-01-09T22:30:00.000Z'),
+        updated_at: new Date('2026-01-09T10:01:00.000Z'),
+        transcript_provider_job_id: null,
+      },
+    });
+    mockPrisma.booking_sessions.update
+      .mockResolvedValueOnce({
+        id: 'session-1',
+        session_token: 'token-1',
+        session_url: '/session/token-1',
+        provider: 'livekit',
+        provider_room_id: 'booking-booking-1',
+        provider_join_url: 'wss://origami.livekit.cloud',
+        status: 'waiting',
+        transcript_consent_status: 'accepted',
+        transcript_status: 'not_requested',
+        transcript_capture_status: 'recording',
+        transcript_capture_provider_id: 'egress-1',
+        transcript_consented_at: new Date('2026-01-09T09:59:00.000Z'),
+        transcript_source_url: 's3://bucket/transcripts/booking-1/session.mp3',
+        transcript_error_message: null,
+        started_at: new Date('2026-01-09T10:00:00.000Z'),
+        ended_at: null,
+        expires_at: new Date('2026-01-09T22:30:00.000Z'),
+        updated_at: new Date('2026-01-09T10:01:30.000Z'),
+        transcript_provider_job_id: null,
+      })
+      .mockResolvedValueOnce({
+        status: 'ended',
+        ended_at: new Date('2026-01-09T10:20:00.000Z'),
+        transcript_status: 'not_requested',
+      });
+
+    const result = await service.terminateRoom('user-1', 'booking-1');
+
+    expect(mockProvider.endRoom).toHaveBeenCalledWith('booking-booking-1');
+    expect(mockPrisma.booking_sessions.update).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        where: { id: 'session-1' },
+        data: expect.objectContaining({ status: 'ended' }),
+      }),
+    );
+    expect(mockPrisma.bookings.update).toHaveBeenCalledWith({
+      where: { id: 'booking-1' },
+      data: { status: 'completed' },
+    });
+    expect(result.status).toBe('ended');
+  });
+
+  it('does not call the provider again when the room is already ended', async () => {
+    mockPrisma.bookings.findUnique.mockResolvedValue({
+      id: 'booking-1',
+      student_id: 'user-1',
+      mentor_id: 'mentor-1',
+      booking_date: new Date('2026-01-09T10:00:00.000Z'),
+      start_time: '10:00',
+      end_time: '10:30',
+      status: 'completed',
+      student: { id: 'user-1', first_name: 'Ada', last_name: 'Lovelace' },
+      mentor: { id: 'mentor-1', first_name: 'Alan', last_name: 'Turing' },
+      session: {
+        id: 'session-1',
+        session_token: 'token-1',
+        session_url: '/session/token-1',
+        provider: 'livekit',
+        provider_room_id: 'booking-booking-1',
+        provider_join_url: 'wss://origami.livekit.cloud',
+        status: 'ended',
+        transcript_consent_status: 'accepted',
+        transcript_status: 'queued',
+        transcript_capture_status: 'uploaded',
+        transcript_capture_provider_id: 'egress-1',
+        transcript_consented_at: new Date('2026-01-09T09:59:00.000Z'),
+        transcript_source_url: 's3://bucket/transcripts/booking-1/session.mp3',
+        transcript_error_message: null,
+        started_at: new Date('2026-01-09T10:00:00.000Z'),
+        ended_at: new Date('2026-01-09T10:20:00.000Z'),
+        expires_at: new Date('2026-01-09T22:30:00.000Z'),
+        updated_at: new Date('2026-01-09T10:21:00.000Z'),
+        transcript_provider_job_id: 'job-1',
+      },
+    });
+
+    mockPrisma.booking_sessions.update.mockResolvedValueOnce({
+      id: 'session-1',
+      session_token: 'token-1',
+      session_url: '/session/token-1',
+      provider: 'livekit',
+      provider_room_id: 'booking-booking-1',
+      provider_join_url: 'wss://origami.livekit.cloud',
+      status: 'ended',
+      transcript_consent_status: 'accepted',
+      transcript_status: 'queued',
+      transcript_capture_status: 'uploaded',
+      transcript_capture_provider_id: 'egress-1',
+      transcript_consented_at: new Date('2026-01-09T09:59:00.000Z'),
+      transcript_source_url: 's3://bucket/transcripts/booking-1/session.mp3',
+      transcript_error_message: null,
+      started_at: new Date('2026-01-09T10:00:00.000Z'),
+      ended_at: new Date('2026-01-09T10:20:00.000Z'),
+      expires_at: new Date('2026-01-09T22:30:00.000Z'),
+      updated_at: new Date('2026-01-09T10:21:00.000Z'),
+      transcript_provider_job_id: 'job-1',
+    });
+
+    const result = await service.terminateRoom('user-1', 'booking-1');
+
+    expect(mockProvider.endRoom).not.toHaveBeenCalled();
+    expect(mockPrisma.booking_sessions.update).toHaveBeenCalledTimes(1);
+    expect(result.status).toBe('ended');
+    expect(result.transcriptStatus).toBe('queued');
   });
 });

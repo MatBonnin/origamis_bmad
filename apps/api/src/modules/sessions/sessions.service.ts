@@ -149,6 +149,75 @@ export class SessionsService {
     };
   }
 
+  async terminateRoom(userId: string, bookingId: string) {
+    const booking = await this.getBookingWithSession(userId, bookingId);
+    const session = await this.ensureSessionRecord(booking);
+
+    if (session.status === 'ended' || session.status === 'cancelled') {
+      return {
+        bookingId,
+        status: session.status,
+        endedAt: session.ended_at?.toISOString() ?? null,
+        transcriptStatus: session.transcript_status,
+      };
+    }
+
+    if (!session.provider_room_id) {
+      const endedAt = new Date();
+      const updated = await this.prisma.booking_sessions.update({
+        where: { id: session.id },
+        data: {
+          status: 'ended',
+          ended_at: endedAt,
+        },
+      });
+
+      await this.prisma.bookings.update({
+        where: { id: bookingId },
+        data: { status: 'completed' },
+      });
+
+      await this.logSessionEvent(session.id, bookingId, 'room_ended', userId, {
+        source: 'manual_terminate',
+        providerRoomId: null,
+      });
+
+      return {
+        bookingId,
+        status: updated.status,
+        endedAt: updated.ended_at?.toISOString() ?? endedAt.toISOString(),
+        transcriptStatus: updated.transcript_status,
+      };
+    }
+
+    await this.sessionProvider.endRoom(session.provider_room_id);
+
+    const updated = await this.prisma.booking_sessions.update({
+      where: { id: session.id },
+      data: {
+        status: 'ended',
+        ended_at: new Date(),
+      },
+    });
+
+    await this.prisma.bookings.update({
+      where: { id: bookingId },
+      data: { status: 'completed' },
+    });
+
+    await this.logSessionEvent(session.id, bookingId, 'room_ended', userId, {
+      source: 'manual_terminate',
+      providerRoomId: session.provider_room_id,
+    });
+
+    return {
+      bookingId,
+      status: updated.status,
+      endedAt: updated.ended_at?.toISOString() ?? null,
+      transcriptStatus: updated.transcript_status,
+    };
+  }
+
   async exportHistory(
     currentUserId: string,
     input: {

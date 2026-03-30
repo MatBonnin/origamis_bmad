@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   LiveKitRoom,
   RoomAudioRenderer,
@@ -143,6 +144,7 @@ function useElapsedTime(startDate: string) {
 }
 
 export function SessionRoom({ accessToken, currentUserId, token }: Props) {
+  const router = useRouter();
   const [room, setRoom] = useState<RoomData | null>(null);
   const [messages, setMessages] = useState<SessionMessage[]>([]);
   const [draft, setDraft] = useState('');
@@ -150,6 +152,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [consenting, setConsenting] = useState(false);
+  const [terminating, setTerminating] = useState(false);
   const [error, setError] = useState('');
   const socketRef = useRef<Socket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -389,6 +392,34 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
     }
   };
 
+  const terminateSession = useCallback(async () => {
+    if (!room || terminating) return;
+
+    setTerminating(true);
+    setError('');
+
+    try {
+      const response = await fetch(`${API_URL}/sessions/${room.bookingId}/terminate`, {
+        method: 'POST',
+        headers,
+      });
+      const result = await response.json();
+
+      if (!response.ok || result.error) {
+        setError(result.error?.message || 'Impossible de terminer la session');
+        setTerminating(false);
+        return;
+      }
+
+      socketRef.current?.disconnect();
+      router.push('/sessions/history');
+      router.refresh();
+    } catch {
+      setError('Impossible de terminer la session');
+      setTerminating(false);
+    }
+  }, [headers, room, router, terminating]);
+
   if (loading) {
     return (
       <div className={styles.loadingScreen}>
@@ -481,6 +512,14 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
         </div>
 
         <div className={styles.topBarRight}>
+          <button
+            className={styles.endCallButton}
+            onClick={() => void terminateSession()}
+            disabled={terminating}
+            type="button"
+          >
+            {terminating ? 'Fin en cours...' : "Quitter l'appel"}
+          </button>
           <div className={styles.participantAvatars}>
             {room.participants.map((p) => (
               <div
@@ -494,6 +533,12 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
           </div>
         </div>
       </header>
+
+      {error ? (
+        <div className={styles.bannerError} role="alert">
+          {error}
+        </div>
+      ) : null}
 
       {/* Main Content */}
       <div className={styles.mainContent}>

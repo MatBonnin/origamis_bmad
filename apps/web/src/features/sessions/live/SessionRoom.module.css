@@ -230,6 +230,8 @@
 .topBarRight {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .topBarCenter {
@@ -240,6 +242,44 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.endCallButton {
+  border: 1px solid rgba(220, 38, 38, 0.18);
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  color: white;
+  border-radius: 999px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 10px 24px rgba(220, 38, 38, 0.22);
+}
+
+.endCallButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(220, 38, 38, 0.28);
+}
+
+.endCallButton:disabled {
+  opacity: 0.7;
+  cursor: wait;
+  transform: none;
+}
+
+.bannerError {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.875rem 1rem;
+  border-radius: 14px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 0.92rem;
+  font-weight: 600;
 }
 
 .liveIndicator {
@@ -974,6 +1014,11 @@
     font-size: 0.7rem;
   }
 
+  .endCallButton {
+    padding: 0.65rem 0.9rem;
+    font-size: 0.82rem;
+  }
+
   .videoStage {
     min-height: 350px;
   }
@@ -995,6 +1040,10 @@
 @media (max-width: 600px) {
   .topBar {
     padding: 0.75rem 1rem;
+  }
+
+  .topBarRight {
+    gap: 0.5rem;
   }
 
   .sessionInfo {
