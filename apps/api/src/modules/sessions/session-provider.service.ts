@@ -34,6 +34,10 @@ export class SessionProviderService {
     return `booking-${bookingId}`;
   }
 
+  buildCallRoomId(callId: string) {
+    return `call-${callId}`;
+  }
+
   getLiveKitServerUrl() {
     return this.requireConfig('LIVEKIT_URL');
   }
@@ -128,6 +132,24 @@ export class SessionProviderService {
       { file: fileOutput },
       { audioOnly: true },
     );
+  }
+
+  async stopAudioRecording(egressId: string) {
+    const client = this.createEgressClient();
+    return client.stopEgress(egressId);
+  }
+
+  async endRoom(roomId: string) {
+    const client = this.createRoomServiceClient();
+    return client.deleteRoom(roomId);
+  }
+
+  async listParticipantIdentities(roomId: string) {
+    const client = this.createRoomServiceClient();
+    const participants = await client.listParticipants(roomId);
+    return participants
+      .map((participant) => participant.identity)
+      .filter((identity): identity is string => Boolean(identity));
   }
 
   async verifyWebhook(rawBody: string, authHeader: string) {

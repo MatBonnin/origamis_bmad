@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Headers,
+  Logger,
   UnauthorizedException,
   Post,
   Req,
@@ -16,6 +17,8 @@ import { SessionsService } from './sessions.service';
 @ApiTags('sessions-provider')
 @Controller('sessions/provider/webhooks')
 export class SessionsWebhookController {
+  private readonly logger = new Logger(SessionsWebhookController.name);
+
   constructor(
     private readonly sessionsService: SessionsService,
     private readonly sessionProvider: SessionProviderService,
@@ -29,6 +32,10 @@ export class SessionsWebhookController {
     @Req() request: Request & { rawBody?: Buffer },
     @Headers('authorization') authorization?: string,
   ) {
+    this.logger.log(
+      `LiveKit webhook received: authorization=${authorization ? 'present' : 'missing'} rawBody=${request.rawBody ? 'present' : 'missing'}`,
+    );
+
     if (!request.rawBody || !authorization) {
       throw new BadRequestException({
         code: 'LIVEKIT_WEBHOOK_INVALID',
@@ -59,6 +66,7 @@ export class SessionsWebhookController {
     @Body()
     body: {
       bookingId?: string;
+      callSessionId?: string;
       providerJobId?: string;
       providerRoomId?: string;
       providerEventId?: string;

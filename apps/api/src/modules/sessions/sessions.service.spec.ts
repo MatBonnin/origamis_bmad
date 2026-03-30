@@ -27,6 +27,13 @@ describe('SessionsService', () => {
       create: jest.fn(),
       update: jest.fn(),
     },
+    booking_call_sessions: {
+      findUnique: jest.fn(),
+      findFirst: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+    },
     session_transcripts: {
       findUnique: jest.fn(),
       upsert: jest.fn(),
@@ -68,6 +75,7 @@ describe('SessionsService', () => {
     buildParticipantToken: jest.fn(() => 'lk-token'),
     ensureRoom: jest.fn(),
     endRoom: jest.fn(),
+    listParticipantIdentities: jest.fn(),
     buildTranscriptObjectKey: jest.fn(() => 'transcripts/booking-1/session.mp3'),
     startAudioRecording: jest.fn().mockResolvedValue({ egressId: 'egress-1' }),
   };
@@ -171,18 +179,27 @@ describe('SessionsService', () => {
     expect(result.metadata.hasMore).toBe(false);
   });
 
-  it('supports visio category filter via booking session relation', async () => {
-    mockPrisma.bookings.findMany.mockResolvedValue([
+  it('supports visio category filter via call session relation', async () => {
+    mockPrisma.booking_call_sessions.findMany.mockResolvedValue([
       {
-        id: 'b-visio-1',
-        student_id: 'user-1',
-        mentor_id: 'mentor-1',
-        booking_date: new Date('2026-01-08T10:00:00.000Z'),
-        status: 'completed',
-        notes: null,
-        session: {
-          id: 'session-1',
-          expires_at: new Date('2099-01-01T00:00:00.000Z'),
+        id: 'call-1',
+        booking_id: 'b-visio-1',
+        call_token: 'call-token-1',
+        status: 'ended',
+        started_at: new Date('2026-01-08T10:00:00.000Z'),
+        ended_at: new Date('2026-01-08T10:30:00.000Z'),
+        created_at: new Date('2026-01-08T10:00:00.000Z'),
+        expires_at: new Date('2099-01-01T00:00:00.000Z'),
+        transcript_consent_status: 'accepted',
+        transcript_status: 'completed',
+        booking: {
+          id: 'b-visio-1',
+          mentor_id: 'mentor-1',
+          notes: null,
+        },
+        transcript: {
+          status: 'completed',
+          summary_text: 'Resume',
         },
       },
     ]);
@@ -192,15 +209,18 @@ describe('SessionsService', () => {
       limit: 10,
     });
 
-    expect(mockPrisma.bookings.findMany).toHaveBeenCalledWith(
+    expect(mockPrisma.booking_call_sessions.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
-          session: { isNot: null },
+          booking: expect.objectContaining({
+            OR: [{ student_id: 'user-1' }, { mentor_id: 'user-1' }],
+          }),
         }),
       }),
     );
     expect(result.sessions[0].type).toBe('visio');
     expect(result.sessions[0].replayAvailable).toBe(true);
+    expect(result.sessions[0].callSessionId).toBe('call-1');
   });
 
   it('uses rdv by default when category is omitted', async () => {
@@ -227,33 +247,35 @@ describe('SessionsService', () => {
   });
 
   it('returns replay link for participant when not expired', async () => {
-    mockPrisma.bookings.findUnique.mockResolvedValue({
-      id: 'booking-1',
-      student_id: 'user-1',
-      mentor_id: 'mentor-1',
-      session: {
-        session_url: '/replay/booking-1',
-        expires_at: new Date('2099-01-01T00:00:00.000Z'),
+    mockPrisma.booking_call_sessions.findUnique.mockResolvedValue({
+      id: 'call-1',
+      session_url: '/session/test-token?call=call-token-1',
+      expires_at: new Date('2099-01-01T00:00:00.000Z'),
+      booking: {
+        id: 'booking-1',
+        student_id: 'user-1',
+        mentor_id: 'mentor-1',
       },
     });
 
-    const result = await service.getReplayLink('user-1', 'booking-1');
+    const result = await service.getReplayLink('user-1', 'call-1');
 
-    expect(result).toEqual({ url: '/replay/booking-1' });
+    expect(result).toEqual({ url: '/session/test-token?call=call-token-1' });
   });
 
   it('throws when replay is expired', async () => {
-    mockPrisma.bookings.findUnique.mockResolvedValue({
-      id: 'booking-1',
-      student_id: 'user-1',
-      mentor_id: 'mentor-1',
-      session: {
-        session_url: '/replay/booking-1',
-        expires_at: new Date('2000-01-01T00:00:00.000Z'),
+    mockPrisma.booking_call_sessions.findUnique.mockResolvedValue({
+      id: 'call-1',
+      session_url: '/session/test-token?call=call-token-1',
+      expires_at: new Date('2000-01-01T00:00:00.000Z'),
+      booking: {
+        id: 'booking-1',
+        student_id: 'user-1',
+        mentor_id: 'mentor-1',
       },
     });
 
-    await expect(service.getReplayLink('user-1', 'booking-1')).rejects.toThrow(
+    await expect(service.getReplayLink('user-1', 'call-1')).rejects.toThrow(
       NotFoundException,
     );
   });
@@ -420,5 +442,126 @@ describe('SessionsService', () => {
     expect(mockPrisma.booking_sessions.update).toHaveBeenCalledTimes(1);
     expect(result.status).toBe('ended');
     expect(result.transcriptStatus).toBe('queued');
+  });
+
+  it('syncs active call participants from LiveKit when loading the session room', async () => {
+    (service as any).assertSessionWindow = jest.fn();
+
+    mockPrisma.booking_sessions.findUnique.mockResolvedValue({
+      session_token: 'session-token-1',
+      session_url: '/session/session-token-1',
+      status: 'active',
+      expires_at: new Date('2099-01-01T00:00:00.000Z'),
+      booking: {
+        id: 'booking-1',
+        status: 'confirmed',
+        booking_date: new Date('2026-03-12T00:00:00.000Z'),
+        start_time: '10:00',
+        end_time: '10:30',
+        student_id: 'user-1',
+        mentor_id: 'mentor-1',
+        student: { id: 'user-1', first_name: 'Ada', last_name: 'Student' },
+        mentor: { id: 'mentor-1', first_name: 'Grace', last_name: 'Mentor' },
+      },
+    });
+
+    mockPrisma.booking_call_sessions.findMany.mockResolvedValue([
+      {
+        id: 'call-1',
+        booking_id: 'booking-1',
+        call_token: 'call-token-1',
+        session_url: '/session/session-token-1?call=call-token-1',
+        provider: 'livekit',
+        provider_room_id: 'call-room-1',
+        provider_join_url: 'wss://origami.livekit.cloud',
+        status: 'initiated',
+        participant_identities_json: [],
+        started_at: null,
+        ended_at: null,
+        expires_at: new Date('2099-01-01T00:00:00.000Z'),
+        transcript_consent_status: 'accepted',
+        transcript_status: 'not_started',
+        transcript_capture_status: 'not_started',
+        transcript_consented_at: null,
+        created_at: new Date('2026-03-12T10:00:00.000Z'),
+        updated_at: new Date('2026-03-12T10:00:00.000Z'),
+      },
+    ]);
+
+    mockProvider.listParticipantIdentities.mockResolvedValue(['user-1']);
+    mockPrisma.booking_call_sessions.update.mockResolvedValue({
+      id: 'call-1',
+      booking_id: 'booking-1',
+      call_token: 'call-token-1',
+      session_url: '/session/session-token-1?call=call-token-1',
+      provider: 'livekit',
+      provider_room_id: 'call-room-1',
+      provider_join_url: 'wss://origami.livekit.cloud',
+      status: 'waiting',
+      participant_identities_json: ['user-1'],
+      started_at: null,
+      ended_at: null,
+      expires_at: new Date('2099-01-01T00:00:00.000Z'),
+      transcript_consent_status: 'accepted',
+      transcript_status: 'not_started',
+      transcript_capture_status: 'not_started',
+      transcript_consented_at: null,
+      created_at: new Date('2026-03-12T10:00:00.000Z'),
+      updated_at: new Date('2026-03-12T10:01:00.000Z'),
+    });
+
+    const result = await service.getSessionRoomByToken('user-1', 'session-token-1');
+
+    expect(mockProvider.listParticipantIdentities).toHaveBeenCalledWith('call-room-1');
+    expect(result.activeCall?.participantIds).toEqual(['user-1']);
+    expect(result.activeCall?.callStatus).toBe('waiting');
+  });
+
+  it('keeps the call waiting when one participant leaves but another is still connected', async () => {
+    mockPrisma.booking_call_sessions.findFirst.mockResolvedValue({
+      id: 'call-1',
+      booking_id: 'booking-1',
+      provider_room_id: 'call-room-1',
+      status: 'live',
+      participant_identities_json: ['user-1', 'mentor-1'],
+      started_at: new Date('2026-03-12T10:00:00.000Z'),
+      ended_at: null,
+      transcript_consent_status: 'accepted',
+      transcript_capture_status: 'not_started',
+      transcript_source_url: null,
+      created_at: new Date('2026-03-12T10:00:00.000Z'),
+    });
+
+    mockPrisma.booking_call_sessions.update.mockResolvedValue({
+      id: 'call-1',
+      booking_id: 'booking-1',
+      provider_room_id: 'call-room-1',
+      status: 'waiting',
+      participant_identities_json: ['mentor-1'],
+      started_at: new Date('2026-03-12T10:00:00.000Z'),
+      ended_at: null,
+      transcript_consent_status: 'accepted',
+      transcript_capture_status: 'not_started',
+      transcript_source_url: null,
+      created_at: new Date('2026-03-12T10:00:00.000Z'),
+    });
+
+    const result = await service.handleVideoWebhook({
+      providerRoomId: 'call-room-1',
+      eventType: 'participant_left',
+      participantUserId: 'user-1',
+      payload: {},
+    });
+
+    expect(mockPrisma.booking_call_sessions.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          participant_identities_json: ['mentor-1'],
+          status: 'waiting',
+          ended_at: null,
+        }),
+      }),
+    );
+    expect(result.status).toBe('waiting');
   });
 });

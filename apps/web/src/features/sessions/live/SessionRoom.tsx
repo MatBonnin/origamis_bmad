@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import {
   LiveKitRoom,
   RoomAudioRenderer,
@@ -40,6 +41,7 @@ interface SessionMessage {
 
 interface TranscriptData {
   bookingId: string;
+  callSessionId?: string | null;
   provider: string;
   status: string;
   language: string | null;
@@ -49,9 +51,10 @@ interface TranscriptData {
   updatedAt: string | null;
 }
 
-interface RoomData {
+interface CallData {
+  callSessionId: string;
   bookingId: string;
-  sessionToken: string;
+  callToken: string;
   sessionUrl: string;
   provider: {
     name: string;
@@ -60,16 +63,29 @@ interface RoomData {
     serverUrl?: string | null;
     token?: string | null;
   };
+  callStatus: string;
+  startedAt: string | null;
+  endedAt: string | null;
+  expiresAt: string;
+  participantIds: string[];
+  transcript: TranscriptData;
+  transcriptConsentRequired: boolean;
+  transcriptConsentStatus?: 'pending' | 'accepted' | 'declined';
+  transcriptCaptureStatus?: 'not_started' | 'recording' | 'uploaded' | 'failed';
+  transcriptConsentedAt?: string | null;
+}
+
+interface RoomData {
+  bookingId: string;
+  sessionToken: string;
+  sessionUrl: string;
   roomStatus: string;
   bookingStatus: string;
   startsAt: string;
   endsAt: string;
   expiresAt: string;
   participants: Participant[];
-  transcript: TranscriptData;
-  transcriptConsentRequired: boolean;
-  transcriptConsentStatus?: 'pending' | 'accepted' | 'declined';
-  transcriptCaptureStatus?: 'not_started' | 'recording' | 'uploaded' | 'failed';
+  activeCall: CallData | null;
 }
 
 interface Props {
@@ -129,7 +145,9 @@ function useElapsedTime(startDate: string) {
       const seconds = diff % 60;
 
       if (hours > 0) {
-        setElapsed(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+        setElapsed(
+          `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`,
+        );
       } else {
         setElapsed(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
       }
@@ -145,15 +163,19 @@ function useElapsedTime(startDate: string) {
 
 export function SessionRoom({ accessToken, currentUserId, token }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [room, setRoom] = useState<RoomData | null>(null);
+  const [joinedCall, setJoinedCall] = useState<CallData | null>(null);
   const [messages, setMessages] = useState<SessionMessage[]>([]);
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [creatingCall, setCreatingCall] = useState(false);
   const [consenting, setConsenting] = useState(false);
   const [terminating, setTerminating] = useState(false);
   const [error, setError] = useState('');
+  const [joinedCallToken, setJoinedCallToken] = useState<string | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -181,12 +203,17 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [messages]);
 
+  const activeCall = room?.activeCall ?? null;
+  const joinedActiveCall = joinedCallToken ? joinedCall : null;
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const loadRoom = useCallback(async () => {
-    setLoading(true);
+  const loadRoom = useCallback(async (options?: { background?: boolean }) => {
+    if (!options?.background) {
+      setLoading(true);
+    }
     setError('');
     try {
       const response = await fetch(`${API_URL}/sessions/room/${token}`, {
@@ -221,30 +248,6 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
     }
   }, [accessToken]);
 
-  const loadTranscript = useCallback(async (bookingId: string) => {
-    try {
-      const response = await fetch(`${API_URL}/sessions/${bookingId}/transcript`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        cache: 'no-store',
-      });
-      const result = await response.json();
-      if (!response.ok || result.error) return;
-      setRoom((previous) =>
-        previous
-          ? {
-              ...previous,
-              transcript: result.data as TranscriptData,
-              transcriptConsentRequired:
-                previous.transcriptConsentRequired &&
-                !['queued', 'processing', 'completed'].includes((result.data as TranscriptData).status),
-            }
-          : previous,
-      );
-    } catch {
-      // Silently fail for transcript
-    }
-  }, [accessToken]);
-
   useEffect(() => {
     void loadRoom();
   }, [loadRoom]);
@@ -252,8 +255,59 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
   useEffect(() => {
     if (!room) return;
     void loadMessages(room.bookingId);
-    void loadTranscript(room.bookingId);
-  }, [room?.bookingId, loadMessages, loadTranscript]);
+  }, [room?.bookingId, loadMessages]);
+
+  useEffect(() => {
+    const requestedCall = searchParams.get('call');
+    if (!requestedCall) return;
+    setJoinedCallToken(requestedCall);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!joinedCallToken) {
+      setJoinedCall(null);
+      return;
+    }
+
+    if (!activeCall && joinedCallToken) {
+      setJoinedCallToken(null);
+      setJoinedCall(null);
+      return;
+    }
+
+    if (activeCall && joinedCallToken === activeCall.callToken) {
+      setJoinedCall((previous) => {
+        if (
+          previous &&
+          previous.callSessionId === activeCall.callSessionId &&
+          previous.provider.token &&
+          previous.provider.serverUrl
+        ) {
+          return {
+            ...activeCall,
+            provider: {
+              ...activeCall.provider,
+              token: previous.provider.token,
+              serverUrl: previous.provider.serverUrl,
+            },
+          };
+        }
+        return activeCall;
+      });
+    }
+  }, [activeCall, joinedCallToken]);
+
+  useEffect(() => {
+    if (!room?.bookingId) return;
+    if (joinedCallToken) return;
+    if (!activeCall) return;
+
+    const interval = setInterval(() => {
+      void loadRoom();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [room?.bookingId, activeCall, joinedCallToken, loadRoom]);
 
   useEffect(() => {
     if (!room) return;
@@ -348,7 +402,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          body: `Document partagé: ${document.originalName}`,
+          body: `Document partage: ${document.originalName}`,
           documentId: document.documentId,
         }),
       });
@@ -366,15 +420,55 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
     }
   }, [accessToken, headers, room]);
 
-  const updateTranscriptConsent = useCallback(async (decision: 'accept' | 'decline') => {
+  const createCall = useCallback(async () => {
     if (!room) return;
+    setCreatingCall(true);
+    setError('');
+    try {
+      const response = await fetch(`${API_URL}/sessions/${room.bookingId}/calls`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const result = await response.json();
+      if (!response.ok || result.error) {
+        setError(result.error?.message || 'Impossible de demarrer un appel');
+        return;
+      }
+      const data = result.data as CallData;
+      setJoinedCallToken(data.callToken);
+      setJoinedCall(data);
+      await loadRoom();
+    } catch {
+      setError('Erreur de connexion au serveur');
+    } finally {
+      setCreatingCall(false);
+    }
+  }, [accessToken, room, loadRoom]);
+
+  const joinCall = useCallback(async () => {
+    if (!activeCall) return;
+    setJoinedCallToken(activeCall.callToken);
+    setJoinedCall(activeCall);
+  }, [activeCall]);
+
+  const handleRoomDisconnected = useCallback(() => {
+    setJoinedCall(null);
+    setJoinedCallToken(null);
+      void loadRoom({ background: true });
+  }, [loadRoom]);
+
+  const updateTranscriptConsent = useCallback(async (decision: 'accept' | 'decline') => {
+    if (!activeCall) return;
     setConsenting(true);
     try {
-      const response = await fetch(`${API_URL}/sessions/${room.bookingId}/transcription/consent`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ decision }),
-      });
+      const response = await fetch(
+        `${API_URL}/sessions/calls/${activeCall.callSessionId}/transcription/consent`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ decision }),
+        },
+      );
       const result = await response.json();
       if (!response.ok || result.error) return;
       await loadRoom();
@@ -383,7 +477,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
     } finally {
       setConsenting(false);
     }
-  }, [headers, room, loadRoom]);
+  }, [activeCall, headers, loadRoom]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -429,7 +523,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
             <div className={styles.spinnerRing} />
             <div className={styles.spinnerRing} />
           </div>
-          <p className={styles.loadingText}>Connexion à la session...</p>
+          <p className={styles.loadingText}>Connexion a la session...</p>
         </div>
       </div>
     );
@@ -446,7 +540,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
             </svg>
           </div>
           <h1>Session introuvable</h1>
-          <p>{error || 'Cette session n\'existe pas ou a expiré.'}</p>
+          <p>{error || 'Cette session n existe pas ou a expire.'}</p>
         </div>
       </div>
     );
@@ -456,8 +550,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
 
   return (
     <div className={styles.roomContainer}>
-      {/* Consent Modal */}
-      {room.transcriptConsentRequired && (
+      {joinedActiveCall?.transcriptConsentRequired && (
         <div className={styles.consentOverlay}>
           <div className={styles.consentModal}>
             <div className={styles.consentIcon}>
@@ -466,9 +559,10 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
                 <path d="M12 15a3 3 0 110-6 3 3 0 010 6z" />
               </svg>
             </div>
-            <h2>Transcription de la session</h2>
+            <h2>Transcription de l appel</h2>
             <p>
-              Cette session peut etre retranscrite apres l'appel. La decision doit etre prise avant l'entree en salle.
+              Cet appel peut etre retranscrit apres sa fermeture. La decision doit etre prise
+              avant l entree dans la visio.
             </p>
             <div className={styles.consentActions}>
               <button
@@ -490,13 +584,12 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
         </div>
       )}
 
-      {/* Top Bar */}
       <header className={styles.topBar}>
         <div className={styles.topBarLeft}>
           <div className={styles.sessionInfo}>
             <div className={styles.liveIndicator}>
               <span className={styles.liveDot} />
-              EN DIRECT
+              {activeCall ? 'APPEL ACTIF' : 'CRENEAU OUVERT'}
             </div>
             <span className={styles.sessionTimer}>{elapsedTime}</span>
           </div>
@@ -539,18 +632,46 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
           {error}
         </div>
       ) : null}
-
-      {/* Main Content */}
       <div className={styles.mainContent}>
-        {/* Video Stage */}
         <main className={styles.videoStage}>
-          {room.provider.serverUrl && room.provider.token ? (
+          {!activeCall ? (
+            <div className={styles.videoPlaceholder}>
+              <div className={styles.placeholderContent}>
+                <div className={styles.placeholderAvatar}>
+                  {getInitials(counterpart?.fullName || 'P')}
+                </div>
+                <p>Aucun appel en cours pour ce creneau.</p>
+                <button
+                  className={styles.consentAccept}
+                  onClick={() => void createCall()}
+                  disabled={creatingCall}
+                >
+                  {creatingCall ? 'Demarrage...' : 'Demarrer un appel'}
+                </button>
+              </div>
+            </div>
+          ) : !joinedActiveCall ? (
+            <div className={styles.videoPlaceholder}>
+              <div className={styles.placeholderContent}>
+                <div className={styles.placeholderAvatar}>
+                  {getInitials(counterpart?.fullName || 'P')}
+                </div>
+                <p>
+                  Appel en cours: {activeCall.callStatus}. Participants connectes: {activeCall.participantIds.length}/2
+                </p>
+                <button className={styles.consentAccept} onClick={() => void joinCall()}>
+                  Rejoindre l appel
+                </button>
+              </div>
+            </div>
+          ) : joinedActiveCall.provider.serverUrl && joinedActiveCall.provider.token ? (
             <LiveKitRoom
-              token={room.provider.token}
-              serverUrl={room.provider.serverUrl}
+              token={joinedActiveCall.provider.token}
+              serverUrl={joinedActiveCall.provider.serverUrl}
               connect
               audio
               video
+              onDisconnected={handleRoomDisconnected}
               className={styles.liveKitContainer}
             >
               <VideoConference />
@@ -563,21 +684,19 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
                   {getInitials(counterpart?.fullName || 'P')}
                 </div>
                 <p>
-                  {room.transcriptConsentRequired
-                    ? 'Choisissez d abord si la session peut etre transcrite.'
-                    : 'En attente de connexion...'}
+                  {joinedActiveCall.transcriptConsentRequired
+                    ? 'Choisissez d abord si cet appel peut etre transcrit.'
+                    : 'Preparation de l appel...'}
                 </p>
               </div>
             </div>
           )}
         </main>
 
-        {/* Sidebar */}
         <aside className={styles.sidebar}>
-          {/* Chat Panel */}
           <section className={styles.chatPanel}>
             <div className={styles.panelHeader}>
-              <h2>💬 Chat de session</h2>
+              <h2>Chat de session</h2>
             </div>
 
             <div className={styles.chatMessages}>
@@ -586,7 +705,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
                     <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  <p>Démarrez la conversation</p>
+                  <p>Demarrez la conversation</p>
                 </div>
               ) : (
                 messages.map((message) => (
@@ -674,10 +793,9 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
             </div>
           </section>
 
-          {/* Documents Panel */}
           <section className={styles.docsPanel}>
             <div className={styles.panelHeader}>
-              <h2>📎 Documents partagés</h2>
+              <h2>Documents partages</h2>
             </div>
 
             <div className={styles.documentsList}>
@@ -686,7 +804,7 @@ export function SessionRoom({ accessToken, currentUserId, token }: Props) {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
                     <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  <p>Aucun document partagé</p>
+                  <p>Aucun document partage</p>
                   <button
                     className={styles.uploadButton}
                     onClick={() => fileInputRef.current?.click()}

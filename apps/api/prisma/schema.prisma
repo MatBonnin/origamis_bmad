@@ -397,6 +397,7 @@ model bookings {
   mentor  users @relation("bookings_mentor", fields: [mentor_id], references: [id], onDelete: Cascade)
   slot    mentor_availability_slots @relation(fields: [slot_id], references: [id], onDelete: Restrict)
   session booking_sessions?
+  call_sessions booking_call_sessions[]
   mentor_review mentor_reviews?
   incidents incidents[]
   payment payments?
@@ -404,7 +405,7 @@ model bookings {
   session_feedback session_feedback?
   session_chat_messages session_chat_messages[]
   session_documents session_documents[]
-  session_transcript session_transcripts?
+  session_transcripts session_transcripts[]
   session_events session_events[]
 
   @@index([student_id])
@@ -438,14 +439,47 @@ model booking_sessions {
   updated_at                 DateTime                  @updatedAt
 
   booking bookings @relation(fields: [booking_id], references: [id], onDelete: Cascade)
-  transcript session_transcripts?
   chat_messages session_chat_messages[]
   documents session_documents[]
-  events session_events[]
 
   @@index([session_token])
   @@index([provider_room_id])
   @@map("booking_sessions")
+}
+
+model booking_call_sessions {
+  id                            String                    @id @default(uuid())
+  booking_id                    String
+  call_token                    String                    @unique
+  session_url                   String
+  provider                      String                    @default("livekit")
+  provider_room_id              String?                   @unique
+  provider_join_url             String?
+  initiated_by                  String?
+  status                        call_session_status       @default(initiated)
+  participant_identities_json   Json                      @default("[]")
+  started_at                    DateTime?
+  ended_at                      DateTime?
+  expires_at                    DateTime
+  transcript_consent_status     transcript_consent_status @default(pending)
+  transcript_status             transcript_job_status     @default(not_requested)
+  transcript_capture_status     transcript_capture_status @default(not_started)
+  transcript_capture_provider_id String?
+  transcript_provider_job_id    String?
+  transcript_consented_at       DateTime?
+  transcript_source_url         String?
+  transcript_error_message      String?
+  created_at                    DateTime                  @default(now())
+  updated_at                    DateTime                  @updatedAt
+
+  booking    bookings              @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  transcript session_transcripts?
+  events     session_events[]
+
+  @@index([booking_id, status])
+  @@index([booking_id, created_at])
+  @@index([provider_room_id])
+  @@map("booking_call_sessions")
 }
 
 enum session_room_status {
@@ -476,6 +510,15 @@ enum transcript_capture_status {
   recording
   uploaded
   failed
+}
+
+enum call_session_status {
+  initiated
+  waiting
+  live
+  ended
+  missed
+  cancelled
 }
 
 enum session_event_type {
@@ -532,38 +575,38 @@ model session_documents {
 }
 
 model session_transcripts {
-  id                 String                @id @default(uuid())
-  booking_session_id String                @unique
-  booking_id         String                @unique
-  provider           String
-  status             transcript_job_status @default(queued)
-  language           String?
-  full_text          String?
-  summary_text       String?
-  segments_json      Json                  @default("[]")
-  created_at         DateTime              @default(now())
-  updated_at         DateTime              @updatedAt
+  id                      String                @id @default(uuid())
+  booking_call_session_id String                @unique
+  booking_id              String
+  provider                String
+  status                  transcript_job_status @default(queued)
+  language                String?
+  full_text               String?
+  summary_text            String?
+  segments_json           Json                  @default("[]")
+  created_at              DateTime              @default(now())
+  updated_at              DateTime              @updatedAt
 
-  session booking_sessions @relation(fields: [booking_session_id], references: [id], onDelete: Cascade)
-  booking bookings         @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  session booking_call_sessions @relation(fields: [booking_call_session_id], references: [id], onDelete: Cascade)
+  booking bookings              @relation(fields: [booking_id], references: [id], onDelete: Cascade)
 
   @@index([booking_id, status])
   @@map("session_transcripts")
 }
 
 model session_events {
-  id                 String             @id @default(uuid())
-  booking_session_id String
-  booking_id         String
-  actor_id           String?
-  event_type         session_event_type
-  provider_event_id  String?            @unique
-  payload            Json               @default("{}")
-  created_at         DateTime           @default(now())
+  id                      String             @id @default(uuid())
+  booking_call_session_id String
+  booking_id              String
+  actor_id                String?
+  event_type              session_event_type
+  provider_event_id       String?            @unique
+  payload                 Json               @default("{}")
+  created_at              DateTime           @default(now())
 
-  session booking_sessions @relation(fields: [booking_session_id], references: [id], onDelete: Cascade)
-  booking bookings         @relation(fields: [booking_id], references: [id], onDelete: Cascade)
-  actor   users?           @relation("session_events_actor", fields: [actor_id], references: [id], onDelete: SetNull)
+  session booking_call_sessions @relation(fields: [booking_call_session_id], references: [id], onDelete: Cascade)
+  booking bookings              @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  actor   users?                @relation("session_events_actor", fields: [actor_id], references: [id], onDelete: SetNull)
 
   @@index([booking_id, created_at])
   @@map("session_events")

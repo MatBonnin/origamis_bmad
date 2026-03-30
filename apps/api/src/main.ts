@@ -2,15 +2,24 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { json, urlencoded, type Request } from 'express';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    rawBody: true,
-    bodyParser: true,
+    bodyParser: false,
   });
+
+  const captureRawBody = (req: Request & { rawBody?: Buffer }, _res: unknown, buffer: Buffer) => {
+    if (buffer.length > 0) {
+      req.rawBody = Buffer.from(buffer);
+    }
+  };
+
+  app.use(json({ verify: captureRawBody, type: ['application/json', 'application/webhook+json'] }));
+  app.use(urlencoded({ extended: true, verify: captureRawBody }));
 
   // Serve static files from /uploads
   app.useStaticAssets(join(process.cwd(), 'uploads'), {

@@ -105,6 +105,7 @@ def main():
             segment_list = list(segments)
             payload = {
                 "bookingId": job["bookingId"],
+                "callSessionId": job.get("callSessionId"),
                 "providerJobId": job["jobId"],
                 "providerRoomId": job["providerRoomId"],
                 "status": "completed",
@@ -125,6 +126,7 @@ def main():
                 post_result(
                     {
                         "bookingId": job.get("bookingId"),
+                        "callSessionId": job.get("callSessionId"),
                         "providerJobId": job.get("jobId"),
                         "providerRoomId": job.get("providerRoomId"),
                         "status": "failed",
