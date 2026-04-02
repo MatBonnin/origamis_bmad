@@ -10,6 +10,18 @@ describe('MentorsAdminService', () => {
     mentor_profiles: {
       findMany: jest.fn(),
       findUnique: jest.fn(),
+      update: jest.fn(),
+    },
+    mentor_validation_checks: {
+      create: jest.fn(),
+      findFirst: jest.fn(),
+    },
+    mentor_visibility: {
+      upsert: jest.fn(),
+      findUnique: jest.fn(),
+    },
+    mentor_visibility_history: {
+      create: jest.fn(),
     },
   };
 
@@ -30,11 +42,28 @@ describe('MentorsAdminService', () => {
         domain: 'informatique',
         is_validated: false,
         updated_at: new Date('2026-02-10T10:00:00.000Z'),
-        user: { first_name: 'Alice', last_name: 'Martin', email: 'alice@example.com' },
+        user: {
+          first_name: 'Alice',
+          last_name: 'Martin',
+          email: 'alice@example.com',
+        },
       },
     ]);
 
-    mockPrisma.mentor_profiles.findUnique.mockResolvedValue({ user_id: 'mentor-1' });
+    mockPrisma.mentor_profiles.findUnique.mockResolvedValue({
+      user_id: 'mentor-1',
+    });
+    mockPrisma.mentor_profiles.update.mockResolvedValue({});
+    mockPrisma.mentor_validation_checks.create.mockResolvedValue({
+      notes: 'ok',
+      updated_at: new Date('2026-02-10T10:00:00.000Z'),
+    });
+    mockPrisma.mentor_validation_checks.findFirst.mockResolvedValue({
+      status: 'validated',
+    });
+    mockPrisma.mentor_visibility.upsert.mockResolvedValue({});
+    mockPrisma.mentor_visibility.findUnique.mockResolvedValue(null);
+    mockPrisma.mentor_visibility_history.create.mockResolvedValue({});
   });
 
   it('returns pending mentors for admin', async () => {

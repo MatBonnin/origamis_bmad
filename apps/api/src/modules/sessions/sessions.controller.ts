@@ -101,7 +101,10 @@ export class SessionsController {
     @CurrentUser() user: { id: string },
     @Param('token') token: string,
   ) {
-    const data = await this.sessionsService.getSessionRoomByToken(user.id, token);
+    const data = await this.sessionsService.getSessionRoomByToken(
+      user.id,
+      token,
+    );
     return { data, error: null };
   }
 
@@ -139,7 +142,9 @@ export class SessionsController {
   }
 
   @Post('calls/:callId/transcription/consent')
-  @ApiOperation({ summary: 'Enregistrer le consentement de transcription pour un appel' })
+  @ApiOperation({
+    summary: 'Enregistrer le consentement de transcription pour un appel',
+  })
   @ApiResponse({ status: 200, description: 'Consentement enregistre' })
   async recordCallTranscriptConsent(
     @CurrentUser() user: { id: string },
@@ -172,7 +177,10 @@ export class SessionsController {
     @CurrentUser() user: { id: string },
     @Param('bookingId') bookingId: string,
   ) {
-    const data = await this.sessionsService.listSessionChatMessages(user.id, bookingId);
+    const data = await this.sessionsService.listSessionChatMessages(
+      user.id,
+      bookingId,
+    );
     return { data, error: null };
   }
 
@@ -184,7 +192,11 @@ export class SessionsController {
     @Param('bookingId') bookingId: string,
     @Body() body: { body?: string; documentId?: string },
   ) {
-    const data = await this.sessionsService.createSessionChatMessage(user.id, bookingId, body);
+    const data = await this.sessionsService.createSessionChatMessage(
+      user.id,
+      bookingId,
+      body,
+    );
     this.sessionsGateway.emitChatMessageCreated(data, bookingId);
     return { data, error: null };
   }
@@ -204,7 +216,11 @@ export class SessionsController {
       sizeBytes: number;
     },
   ) {
-    const data = await this.sessionsService.createSessionDocument(user.id, bookingId, body);
+    const data = await this.sessionsService.createSessionDocument(
+      user.id,
+      bookingId,
+      body,
+    );
     return { data, error: null };
   }
 
@@ -256,7 +272,11 @@ export class SessionsController {
     @Param('bookingId') bookingId: string,
     @Body() body: { content: string },
   ) {
-    const data = await this.sessionsService.createNote(user.id, bookingId, body);
+    const data = await this.sessionsService.createNote(
+      user.id,
+      bookingId,
+      body,
+    );
     return { data, error: null };
   }
 
@@ -287,7 +307,11 @@ export class SessionsController {
       notesForStudent?: string;
     },
   ) {
-    const data = await this.sessionsService.submitFeedback(user.id, bookingId, body);
+    const data = await this.sessionsService.submitFeedback(
+      user.id,
+      bookingId,
+      body,
+    );
     return { data, error: null };
   }
 

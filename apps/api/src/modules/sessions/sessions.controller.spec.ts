@@ -153,8 +153,12 @@ describe('SessionsController', () => {
       },
       error: null,
     });
-    expect(mockService.recordTranscriptConsent).toHaveBeenCalledWith('user-1', 'booking-1', {
-      decision: 'accept',
-    });
+    expect(mockService.recordTranscriptConsent).toHaveBeenCalledWith(
+      'user-1',
+      'booking-1',
+      {
+        decision: 'accept',
+      },
+    );
   });
 });

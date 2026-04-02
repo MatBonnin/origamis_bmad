@@ -44,7 +44,8 @@ describe('BookingsService', () => {
     service = module.get<BookingsService>(BookingsService);
     jest.clearAllMocks();
     mockPrisma.$transaction.mockImplementation(
-      async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma),
+      async (callback: (tx: typeof mockPrisma) => unknown) =>
+        callback(mockPrisma),
     );
   });
 

@@ -25,9 +25,7 @@ export class ReferencesService {
     return this.prisma.skill_refs.findMany({
       where: {
         ...(domain ? { domain_slug: domain } : {}),
-        ...(search
-          ? { label: { contains: search, mode: 'insensitive' } }
-          : {}),
+        ...(search ? { label: { contains: search, mode: 'insensitive' } } : {}),
       },
       orderBy: { label: 'asc' },
       take: 60,

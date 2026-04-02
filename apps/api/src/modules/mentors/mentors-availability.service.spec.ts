@@ -477,7 +477,9 @@ describe('MentorsAvailabilityService', () => {
       mockPrisma.mentor_calendar_busy_slots.findMany.mockResolvedValue([]);
 
       const result = await service.getAvailableSlots('mentor-1');
-      const sameDaySlots = result.slots.filter((slot) => slot.date === '2026-03-12');
+      const sameDaySlots = result.slots.filter(
+        (slot) => slot.date === '2026-03-12',
+      );
 
       expect(sameDaySlots).toEqual(
         expect.arrayContaining([

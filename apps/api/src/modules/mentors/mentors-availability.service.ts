@@ -51,8 +51,10 @@ function toTimeWindows(json: unknown): TimeWindow[] {
 }
 
 // Helper to convert TimeWindowDto[] to JSON-compatible format
-function toJsonTimeWindows(windows: TimeWindowDto[]): Array<{ start: string; end: string }> {
-  return windows.map(w => ({ start: w.start, end: w.end }));
+function toJsonTimeWindows(
+  windows: TimeWindowDto[],
+): Array<{ start: string; end: string }> {
+  return windows.map((w) => ({ start: w.start, end: w.end }));
 }
 
 // ─── Service ──────────────────────────────────────────────────────────────────
@@ -65,7 +67,9 @@ export class MentorsAvailabilityService {
   // FULL AVAILABILITY (Mentor view)
   // ═══════════════════════════════════════════════════════════════════════════
 
-  async getMyFullAvailability(userId: string): Promise<FullAvailabilityResponse> {
+  async getMyFullAvailability(
+    userId: string,
+  ): Promise<FullAvailabilityResponse> {
     const availability = await this.findOrCreateAvailability(userId);
 
     const weeklySchedules = await this.prisma.mentor_weekly_schedule.findMany({
@@ -124,14 +128,20 @@ export class MentorsAvailabilityService {
     const availability = await this.findOrCreateAvailability(userId);
 
     // Validate values
-    if (dto.sessionDuration && !VALID_SESSION_DURATIONS.has(dto.sessionDuration)) {
+    if (
+      dto.sessionDuration &&
+      !VALID_SESSION_DURATIONS.has(dto.sessionDuration)
+    ) {
       throw new BadRequestException({
         code: 'INVALID_SESSION_DURATION',
         message: 'Duree de session invalide (30, 45, 60, 90, 120 minutes)',
       });
     }
 
-    if (dto.startTimeIncrement && !VALID_START_INCREMENTS.has(dto.startTimeIncrement)) {
+    if (
+      dto.startTimeIncrement &&
+      !VALID_START_INCREMENTS.has(dto.startTimeIncrement)
+    ) {
       throw new BadRequestException({
         code: 'INVALID_START_INCREMENT',
         message: 'Intervalle invalide (15, 30, 60 minutes)',
@@ -150,9 +160,16 @@ export class MentorsAvailabilityService {
         buffer_after: dto.bufferAfter ?? availability.buffer_after,
         min_notice_hours: dto.minNoticeHours ?? availability.min_notice_hours,
         max_days_ahead: dto.maxDaysAhead ?? availability.max_days_ahead,
-        start_time_increment: dto.startTimeIncrement ?? availability.start_time_increment,
-        daily_limit: dto.dailyLimit !== undefined ? dto.dailyLimit : availability.daily_limit,
-        weekly_limit: dto.weeklyLimit !== undefined ? dto.weeklyLimit : availability.weekly_limit,
+        start_time_increment:
+          dto.startTimeIncrement ?? availability.start_time_increment,
+        daily_limit:
+          dto.dailyLimit !== undefined
+            ? dto.dailyLimit
+            : availability.daily_limit,
+        weekly_limit:
+          dto.weeklyLimit !== undefined
+            ? dto.weeklyLimit
+            : availability.weekly_limit,
         timezone: dto.timezone ?? availability.timezone,
       },
     });
@@ -345,7 +362,8 @@ export class MentorsAvailabilityService {
       if (!dto.timeWindows || dto.timeWindows.length === 0) {
         throw new BadRequestException({
           code: 'TIME_WINDOWS_REQUIRED',
-          message: 'Les fenetres horaires sont requises pour les horaires personnalises',
+          message:
+            'Les fenetres horaires sont requises pour les horaires personnalises',
         });
       }
       this.validateTimeWindows(dto.timeWindows);
@@ -373,7 +391,9 @@ export class MentorsAvailabilityService {
         availability_id: availability.id,
         date: date,
         override_type: dto.overrideType,
-        time_windows: dto.timeWindows ? toJsonTimeWindows(dto.timeWindows) : undefined,
+        time_windows: dto.timeWindows
+          ? toJsonTimeWindows(dto.timeWindows)
+          : undefined,
         reason: dto.reason ?? null,
       },
     });
@@ -403,11 +423,13 @@ export class MentorsAvailabilityService {
 
     // Validate time windows if custom_hours
     if (overrideType === 'custom_hours') {
-      const timeWindows = dto.timeWindows ?? (existing.time_windows as TimeWindow[] | null);
+      const timeWindows =
+        dto.timeWindows ?? (existing.time_windows as TimeWindow[] | null);
       if (!timeWindows || timeWindows.length === 0) {
         throw new BadRequestException({
           code: 'TIME_WINDOWS_REQUIRED',
-          message: 'Les fenetres horaires sont requises pour les horaires personnalises',
+          message:
+            'Les fenetres horaires sont requises pour les horaires personnalises',
         });
       }
       if (dto.timeWindows) {
@@ -419,9 +441,10 @@ export class MentorsAvailabilityService {
       where: { id: overrideId },
       data: {
         override_type: overrideType,
-        time_windows: dto.timeWindows !== undefined
-          ? toJsonTimeWindows(dto.timeWindows)
-          : undefined,
+        time_windows:
+          dto.timeWindows !== undefined
+            ? toJsonTimeWindows(dto.timeWindows)
+            : undefined,
         reason: dto.reason !== undefined ? dto.reason : existing.reason,
       },
     });
@@ -429,7 +452,10 @@ export class MentorsAvailabilityService {
     return this.mapDateOverride(updated);
   }
 
-  async deleteDateOverride(userId: string, overrideId: string): Promise<{ success: boolean }> {
+  async deleteDateOverride(
+    userId: string,
+    overrideId: string,
+  ): Promise<{ success: boolean }> {
     const availability = await this.findOrCreateAvailability(userId);
 
     const existing = await this.prisma.mentor_date_overrides.findUnique({
@@ -500,7 +526,9 @@ export class MentorsAvailabilityService {
     // Calculate date range
     const now = new Date();
     const today = this.getStartOfTodayUtc(now);
-    const minNoticeDate = new Date(now.getTime() + availability.min_notice_hours * 60 * 60 * 1000);
+    const minNoticeDate = new Date(
+      now.getTime() + availability.min_notice_hours * 60 * 60 * 1000,
+    );
 
     const rangeStart = startDate
       ? new Date(startDate + 'T00:00:00.000Z')
@@ -549,7 +577,10 @@ export class MentorsAvailabilityService {
     });
 
     // Build booking map by date
-    const bookingsMap = new Map<string, Array<{ start: string; end: string }>>();
+    const bookingsMap = new Map<
+      string,
+      Array<{ start: string; end: string }>
+    >();
     for (const booking of existingBookings) {
       const dateKey = booking.booking_date.toISOString().split('T')[0];
       if (!bookingsMap.has(dateKey)) {
@@ -571,7 +602,10 @@ export class MentorsAvailabilityService {
     });
 
     // Build busy slots map by date
-    const busySlotsMap = new Map<string, Array<{ startAt: Date; endAt: Date }>>();
+    const busySlotsMap = new Map<
+      string,
+      Array<{ startAt: Date; endAt: Date }>
+    >();
     for (const busy of busySlots) {
       const dateKey = busy.start_at.toISOString().split('T')[0];
       if (!busySlotsMap.has(dateKey)) {
@@ -647,27 +681,33 @@ export class MentorsAvailabilityService {
           let isAvailable = true;
 
           // Check min notice
-          const slotDateTime = new Date(
-            `${dateStr}T${slot.startTime}:00.000Z`,
-          );
+          const slotDateTime = new Date(`${dateStr}T${slot.startTime}:00.000Z`);
           if (slotDateTime < minNoticeDate) {
             isAvailable = false;
           }
 
           // Check existing bookings
-          if (isAvailable && dailyBookings.some((b) =>
-            this.timesOverlap(slot.startTime, slot.endTime, b.start, b.end)
-          )) {
+          if (
+            isAvailable &&
+            dailyBookings.some((b) =>
+              this.timesOverlap(slot.startTime, slot.endTime, b.start, b.end),
+            )
+          ) {
             isAvailable = false;
           }
 
           // Check busy slots
           const dayBusySlots = busySlotsMap.get(dateStr) ?? [];
-          if (isAvailable && dayBusySlots.some((busy) => {
-            const slotStart = new Date(`${dateStr}T${slot.startTime}:00.000Z`);
-            const slotEnd = new Date(`${dateStr}T${slot.endTime}:00.000Z`);
-            return slotStart < busy.endAt && slotEnd > busy.startAt;
-          })) {
+          if (
+            isAvailable &&
+            dayBusySlots.some((busy) => {
+              const slotStart = new Date(
+                `${dateStr}T${slot.startTime}:00.000Z`,
+              );
+              const slotEnd = new Date(`${dateStr}T${slot.endTime}:00.000Z`);
+              return slotStart < busy.endAt && slotEnd > busy.startAt;
+            })
+          ) {
             isAvailable = false;
           }
 

@@ -12,13 +12,22 @@ async function bootstrap() {
     bodyParser: false,
   });
 
-  const captureRawBody = (req: Request & { rawBody?: Buffer }, _res: unknown, buffer: Buffer) => {
+  const captureRawBody = (
+    req: Request & { rawBody?: Buffer },
+    _res: unknown,
+    buffer: Buffer,
+  ) => {
     if (buffer.length > 0) {
       req.rawBody = Buffer.from(buffer);
     }
   };
 
-  app.use(json({ verify: captureRawBody, type: ['application/json', 'application/webhook+json'] }));
+  app.use(
+    json({
+      verify: captureRawBody,
+      type: ['application/json', 'application/webhook+json'],
+    }),
+  );
   app.use(urlencoded({ extended: true, verify: captureRawBody }));
 
   // Serve static files from /uploads

@@ -326,7 +326,9 @@ export class SessionsService {
 
     this.assertBookingParticipant(userId, session.booking);
     this.assertSessionWindow(session.booking);
-    const activeCall = await this.getSyncedActiveCallForBooking(session.booking.id);
+    const activeCall = await this.getSyncedActiveCallForBooking(
+      session.booking.id,
+    );
 
     return this.mapSessionRoom(userId, session.booking, session, activeCall);
   }
@@ -390,7 +392,9 @@ export class SessionsService {
     const activeCall = await this.getActiveCallForBooking(bookingId);
     return {
       bookingId,
-      activeCall: activeCall ? await this.mapCallSession(userId, booking, activeCall) : null,
+      activeCall: activeCall
+        ? await this.mapCallSession(userId, booking, activeCall)
+        : null,
     };
   }
 
@@ -400,7 +404,9 @@ export class SessionsService {
       include: {
         booking: {
           include: {
-            student: { select: { id: true, first_name: true, last_name: true } },
+            student: {
+              select: { id: true, first_name: true, last_name: true },
+            },
             mentor: { select: { id: true, first_name: true, last_name: true } },
           },
         },
@@ -419,7 +425,12 @@ export class SessionsService {
     this.assertSessionWindow(call.booking);
     const normalized = await this.ensureCallNotExpired(call);
 
-    return this.mapCallSession(userId, call.booking, normalized, call.transcript);
+    return this.mapCallSession(
+      userId,
+      call.booking,
+      normalized,
+      call.transcript,
+    );
   }
 
   async listSessionChatMessages(userId: string, bookingId: string) {
@@ -457,7 +468,7 @@ export class SessionsService {
       });
     }
 
-    let documentId = input.documentId ?? null;
+    const documentId = input.documentId ?? null;
     if (documentId) {
       const document = await this.prisma.session_documents.findUnique({
         where: { id: documentId },
@@ -517,10 +528,16 @@ export class SessionsService {
       },
     });
 
-    await this.logSessionEvent(session.id, bookingId, 'webhook_received', userId, {
-      type: 'document.uploaded',
-      documentId: document.id,
-    });
+    await this.logSessionEvent(
+      session.id,
+      bookingId,
+      'webhook_received',
+      userId,
+      {
+        type: 'document.uploaded',
+        documentId: document.id,
+      },
+    );
 
     return {
       bookingId,
@@ -541,7 +558,9 @@ export class SessionsService {
       : {
           bookingId,
           provider: this.sessionProvider.getTranscriptProviderName(),
-          status: latestCall ? this.resolveTranscriptDisplayStatus(latestCall) : 'not_requested',
+          status: latestCall
+            ? this.resolveTranscriptDisplayStatus(latestCall)
+            : 'not_requested',
           language: null,
           fullText: null,
           summaryText: null,
@@ -592,7 +611,11 @@ export class SessionsService {
         message: 'Aucun appel actif pour cette reservation',
       });
     }
-    return this.recordCallTranscriptConsent(userId, activeCall.activeCall.callSessionId, input);
+    return this.recordCallTranscriptConsent(
+      userId,
+      activeCall.activeCall.callSessionId,
+      input,
+    );
   }
 
   async recordCallTranscriptConsent(
@@ -617,19 +640,27 @@ export class SessionsService {
     const updated = await this.prisma.booking_call_sessions.update({
       where: { id: call.id },
       data: {
-        transcript_consent_status: input.decision === 'accept' ? 'accepted' : 'declined',
+        transcript_consent_status:
+          input.decision === 'accept' ? 'accepted' : 'declined',
         transcript_status: 'not_requested',
-        transcript_consented_at: input.decision === 'accept' ? new Date() : null,
+        transcript_consented_at:
+          input.decision === 'accept' ? new Date() : null,
         transcript_error_message: null,
       },
     });
 
-    await this.logSessionEvent(call.id, call.booking_id, 'transcript_requested', userId, {
-      type:
-        input.decision === 'accept'
-          ? 'transcript.consent.accepted'
-          : 'transcript.consent.declined',
-    });
+    await this.logSessionEvent(
+      call.id,
+      call.booking_id,
+      'transcript_requested',
+      userId,
+      {
+        type:
+          input.decision === 'accept'
+            ? 'transcript.consent.accepted'
+            : 'transcript.consent.declined',
+      },
+    );
 
     if (input.decision === 'accept' && updated.status === 'live') {
       await this.maybeStartCallRecording(updated);
@@ -645,7 +676,10 @@ export class SessionsService {
   }
 
   async handleVideoWebhook(payload: VideoWebhookPayload) {
-    const existingCall = await this.findCallFromWebhook(payload.bookingId, payload.providerRoomId);
+    const existingCall = await this.findCallFromWebhook(
+      payload.bookingId,
+      payload.providerRoomId,
+    );
     if (!existingCall) {
       return { ok: true, ignored: true };
     }
@@ -669,7 +703,9 @@ export class SessionsService {
       return { ok: true, ignored: true };
     }
 
-    const participantIds = this.getParticipantIdentities(call.participant_identities_json);
+    const participantIds = this.getParticipantIdentities(
+      call.participant_identities_json,
+    );
     const participantUserId = payload.participantUserId ?? null;
     const data: Record<string, unknown> = {};
 
@@ -687,10 +723,15 @@ export class SessionsService {
         break;
       }
       case 'participant_left': {
-        const remainingParticipantIds = participantIds.filter((value) => value !== participantUserId);
-        data.participant_identities_json = this.toJsonValue(remainingParticipantIds);
+        const remainingParticipantIds = participantIds.filter(
+          (value) => value !== participantUserId,
+        );
+        data.participant_identities_json = this.toJsonValue(
+          remainingParticipantIds,
+        );
         data.status = remainingParticipantIds.length > 0 ? 'waiting' : 'ended';
-        data.ended_at = remainingParticipantIds.length === 0 ? new Date() : null;
+        data.ended_at =
+          remainingParticipantIds.length === 0 ? new Date() : null;
         break;
       }
       case 'room_started': {
@@ -738,10 +779,7 @@ export class SessionsService {
       await this.maybeStartCallRecording(updated);
     }
 
-    if (
-      eventType === 'participant_left' &&
-      updated.status === 'ended'
-    ) {
+    if (eventType === 'participant_left' && updated.status === 'ended') {
       await this.terminateCallInfrastructure(updated);
     }
 
@@ -867,26 +905,45 @@ export class SessionsService {
     });
 
     if (!booking) {
-      throw new NotFoundException({ code: 'BOOKING_NOT_FOUND', message: 'Session introuvable' });
+      throw new NotFoundException({
+        code: 'BOOKING_NOT_FOUND',
+        message: 'Session introuvable',
+      });
     }
 
     if (booking.student_id !== userId && booking.mentor_id !== userId) {
-      throw new ForbiddenException({ code: 'NOT_PARTICIPANT', message: "Vous n'etes pas participant de cette session" });
+      throw new ForbiddenException({
+        code: 'NOT_PARTICIPANT',
+        message: "Vous n'etes pas participant de cette session",
+      });
     }
 
     if (booking.status !== 'completed') {
-      throw new BadRequestException({ code: 'SESSION_NOT_COMPLETED', message: 'La session doit etre terminee pour ajouter des notes' });
+      throw new BadRequestException({
+        code: 'SESSION_NOT_COMPLETED',
+        message: 'La session doit etre terminee pour ajouter des notes',
+      });
     }
 
     if (input.content.length > 2000) {
-      throw new BadRequestException({ code: 'CONTENT_TOO_LONG', message: 'Le contenu ne peut pas depasser 2000 caracteres' });
+      throw new BadRequestException({
+        code: 'CONTENT_TOO_LONG',
+        message: 'Le contenu ne peut pas depasser 2000 caracteres',
+      });
     }
 
     const role = booking.mentor_id === userId ? 'mentor' : 'student';
 
     const note = await this.prisma.session_notes.upsert({
-      where: { booking_id_author_id: { booking_id: bookingId, author_id: userId } },
-      create: { booking_id: bookingId, author_id: userId, role, content: input.content },
+      where: {
+        booking_id_author_id: { booking_id: bookingId, author_id: userId },
+      },
+      create: {
+        booking_id: bookingId,
+        author_id: userId,
+        role,
+        content: input.content,
+      },
       update: { content: input.content },
     });
 
@@ -899,11 +956,17 @@ export class SessionsService {
     });
 
     if (!booking) {
-      throw new NotFoundException({ code: 'BOOKING_NOT_FOUND', message: 'Session introuvable' });
+      throw new NotFoundException({
+        code: 'BOOKING_NOT_FOUND',
+        message: 'Session introuvable',
+      });
     }
 
     if (booking.student_id !== userId && booking.mentor_id !== userId) {
-      throw new ForbiddenException({ code: 'NOT_PARTICIPANT', message: 'Acces refuse' });
+      throw new ForbiddenException({
+        code: 'NOT_PARTICIPANT',
+        message: 'Acces refuse',
+      });
     }
 
     const notes = await this.prisma.session_notes.findMany({
@@ -929,30 +992,40 @@ export class SessionsService {
     });
 
     if (!booking) {
-      throw new NotFoundException({ code: 'BOOKING_NOT_FOUND', message: 'Session introuvable' });
+      throw new NotFoundException({
+        code: 'BOOKING_NOT_FOUND',
+        message: 'Session introuvable',
+      });
     }
 
     if (booking.mentor_id !== mentorId) {
-      throw new ForbiddenException({ code: 'NOT_MENTOR', message: 'Seul le mentor peut soumettre le feedback' });
+      throw new ForbiddenException({
+        code: 'NOT_MENTOR',
+        message: 'Seul le mentor peut soumettre le feedback',
+      });
     }
 
     if (booking.status !== 'completed') {
-      throw new BadRequestException({ code: 'SESSION_NOT_COMPLETED', message: 'La session doit etre terminee' });
+      throw new BadRequestException({
+        code: 'SESSION_NOT_COMPLETED',
+        message: 'La session doit etre terminee',
+      });
     }
 
     if (input.linkedMilestoneId) {
-      const linkedMilestone = await this.prisma.student_program_milestones.findUnique({
-        where: { id: input.linkedMilestoneId },
-        include: {
-          program: {
-            select: {
-              mentor_id: true,
-              student_id: true,
-              status: true,
+      const linkedMilestone =
+        await this.prisma.student_program_milestones.findUnique({
+          where: { id: input.linkedMilestoneId },
+          include: {
+            program: {
+              select: {
+                mentor_id: true,
+                student_id: true,
+                status: true,
+              },
             },
           },
-        },
-      });
+        });
 
       if (!linkedMilestone) {
         throw new BadRequestException({
@@ -967,7 +1040,8 @@ export class SessionsService {
       if (!samePair || linkedMilestone.program.status !== 'active') {
         throw new BadRequestException({
           code: 'LINKED_MILESTONE_INVALID',
-          message: 'Le jalon lie doit appartenir au parcours actif de cet etudiant',
+          message:
+            'Le jalon lie doit appartenir au parcours actif de cet etudiant',
         });
       }
     }
@@ -1008,11 +1082,17 @@ export class SessionsService {
     });
 
     if (!booking) {
-      throw new NotFoundException({ code: 'BOOKING_NOT_FOUND', message: 'Session introuvable' });
+      throw new NotFoundException({
+        code: 'BOOKING_NOT_FOUND',
+        message: 'Session introuvable',
+      });
     }
 
     if (booking.student_id !== userId && booking.mentor_id !== userId) {
-      throw new ForbiddenException({ code: 'NOT_PARTICIPANT', message: 'Acces refuse' });
+      throw new ForbiddenException({
+        code: 'NOT_PARTICIPANT',
+        message: 'Acces refuse',
+      });
     }
 
     const feedback = await this.prisma.session_feedback.findUnique({
@@ -1118,7 +1198,8 @@ export class SessionsService {
             status: row.status,
             replayAvailable: row.expires_at > new Date(),
             transcriptStatus:
-              row.transcript?.status ?? this.resolveTranscriptDisplayStatus(row),
+              row.transcript?.status ??
+              this.resolveTranscriptDisplayStatus(row),
             transcriptSummary: row.transcript?.summary_text ?? null,
             transcriptConsentStatus: row.transcript_consent_status,
           }),
@@ -1276,16 +1357,27 @@ startxref
     start_time: string;
     end_time: string;
   }) {
-    const startAt = this.combineDateAndTime(booking.booking_date, booking.start_time);
-    const endAt = this.combineDateAndTime(booking.booking_date, booking.end_time);
-    const earliest = new Date(startAt.getTime() - this.accessLeadMinutes * 60 * 1000);
-    const latest = new Date(endAt.getTime() + this.accessGraceHours * 60 * 60 * 1000);
+    const startAt = this.combineDateAndTime(
+      booking.booking_date,
+      booking.start_time,
+    );
+    const endAt = this.combineDateAndTime(
+      booking.booking_date,
+      booking.end_time,
+    );
+    const earliest = new Date(
+      startAt.getTime() - this.accessLeadMinutes * 60 * 1000,
+    );
+    const latest = new Date(
+      endAt.getTime() + this.accessGraceHours * 60 * 60 * 1000,
+    );
     const now = new Date();
 
     if (now < earliest || now > latest) {
       throw new BadRequestException({
         code: 'SESSION_WINDOW_CLOSED',
-        message: 'La salle est accessible uniquement autour du rendez-vous prevu',
+        message:
+          'La salle est accessible uniquement autour du rendez-vous prevu',
       });
     }
   }
@@ -1331,7 +1423,10 @@ startxref
 
     const sessionToken = booking.session?.session_token ?? randomUUID();
     const expiresAt = new Date(
-      this.combineDateAndTime(booking.booking_date, booking.end_time).getTime() +
+      this.combineDateAndTime(
+        booking.booking_date,
+        booking.end_time,
+      ).getTime() +
         this.accessGraceHours * 60 * 60 * 1000,
     );
 
@@ -1393,28 +1488,26 @@ startxref
       status: string;
       expires_at: Date;
     },
-    activeCall:
-      | {
-          id: string;
-          booking_id: string;
-          call_token: string;
-          session_url: string;
-          provider: string;
-          provider_room_id: string | null;
-          provider_join_url: string | null;
-          status: string;
-          transcript_consent_status: string;
-          transcript_status: string;
-          transcript_capture_status: string;
-          transcript_consented_at: Date | null;
-          started_at: Date | null;
-          ended_at: Date | null;
-          expires_at: Date;
-          participant_identities_json: unknown;
-          created_at: Date;
-          updated_at: Date;
-        }
-      | null,
+    activeCall: {
+      id: string;
+      booking_id: string;
+      call_token: string;
+      session_url: string;
+      provider: string;
+      provider_room_id: string | null;
+      provider_join_url: string | null;
+      status: string;
+      transcript_consent_status: string;
+      transcript_status: string;
+      transcript_capture_status: string;
+      transcript_consented_at: Date | null;
+      started_at: Date | null;
+      ended_at: Date | null;
+      expires_at: Date;
+      participant_identities_json: unknown;
+      created_at: Date;
+      updated_at: Date;
+    } | null,
   ) {
     return {
       bookingId: booking.id,
@@ -1422,8 +1515,14 @@ startxref
       sessionUrl: session.session_url,
       roomStatus: session.status,
       bookingStatus: booking.status,
-      startsAt: this.combineDateAndTime(booking.booking_date, booking.start_time).toISOString(),
-      endsAt: this.combineDateAndTime(booking.booking_date, booking.end_time).toISOString(),
+      startsAt: this.combineDateAndTime(
+        booking.booking_date,
+        booking.start_time,
+      ).toISOString(),
+      endsAt: this.combineDateAndTime(
+        booking.booking_date,
+        booking.end_time,
+      ).toISOString(),
       expiresAt: session.expires_at.toISOString(),
       participants: [
         {
@@ -1472,18 +1571,16 @@ startxref
       created_at: Date;
       updated_at: Date;
     },
-    transcript?:
-      | {
-          booking_id?: string;
-          provider: string;
-          status: string;
-          language: string | null;
-          full_text: string | null;
-          summary_text: string | null;
-          segments_json: unknown;
-          updated_at: Date;
-        }
-      | null,
+    transcript?: {
+      booking_id?: string;
+      provider: string;
+      status: string;
+      language: string | null;
+      full_text: string | null;
+      summary_text: string | null;
+      segments_json: unknown;
+      updated_at: Date;
+    } | null,
   ) {
     const currentParticipant =
       booking.student.id === currentUserId
@@ -1499,7 +1596,8 @@ startxref
           };
 
     const liveKitToken =
-      call.provider_room_id === null || call.transcript_consent_status === 'pending'
+      call.provider_room_id === null ||
+      call.transcript_consent_status === 'pending'
         ? null
         : await this.sessionProvider.buildParticipantToken({
             roomId: call.provider_room_id,
@@ -1528,7 +1626,9 @@ startxref
       startedAt: call.started_at?.toISOString() ?? null,
       endedAt: call.ended_at?.toISOString() ?? null,
       expiresAt: call.expires_at.toISOString(),
-      participantIds: this.getParticipantIdentities(call.participant_identities_json),
+      participantIds: this.getParticipantIdentities(
+        call.participant_identities_json,
+      ),
       transcript: transcript
         ? this.mapTranscript(transcript)
         : {
@@ -1545,7 +1645,8 @@ startxref
       transcriptConsentRequired: call.transcript_consent_status === 'pending',
       transcriptConsentStatus: call.transcript_consent_status,
       transcriptCaptureStatus: call.transcript_capture_status,
-      transcriptConsentedAt: call.transcript_consented_at?.toISOString() ?? null,
+      transcriptConsentedAt:
+        call.transcript_consented_at?.toISOString() ?? null,
     };
   }
 
@@ -1573,7 +1674,9 @@ startxref
       authorName: `${message.author.first_name} ${message.author.last_name}`,
       body: message.body,
       createdAt: message.created_at.toISOString(),
-      document: message.document ? this.mapSessionDocument(message.document) : null,
+      document: message.document
+        ? this.mapSessionDocument(message.document)
+        : null,
     };
   }
 
@@ -1630,7 +1733,10 @@ startxref
     return combined;
   }
 
-  private async findCallFromWebhook(bookingId?: string, providerRoomId?: string) {
+  private async findCallFromWebhook(
+    bookingId?: string,
+    providerRoomId?: string,
+  ) {
     if (providerRoomId) {
       const byRoom = await this.prisma.booking_call_sessions.findFirst({
         where: { provider_room_id: providerRoomId },
@@ -1653,7 +1759,9 @@ startxref
     return null;
   }
 
-  private async findSessionForTranscriptWebhook(payload: TranscriptWebhookPayload) {
+  private async findSessionForTranscriptWebhook(
+    payload: TranscriptWebhookPayload,
+  ) {
     if (payload.callSessionId) {
       const byCallId = await this.prisma.booking_call_sessions.findUnique({
         where: { id: payload.callSessionId },
@@ -1735,14 +1843,16 @@ startxref
     return this.syncCallParticipantsWithProvider(activeCall);
   }
 
-  private async ensureCallNotExpired<T extends {
-    id: string;
-    booking_id: string;
-    provider_room_id: string | null;
-    status: string;
-    created_at: Date;
-    ended_at: Date | null;
-  }>(call: T): Promise<T> {
+  private async ensureCallNotExpired<
+    T extends {
+      id: string;
+      booking_id: string;
+      provider_room_id: string | null;
+      status: string;
+      created_at: Date;
+      ended_at: Date | null;
+    },
+  >(call: T): Promise<T> {
     if (!['initiated', 'waiting'].includes(call.status)) {
       return call;
     }
@@ -1776,26 +1886,38 @@ startxref
       : [];
   }
 
-  private async syncCallParticipantsWithProvider<T extends {
-    id: string;
-    booking_id: string;
-    provider_room_id: string | null;
-    status: string;
-    started_at?: Date | null;
-    ended_at?: Date | null;
-    participant_identities_json: unknown;
-  }>(call: T): Promise<T> {
-    if (!call.provider_room_id || !['initiated', 'waiting', 'live'].includes(call.status)) {
+  private async syncCallParticipantsWithProvider<
+    T extends {
+      id: string;
+      booking_id: string;
+      provider_room_id: string | null;
+      status: string;
+      started_at?: Date | null;
+      ended_at?: Date | null;
+      participant_identities_json: unknown;
+    },
+  >(call: T): Promise<T> {
+    if (
+      !call.provider_room_id ||
+      !['initiated', 'waiting', 'live'].includes(call.status)
+    ) {
       return call;
     }
 
     try {
-      const providerParticipantIds = await this.sessionProvider.listParticipantIdentities(call.provider_room_id);
-      const storedParticipantIds = this.getParticipantIdentities(call.participant_identities_json);
+      const providerParticipantIds =
+        await this.sessionProvider.listParticipantIdentities(
+          call.provider_room_id,
+        );
+      const storedParticipantIds = this.getParticipantIdentities(
+        call.participant_identities_json,
+      );
 
       const sameParticipants =
         providerParticipantIds.length === storedParticipantIds.length &&
-        providerParticipantIds.every((participantId) => storedParticipantIds.includes(participantId));
+        providerParticipantIds.every((participantId) =>
+          storedParticipantIds.includes(participantId),
+        );
 
       const nextStatus =
         providerParticipantIds.length >= 2
@@ -1875,7 +1997,9 @@ startxref
   }) {
     if (call.transcript_capture_provider_id) {
       try {
-        await this.sessionProvider.stopAudioRecording(call.transcript_capture_provider_id);
+        await this.sessionProvider.stopAudioRecording(
+          call.transcript_capture_provider_id,
+        );
       } catch (error) {
         this.logger.warn(`Unable to stop egress: ${String(error)}`);
       }
@@ -1885,7 +2009,9 @@ startxref
       try {
         await this.sessionProvider.endRoom(call.provider_room_id);
       } catch (error) {
-        this.logger.warn(`Unable to end room ${call.provider_room_id}: ${String(error)}`);
+        this.logger.warn(
+          `Unable to end room ${call.provider_room_id}: ${String(error)}`,
+        );
       }
     }
   }

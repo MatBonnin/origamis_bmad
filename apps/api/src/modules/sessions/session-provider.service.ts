@@ -23,11 +23,16 @@ export class SessionProviderService {
   constructor(private readonly configService: ConfigService) {}
 
   getVideoProviderName() {
-    return this.configService.get<string>('SESSION_VIDEO_PROVIDER') || 'livekit';
+    return (
+      this.configService.get<string>('SESSION_VIDEO_PROVIDER') || 'livekit'
+    );
   }
 
   getTranscriptProviderName() {
-    return this.configService.get<string>('SESSION_TRANSCRIPT_PROVIDER') || 'faster-whisper';
+    return (
+      this.configService.get<string>('SESSION_TRANSCRIPT_PROVIDER') ||
+      'faster-whisper'
+    );
   }
 
   buildRoomId(bookingId: string) {
@@ -122,7 +127,9 @@ export class SessionProviderService {
           bucket: this.requireConfig('S3_BUCKET'),
           endpoint: this.requireConfig('S3_ENDPOINT'),
           region: this.configService.get<string>('S3_REGION') || 'us-east-1',
-          forcePathStyle: (this.configService.get<string>('S3_FORCE_PATH_STYLE') || 'true') === 'true',
+          forcePathStyle:
+            (this.configService.get<string>('S3_FORCE_PATH_STYLE') ||
+              'true') === 'true',
         }),
       },
     });
@@ -152,7 +159,7 @@ export class SessionProviderService {
       this.requireConfig('LIVEKIT_API_KEY'),
       this.requireConfig('LIVEKIT_API_SECRET'),
     );
-    return receiver.receive(rawBody, authHeader) as Promise<WebhookEvent>;
+    return receiver.receive(rawBody, authHeader);
   }
 
   private createRoomServiceClient() {

@@ -336,7 +336,7 @@ export class MentorsController {
   @Patch('me/availability/schedule/:dayOfWeek')
   @UseGuards(RolesGuard)
   @Roles('mentor')
-  @ApiOperation({ summary: 'Modifier le planning d\'un jour specifique' })
+  @ApiOperation({ summary: "Modifier le planning d'un jour specifique" })
   @ApiResponse({ status: 200, description: 'Jour mis a jour' })
   async updateSingleDaySchedule(
     @CurrentUser() user: UserResponseDto,
@@ -421,7 +421,7 @@ export class MentorsController {
   // ── Public Availability (for students) ──
 
   @Get(':id/slots')
-  @ApiOperation({ summary: 'Obtenir les creneaux disponibles d\'un mentor' })
+  @ApiOperation({ summary: "Obtenir les creneaux disponibles d'un mentor" })
   @ApiResponse({ status: 200, description: 'Creneaux disponibles' })
   async getMentorAvailableSlots(
     @Param('id') mentorId: string,

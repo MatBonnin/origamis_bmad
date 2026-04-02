@@ -28,7 +28,11 @@ const EDUCATION_LEVELS = [
   'doctorat',
   'autre',
 ] as const;
-const SUPPORT_TYPES = ['ponctuel', 'suivi_regulier', 'long_uniquement'] as const;
+const SUPPORT_TYPES = [
+  'ponctuel',
+  'suivi_regulier',
+  'long_uniquement',
+] as const;
 
 export class MentorTariffsDto {
   @ApiProperty({ description: 'Tarif minimum horaire', example: 30 })
@@ -143,7 +147,11 @@ export class CreateMentorSelfProfileDto {
   @ApiPropertyOptional({ description: 'URL de la banniere mentor' })
   @IsOptional()
   @IsString()
-  @IsUrl({ require_protocol: true, protocols: ['https', 'http'], require_tld: false })
+  @IsUrl({
+    require_protocol: true,
+    protocols: ['https', 'http'],
+    require_tld: false,
+  })
   @MaxLength(500)
   bannerUrl?: string;
 
@@ -278,7 +286,11 @@ export class UpdateMentorSelfProfileDto {
   @ApiPropertyOptional({ description: 'URL de la banniere mentor' })
   @IsOptional()
   @IsString()
-  @IsUrl({ require_protocol: true, protocols: ['https', 'http'], require_tld: false })
+  @IsUrl({
+    require_protocol: true,
+    protocols: ['https', 'http'],
+    require_tld: false,
+  })
   @MaxLength(500)
   bannerUrl?: string;
 

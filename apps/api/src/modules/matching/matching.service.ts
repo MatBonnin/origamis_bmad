@@ -136,7 +136,7 @@ export class MatchingService {
     const scored = mentors
       .filter((mentor) => {
         const validationStatus =
-          mentor.validation_checks[0]?.status ??
+          mentor.validation_checks?.[0]?.status ??
           (mentor.is_validated ? 'validated' : 'pending_review');
         const visibility = mentor.visibility?.status ?? 'visible';
         return (

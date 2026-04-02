@@ -59,7 +59,9 @@ describe('MentorsController', () => {
       mockMentorsEpic8Service as never,
     );
     jest.clearAllMocks();
-    mockMentorsAdminService.getMentorVisibilityStatus.mockReturnValue('visible');
+    mockMentorsAdminService.getMentorVisibilityStatus.mockReturnValue(
+      'visible',
+    );
     mockMentorsAdminService.getMentorValidationOverride.mockReturnValue(null);
   });
 

@@ -26,7 +26,9 @@ export class MilestonesLegacyController {
   }
 
   @Get('students/:id/progression')
-  @ApiOperation({ summary: 'Alias legacy de /milestones/students/:id/progression' })
+  @ApiOperation({
+    summary: 'Alias legacy de /milestones/students/:id/progression',
+  })
   async getStudentProgression(
     @CurrentUser() user: { id: string; roles: string[] },
     @Param('id') studentId: string,
@@ -39,7 +41,9 @@ export class MilestonesLegacyController {
   }
 
   @Get('students/:id/milestone-insights')
-  @ApiOperation({ summary: 'Alias legacy de /milestones/students/:id/milestone-insights' })
+  @ApiOperation({
+    summary: 'Alias legacy de /milestones/students/:id/milestone-insights',
+  })
   async getStudentInsights(
     @CurrentUser() user: { id: string; roles: string[] },
     @Param('id') studentId: string,
@@ -51,4 +55,3 @@ export class MilestonesLegacyController {
     return { data, error: null };
   }
 }
-

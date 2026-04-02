@@ -47,7 +47,9 @@ export class SupportService {
 
   listIncidents(input?: { status?: IncidentStatus }) {
     const items = [...this.incidents.values()]
-      .filter((incident) => (input?.status ? incident.status === input.status : true))
+      .filter((incident) =>
+        input?.status ? incident.status === input.status : true,
+      )
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
     return { incidents: items };

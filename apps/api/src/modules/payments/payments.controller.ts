@@ -23,12 +23,17 @@ export class PaymentsController {
   @Post('bookings/:bookingId/checkout')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Creer une session de paiement Stripe pour un booking' })
+  @ApiOperation({
+    summary: 'Creer une session de paiement Stripe pour un booking',
+  })
   async createCheckout(
     @CurrentUser() user: { id: string },
     @Param('bookingId') bookingId: string,
   ) {
-    const data = await this.paymentsService.createCheckoutSession(user.id, bookingId);
+    const data = await this.paymentsService.createCheckoutSession(
+      user.id,
+      bookingId,
+    );
     return { data, error: null };
   }
 

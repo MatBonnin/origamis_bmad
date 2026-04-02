@@ -21,7 +21,9 @@ export class TranscriptQueueService implements OnModuleDestroy {
     const client = this.getClient();
     const queueName = this.getQueueName();
     await client.lpush(queueName, JSON.stringify(job));
-    this.logger.log(`Queued transcript job ${job.jobId} for booking ${job.bookingId}`);
+    this.logger.log(
+      `Queued transcript job ${job.jobId} for booking ${job.bookingId}`,
+    );
   }
 
   async onModuleDestroy() {
@@ -43,6 +45,9 @@ export class TranscriptQueueService implements OnModuleDestroy {
   }
 
   private getQueueName() {
-    return this.configService.get<string>('TRANSCRIPT_QUEUE_NAME') || 'transcript_jobs';
+    return (
+      this.configService.get<string>('TRANSCRIPT_QUEUE_NAME') ||
+      'transcript_jobs'
+    );
   }
 }

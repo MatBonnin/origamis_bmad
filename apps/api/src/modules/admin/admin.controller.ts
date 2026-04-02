@@ -57,7 +57,12 @@ export class AdminController {
   async updateUser(
     @CurrentUser() currentUser: UserResponseDto,
     @Param('id') id: string,
-    @Body() dto: { firstName?: string; lastName?: string; status?: 'active' | 'suspended' | 'deleted' },
+    @Body()
+    dto: {
+      firstName?: string;
+      lastName?: string;
+      status?: 'active' | 'suspended' | 'deleted';
+    },
   ) {
     const user = await this.adminService.updateUserAccount(
       currentUser.id,

@@ -55,10 +55,12 @@ describe('MilestonesService', () => {
     mockPrisma.student_program_milestones.findMany.mockResolvedValue([
       { ...baseMilestoneRow, status: currentStatus },
     ]);
-    mockPrisma.student_program_milestones.findUnique.mockImplementation(async () => ({
-      ...baseMilestoneRow,
-      status: currentStatus,
-    }));
+    mockPrisma.student_program_milestones.findUnique.mockImplementation(
+      async () => ({
+        ...baseMilestoneRow,
+        status: currentStatus,
+      }),
+    );
     mockPrisma.student_program_milestones.update.mockImplementation(
       async ({ data }: { data: { status?: string } }) => {
         currentStatus = data.status ?? currentStatus;
@@ -113,11 +115,9 @@ describe('MilestonesService', () => {
 
   it('blocks review for non mentor role', async () => {
     await expect(
-      service.reviewMilestone(
-        { id: 'student-1', roles: ['etudiant'] },
-        'm-1',
-        { approved: true },
-      ),
+      service.reviewMilestone({ id: 'student-1', roles: ['etudiant'] }, 'm-1', {
+        approved: true,
+      }),
     ).rejects.toThrow(ForbiddenException);
   });
 

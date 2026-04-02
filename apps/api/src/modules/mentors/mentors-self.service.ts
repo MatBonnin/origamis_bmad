@@ -158,7 +158,10 @@ export class MentorsSelfService {
       },
     });
 
-    await this.syncAvailabilitySlotsToTable(userId, dto.availability.slots ?? []);
+    await this.syncAvailabilitySlotsToTable(
+      userId,
+      dto.availability.slots ?? [],
+    );
 
     await this.saveMentorMetadata(userId, {
       languages: this.cleanTags(dto.languages ?? []),
@@ -303,10 +306,13 @@ export class MentorsSelfService {
           is_available: dto.availability.isAvailable,
           next_available_at: dto.availability.nextAvailableAt
             ? new Date(dto.availability.nextAvailableAt)
-          : null,
+            : null,
         },
       });
-      await this.syncAvailabilitySlotsToTable(userId, dto.availability.slots ?? []);
+      await this.syncAvailabilitySlotsToTable(
+        userId,
+        dto.availability.slots ?? [],
+      );
     }
 
     await this.saveMentorMetadata(userId, {
@@ -449,11 +455,9 @@ export class MentorsSelfService {
     return output;
   }
 
-  private cleanSupportTypes(values: string[]): (
-    | 'ponctuel'
-    | 'suivi_regulier'
-    | 'long_uniquement'
-  )[] {
+  private cleanSupportTypes(
+    values: string[],
+  ): ('ponctuel' | 'suivi_regulier' | 'long_uniquement')[] {
     return [
       ...new Set(
         values.filter(
@@ -605,17 +609,17 @@ export class MentorsSelfService {
         languages: metadata.languages,
         certifications: metadata.certifications,
         tariffs: metadata.tariffs,
-      availability: {
-        isAvailable: mentor.availability?.is_available ?? false,
-        nextAvailableAt:
-          mentor.availability?.next_available_at?.toISOString() ?? null,
-        slots:
-          mentor.availability?.slots?.map((slot) => ({
-            dayOfWeek: slot.day_of_week,
-            startTime: slot.start_time,
-            endTime: slot.end_time,
-          })) ?? metadata.availabilitySlots,
-      },
+        availability: {
+          isAvailable: mentor.availability?.is_available ?? false,
+          nextAvailableAt:
+            mentor.availability?.next_available_at?.toISOString() ?? null,
+          slots:
+            mentor.availability?.slots?.map((slot) => ({
+              dayOfWeek: slot.day_of_week,
+              startTime: slot.start_time,
+              endTime: slot.end_time,
+            })) ?? metadata.availabilitySlots,
+        },
         isPublished: mentor.is_publish_ready && mentor.is_validated,
         updatedAt: mentor.updated_at.toISOString(),
       },

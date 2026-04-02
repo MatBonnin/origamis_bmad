@@ -59,7 +59,11 @@ export class AdminService {
         if (input?.role && !user.roles.includes(input.role)) {
           return false;
         }
-        if (input?.status && input.status !== 'all' && user.status !== input.status) {
+        if (
+          input?.status &&
+          input.status !== 'all' &&
+          user.status !== input.status
+        ) {
           return false;
         }
         return true;

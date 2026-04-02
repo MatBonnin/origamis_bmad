@@ -246,7 +246,11 @@ export class UsersController {
     @CurrentUser() user: UserResponseDto,
     @Param('id') targetUserId: string,
     @Body()
-    dto: { firstName?: string; lastName?: string; status?: 'active' | 'suspended' | 'deleted' },
+    dto: {
+      firstName?: string;
+      lastName?: string;
+      status?: 'active' | 'suspended' | 'deleted';
+    },
   ) {
     const updated = await this.adminService.updateUserAccount(
       user.id,
@@ -293,7 +297,9 @@ export class UsersController {
   @Post(':id/suppress')
   @UseGuards(RolesGuard)
   @Roles('admin')
-  @ApiOperation({ summary: 'Archiver/supprimer logiquement un utilisateur (admin)' })
+  @ApiOperation({
+    summary: 'Archiver/supprimer logiquement un utilisateur (admin)',
+  })
   async suppressUserForAdmin(
     @CurrentUser() user: UserResponseDto,
     @Param('id') targetUserId: string,
@@ -309,7 +315,11 @@ export class UsersController {
     @Param('id') targetUserId: string,
     @Body() dto: { reason?: string; requestExport?: boolean },
   ) {
-    const request = await this.usersService.requestDeletion(user, targetUserId, dto);
+    const request = await this.usersService.requestDeletion(
+      user,
+      targetUserId,
+      dto,
+    );
     return { data: { request }, error: null };
   }
 
@@ -320,7 +330,11 @@ export class UsersController {
   async updateDeletionStatus(
     @CurrentUser() user: UserResponseDto,
     @Param('id') targetUserId: string,
-    @Body() dto: { status: 'requested' | 'reviewed' | 'approved' | 'rejected' | 'deleted'; notes?: string },
+    @Body()
+    dto: {
+      status: 'requested' | 'reviewed' | 'approved' | 'rejected' | 'deleted';
+      notes?: string;
+    },
   ) {
     const status = await this.usersService.updateDeletionStatus(
       user,

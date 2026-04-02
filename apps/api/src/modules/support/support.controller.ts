@@ -1,4 +1,13 @@
-﻿import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+﻿import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser, Roles } from '../../common/decorators';
 import { JwtAuthGuard, RolesGuard } from '../../common/guards';
@@ -14,7 +23,9 @@ export class SupportController {
 
   @Get('incidents')
   @ApiOperation({ summary: 'Lister la file des incidents support' })
-  listIncidents(@Query('status') status?: 'open' | 'in_review' | 'resolved' | 'escalated') {
+  listIncidents(
+    @Query('status') status?: 'open' | 'in_review' | 'resolved' | 'escalated',
+  ) {
     const data = this.supportService.listIncidents({ status });
     return { data, error: null };
   }
@@ -51,7 +62,11 @@ export class SupportController {
   updateStatus(
     @CurrentUser() user: { id: string },
     @Param('id') incidentId: string,
-    @Body() body: { status: 'open' | 'in_review' | 'resolved' | 'escalated'; notes?: string },
+    @Body()
+    body: {
+      status: 'open' | 'in_review' | 'resolved' | 'escalated';
+      notes?: string;
+    },
   ) {
     const data = this.supportService.updateIncidentStatus(incidentId, {
       ...body,

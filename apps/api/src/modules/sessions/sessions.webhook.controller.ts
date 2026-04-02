@@ -79,7 +79,9 @@ export class SessionsWebhookController {
     },
     @Headers('x-transcript-worker-secret') workerSecret?: string,
   ) {
-    const expectedSecret = this.configService.get<string>('TRANSCRIPT_WORKER_SECRET');
+    const expectedSecret = this.configService.get<string>(
+      'TRANSCRIPT_WORKER_SECRET',
+    );
     if (expectedSecret && workerSecret !== expectedSecret) {
       throw new UnauthorizedException({
         code: 'TRANSCRIPT_WORKER_UNAUTHORIZED',

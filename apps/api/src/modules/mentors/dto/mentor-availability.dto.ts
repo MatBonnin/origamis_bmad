@@ -84,7 +84,7 @@ export class UpdateSchedulingSettingsDto {
   minNoticeHours?: number;
 
   @ApiPropertyOptional({
-    description: 'Jours maximum a l\'avance pour reserver (7-365)',
+    description: "Jours maximum a l'avance pour reserver (7-365)",
     example: 60,
   })
   @IsOptional()
@@ -191,7 +191,7 @@ export class CreateDateOverrideDto {
   date: string;
 
   @ApiProperty({
-    description: 'Type d\'exception',
+    description: "Type d'exception",
     enum: OVERRIDE_TYPES,
     example: 'unavailable',
   })
@@ -211,7 +211,7 @@ export class CreateDateOverrideDto {
   timeWindows?: TimeWindowDto[];
 
   @ApiPropertyOptional({
-    description: 'Raison de l\'exception',
+    description: "Raison de l'exception",
     example: 'Vacances',
   })
   @IsOptional()
@@ -221,7 +221,7 @@ export class CreateDateOverrideDto {
 
 export class UpdateDateOverrideDto {
   @ApiPropertyOptional({
-    description: 'Type d\'exception',
+    description: "Type d'exception",
     enum: OVERRIDE_TYPES,
   })
   @IsOptional()
@@ -241,7 +241,7 @@ export class UpdateDateOverrideDto {
   timeWindows?: TimeWindowDto[];
 
   @ApiPropertyOptional({
-    description: 'Raison de l\'exception',
+    description: "Raison de l'exception",
   })
   @IsOptional()
   @IsString()
@@ -271,7 +271,7 @@ export class UpdateGeneralAvailabilityDto {
 
 export class GetAvailableSlotsQueryDto {
   @ApiPropertyOptional({
-    description: 'Date de debut (YYYY-MM-DD), defaut: aujourd\'hui',
+    description: "Date de debut (YYYY-MM-DD), defaut: aujourd'hui",
   })
   @IsOptional()
   @IsString()
@@ -317,11 +317,11 @@ export interface DateOverrideResponse {
 }
 
 export interface AvailableSlot {
-  date: string;           // YYYY-MM-DD
+  date: string; // YYYY-MM-DD
   dayOfWeek: number;
-  startTime: string;      // HH:mm
-  endTime: string;        // HH:mm
-  isAvailable: boolean;   // false if already booked
+  startTime: string; // HH:mm
+  endTime: string; // HH:mm
+  isAvailable: boolean; // false if already booked
 }
 
 export interface AvailableSlotsResponse {

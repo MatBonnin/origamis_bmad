@@ -22,9 +22,9 @@ export interface CreateBookingDto {
 // New DTO for dynamic slot booking (V2)
 export interface CreateBookingV2Dto {
   mentorId: string;
-  date: string;       // ISO date string YYYY-MM-DD
-  startTime: string;  // HH:mm
-  endTime: string;    // HH:mm
+  date: string; // ISO date string YYYY-MM-DD
+  startTime: string; // HH:mm
+  endTime: string; // HH:mm
   notes?: string;
 }
 
@@ -229,7 +229,8 @@ export class BookingsService {
     // 5. Check min notice
     const now = new Date();
     const slotDateTime = new Date(`${dto.date}T${dto.startTime}:00.000Z`);
-    const hoursUntilSlot = (slotDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+    const hoursUntilSlot =
+      (slotDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
 
     if (hoursUntilSlot < availability.min_notice_hours) {
       throw new BadRequestException({
@@ -251,7 +252,10 @@ export class BookingsService {
     }
 
     // 7. Validate session duration matches
-    const requestedDuration = this.calculateDurationMinutes(dto.startTime, dto.endTime);
+    const requestedDuration = this.calculateDurationMinutes(
+      dto.startTime,
+      dto.endTime,
+    );
     if (requestedDuration !== availability.session_duration) {
       throw new BadRequestException({
         code: 'INVALID_DURATION',
@@ -268,7 +272,7 @@ export class BookingsService {
     if (override && override.override_type === 'unavailable') {
       throw new BadRequestException({
         code: 'DATE_UNAVAILABLE',
-        message: 'Le mentor n\'est pas disponible ce jour-la',
+        message: "Le mentor n'est pas disponible ce jour-la",
       });
     }
 
@@ -277,7 +281,10 @@ export class BookingsService {
     let timeWindows: Array<{ start: string; end: string }>;
 
     if (override && override.override_type === 'custom_hours') {
-      timeWindows = override.time_windows as Array<{ start: string; end: string }>;
+      timeWindows = override.time_windows as Array<{
+        start: string;
+        end: string;
+      }>;
     } else {
       const weeklySchedule = availability.weekly_schedules.find(
         (ws) => ws.day_of_week === dayOfWeek,
@@ -286,11 +293,14 @@ export class BookingsService {
       if (!weeklySchedule || !weeklySchedule.is_available) {
         throw new BadRequestException({
           code: 'DAY_NOT_AVAILABLE',
-          message: 'Le mentor n\'est pas disponible ce jour de la semaine',
+          message: "Le mentor n'est pas disponible ce jour de la semaine",
         });
       }
 
-      timeWindows = weeklySchedule.time_windows as Array<{ start: string; end: string }>;
+      timeWindows = weeklySchedule.time_windows as Array<{
+        start: string;
+        end: string;
+      }>;
     }
 
     // Check if requested slot fits within any time window (including buffers)
@@ -304,7 +314,10 @@ export class BookingsService {
       const effectiveSlotStart = slotStartMinutes - availability.buffer_before;
       const effectiveSlotEnd = slotEndMinutes + availability.buffer_after;
 
-      return effectiveSlotStart >= windowStartMinutes && effectiveSlotEnd <= windowEndMinutes;
+      return (
+        effectiveSlotStart >= windowStartMinutes &&
+        effectiveSlotEnd <= windowEndMinutes
+      );
     });
 
     if (!slotFits) {
@@ -331,7 +344,10 @@ export class BookingsService {
       },
     });
 
-    if (availability.daily_limit && existingBookingsToday >= availability.daily_limit) {
+    if (
+      availability.daily_limit &&
+      existingBookingsToday >= availability.daily_limit
+    ) {
       throw new BadRequestException({
         code: 'DAILY_LIMIT_REACHED',
         message: 'Le mentor a atteint sa limite de sessions pour ce jour',
@@ -350,7 +366,10 @@ export class BookingsService {
       },
     });
 
-    if (availability.weekly_limit && existingBookingsThisWeek >= availability.weekly_limit) {
+    if (
+      availability.weekly_limit &&
+      existingBookingsThisWeek >= availability.weekly_limit
+    ) {
       throw new BadRequestException({
         code: 'WEEKLY_LIMIT_REACHED',
         message: 'Le mentor a atteint sa limite de sessions pour cette semaine',
@@ -410,7 +429,7 @@ export class BookingsService {
           data: {
             student_id: studentId,
             mentor_id: dto.mentorId,
-            slot_id: slot!.id,
+            slot_id: slot.id,
             booking_date: bookingDate,
             start_time: dto.startTime,
             end_time: dto.endTime,

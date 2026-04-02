@@ -23,7 +23,9 @@ export class SessionsGateway implements OnGatewayConnection {
   constructor(private readonly sessionsService: SessionsService) {}
 
   emitChatMessageCreated(payload: unknown, bookingId: string) {
-    this.server.to(`booking:${bookingId}`).emit('session.chat.created', payload);
+    this.server
+      .to(`booking:${bookingId}`)
+      .emit('session.chat.created', payload);
   }
 
   handleConnection(client: AuthenticatedSocket) {
@@ -49,7 +51,10 @@ export class SessionsGateway implements OnGatewayConnection {
       return { ok: false };
     }
 
-    await this.sessionsService.assertSessionParticipant(userId, payload.bookingId);
+    await this.sessionsService.assertSessionParticipant(
+      userId,
+      payload.bookingId,
+    );
     client.join(`booking:${payload.bookingId}`);
     return { ok: true };
   }

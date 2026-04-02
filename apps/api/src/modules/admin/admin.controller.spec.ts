@@ -31,7 +31,10 @@ describe('AdminController', () => {
   });
 
   it('getUsers should return data envelope', async () => {
-    const data = { users: [{ id: 'u1', roles: ['mentor'] }], metadata: { total: 1, nextCursor: null } };
+    const data = {
+      users: [{ id: 'u1', roles: ['mentor'] }],
+      metadata: { total: 1, nextCursor: null },
+    };
     mockAdminService.listUsers.mockResolvedValue(data);
 
     const result = await controller.getUsers();

@@ -89,7 +89,9 @@ describe('MessagingController', () => {
       receiverId: 'mentor-1',
       body: 'Salut mentor',
     });
-    expect(mockMessagingGateway.emitConversationMessageCreated).toHaveBeenCalledWith({
+    expect(
+      mockMessagingGateway.emitConversationMessageCreated,
+    ).toHaveBeenCalledWith({
       conversationId: 'conv-1',
       message: { messageId: 'msg-1' },
     });

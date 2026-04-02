@@ -11,7 +11,12 @@ export interface UploadedFile {
   size: number;
 }
 
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+];
 const ALLOWED_DOCUMENT_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_DOCUMENT_SIZE = 10 * 1024 * 1024; // 10MB
@@ -28,7 +33,9 @@ export class UploadService {
   }
 
   private ensureUploadDir(): void {
-    const dirs = ['images', 'documents'].map((sub) => join(this.uploadDir, sub));
+    const dirs = ['images', 'documents'].map((sub) =>
+      join(this.uploadDir, sub),
+    );
     for (const dir of dirs) {
       if (!existsSync(dir)) {
         mkdirSync(dir, { recursive: true });

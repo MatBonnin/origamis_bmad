@@ -10,6 +10,9 @@ describe('MentorsSearchService', () => {
     mentor_profiles: {
       findMany: jest.fn(),
     },
+    domain_refs: {
+      findMany: jest.fn(),
+    },
   };
   const mockMentorsAdminService = {
     getMentorValidationOverride: jest.fn(),
@@ -28,7 +31,10 @@ describe('MentorsSearchService', () => {
     service = module.get<MentorsSearchService>(MentorsSearchService);
     jest.clearAllMocks();
     mockMentorsAdminService.getMentorValidationOverride.mockReturnValue(null);
-    mockMentorsAdminService.getMentorVisibilityStatus.mockReturnValue('visible');
+    mockMentorsAdminService.getMentorVisibilityStatus.mockReturnValue(
+      'visible',
+    );
+    mockPrismaService.domain_refs.findMany.mockResolvedValue([]);
   });
 
   it('returns paginated search results sorted by relevance', async () => {
@@ -133,6 +139,10 @@ describe('MentorsSearchService', () => {
         rating_avg: 3.9,
         availability: { is_available: false },
       },
+    ]);
+    mockPrismaService.domain_refs.findMany.mockResolvedValue([
+      { label: 'commerce' },
+      { label: 'informatique' },
     ]);
 
     const facets = await service.getFilterFacets();

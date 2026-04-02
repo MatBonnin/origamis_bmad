@@ -12,7 +12,9 @@ describe('SupportController', () => {
   let controller: SupportController;
 
   beforeEach(() => {
-    controller = new SupportController(mockService as unknown as SupportService);
+    controller = new SupportController(
+      mockService as unknown as SupportService,
+    );
     jest.clearAllMocks();
   });
 

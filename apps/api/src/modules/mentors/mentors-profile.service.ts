@@ -291,9 +291,9 @@ export class MentorsProfileService {
     return reviews
       .map((review) => this.mapDbReview(review))
       .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
   }
 
   private mapDbReview(review: {

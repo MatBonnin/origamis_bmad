@@ -14,9 +14,7 @@ export interface AuditLog {
 export class ModerationService {
   private readonly auditLogs: AuditLog[] = [];
 
-  constructor(
-    private readonly reportsService: ContentReportsService,
-  ) {}
+  constructor(private readonly reportsService: ContentReportsService) {}
 
   async listPending(user: { id: string; roles: string[] }) {
     return await this.reportsService.listPendingReports(user);

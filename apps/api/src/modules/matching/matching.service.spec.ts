@@ -64,6 +64,7 @@ describe('MatchingService', () => {
     mockPrismaService.mentor_profiles.findMany.mockResolvedValue([
       {
         user_id: 'mentor-1',
+        is_validated: true,
         domain: 'informatique',
         expertise_tags: ['networking', 'career-guidance'],
         supported_levels: ['intermediaire'],
@@ -71,9 +72,12 @@ describe('MatchingService', () => {
         rating_avg: 4.8,
         user: { first_name: 'Alice', last_name: 'Martin' },
         availability: { is_available: true },
+        validation_checks: [{ status: 'validated' }],
+        visibility: { status: 'visible' },
       },
       {
         user_id: 'mentor-2',
+        is_validated: true,
         domain: 'commerce',
         expertise_tags: ['negociation'],
         supported_levels: ['debutant'],
@@ -81,6 +85,8 @@ describe('MatchingService', () => {
         rating_avg: 4.1,
         user: { first_name: 'Bob', last_name: 'Durand' },
         availability: { is_available: true },
+        validation_checks: [{ status: 'validated' }],
+        visibility: { status: 'visible' },
       },
     ]);
     mockPrismaService.mentor_interactions.findMany.mockResolvedValue([
@@ -191,6 +197,7 @@ describe('MatchingService', () => {
   it('scores recommendation list fast for live usage baseline', async () => {
     const mentors = Array.from({ length: 600 }).map((_, index) => ({
       user_id: `mentor-${index}`,
+      is_validated: true,
       domain: index % 2 === 0 ? 'informatique' : 'commerce',
       expertise_tags: ['career-guidance', 'networking'],
       supported_levels: ['intermediaire'],
@@ -198,6 +205,8 @@ describe('MatchingService', () => {
       rating_avg: 4,
       user: { first_name: 'Mentor', last_name: String(index) },
       availability: { is_available: true },
+      validation_checks: [{ status: 'validated' }],
+      visibility: { status: 'visible' },
     }));
 
     mockPrismaService.users.findUnique

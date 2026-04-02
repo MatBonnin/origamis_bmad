@@ -268,7 +268,9 @@ describe('UsersController', () => {
 
   describe('rgpd deletion endpoints', () => {
     it('should create deletion request', async () => {
-      mockUsersService.requestDeletion.mockResolvedValue({ status: 'requested' });
+      mockUsersService.requestDeletion.mockResolvedValue({
+        status: 'requested',
+      });
       const result = await controller.requestDeletion(
         mockUser as never,
         'user-1',

@@ -20,26 +20,37 @@ export class PaymentsService {
     private readonly notifications: NotificationsService,
     private readonly config: ConfigService,
   ) {
-    this.stripe = new Stripe(this.config.get<string>('STRIPE_SECRET_KEY') ?? '');
+    this.stripe = new Stripe(
+      this.config.get<string>('STRIPE_SECRET_KEY') ?? '',
+    );
   }
 
   async createCheckoutSession(studentId: string, bookingId: string) {
     const booking = await this.prisma.bookings.findUnique({
       where: { id: bookingId },
-      include: { slot: { include: { availability: { include: { mentor: true } } } } },
+      include: {
+        slot: { include: { availability: { include: { mentor: true } } } },
+      },
     });
 
     if (!booking) {
-      throw new NotFoundException({ code: 'BOOKING_NOT_FOUND', message: 'Rendez-vous introuvable' });
+      throw new NotFoundException({
+        code: 'BOOKING_NOT_FOUND',
+        message: 'Rendez-vous introuvable',
+      });
     }
 
     if (booking.student_id !== studentId) {
-      throw new BadRequestException({ code: 'NOT_YOUR_BOOKING', message: 'Ce rendez-vous ne vous appartient pas' });
+      throw new BadRequestException({
+        code: 'NOT_YOUR_BOOKING',
+        message: 'Ce rendez-vous ne vous appartient pas',
+      });
     }
     if (booking.status !== 'pending') {
       throw new ConflictException({
         code: 'BOOKING_NOT_PENDING',
-        message: 'Le paiement est autorise uniquement pour une reservation en attente',
+        message:
+          'Le paiement est autorise uniquement pour une reservation en attente',
       });
     }
 
@@ -48,7 +59,10 @@ export class PaymentsService {
     });
 
     if (existingPayment?.status === 'succeeded') {
-      throw new BadRequestException({ code: 'ALREADY_PAID', message: 'Ce rendez-vous est deja paye' });
+      throw new BadRequestException({
+        code: 'ALREADY_PAID',
+        message: 'Ce rendez-vous est deja paye',
+      });
     }
 
     const mentor = booking.slot.availability.mentor;
@@ -63,7 +77,8 @@ export class PaymentsService {
     const platformFeeCents = Math.round(amountCents * 0.15);
     const mentorPayoutCents = amountCents - platformFeeCents;
 
-    const frontendUrl = this.config.get<string>('FRONTEND_URL') ?? 'http://localhost:3000';
+    const frontendUrl =
+      this.config.get<string>('FRONTEND_URL') ?? 'http://localhost:3000';
 
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -109,20 +124,28 @@ export class PaymentsService {
   }
 
   async handleWebhook(rawBody: Buffer, signature: string) {
-    const webhookSecret = this.config.get<string>('STRIPE_WEBHOOK_SECRET') ?? '';
+    const webhookSecret =
+      this.config.get<string>('STRIPE_WEBHOOK_SECRET') ?? '';
     let event: Stripe.Event;
 
     try {
-      event = this.stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+      event = this.stripe.webhooks.constructEvent(
+        rawBody,
+        signature,
+        webhookSecret,
+      );
     } catch (err) {
       this.logger.warn(`Webhook signature verification failed: ${String(err)}`);
-      throw new BadRequestException({ code: 'INVALID_WEBHOOK', message: 'Signature invalide' });
+      throw new BadRequestException({
+        code: 'INVALID_WEBHOOK',
+        message: 'Signature invalide',
+      });
     }
 
     console.log('>>> WEBHOOK RECU - event.type:', event.type);
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
+      const session = event.data.object;
       console.log('>>> METADATA:', JSON.stringify(session.metadata));
       const bookingId = session.metadata?.bookingId;
       if (!bookingId) {
@@ -134,9 +157,11 @@ export class PaymentsService {
       const paymentIntentId =
         typeof session.payment_intent === 'string'
           ? session.payment_intent
-          : session.payment_intent?.id ?? null;
+          : (session.payment_intent?.id ?? null);
 
-      this.logger.log(`Webhook: Mise à jour paiement pour booking ${bookingId}`);
+      this.logger.log(
+        `Webhook: Mise à jour paiement pour booking ${bookingId}`,
+      );
       try {
         await this.prisma.payments.update({
           where: { booking_id: bookingId },
@@ -147,7 +172,9 @@ export class PaymentsService {
         });
         this.logger.log(`Webhook: Paiement mis à jour avec succès`);
       } catch (err) {
-        this.logger.error(`Webhook: Erreur mise à jour paiement: ${String(err)}`);
+        this.logger.error(
+          `Webhook: Erreur mise à jour paiement: ${String(err)}`,
+        );
       }
 
       try {
@@ -157,7 +184,9 @@ export class PaymentsService {
         });
         this.logger.log(`Webhook: Réservation ${bookingId} confirmée`);
       } catch (err) {
-        this.logger.error(`Webhook: Erreur mise à jour réservation: ${String(err)}`);
+        this.logger.error(
+          `Webhook: Erreur mise à jour réservation: ${String(err)}`,
+        );
       }
 
       const booking = await this.prisma.bookings.findUnique({
@@ -166,7 +195,11 @@ export class PaymentsService {
 
       if (booking) {
         await this.ensureConversation(booking.student_id, booking.mentor_id);
-        await this.ensureActiveProgram(booking.student_id, booking.mentor_id, booking.booking_date);
+        await this.ensureActiveProgram(
+          booking.student_id,
+          booking.mentor_id,
+          booking.booking_date,
+        );
 
         await this.notifications.emitNotification({
           userId: booking.student_id,
@@ -189,7 +222,7 @@ export class PaymentsService {
     }
 
     if (event.type === 'payment_intent.payment_failed') {
-      const intent = event.data.object as Stripe.PaymentIntent;
+      const intent = event.data.object;
       await this.prisma.payments.updateMany({
         where: { stripe_payment_intent: intent.id },
         data: { status: 'failed' },
@@ -225,16 +258,19 @@ export class PaymentsService {
 
   async createSubscription(userId: string) {
     const priceId = this.config.get<string>('STRIPE_PREMIUM_PRICE_ID') ?? '';
-    const frontendUrl = this.config.get<string>('FRONTEND_URL') ?? 'http://localhost:3000';
+    const frontendUrl =
+      this.config.get<string>('FRONTEND_URL') ?? 'http://localhost:3000';
 
-    let subscription = await this.prisma.subscriptions.findUnique({
+    const subscription = await this.prisma.subscriptions.findUnique({
       where: { user_id: userId },
     });
 
     let customerId = subscription?.stripe_customer_id;
 
     if (!customerId) {
-      const user = await this.prisma.users.findUnique({ where: { id: userId } });
+      const user = await this.prisma.users.findUnique({
+        where: { id: userId },
+      });
       const customer = await this.stripe.customers.create({
         email: user?.email,
         metadata: { userId },
@@ -277,7 +313,10 @@ export class PaymentsService {
     });
 
     if (!subscription?.stripe_subscription_id) {
-      throw new NotFoundException({ code: 'NO_SUBSCRIPTION', message: 'Aucun abonnement actif' });
+      throw new NotFoundException({
+        code: 'NO_SUBSCRIPTION',
+        message: 'Aucun abonnement actif',
+      });
     }
 
     await this.stripe.subscriptions.cancel(subscription.stripe_subscription_id);
@@ -393,7 +432,8 @@ export class PaymentsService {
       },
       {
         title: 'Produire un premier livrable',
-        description: 'Realiser une version initiale puis recueillir un retour mentor.',
+        description:
+          'Realiser une version initiale puis recueillir un retour mentor.',
         dueDaysFromStart: 21,
       },
       {

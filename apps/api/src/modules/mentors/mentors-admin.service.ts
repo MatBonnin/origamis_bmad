@@ -1,7 +1,14 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma';
 
-export type MentorValidationStatus = 'pending_review' | 'validated' | 'rejected';
+export type MentorValidationStatus =
+  | 'pending_review'
+  | 'validated'
+  | 'rejected';
 export type MentorVisibilityStatus =
   | 'visible'
   | 'hidden'
@@ -31,15 +38,17 @@ export class MentorsAdminService {
 
     const pending = mentors.filter((mentor) => {
       const status =
-        mentor.validation_checks[0]?.status ??
+        mentor.validation_checks?.[0]?.status ??
         (mentor.is_validated ? 'validated' : 'pending_review');
       return status === 'pending_review';
     });
 
     return {
       mentors: pending.map((mentor) => {
-        const latest = mentor.validation_checks[0];
-        const status = latest?.status ?? (mentor.is_validated ? 'validated' : 'pending_review');
+        const latest = mentor.validation_checks?.[0];
+        const status =
+          latest?.status ??
+          (mentor.is_validated ? 'validated' : 'pending_review');
         return {
           mentorId: mentor.user_id,
           fullName: `${mentor.user.first_name} ${mentor.user.last_name}`,
@@ -47,7 +56,8 @@ export class MentorsAdminService {
           domain: mentor.domain,
           status,
           notes: latest?.notes ?? '',
-          updatedAt: latest?.updated_at.toISOString() ?? mentor.updated_at.toISOString(),
+          updatedAt:
+            latest?.updated_at.toISOString() ?? mentor.updated_at.toISOString(),
         };
       }),
     };
@@ -100,7 +110,11 @@ export class MentorsAdminService {
   async updateVisibility(
     user: { id: string; roles: string[] },
     mentorId: string,
-    input: { status: MentorVisibilityStatus; effectiveFrom?: string; notes?: string },
+    input: {
+      status: MentorVisibilityStatus;
+      effectiveFrom?: string;
+      notes?: string;
+    },
   ) {
     this.assertAdmin(user.roles);
     await this.assertMentorExists(mentorId);
@@ -183,7 +197,9 @@ export class MentorsAdminService {
     };
   }
 
-  async getMentorVisibilityStatus(mentorId: string): Promise<MentorVisibilityStatus> {
+  async getMentorVisibilityStatus(
+    mentorId: string,
+  ): Promise<MentorVisibilityStatus> {
     const row = await this.prisma.mentor_visibility.findUnique({
       where: { mentor_id: mentorId },
       select: { status: true },
@@ -191,7 +207,9 @@ export class MentorsAdminService {
     return row?.status ?? 'visible';
   }
 
-  async getMentorValidationStatus(mentorId: string): Promise<MentorValidationStatus> {
+  async getMentorValidationStatus(
+    mentorId: string,
+  ): Promise<MentorValidationStatus> {
     const row = await this.prisma.mentor_validation_checks.findFirst({
       where: { mentor_id: mentorId },
       orderBy: { created_at: 'desc' },

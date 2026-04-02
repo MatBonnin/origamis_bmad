@@ -11,7 +11,9 @@ describe('AnalyticsController', () => {
   let controller: AnalyticsController;
 
   beforeEach(() => {
-    controller = new AnalyticsController(mockService as unknown as AnalyticsService);
+    controller = new AnalyticsController(
+      mockService as unknown as AnalyticsService,
+    );
     jest.clearAllMocks();
   });
 

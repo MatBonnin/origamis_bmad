@@ -160,7 +160,10 @@ export class MentorsEpic8Service {
 
   async connectGoogleCalendar(userId: string, authCode?: string) {
     await this.assertMentorProfile(userId);
-    const token = Buffer.from(`${authCode ?? 'manual'}:${userId}`, 'utf-8').toString('base64');
+    const token = Buffer.from(
+      `${authCode ?? 'manual'}:${userId}`,
+      'utf-8',
+    ).toString('base64');
 
     const connection = await this.prisma.mentor_calendar_connections.upsert({
       where: {
@@ -226,7 +229,11 @@ export class MentorsEpic8Service {
   async syncGoogleCalendar(
     userId: string,
     input: {
-      busySlots?: Array<{ startAt: string; endAt: string; providerEventId?: string }>;
+      busySlots?: Array<{
+        startAt: string;
+        endAt: string;
+        providerEventId?: string;
+      }>;
     },
   ) {
     const existing = await this.prisma.mentor_calendar_connections.findUnique({
@@ -255,7 +262,11 @@ export class MentorsEpic8Service {
       const slot = busySlots[index];
       const startAt = new Date(slot.startAt);
       const endAt = new Date(slot.endAt);
-      if (Number.isNaN(startAt.getTime()) || Number.isNaN(endAt.getTime()) || startAt >= endAt) {
+      if (
+        Number.isNaN(startAt.getTime()) ||
+        Number.isNaN(endAt.getTime()) ||
+        startAt >= endAt
+      ) {
         throw new BadRequestException({
           code: 'INVALID_BUSY_SLOT',
           message: 'Slot occupe invalide',
@@ -287,7 +298,11 @@ export class MentorsEpic8Service {
     };
   }
 
-  async createMentorRequest(studentId: string, mentorId: string, message?: string) {
+  async createMentorRequest(
+    studentId: string,
+    mentorId: string,
+    message?: string,
+  ) {
     await this.assertMentorProfile(mentorId);
     if (studentId === mentorId) {
       throw new BadRequestException({
@@ -346,7 +361,8 @@ export class MentorsEpic8Service {
         status: row.status,
         message: row.message,
         decisionReason: row.decision_reason,
-        studentName: `${row.student.first_name} ${row.student.last_name}`.trim(),
+        studentName:
+          `${row.student.first_name} ${row.student.last_name}`.trim(),
         createdAt: row.created_at.toISOString(),
         updatedAt: row.updated_at.toISOString(),
       })),
@@ -480,7 +496,8 @@ export class MentorsEpic8Service {
     for (const request of acceptedRequests) {
       students.set(request.student.id, {
         studentId: request.student.id,
-        fullName: `${request.student.first_name} ${request.student.last_name}`.trim(),
+        fullName:
+          `${request.student.first_name} ${request.student.last_name}`.trim(),
         avatarUrl: request.student.avatar_url ?? null,
         relationSource: 'request',
       });
@@ -493,7 +510,8 @@ export class MentorsEpic8Service {
 
       students.set(booking.student.id, {
         studentId: booking.student.id,
-        fullName: `${booking.student.first_name} ${booking.student.last_name}`.trim(),
+        fullName:
+          `${booking.student.first_name} ${booking.student.last_name}`.trim(),
         avatarUrl: booking.student.avatar_url ?? null,
         relationSource: 'booking',
       });
@@ -543,7 +561,11 @@ export class MentorsEpic8Service {
         input.status === 'accepted'
           ? 'Votre demande a ete acceptee'
           : `Votre demande a ete refusee${input.reason ? `: ${input.reason}` : ''}`,
-      payload: { requestId: updated.id, status: updated.status, reason: updated.decision_reason },
+      payload: {
+        requestId: updated.id,
+        status: updated.status,
+        reason: updated.decision_reason,
+      },
     });
 
     return {
@@ -561,14 +583,28 @@ export class MentorsEpic8Service {
     input: {
       title: string;
       description?: string;
-      milestones: Array<{ title: string; description?: string; dueDaysFromStart: number }>;
+      milestones: Array<{
+        title: string;
+        description?: string;
+        dueDaysFromStart: number;
+      }>;
     },
   ) {
     if (!input.title.trim()) {
-      throw new BadRequestException({ code: 'TEMPLATE_TITLE_REQUIRED', message: 'Le titre est requis' });
+      throw new BadRequestException({
+        code: 'TEMPLATE_TITLE_REQUIRED',
+        message: 'Le titre est requis',
+      });
     }
-    if (!Array.isArray(input.milestones) || input.milestones.length === 0 || input.milestones.length > 20) {
-      throw new BadRequestException({ code: 'INVALID_TEMPLATE_MILESTONES', message: 'Le template doit contenir entre 1 et 20 jalons' });
+    if (
+      !Array.isArray(input.milestones) ||
+      input.milestones.length === 0 ||
+      input.milestones.length > 20
+    ) {
+      throw new BadRequestException({
+        code: 'INVALID_TEMPLATE_MILESTONES',
+        message: 'Le template doit contenir entre 1 et 20 jalons',
+      });
     }
 
     const template = await this.prisma.program_templates.create({
@@ -582,7 +618,10 @@ export class MentorsEpic8Service {
     for (let index = 0; index < input.milestones.length; index += 1) {
       const milestone = input.milestones[index];
       if (!milestone.title.trim()) {
-        throw new BadRequestException({ code: 'MILESTONE_TITLE_REQUIRED', message: 'Chaque jalon doit avoir un titre' });
+        throw new BadRequestException({
+          code: 'MILESTONE_TITLE_REQUIRED',
+          message: 'Chaque jalon doit avoir un titre',
+        });
       }
       await this.prisma.program_template_milestones.create({
         data: {
@@ -629,7 +668,11 @@ export class MentorsEpic8Service {
     input: {
       title?: string;
       description?: string;
-      milestones?: Array<{ title: string; description?: string; dueDaysFromStart: number }>;
+      milestones?: Array<{
+        title: string;
+        description?: string;
+        dueDaysFromStart: number;
+      }>;
     },
   ) {
     const template = await this.prisma.program_templates.findUnique({
@@ -638,25 +681,39 @@ export class MentorsEpic8Service {
     });
 
     if (!template) {
-      throw new NotFoundException({ code: 'PROGRAM_TEMPLATE_NOT_FOUND', message: 'Template introuvable' });
+      throw new NotFoundException({
+        code: 'PROGRAM_TEMPLATE_NOT_FOUND',
+        message: 'Template introuvable',
+      });
     }
     if (template.mentor_id !== mentorId) {
-      throw new ForbiddenException({ code: 'PROGRAM_TEMPLATE_FORBIDDEN', message: 'Acces refuse au template' });
+      throw new ForbiddenException({
+        code: 'PROGRAM_TEMPLATE_FORBIDDEN',
+        message: 'Acces refuse au template',
+      });
     }
 
     await this.prisma.program_templates.update({
       where: { id: templateId },
       data: {
         title: input.title?.trim() || undefined,
-        description: input.description !== undefined ? input.description.trim() || null : undefined,
+        description:
+          input.description !== undefined
+            ? input.description.trim() || null
+            : undefined,
       },
     });
 
     if (input.milestones) {
       if (input.milestones.length === 0 || input.milestones.length > 20) {
-        throw new BadRequestException({ code: 'INVALID_TEMPLATE_MILESTONES', message: 'Le template doit contenir entre 1 et 20 jalons' });
+        throw new BadRequestException({
+          code: 'INVALID_TEMPLATE_MILESTONES',
+          message: 'Le template doit contenir entre 1 et 20 jalons',
+        });
       }
-      await this.prisma.program_template_milestones.deleteMany({ where: { template_id: templateId } });
+      await this.prisma.program_template_milestones.deleteMany({
+        where: { template_id: templateId },
+      });
       for (let index = 0; index < input.milestones.length; index += 1) {
         const milestone = input.milestones[index];
         await this.prisma.program_template_milestones.create({
@@ -695,7 +752,10 @@ export class MentorsEpic8Service {
 
     const startAt = input.startAt ? new Date(input.startAt) : new Date();
     if (Number.isNaN(startAt.getTime())) {
-      throw new BadRequestException({ code: 'INVALID_START_AT', message: 'Date de debut invalide' });
+      throw new BadRequestException({
+        code: 'INVALID_START_AT',
+        message: 'Date de debut invalide',
+      });
     }
 
     const program = await this.prisma.student_programs.create({
@@ -751,7 +811,8 @@ export class MentorsEpic8Service {
         templateId: program.template_id,
         mentorId: program.mentor_id,
         studentId: program.student_id,
-        studentName: `${program.student.first_name} ${program.student.last_name}`.trim(),
+        studentName:
+          `${program.student.first_name} ${program.student.last_name}`.trim(),
         title: program.title,
         status: program.status,
         startAt: program.start_at.toISOString(),
@@ -770,7 +831,10 @@ export class MentorsEpic8Service {
   async updateProgramMilestone(
     mentorId: string,
     milestoneId: string,
-    input: { status?: 'planned' | 'in_progress' | 'review' | 'done' | 'blocked'; deadlineAt?: string },
+    input: {
+      status?: 'planned' | 'in_progress' | 'review' | 'done' | 'blocked';
+      deadlineAt?: string;
+    },
   ) {
     const row = await this.prisma.student_program_milestones.findUnique({
       where: { id: milestoneId },
@@ -778,16 +842,27 @@ export class MentorsEpic8Service {
     });
 
     if (!row) {
-      throw new NotFoundException({ code: 'PROGRAM_MILESTONE_NOT_FOUND', message: 'Jalon introuvable' });
+      throw new NotFoundException({
+        code: 'PROGRAM_MILESTONE_NOT_FOUND',
+        message: 'Jalon introuvable',
+      });
     }
 
     if (row.program.mentor_id !== mentorId) {
-      throw new ForbiddenException({ code: 'PROGRAM_MILESTONE_FORBIDDEN', message: 'Acces refuse au jalon' });
+      throw new ForbiddenException({
+        code: 'PROGRAM_MILESTONE_FORBIDDEN',
+        message: 'Acces refuse au jalon',
+      });
     }
 
-    const deadlineAt = input.deadlineAt ? new Date(input.deadlineAt) : undefined;
+    const deadlineAt = input.deadlineAt
+      ? new Date(input.deadlineAt)
+      : undefined;
     if (deadlineAt && Number.isNaN(deadlineAt.getTime())) {
-      throw new BadRequestException({ code: 'INVALID_DEADLINE', message: 'Deadline invalide' });
+      throw new BadRequestException({
+        code: 'INVALID_DEADLINE',
+        message: 'Deadline invalide',
+      });
     }
 
     const updated = await this.prisma.student_program_milestones.update({
@@ -811,7 +886,11 @@ export class MentorsEpic8Service {
   async uploadProgramDocument(
     actorId: string,
     programId: string,
-    input: { url: string; type?: 'memory' | 'brief' | 'annex' | 'other'; fileName?: string },
+    input: {
+      url: string;
+      type?: 'memory' | 'brief' | 'annex' | 'other';
+      fileName?: string;
+    },
   ) {
     this.assertHttpsUrl(input.url, 'url');
 
@@ -858,18 +937,28 @@ export class MentorsEpic8Service {
     };
   }
 
-  async deleteProgramDocument(actorId: string, programId: string, documentId: string) {
+  async deleteProgramDocument(
+    actorId: string,
+    programId: string,
+    documentId: string,
+  ) {
     const program = await this.assertProgramAccess(actorId, programId);
     const row = await this.prisma.program_documents.findUnique({
       where: { id: documentId },
     });
 
     if (!row || row.program_id !== program.id || row.deleted_at) {
-      throw new NotFoundException({ code: 'PROGRAM_DOCUMENT_NOT_FOUND', message: 'Document introuvable' });
+      throw new NotFoundException({
+        code: 'PROGRAM_DOCUMENT_NOT_FOUND',
+        message: 'Document introuvable',
+      });
     }
 
     if (row.uploaded_by !== actorId && actorId !== program.mentor_id) {
-      throw new ForbiddenException({ code: 'PROGRAM_DOCUMENT_FORBIDDEN', message: 'Suppression non autorisee' });
+      throw new ForbiddenException({
+        code: 'PROGRAM_DOCUMENT_FORBIDDEN',
+        message: 'Suppression non autorisee',
+      });
     }
 
     await this.prisma.program_documents.update({
@@ -894,7 +983,10 @@ export class MentorsEpic8Service {
     return mentor;
   }
 
-  private async assertMentorStudentRelation(mentorId: string, studentId: string) {
+  private async assertMentorStudentRelation(
+    mentorId: string,
+    studentId: string,
+  ) {
     const [bookingRelation, requestRelation] = await Promise.all([
       this.prisma.bookings.findFirst({
         where: { mentor_id: mentorId, student_id: studentId },
@@ -966,7 +1058,10 @@ export class MentorsEpic8Service {
     });
 
     if (!template || template.mentor_id !== mentorId) {
-      throw new NotFoundException({ code: 'PROGRAM_TEMPLATE_NOT_FOUND', message: 'Template introuvable' });
+      throw new NotFoundException({
+        code: 'PROGRAM_TEMPLATE_NOT_FOUND',
+        message: 'Template introuvable',
+      });
     }
 
     return {
@@ -992,7 +1087,10 @@ export class MentorsEpic8Service {
     });
 
     if (!program || program.mentor_id !== mentorId) {
-      throw new NotFoundException({ code: 'PROGRAM_NOT_FOUND', message: 'Parcours introuvable' });
+      throw new NotFoundException({
+        code: 'PROGRAM_NOT_FOUND',
+        message: 'Parcours introuvable',
+      });
     }
 
     return {

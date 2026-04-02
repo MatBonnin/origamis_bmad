@@ -32,7 +32,11 @@ export class MentorsWorkflowController {
     body: {
       title: string;
       description?: string;
-      milestones: Array<{ title: string; description?: string; dueDaysFromStart: number }>;
+      milestones: Array<{
+        title: string;
+        description?: string;
+        dueDaysFromStart: number;
+      }>;
     },
   ) {
     const data = await this.epic8.createProgramTemplate(user.id, body);
@@ -59,10 +63,18 @@ export class MentorsWorkflowController {
     body: {
       title?: string;
       description?: string;
-      milestones?: Array<{ title: string; description?: string; dueDaysFromStart: number }>;
+      milestones?: Array<{
+        title: string;
+        description?: string;
+        dueDaysFromStart: number;
+      }>;
     },
   ) {
-    const data = await this.epic8.updateProgramTemplate(user.id, templateId, body);
+    const data = await this.epic8.updateProgramTemplate(
+      user.id,
+      templateId,
+      body,
+    );
     return { data, error: null };
   }
 
@@ -75,7 +87,11 @@ export class MentorsWorkflowController {
     @Param('id') studentId: string,
     @Body() body: { templateId: string; title?: string; startAt?: string },
   ) {
-    const data = await this.epic8.assignProgramToStudent(user.id, studentId, body);
+    const data = await this.epic8.assignProgramToStudent(
+      user.id,
+      studentId,
+      body,
+    );
     return { data, error: null };
   }
 
@@ -113,7 +129,11 @@ export class MentorsWorkflowController {
       deadlineAt?: string;
     },
   ) {
-    const data = await this.epic8.updateProgramMilestone(user.id, milestoneId, body);
+    const data = await this.epic8.updateProgramMilestone(
+      user.id,
+      milestoneId,
+      body,
+    );
     return { data, error: null };
   }
 
@@ -122,9 +142,18 @@ export class MentorsWorkflowController {
   async uploadProgramDocument(
     @CurrentUser() user: { id: string },
     @Param('id') programId: string,
-    @Body() body: { url: string; type?: 'memory' | 'brief' | 'annex' | 'other'; fileName?: string },
+    @Body()
+    body: {
+      url: string;
+      type?: 'memory' | 'brief' | 'annex' | 'other';
+      fileName?: string;
+    },
   ) {
-    const data = await this.epic8.uploadProgramDocument(user.id, programId, body);
+    const data = await this.epic8.uploadProgramDocument(
+      user.id,
+      programId,
+      body,
+    );
     return { data, error: null };
   }
 
@@ -145,18 +174,28 @@ export class MentorsWorkflowController {
     @Param('id') programId: string,
     @Param('docId') docId: string,
   ) {
-    const data = await this.epic8.deleteProgramDocument(user.id, programId, docId);
+    const data = await this.epic8.deleteProgramDocument(
+      user.id,
+      programId,
+      docId,
+    );
     return { data, error: null };
   }
 
   @Post('mentors/:id/requests')
-  @ApiOperation({ summary: 'Creer une demande d accompagnement vers un mentor' })
+  @ApiOperation({
+    summary: 'Creer une demande d accompagnement vers un mentor',
+  })
   async createMentorRequest(
     @CurrentUser() user: { id: string },
     @Param('id') mentorId: string,
     @Body() body: { message?: string },
   ) {
-    const data = await this.epic8.createMentorRequest(user.id, mentorId, body.message);
+    const data = await this.epic8.createMentorRequest(
+      user.id,
+      mentorId,
+      body.message,
+    );
     return { data, error: null };
   }
 
@@ -170,7 +209,9 @@ export class MentorsWorkflowController {
   }
 
   @Get('students/me/mentor')
-  @ApiOperation({ summary: "Recuperer le mentor actuel de l'etudiant connecte" })
+  @ApiOperation({
+    summary: "Recuperer le mentor actuel de l'etudiant connecte",
+  })
   async getMyMentor(@CurrentUser() user: { id: string }) {
     const data = await this.epic8.getMyMentor(user.id);
     return { data, error: null };

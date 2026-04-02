@@ -9,7 +9,12 @@ import { PrismaService } from '../prisma';
 
 type Role = 'etudiant' | 'mentor' | 'admin' | 'support';
 type MilestoneType = 'message' | 'rdv' | 'visio';
-type MilestoneStatus = 'planned' | 'in_progress' | 'review' | 'done' | 'blocked';
+type MilestoneStatus =
+  | 'planned'
+  | 'in_progress'
+  | 'review'
+  | 'done'
+  | 'blocked';
 
 interface CurrentUser {
   id: string;
@@ -67,7 +72,8 @@ export class MilestonesService {
       currentUser,
       query.userId,
     );
-    const milestones = await this.buildProgramMilestonesForStudent(targetUserId);
+    const milestones =
+      await this.buildProgramMilestonesForStudent(targetUserId);
 
     const filtered = query.type
       ? milestones.filter((item) => item.type === query.type)
@@ -193,7 +199,10 @@ export class MilestonesService {
         category: 'rdv',
         title: 'Jalon en attente de validation',
         message: "Un etudiant a demande la validation d'un jalon.",
-        payload: { milestoneId: updated.id, studentId: updated.program.student_id },
+        payload: {
+          milestoneId: updated.id,
+          studentId: updated.program.student_id,
+        },
       });
     }
 

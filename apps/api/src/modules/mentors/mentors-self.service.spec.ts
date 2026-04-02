@@ -56,27 +56,27 @@ describe('MentorsSelfService', () => {
       user_roles: [{ role: { name: 'mentor' } }],
     });
     const persistedProfile = {
-        user_id: 'mentor-1',
-        domain: 'informatique',
-        banner_url: 'https://cdn.origami.app/banner.png',
-        about: 'Mentor fullstack',
-        professional_links: ['https://www.linkedin.com/in/alice-martin'],
-        expertise_tags: ['react'],
-        supported_levels: ['intermediaire'],
-        hourly_rate: 30,
-        is_validated: true,
-        updated_at: new Date('2026-02-16T10:00:00.000Z'),
-        user: {
-          first_name: 'Alice',
-          last_name: 'Martin',
-          bio: 'Mentor fullstack',
-        },
-        availability: {
-          is_available: true,
-          next_available_at: new Date('2026-02-17T10:00:00.000Z'),
-          slots: [{ day_of_week: 1, start_time: '09:00', end_time: '12:00' }],
-        },
-      };
+      user_id: 'mentor-1',
+      domain: 'informatique',
+      banner_url: 'https://cdn.origami.app/banner.png',
+      about: 'Mentor fullstack',
+      professional_links: ['https://www.linkedin.com/in/alice-martin'],
+      expertise_tags: ['react'],
+      supported_levels: ['intermediaire'],
+      hourly_rate: 30,
+      is_validated: true,
+      updated_at: new Date('2026-02-16T10:00:00.000Z'),
+      user: {
+        first_name: 'Alice',
+        last_name: 'Martin',
+        bio: 'Mentor fullstack',
+      },
+      availability: {
+        is_available: true,
+        next_available_at: new Date('2026-02-17T10:00:00.000Z'),
+        slots: [{ day_of_week: 1, start_time: '09:00', end_time: '12:00' }],
+      },
+    };
     mockPrismaService.mentor_profiles.findUnique
       .mockResolvedValueOnce(null)
       .mockResolvedValue(persistedProfile);

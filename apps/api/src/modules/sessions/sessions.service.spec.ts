@@ -76,7 +76,9 @@ describe('SessionsService', () => {
     ensureRoom: jest.fn(),
     endRoom: jest.fn(),
     listParticipantIdentities: jest.fn(),
-    buildTranscriptObjectKey: jest.fn(() => 'transcripts/booking-1/session.mp3'),
+    buildTranscriptObjectKey: jest.fn(
+      () => 'transcripts/booking-1/session.mp3',
+    ),
     startAudioRecording: jest.fn().mockResolvedValue({ egressId: 'egress-1' }),
   };
 
@@ -111,7 +113,9 @@ describe('SessionsService', () => {
     const result = await service.getHistory('user-1', { category: 'rdv' });
 
     expect(result.sessions).toEqual([]);
-    expect('rgpdRestricted' in result.metadata && result.metadata.rgpdRestricted).toBe(true);
+    expect(
+      'rgpdRestricted' in result.metadata && result.metadata.rgpdRestricted,
+    ).toBe(true);
   });
 
   it('supports rdv filter and cursor pagination', async () => {
@@ -510,9 +514,14 @@ describe('SessionsService', () => {
       updated_at: new Date('2026-03-12T10:01:00.000Z'),
     });
 
-    const result = await service.getSessionRoomByToken('user-1', 'session-token-1');
+    const result = await service.getSessionRoomByToken(
+      'user-1',
+      'session-token-1',
+    );
 
-    expect(mockProvider.listParticipantIdentities).toHaveBeenCalledWith('call-room-1');
+    expect(mockProvider.listParticipantIdentities).toHaveBeenCalledWith(
+      'call-room-1',
+    );
     expect(result.activeCall?.participantIds).toEqual(['user-1']);
     expect(result.activeCall?.callStatus).toBe('waiting');
   });

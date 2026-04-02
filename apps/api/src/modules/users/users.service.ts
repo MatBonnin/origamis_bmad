@@ -418,7 +418,10 @@ export class UsersService {
     await this.assertUserExists(targetUserId);
 
     const request = this.deletionRequests.get(targetUserId);
-    if (!request || (request.status !== 'approved' && request.status !== 'deleted')) {
+    if (
+      !request ||
+      (request.status !== 'approved' && request.status !== 'deleted')
+    ) {
       throw new ForbiddenException({
         code: 'RGPD_NOT_APPROVED',
         message: 'La suppression finale requiert une approbation prealable',

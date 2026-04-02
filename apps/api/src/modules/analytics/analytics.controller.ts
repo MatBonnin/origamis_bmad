@@ -1,4 +1,12 @@
-﻿import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+﻿import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { JwtAuthGuard, RolesGuard } from '../../common/guards';
@@ -24,7 +32,11 @@ export class AnalyticsController {
   @Post('reports')
   @ApiOperation({ summary: 'Generer un rapport analytics' })
   async createReport(
-    @Body() body: { type: 'matching' | 'usage' | 'incidents'; format?: 'csv' | 'pdf' },
+    @Body()
+    body: {
+      type: 'matching' | 'usage' | 'incidents';
+      format?: 'csv' | 'pdf';
+    },
   ) {
     const data = await this.analyticsService.createReport(body);
     return { data, error: null };

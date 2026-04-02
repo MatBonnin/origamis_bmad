@@ -6,7 +6,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { randomUUID } from 'crypto';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
@@ -35,7 +40,9 @@ export class UploadController {
   @Post('image')
   @ApiOperation({ summary: 'Upload une image (avatar, banniere)' })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', { storage: createStorage('images') }))
+  @UseInterceptors(
+    FileInterceptor('file', { storage: createStorage('images') }),
+  )
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ApiEnvelope<UploadResult>> {
@@ -52,7 +59,9 @@ export class UploadController {
   @Post('document')
   @ApiOperation({ summary: 'Upload un document (diplome, certificat)' })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', { storage: createStorage('documents') }))
+  @UseInterceptors(
+    FileInterceptor('file', { storage: createStorage('documents') }),
+  )
   async uploadDocument(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ApiEnvelope<UploadResult>> {
